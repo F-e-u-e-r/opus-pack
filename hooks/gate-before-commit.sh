@@ -1,23 +1,36 @@
 #!/usr/bin/env bash
 # Claude Code PreToolUse hook (matcher: Bash).
 # Blocks `git commit` while the TARGET repo's ground-truth gates are red.
-# Uses jq when available to parse the tool call JSON from stdin.
-# Exit 0 = allow the tool call. Exit 2 = block it (stderr is fed back to the model).
-# BLOCK/anomaly events append to ~/.claude/hooks/hooks.log for human audit.
+# Uses jq when available to parse the tool call JSON from stdin, and python3
+# to safely tokenize the shell command (quotes, heredocs, operators) so commit
+# detection and target-repo resolution work on command STRUCTURE, not raw
+# text. Exit 0 = allow the tool call. Exit 2 = block it (stderr fed back to
+# the model). BLOCK/anomaly events append to ~/.claude/hooks/hooks.log.
 #
-# Two design points (both learned from real misfires):
+# Design points (each fixes a real misfire found in production use, plus a
+# second round found by an adversarial review — see hooks.log history):
 # 1. The gates that run are the ones in the repo the commit TARGETS — resolved
-#    from `git -C <dir>` or a preceding `cd <dir>` in the command — not the
-#    session's $CLAUDE_PROJECT_DIR. A session open in project A must not gate a
-#    commit to repo B with A's checks. $CLAUDE_PROJECT_DIR remains the fallback
-#    for a bare `git commit` with no directory hints.
-# 2. Commit DETECTION strips quoted strings and heredoc bodies first, so a
-#    commit MESSAGE, a printf writing a script, or documentation prose that
-#    merely mentions "git commit" cannot trip the gate. What remains is matched
-#    as command structure: the word `git`, then `commit` before any command
-#    separator. False positives that survive this merely run the gates (safe
-#    direction); false negatives (e.g. a commit hidden inside `bash script.sh`)
-#    are inherent to text-level hooks and out of scope.
+#    from the LAST `git -C <dir>` on a git invocation, else the most recent
+#    preceding `cd <dir>` — not the session's $CLAUDE_PROJECT_DIR (which is
+#    only the fallback for a bare commit with no directory hints). A `-C` on
+#    some OTHER command (`make -C`, `tar -C`) must not be mistaken for git's.
+# 2. Commit DETECTION and directory extraction run on a real shell tokenizer
+#    (Python's shlex, no code execution — command substitutions and variables
+#    are left as inert literal text), not sed/grep substring matching. This is
+#    what makes quoted commit messages, printf/heredoc payloads, apostrophes,
+#    escaped quotes, and single- vs double-quoted directory args all behave
+#    correctly instead of relying on hand-rolled quote-stripping regexes that
+#    can mis-pair on apostrophes or drop everything after a heredoc marker.
+# 3. Gates run with cwd set to the target repo root, so a checks/run-all.sh
+#    that uses relative paths evaluates against the right repo.
+# 4. `git log --grep commit` / `git help commit` are not commits — only the
+#    token immediately after git's global options (skipping recognized
+#    value-taking flags) counts as the subcommand.
+# A command Python can't tokenize (unbalanced quoting) is treated as "can't
+# tell" and fails toward blocking a likely commit, same posture as jq/python3
+# being absent. False positives that survive all this just run the gates
+# (safe direction); a commit hidden inside `bash script.sh` bypasses the hook
+# entirely — inherent to any text/structure-level hook, out of scope.
 set -u
 
 log() {
@@ -28,6 +41,7 @@ log() {
 }
 
 fallback_dir="${CLAUDE_PROJECT_DIR:-.}"
+fallback_has_gates() { [ -f "$fallback_dir/checks/run-all.sh" ]; }
 
 input=$(cat)
 
@@ -38,68 +52,53 @@ raw_looks_like_commit() {
   esac
 }
 
-# Fail-closed paths: without a parsable command we can't resolve a target repo,
-# so these fall back to gating on the session project dir, as before.
-if command -v jq >/dev/null 2>&1; then
-  if ! cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null); then
-    if [ -f "$fallback_dir/checks/run-all.sh" ] && raw_looks_like_commit; then
-      log 'BLOCK jq parse failed on a likely git commit'
-      echo 'gate-before-commit hook: could not parse hook JSON for a likely git commit — blocking until fixed' >&2
-      exit 2
-    fi
-    exit 0
-  fi
-else
-  if [ -f "$fallback_dir/checks/run-all.sh" ] && raw_looks_like_commit; then
-    log 'BLOCK jq missing on a likely git commit'
-    echo 'gate-before-commit hook: jq is not installed — blocking likely git commit until jq is installed or the hook is removed' >&2
+# Fail-closed paths: without a parsable command we can't resolve a target repo
+# or check its structure, so these fall back to a raw text guess against the
+# session project dir — the same degraded posture on every "can't tell" exit.
+block_fallback_guess() {
+  if fallback_has_gates && raw_looks_like_commit; then
+    log "BLOCK $1"
+    echo "gate-before-commit hook: $2 — blocking a likely git commit until fixed" >&2
     exit 2
   fi
   exit 0
-fi
-
-# --- Commit detection on command structure, not raw text ------------------
-# Strip single- and double-quoted segments (commit messages, printf payloads),
-# then drop everything from the first heredoc marker on (its body is data).
-stripped=$(printf '%s' "$cmd" | sed -e "s/'[^']*'//g" -e 's/"[^"]*"//g')
-case "$stripped" in
-  *'<<'*) stripped=${stripped%%<<*} ;;
-esac
-# The word `git`, then `commit` with no command separator (; & |) between them.
-printf '%s' "$stripped" |
-  grep -Eq '(^|[^[:alnum:]_./-])git[[:space:]]([^;&|]*[^[:alnum:]_./-])?commit([^[:alnum:]_-]|$)' ||
-  exit 0
-
-# --- Resolve the repo the commit targets -----------------------------------
-# Last `git -C <dir>` wins, else the last `cd <dir>`, else the session dir.
-# Unquoted args are extracted from the STRIPPED text (so a commit message
-# mentioning "git -C <dir>" can't poison this); quoted args must come from the
-# raw command (stripping removed them), so each candidate is validated with -d
-# before being trusted — a non-directory candidate falls through, not back.
-try_dir() { # expand ~ and accept only an existing directory
-  c=$1
-  c=${c%\"}; c=${c#\"}
-  case "$c" in "~") c="$HOME" ;; "~/"*) c="$HOME/${c#\~/}" ;; esac
-  [ -n "$c" ] && [ -d "$c" ] && printf '%s' "$c"
 }
-last_match() { printf '%s' "$1" | grep -oE -- "$2" | tail -n 1 | sed -E "s/$3//"; }
-dir=""
-for cand in \
-  "$(last_match "$stripped" '-C[[:space:]]+[^[:space:];&|]+'                    '^-C[[:space:]]+')" \
-  "$(last_match "$cmd"      '-C[[:space:]]+"[^"]+"'                             '^-C[[:space:]]+')" \
-  "$(last_match "$stripped" '(^|[;&|][[:space:]]*)cd[[:space:]]+[^[:space:];&|]+' '^.*cd[[:space:]]+')" \
-  "$(last_match "$cmd"      '(^|[;&|][[:space:]]*)cd[[:space:]]+"[^"]+"'          '^.*cd[[:space:]]+')"
-do
-  dir=$(try_dir "$cand") && [ -n "$dir" ] && break
-done
-[ -n "${dir:-}" ] || dir="$fallback_dir"
+
+command -v jq >/dev/null 2>&1 ||
+  block_fallback_guess 'jq missing on a likely git commit' \
+    'jq is not installed'
+cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null) ||
+  block_fallback_guess 'jq parse failed on a likely git commit' \
+    'could not parse hook JSON'
+
+command -v python3 >/dev/null 2>&1 ||
+  block_fallback_guess 'python3 missing on a likely git commit' \
+    'python3 is not installed — cannot safely parse the command'
+
+hook_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+parsed=$(python3 "$hook_dir/parse-commit-command.py" "$cmd" 2>/dev/null) ||
+  block_fallback_guess 'parser crashed on a likely git commit' \
+    'the command parser failed'
+
+verdict=$(printf '%s\n' "$parsed" | sed -n '1p')
+dir=$(printf '%s\n' "$parsed" | sed -n '2p')
+
+[ "$verdict" = "UNPARSEABLE" ] &&
+  block_fallback_guess 'unparseable command on a likely git commit' \
+    'could not safely parse this command (e.g. unbalanced quoting)'
+
+[ "$verdict" = "COMMIT" ] || exit 0
+
+[ -n "$dir" ] || dir="$fallback_dir"
+case "$dir" in "~") dir="$HOME" ;; "~/"*) dir="$HOME/${dir#\~/}" ;; esac
+[ -d "$dir" ] || dir="$fallback_dir"
 
 # The gate lives at the target repo's root; fall back to the dir itself.
 repo=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || repo="$dir"
 gates="$repo/checks/run-all.sh"
 [ -f "$gates" ] || exit 0 # target repo has no gates — nothing to enforce
 
-if out=$(bash "$gates" 2>&1); then
+if out=$(cd "$repo" && bash "$gates" 2>&1); then
   exit 0
 fi
 log "BLOCK gates red on git commit (repo: $repo)"
