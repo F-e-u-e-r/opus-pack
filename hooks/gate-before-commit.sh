@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code PreToolUse hook (matcher: Bash).
-# Blocks `git commit` while the TARGET repo's ground-truth gates are red.
+# Blocks `git commit` while any TARGET repo's ground-truth gates are red.
 # Uses jq when available to parse the tool call JSON from stdin, and python3
 # to safely tokenize the shell command (quotes, heredocs, operators) so commit
 # detection and target-repo resolution work on command STRUCTURE, not raw
@@ -9,11 +9,12 @@
 #
 # Design points (each fixes a real misfire found in production use, plus a
 # second round found by an adversarial review — see hooks.log history):
-# 1. The gates that run are the ones in the repo the commit TARGETS — resolved
-#    from the LAST `git -C <dir>` on a git invocation, else the most recent
-#    preceding `cd <dir>` — not the session's $CLAUDE_PROJECT_DIR (which is
-#    only the fallback for a bare commit with no directory hints). A `-C` on
-#    some OTHER command (`make -C`, `tar -C`) must not be mistaken for git's.
+# 1. The gates that run are the ones in every repo a commit TARGETS — each
+#    target is resolved from `git -C <dir>` on that git invocation, else the
+#    most recent preceding `cd <dir>` — not the session's $CLAUDE_PROJECT_DIR
+#    (which is only the fallback for a bare commit with no directory hints). A
+#    `-C` on some OTHER command (`make -C`, `tar -C`) must not be mistaken for
+#    git's.
 # 2. Commit DETECTION and directory extraction run on a real shell tokenizer
 #    (Python's shlex, no code execution — command substitutions and variables
 #    are left as inert literal text), not sed/grep substring matching. This is
@@ -81,7 +82,7 @@ parsed=$(python3 "$hook_dir/parse-commit-command.py" "$cmd" 2>/dev/null) ||
     'the command parser failed'
 
 verdict=$(printf '%s\n' "$parsed" | sed -n '1p')
-dir=$(printf '%s\n' "$parsed" | sed -n '2p')
+target_lines=$(printf '%s\n' "$parsed" | sed -n '2,$p')
 
 [ "$verdict" = "UNPARSEABLE" ] &&
   block_fallback_guess 'unparseable command on a likely git commit' \
@@ -89,21 +90,34 @@ dir=$(printf '%s\n' "$parsed" | sed -n '2p')
 
 [ "$verdict" = "COMMIT" ] || exit 0
 
-[ -n "$dir" ] || dir="$fallback_dir"
-case "$dir" in "~") dir="$HOME" ;; "~/"*) dir="$HOME/${dir#\~/}" ;; esac
-[ -d "$dir" ] || dir="$fallback_dir"
+[ -n "$target_lines" ] || target_lines='DIR:'
 
-# The gate lives at the target repo's root; fall back to the dir itself.
-repo=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || repo="$dir"
-gates="$repo/checks/run-all.sh"
-[ -f "$gates" ] || exit 0 # target repo has no gates — nothing to enforce
+while IFS= read -r target_line; do
+  case "$target_line" in
+    DIR:*) dir="${target_line#DIR:}" ;;
+    *) continue ;;
+  esac
 
-if out=$(cd "$repo" && bash "$gates" 2>&1); then
-  exit 0
-fi
-log "BLOCK gates red on git commit (repo: $repo)"
-{
-  echo 'GATES RED — commit blocked by PreToolUse hook. Fix the gates, then retry:'
-  printf '%s\n' "$out" | tail -n 20
-} >&2
-exit 2
+  [ -n "$dir" ] || dir="$fallback_dir"
+  case "$dir" in "~") dir="$HOME" ;; "~/"*) dir="$HOME/${dir#\~/}" ;; esac
+  [ -d "$dir" ] || dir="$fallback_dir"
+
+  # The gate lives at the target repo's root; fall back to the dir itself.
+  repo=$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null) || repo="$dir"
+  gates="$repo/checks/run-all.sh"
+  [ -f "$gates" ] || continue # target repo has no gates — nothing to enforce
+
+  if out=$(cd "$repo" && bash "$gates" 2>&1); then
+    continue
+  fi
+  log "BLOCK gates red on git commit (repo: $repo)"
+  {
+    echo 'GATES RED — commit blocked by PreToolUse hook. Fix the gates, then retry:'
+    printf '%s\n' "$out" | tail -n 20
+  } >&2
+  exit 2
+done <<EOF
+$target_lines
+EOF
+
+exit 0

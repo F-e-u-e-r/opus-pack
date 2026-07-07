@@ -7,7 +7,7 @@ Distilled for the daily-driver models that remain after Fable 5's window closes
 Principles: few dense rules beat comprehensive constitutions; executable gates
 beat more prose.
 
-Early alpha (`alpha-0.1.0`): rules may change as real sessions expose misses.
+Early alpha (`alpha-0.1.1`): rules may change as real sessions expose misses.
 Issues and PRs with concrete failure cases are welcome.
 
 ## Install
@@ -154,6 +154,12 @@ silently allowing one):
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py .claude/hooks/
+```
+
+Maintainers can regression-test the commit hook with:
+
+```bash
+bash hooks/test-gate-before-commit.sh
 ```
 
 Then add to `.claude/settings.json`:
