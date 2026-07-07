@@ -144,14 +144,15 @@ it knows why and can fix the cause; other codes = non-blocking warning.
 **Worked example — no commit while gates are red** (script ships at
 `hooks/gate-before-commit.sh`, tested 2026-07-07: non-commit
 commands and green gates pass through; red gates block with the failure fed
-back to the model; uses `jq` when available to parse Bash tool-call JSON. If
-`jq` is missing, repos without gates and non-commit commands still pass, but a
-likely `git commit` is blocked with a clear error rather than silently allowing
-a commit without gate enforcement):
+back to the model; it gates the repo the commit *targets*, and uses `jq` +
+`python3` (`parse-commit-command.py`) to detect commits from command structure
+— so quoted messages, branch names, and `printf`/heredoc prose no longer
+misfire. A missing `jq`/`python3` fails closed on a likely commit rather than
+silently allowing one):
 
 ```bash
 mkdir -p .claude/hooks
-cp hooks/gate-before-commit.sh .claude/hooks/
+cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py .claude/hooks/
 ```
 
