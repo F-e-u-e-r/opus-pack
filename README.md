@@ -7,7 +7,7 @@ Distilled for the daily-driver models that remain after Fable 5's window closes
 Principles: few dense rules beat comprehensive constitutions; executable gates
 beat more prose.
 
-Early alpha (`alpha-0.1.0`): rules may change as real sessions expose misses.
+Early alpha (`alpha-0.1.2`): rules may change as real sessions expose misses.
 Issues and PRs with concrete failure cases are welcome.
 
 ## Install
@@ -27,7 +27,7 @@ Skills load on demand: only the description occupies context until triggered.
 |---|---|---|
 | `operational-rigor` | Task contract, action gating, scope containment, verify-by-execution, adversarial self-review, honest completion | operational-rigor source draft (backbone) + false-stops / investigate-before-fix / slop list from the two public repos — see Acknowledgements |
 | `delegation-and-review` | When to delegate, dispatch packets, two-critic review, failure/escalation ladder, long-task handoff, when to ask the user, injection defense | institution-design source briefs + fable-agent-orchestration + agent-standard-oss §8–10 |
-| `ground-truth-gates` | golden / replay / project gates and task-relative test discipline; ships a runnable `template/` | a privately shared ground-truth harness note (backbone, with permission) + task-relative-test-gate |
+| `ground-truth-gates` | golden / replay / project gates and task-relative test discipline; ships a runnable `template/` | a privately shared ground-truth harness note (backbone) + task-relative-test-gate |
 | `skill-authoring` | Executable-rule format for weaker models, ground-truth-only, provenance and decay, memory architecture (compile-don't-retrieve), review before adopting | the tomicz skill-library brief (MIT) + agent-standard-oss §1–2, §11 |
 | `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, agent tool permissions, leak incident response | user-supplied security reference draft + OWASP/RFC common knowledge, verified and extended |
 | `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | user-supplied roadmap reference draft — ceremony cut, judgment added |
@@ -144,15 +144,22 @@ it knows why and can fix the cause; other codes = non-blocking warning.
 **Worked example — no commit while gates are red** (script ships at
 `hooks/gate-before-commit.sh`, tested 2026-07-07: non-commit
 commands and green gates pass through; red gates block with the failure fed
-back to the model; uses `jq` when available to parse Bash tool-call JSON. If
-`jq` is missing, repos without gates and non-commit commands still pass, but a
-likely `git commit` is blocked with a clear error rather than silently allowing
-a commit without gate enforcement):
+back to the model; it gates the repo the commit *targets*, and uses `jq` +
+`python3` (`parse-commit-command.py`) to detect commits from command structure
+— so quoted messages, branch names, and `printf`/heredoc prose no longer
+misfire. A missing `jq`/`python3` fails closed on a likely commit rather than
+silently allowing one):
 
 ```bash
 mkdir -p .claude/hooks
-cp hooks/gate-before-commit.sh .claude/hooks/
+cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py .claude/hooks/
+```
+
+Maintainers can regression-test the commit hook with:
+
+```bash
+bash hooks/test-gate-before-commit.sh
 ```
 
 Then add to `.claude/settings.json`:
@@ -262,8 +269,11 @@ This pack distills and adapts ideas from:
 - **kannaiah** —
   [Reddit comment](https://www.reddit.com/r/ClaudeAI/comments/1ukynrw/comment/ovnh8zu/)
   on operational rigor, adapted into `operational-rigor`.
-- **Friend A** — private Discord note, adapted into `ground-truth-gates`,
-  shared with permission.
+- **Friend A** — private Discord notes shared with the maintainer (a
+  checks/-harness design note and a measured Claude Code harness export),
+  adapted into `ground-truth-gates`, `operational-rigor`,
+  `delegation-and-review`, and `skill-authoring`; source text is not
+  distributed.
 - **pro_ai.news** — Threads post; five-step goal-coaching protocol, adapted
   into `personal-goal-planning`:
   <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
@@ -275,6 +285,8 @@ This pack distills and adapts ideas from:
   into operational-rigor / delegation-and-review / skill-authoring. Reviewed
   in full; its always-loaded/nudge/template layer was deliberately not
   adopted — same reasoning as dropped-item 5.
+- **firaen22** — contributed the cost-asymmetric golden runner and the first
+  structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
 - **agent-standard-oss** @ `3786c4c` (github.com/anmoln7, MIT)
 - `security-architect` and `product-roadmap` were built from reference drafts
@@ -296,5 +308,6 @@ travel with the code are collected in
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). The most concrete case is
 the `verify-before-stop` hook — a derivative of MIT-licensed code by Curtis Chou
 (and, upstream, Miguok). No copyleft (GPL/AGPL/LGPL) exists anywhere in the
-chain. The `guideline *.txt` source drafts are the owner's own material and are
-not distributed (excluded via `.gitignore`).
+chain. The `guideline *.txt` source drafts are private source material (the
+owner's, plus Friend A's private note) and are not distributed
+(excluded via `.gitignore`).

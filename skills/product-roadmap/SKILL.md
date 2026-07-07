@@ -22,7 +22,7 @@ Assess current state from artifacts, not from the README's aspirations:
   reverted work, dead branches)? Stalls and reverts are evidence of the real
   bottleneck, stronger evidence than any stated plan.
 - **Risk:** security-sensitive flows, migration hazards, external API
-  dependencies, bus-factor-one areas.
+  dependencies, bus-factor-one areas (code only one person understands).
 
 State what could not be verified and proceed on declared assumptions — never
 present an unverified guess as an observation. (Repo scanning is bulk work:
@@ -67,7 +67,11 @@ and risk — then assign:
 - **P2** — worth an issue, not a slot.
 - **P3** — Not-now list with the reason.
 
-Confidence gates value: "High value, Low confidence" items get a cheap probe
+P-levels are internal scoring that feeds the §3 buckets: P0 enters Now, P1
+enters Next, P2 becomes a filed issue under Later, P3 joins Not-now. The
+output (§7) shows buckets, not P-labels.
+
+Confidence caps value: "High value, Low confidence" items get a cheap probe
 (prototype, mock, 5-user test), not a milestone. Distinguish evidence
 ("users filed 6 issues asking for X") from speculation ("users would love
 X") — speculation is allowed, labeled.
@@ -91,7 +95,8 @@ When comparable projects exist, their repos are free research:
 - **Their issues are user research** — recurring requests and complaints in
   a similar project are demand signals for yours, cheaper than interviews.
 - **Their changelog/BREAKING CHANGES/migration guides are regret logs** —
-  design decisions they had to walk back; avoid the same one-way doors.
+  design decisions they had to walk back; avoid the same one-way doors
+  (choices that are hard to reverse).
 - **Their architecture answers feasibility questions** ("how do they handle
   sync?") before you prototype.
 - Calibrate: stars ≠ quality, activity ≠ direction; a popular repo's

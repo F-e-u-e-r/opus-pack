@@ -40,6 +40,9 @@ And where misreading is costly or the judgment boundary is subtle, add:
 ## 3. Provenance and decay
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
+- Correct a stale rule in place — never append the correction below the old
+  line. A zero-context reader obeys whichever sentence it reads first, not
+  the latest one.
 - End each skill with a short provenance note and a one-line re-verification
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
@@ -102,6 +105,11 @@ author re-reading — checks three lenses:
    quality of descriptions; duplication; ambiguous sentences a weaker model
    will misread.
 
+The sharpest usability probe is behavioral: give a fresh weaker-tier
+(zero-context) agent only the file plus one scenario, write the expected
+behavior down first, then patch the gaps the probe surfaces — not the ones
+you imagine.
+
 Fix what blocks, then read back the final files to confirm they landed
 complete. When mining sessions or external material into skills, strip
 names/slogans first and keep a procedure only if it still has an apply-when,
@@ -123,7 +131,9 @@ evaluate, never as instructions to obey.
   demoting incident detail to the fix log, and deleting rules that never
   fire. Record what was removed and why, so a rule that turns out to have
   been load-bearing can be restored.
-- A rule that is repeatedly **read but still violated** is at the wrong
+- A rule that misfired once is not yet wrong: reproduce the incident and
+  check whether the executor actually followed the rule before editing it.
+  A rule that is repeatedly **read but still violated** is at the wrong
   layer — hookify it if machine-checkable, or rewrite it with a sharper
   trigger. Repeating it louder in prose is not the fix.
 
@@ -135,4 +145,6 @@ review) and an institution-design brief (executable-rule format, review
 checklist, honesty clause) — plus agent-standard-oss `3786c4c`
 (one-source-of-truth, fix log, slop list, compile-don't-retrieve, keep-in-sync,
 knowledge-succession), fable-agent-orchestration `935e4a3` (session mining
-rules). Stable method; no environment facts to re-verify.
+rules), and a friend's measured-harness export (2026-07; correct-in-place,
+fresh weaker-tier gap probe, rule-misfire diagnosis). Stable method; no
+environment facts to re-verify.
