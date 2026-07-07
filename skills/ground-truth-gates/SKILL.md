@@ -44,6 +44,25 @@ deterministic per input). Set the team's bar by editing `MIN_DEFAULT` in
 `golden/run.mjs` — that is what `run-all.sh` (and any hook/CI on top of it)
 enforces; the `--min` flag only overrides ad-hoc runs.
 
+Three rules make the golden gate earn its keep:
+
+- **Anonymize structure-preserving** — replace PII values with same-shape
+  stand-ins (digits for digits, `client@example.com` for an email, a
+  placeholder name like `Jordan Lee` for a name). `REDACTED` destroys the
+  very shapes the logic keys on.
+- **Include hard negatives** — real inputs that look like a match but must
+  fall through. That is where regressions hide and where synthetic cases
+  never go.
+- **Score cost-asymmetrically** — name the class of wrong output that
+  triggers a real, unconfirmed action (wrong route, wrong send) and treat
+  any instance of it as a hard failure when you wire `run.mjs`; the starter
+  runner scores an aggregate only, and an aggregate threshold averages the
+  expensive miss away.
+
+The golden runner doubles as an experiment grader: pre-register expected
+outputs as cases before any runs, then grade with code, not impressions —
+no harness, no experiment.
+
 **replay:** replace `replay/corpus.jsonl` with a representative sample of
 real logged inputs. Replace `transform()` with the step being changed. Run
 `node replay/run.mjs --update` once to freeze current behavior; after each
@@ -81,8 +100,10 @@ that are aspirational.
 
 ## Provenance
 
-Distilled 2026-07 from: a private checks/-harness design note (used with
-permission; the prose-vs-ground-truth finding), fable-agent-orchestration `935e4a3`
+Distilled 2026-07 from: private checks/-harness design notes (the
+prose-vs-ground-truth finding, plus — same author's 2026-07 harness export —
+cost-asymmetric scoring, shape-preserving anonymization, hard negatives, the
+experiment-grader rule), fable-agent-orchestration `935e4a3`
 (task-relative-test-gate, fail-under-broken, two truth sources).
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.

@@ -27,7 +27,11 @@ keep the judgment, and treat every returned result as a claim until verified.
   invariant, and proof for the packet below, do that recon first.
 - **Bounded fan-out:** never launch more agents than you can review and
   merge. Past your review capacity, more agents create backlog, not speed.
-  Parallel writers get isolated worktrees — never two agents in one dir.
+  When the next wave builds on the last, accept or reject it before
+  launching the follow-on — unaccepted work compounds its errors
+  downstream; independent slices need only stay within that review
+  capacity. Parallel writers get isolated worktrees — never two agents in
+  one dir.
 - Route by task type: mechanical clear-spec work → the cheapest capable
   model; user-facing output (UI, copy, API design) → a high-taste model;
   reviews and hard debugging → the strongest available. Tie-break
@@ -47,13 +51,19 @@ Delegate packets, not vague goals. Every packet names:
 - **Proof gate** — the concrete check that must pass, one that would FAIL
   under the broken behavior (see ground-truth-gates). "Tests pass" chosen by
   the worker itself is not a gate.
-- **Output contract** — return conclusions + `file:line` references; long
-  artifacts go to files, return the path. A long inline report defeats the
-  delegation.
+- **Output contract** — return conclusions + `file:line` references, each
+  claim tagged `[verified: ran <cmd>]`, `[verified: read <file:line>]`, or
+  `[unverified: <reason>]`; long artifacts go to files, return the path. A
+  long inline report defeats the delegation.
 - **Rules** — do not merge, do not weaken gates, do not revert unrelated work,
-  report blockers instead of working around them.
+  report blockers instead of working around them, and state failure plainly —
+  "could not do X because Y" is a good report; a plausible-sounding success
+  is the worst one.
 
-If any field cannot be filled, the task is not ready to delegate.
+If any field cannot be filled, the task is not ready to delegate. Before
+dispatching non-trivial implementation, have a fresh context review the
+packet itself — models volunteer risks as reviewers that they silently
+absorb as implementers.
 
 ## 3. Reviewing what comes back
 
@@ -70,6 +80,13 @@ If any field cannot be filled, the task is not ready to delegate.
   2. *Change critic:* does the code close the claimed invariant? Regressions
      in ownership, durability, security, compatibility? Does the property
      hold structurally, or only via a flag, sleep, or wrapper?
+- Both dispatcher and critics write the expected result before looking at
+  the actual one (operational-rigor §4). Redundant same-lens voters add
+  cost, not signal — invest in that ordering and in lens diversity, not in
+  vote-counting.
+- Choose critic framing deliberately: "verify against this contract" yields
+  precise, low-noise verdicts; "try to break it" maximizes recall at the
+  cost of false alarms — reproduce hunt-mode findings before acting on them.
 - Hand a verifier the spec and the artifact — never the author's
   self-summary, which smuggles the author's framing into the "independent"
   check. And an all-clear must name the point nearest to failure; an
@@ -88,6 +105,9 @@ If any field cannot be filled, the task is not ready to delegate.
 - **Machinery is not the user.** Tool completions, CI events, and agent
   status updates are state changes — not approval, not proof. Match the event
   to the task, open the real artifact (diff, log, CI run), verify, continue.
+- An aggregator fed nothing fabricates: before trusting any synthesis of
+  fan-out results, confirm its inputs actually arrived — non-empty, in the
+  expected count.
 
 ## 4. Failure and escalation ladder
 
@@ -102,7 +122,9 @@ usually not an option. The ladder:
 4. Still stuck, or the tradeoff is genuinely the user's → escalate to the
    user with the failure trail, options, and a recommendation.
 5. Once a pattern is solved, downgrade: hand the batch application to a
-   cheaper model with the solved example in the packet.
+   cheaper model with the solved example in the packet. Spot-check a random
+   ~20% of the batch (minimum 2) plus every flagged item; one bad
+   spot-check → verify the whole batch.
 - For high-stakes open decisions, spawn 2–3 fresh agents with **different
   mandates** (e.g. risk-first vs. simplest-first) and adjudicate only their
   disagreement list — where independent contexts diverge is where the real
@@ -154,5 +176,7 @@ user-todo minimization, decision-card essentials), fable-agent-orchestration `93
 (dispatch packet, two-critic loop, bounded fan-out, machinery-is-not-the-user,
 artifact reconciliation), agent-standard-oss `3786c4c` (files-over-context,
 author-is-not-the-judge, one-catch-one-class-one-sweep, stop-condition policy,
-verifier decay, injection rule). Stable behavioral rules; re-check only the
-worktree/agent mechanics against your current harness.
+verifier decay, injection rule), and a friend's measured-harness export
+(2026-07; spec-review-first, critic framing, claim tags, batch spot-check,
+wave sequencing, empty-synthesis check). Stable behavioral rules; re-check
+only the worktree/agent mechanics against your current harness.

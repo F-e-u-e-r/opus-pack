@@ -116,19 +116,24 @@ SOFTWARE.
 
 ---
 
-## 4. Idea-level and permission-based sources (no license text required)
+## 4. Idea-level and private-note sources (no license text required)
 
-The following informed Opus Pack at the level of ideas, or were shared with the
-author's permission, and impose no notice-retention obligation. They are
-credited in full in `README.md`; copyright protects expression, not
-ideas or methods, and no verbatim expression from these sources is reproduced:
+The following informed Opus Pack at the level of ideas and impose no
+notice-retention obligation. They are credited in full in `README.md`;
+copyright protects expression, not ideas or methods, and no substantial
+verbatim expression from these sources is reproduced:
 
 - **gyozalab** — Threads post (originating framing).
 - **林長揚** — Facebook post (institution-design ideas).
 - **kannaiah** — Reddit comment (operational-rigor ideas).
 - **pro_ai.news** — Threads post (goal-coaching protocol).
-- **"Friend A"** — private Discord note, adapted with permission into
-  `ground-truth-gates`.
-- **Owner-supplied reference drafts** — the `security-architect` and
-  `product-roadmap` skills, and the `guideline *.txt` source material (the
-  latter is not distributed; it is excluded via `.gitignore`).
+- **"Friend A"** — private Discord notes shared with the maintainer (a
+  checks/-harness design note and a measured Claude Code harness export),
+  adapted at idea/rule level into `ground-truth-gates`, `operational-rigor`,
+  `delegation-and-review`, and `skill-authoring`; source text is not
+  distributed.
+- **Private source drafts** — the owner's reference drafts for
+  `security-architect` and `product-roadmap`, plus the collected
+  `guideline *.txt` source copies (guidelines 5 and 6 are Friend A's
+  notes; the rest were supplied by the owner). These source drafts are not
+  distributed; they are excluded via `.gitignore`.

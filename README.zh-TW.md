@@ -25,7 +25,7 @@ Skill 是按需載入的:平時只有 description 佔 context,觸發才讀全文
 |---|---|---|
 | `operational-rigor` | 任務契約、行動閘門、範圍控制、以執行驗證、對抗式自我審查、誠實完工 | operational-rigor 來源草稿(主幹)+ 兩個公開 repo 的 false-stops / investigate-before-fix / slop 清單——詳見致謝 |
 | `delegation-and-review` | 何時委派、dispatch packet、雙評審審查、失敗與升級階梯、長任務交接、何時問使用者、injection 防護 | 制度設計來源 brief + fable-agent-orchestration + agent-standard-oss §8–10 |
-| `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 ground-truth harness 筆記(主幹,經同意使用)+ task-relative-test-gate |
+| `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 ground-truth harness 筆記(主幹)+ task-relative-test-gate |
 | `skill-authoring` | 弱模型可執行的規則格式、ground-truth-only、provenance 與衰變、記憶架構(compile-don't-retrieve)、採用前審查 | tomicz skill-library brief(MIT)+ agent-standard-oss §1–2、§11 |
 | `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、agent 工具權限、洩漏事件處理 | 使用者提供的 security 參考稿 + OWASP/RFC 常識,經查證與補強 |
 | `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | 使用者提供的 roadmap 參考稿,砍儀式、補判斷 |
@@ -170,7 +170,7 @@ cp hooks/verify-before-stop.py .claude/hooks/
   <https://www.facebook.com/story.php?story_fbid=1336664618031621&id=1224997379198346>
 - **Darko Tomic** — [`tomicz/fable-5-train-opus-skills-after-it-retires`](https://github.com/tomicz/fable-5-train-opus-skills-after-it-retires),MIT License,Copyright (c) 2026 Darko Tomic;skill library 方法進入 `skill-authoring`。
 - **kannaiah** — [Reddit 留言](https://www.reddit.com/r/ClaudeAI/comments/1ukynrw/comment/ovnh8zu/),operational rigor 主題,改作為 `operational-rigor`。
-- **朋友 A** — 私人 Discord 筆記,經同意改作為 `ground-truth-gates`。
+- **朋友 A** — 私人 Discord 筆記(checks/-harness 設計筆記,及一份實測 harness 匯出),由維護者取得並改作為 `ground-truth-gates`、`operational-rigor`、`delegation-and-review` 與 `skill-authoring`;來源原文不隨發佈散佈。
 - **pro_ai.news** — Threads 貼文;五步驟目標教練 protocol,改作為 `personal-goal-planning`:
   <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
 - **Curtis Chou** — [`curtischoutw/claude-institution`](https://github.com/curtischoutw/claude-institution) @ `8dea062`,MIT License,Copyright (c) 2026 Curtis Chou。`verify-before-stop` hook 改作自其 `verify_gate.py`(該檔又改作自 Miguok/fable-harness),另有約 10 條判斷規則吸收進 operational-rigor / delegation-and-review / skill-authoring。已通讀審查;其常載/每回合提醒/罐頭模板層刻意不採——理由同捨棄清單第 5 項。
@@ -184,4 +184,4 @@ cp hooks/verify-before-stop.py .claude/hooks/
 
 Opus Pack 以 [MIT License](LICENSE) 發佈——Copyright (c) 2026 F-e-u-e-r。
 
-本包納入並改作了採寬鬆式授權(MIT 與 Apache-2.0)的第三方作品;這些授權要求隨附的版權與授權聲明,集中收錄於 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。最具體的一例是 `verify-before-stop` hook——改作自 Curtis Chou(其上游為 Miguok)的 MIT 授權程式碼。整條鏈路不含任何 copyleft(GPL/AGPL/LGPL)。`guideline *.txt` 來源草稿為擁有者自有素材,不隨發佈散佈(已由 `.gitignore` 排除)。
+本包納入並改作了採寬鬆式授權(MIT 與 Apache-2.0)的第三方作品;這些授權要求隨附的版權與授權聲明,集中收錄於 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。最具體的一例是 `verify-before-stop` hook——改作自 Curtis Chou(其上游為 Miguok)的 MIT 授權程式碼。整條鏈路不含任何 copyleft(GPL/AGPL/LGPL)。`guideline *.txt` 來源草稿為私人來源素材(擁有者自有,及朋友 A 的私人筆記),不隨發佈散佈(已由 `.gitignore` 排除)。

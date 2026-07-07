@@ -42,6 +42,9 @@ When a rule conflicts with finishing sooner, the rule wins.
 - **Two-failure rule:** after two consecutive failures of the same step, stop
   and replan. Never retry a third time with cosmetic variations — repeated
   failure means the model of the system is wrong, not that luck was bad.
+  Before every retry — the first one included — fill the blank "attempt N
+  failed because ___" with a mechanism; if the blank will not fill, do not
+  retry — reproduce the failure in isolation first.
 - Same force as two failures, any one of these: fixing A breaks B; the diff
   keeps growing while the root cause stays unnamed; you reach for a sleep, a
   retry, or a weakened assertion to get green. Stop and rediagnose.
@@ -72,6 +75,11 @@ When a rule conflicts with finishing sooner, the rule wins.
 
 ## 4. Verify by observation, never by intent
 
+- **Write the expected result before looking at the actual one** — for your
+  own checks, a subagent's report, and any test run you use to validate the
+  change. Actual-first invites rationalizing whatever appears; catch
+  yourself back-filling the expectation after peeking and the check is
+  void — redo it or mark the item unverified.
 - Between failed fix attempts, revert to a clean state — stacked half-fixes
   make the next diagnosis unreadable. A fix whose root cause you cannot
   state in one sentence is not a fix yet.
@@ -150,5 +158,7 @@ When a rule conflicts with finishing sooner, the rule wins.
 Distilled 2026-07 from: a sourced operational-rigor draft (kept ~2/3;
 attribution in the repo README),
 fable-agent-orchestration `935e4a3` (false stops, investigate-before-fix,
-easy-vs-right), agent-standard-oss `3786c4c` (slop list, scrutiny-vs-novelty).
+easy-vs-right), agent-standard-oss `3786c4c` (slop list, scrutiny-vs-novelty),
+and a friend's measured-harness export (2026-07; expected-before-actual
+ordering, retry-mechanism gate).
 Stable behavioral rules; no environment-specific facts to re-verify.
