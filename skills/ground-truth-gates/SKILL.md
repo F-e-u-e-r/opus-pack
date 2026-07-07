@@ -55,9 +55,10 @@ Three rules make the golden gate earn its keep:
   never go.
 - **Score cost-asymmetrically** — name the class of wrong output that
   triggers a real, unconfirmed action (wrong route, wrong send) and treat
-  any instance of it as a hard failure when you wire `run.mjs`; the starter
-  runner scores an aggregate only, and an aggregate threshold averages the
-  expensive miss away.
+  any instance of it as a hard failure, not something aggregate accuracy can
+  average away. The starter `run.mjs` implements this: set `DEFER_LABEL` to
+  your safe-fallback label and the gate hard-fails on any false route
+  regardless of accuracy.
 
 The golden runner doubles as an experiment grader: pre-register expected
 outputs as cases before any runs, then grade with code, not impressions —

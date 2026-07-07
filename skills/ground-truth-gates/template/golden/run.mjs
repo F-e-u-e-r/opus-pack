@@ -15,6 +15,16 @@ import { fileURLToPath } from 'node:url';
 
 const MIN_DEFAULT = 0.85; // the team's bar; enforced by run-all.sh
 
+// Cost asymmetry: a wrong ACTIONABLE label (a "false route") fires a concrete
+// action nobody confirmed; a miss that falls through to the safe fallback
+// (LLM, human queue) only costs a fallback call. Aggregate accuracy averages
+// false routes away — the gate can stay green while shipping an action-taking
+// bug. Set DEFER_LABEL to your fallback label ('general', '(no-match)', ...)
+// and the gate hard-fails on ANY false route regardless of accuracy.
+// Set to null to score on accuracy alone (not recommended once the labels
+// map to real actions).
+const DEFER_LABEL = 'general';
+
 const here = dirname(fileURLToPath(import.meta.url));
 const minArg = process.argv.indexOf('--min');
 const min = minArg === -1 ? MIN_DEFAULT : Number(process.argv[minArg + 1]);
@@ -42,10 +52,20 @@ for (const c of cases) {
 
 const correct = cases.length - misses.length;
 const accuracy = correct / cases.length;
+const falseRoutes = DEFER_LABEL === null ? [] : misses.filter((m) => m.got !== DEFER_LABEL);
+const deferMisses = DEFER_LABEL === null ? [] : misses.filter((m) => m.got === DEFER_LABEL);
+
 console.log(`golden: ${correct}/${cases.length} correct (${accuracy.toFixed(3)}), min ${min}`);
+if (DEFER_LABEL !== null) {
+  console.log(`golden: ${falseRoutes.length} false route(s) [hard gate], ${deferMisses.length} defer miss(es) [warn]`);
+}
 for (const m of misses.slice(0, 10)) {
-  console.log(`  MISS ${JSON.stringify(m.input)} expected=${m.expected} got=${m.got}`);
+  const kind = DEFER_LABEL === null ? 'MISS' : m.got === DEFER_LABEL ? 'DEFER-MISS' : 'FALSE-ROUTE';
+  console.log(`  ${kind} ${JSON.stringify(m.input)} expected=${m.expected} got=${m.got}`);
 }
 if (misses.length > 10) console.log(`  ... ${misses.length - 10} more misses`);
 
-process.exit(accuracy >= min ? 0 : 1);
+const accuracyOk = accuracy >= min;
+const routesOk = DEFER_LABEL === null || falseRoutes.length === 0;
+if (!routesOk) console.log('golden: FAIL — false route(s) present; accuracy cannot buy these back');
+process.exit(accuracyOk && routesOk ? 0 : 1);
