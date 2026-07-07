@@ -45,21 +45,46 @@ text = text.replace("\n", " ; ")
 lex = shlex.shlex(text, posix=True, punctuation_chars="();<>|&")
 lex.whitespace_split = True
 try:
-    tokens = list(lex)
+    raw_tokens = list(lex)
 except ValueError:
     # Unbalanced quote etc. — can't safely parse.
     print("UNPARSEABLE")
     sys.exit(0)
 
 BOUNDARY = {";", "&", "&&", "|", "||", "(", ")", "\n"}
+PUNCT_CHARS = set("();<>|&")
 VALUE_OPTS = {"-C", "--git-dir", "--work-tree", "-c"}
 COMMAND_WRAPPERS = {"command", "builtin"}
 ENV_VALUE_OPTS = {"-u", "--unset", "-S", "--split-string"}
 ENV_FLAG_OPTS = {"-i", "--ignore-environment", "-0", "--null"}
 ASSIGNMENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
 
+tokens = []
+for tok in raw_tokens:
+    if tok and all(ch in PUNCT_CHARS for ch in tok):
+        i = 0
+        while i < len(tok):
+            if tok[i : i + 2] in {"&&", "||"}:
+                tokens.append(tok[i : i + 2])
+                i += 2
+            else:
+                tokens.append(tok[i])
+                i += 1
+    else:
+        tokens.append(tok)
+
 commit_dirs = []
 last_cd = ""
+cd_stack = []
+
+
+def dir_from_git_dir(path):
+    path = path.rstrip("/")
+    if path.endswith("/.git"):
+        return path[:-5] or "/"
+    if path == ".git":
+        return ""
+    return ""
 
 
 def skip_env(words, i):
@@ -120,12 +145,27 @@ def flush_statement(words):
         return
     i += 1
     stmt_dir = ""
+    git_dir = ""
     subcmd = ""
     while i < len(words):
         w = words[i]
-        if w in VALUE_OPTS:
-            if w == "-C" and i + 1 < len(words):
-                stmt_dir = words[i + 1]
+        if w in {"-C", "--work-tree", "--git-dir"}:
+            value = words[i + 1] if i + 1 < len(words) else ""
+            if w in {"-C", "--work-tree"}:
+                stmt_dir = value
+            elif w == "--git-dir":
+                git_dir = value
+            i += 2
+            continue
+        if w.startswith("--work-tree="):
+            stmt_dir = w.split("=", 1)[1]
+            i += 1
+            continue
+        if w.startswith("--git-dir="):
+            git_dir = w.split("=", 1)[1]
+            i += 1
+            continue
+        if w == "-c":
             i += 2
             continue
         if w.startswith("-"):
@@ -134,7 +174,7 @@ def flush_statement(words):
         subcmd = w
         break
     if subcmd == "commit":
-        commit_dirs.append(stmt_dir if stmt_dir else last_cd)
+        commit_dirs.append(stmt_dir or dir_from_git_dir(git_dir) or last_cd)
 
 
 buf = []
@@ -142,6 +182,10 @@ for tok in tokens:
     if tok in BOUNDARY:
         flush_statement(buf)
         buf = []
+        if tok == "(":
+            cd_stack.append(last_cd)
+        elif tok == ")" and cd_stack:
+            last_cd = cd_stack.pop()
     else:
         buf.append(tok)
 flush_statement(buf)

@@ -30,8 +30,9 @@
 # A command Python can't tokenize (unbalanced quoting) is treated as "can't
 # tell" and fails toward blocking a likely commit, same posture as jq/python3
 # being absent. False positives that survive all this just run the gates
-# (safe direction); a commit hidden inside `bash script.sh` bypasses the hook
-# entirely — inherent to any text/structure-level hook, out of scope.
+# (safe direction); a commit hidden inside `bash script.sh` or behind a shell
+# alias (e.g. `gc`) bypasses the hook entirely — inherent to any
+# text/structure-level hook, out of scope.
 set -u
 
 log() {

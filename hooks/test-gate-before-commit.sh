@@ -78,5 +78,12 @@ assert_exit 0 "git log grep commit is not a commit" "git log --grep commit"
 assert_exit 0 "git help commit is not a commit" "git help commit"
 assert_exit 2 "make -C does not poison later cd commit" \
   "make -C $gateless; cd $red; git commit -m x"
+assert_exit 2 "subshell cd does not leak to later bare commit" \
+  "(cd $gateless && git commit -m x); git commit -m y" "$red"
+assert_exit 2 "--git-dir target resolves .git parent" \
+  "git --git-dir=$red/.git commit -m x"
+assert_exit 2 "--work-tree target resolves work tree" \
+  "git --work-tree=$red commit -m x"
+assert_exit 0 "alias-shaped command is not structurally knowable" "gc -m x" "$red"
 
 echo "gate-before-commit tests passed"

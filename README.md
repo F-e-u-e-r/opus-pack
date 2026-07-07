@@ -7,7 +7,7 @@ Distilled for the daily-driver models that remain after Fable 5's window closes
 Principles: few dense rules beat comprehensive constitutions; executable gates
 beat more prose.
 
-Early alpha (`alpha-0.1.1`): rules may change as real sessions expose misses.
+Early alpha (`alpha-0.1.2`): rules may change as real sessions expose misses.
 Issues and PRs with concrete failure cases are welcome.
 
 ## Install
@@ -285,6 +285,8 @@ This pack distills and adapts ideas from:
   into operational-rigor / delegation-and-review / skill-authoring. Reviewed
   in full; its always-loaded/nudge/template layer was deliberately not
   adopted — same reasoning as dropped-item 5.
+- **firaen22** — contributed the cost-asymmetric golden runner and the first
+  structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
 - **agent-standard-oss** @ `3786c4c` (github.com/anmoln7, MIT)
 - `security-architect` and `product-roadmap` were built from reference drafts

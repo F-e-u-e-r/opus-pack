@@ -5,7 +5,7 @@
 為 Fable 5 退場後的日常模型(Opus 4.8 / Sonnet 5 / Haiku)萃取,2026-07。
 原則:少而密的規則勝過完整的憲法;可執行的閘門勝過更多的散文。
 
-早期 alpha(`alpha-0.1.1`):規則會隨真實 session 暴露出的缺口調整。
+早期 alpha(`alpha-0.1.2`):規則會隨真實 session 暴露出的缺口調整。
 歡迎用具體失敗案例開 issue 或 PR。
 
 ## 安裝
@@ -180,6 +180,7 @@ bash hooks/test-gate-before-commit.sh
 - **pro_ai.news** — Threads 貼文;五步驟目標教練 protocol,改作為 `personal-goal-planning`:
   <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
 - **Curtis Chou** — [`curtischoutw/claude-institution`](https://github.com/curtischoutw/claude-institution) @ `8dea062`,MIT License,Copyright (c) 2026 Curtis Chou。`verify-before-stop` hook 改作自其 `verify_gate.py`(該檔又改作自 Miguok/fable-harness),另有約 10 條判斷規則吸收進 operational-rigor / delegation-and-review / skill-authoring。已通讀審查;其常載/每回合提醒/罐頭模板層刻意不採——理由同捨棄清單第 5 項。
+- **firaen22** — 透過 GitHub PR 貢獻 cost-asymmetric golden runner 與第一版結構化 commit-hook parser。
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)
 - `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
