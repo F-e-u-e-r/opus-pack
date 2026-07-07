@@ -74,6 +74,12 @@ If any field cannot be filled, the task is not ready to delegate.
   self-summary, which smuggles the author's framing into the "independent"
   check. And an all-clear must name the point nearest to failure; an
   all-clear without one is a rubber stamp.
+- Put the expected-first ordering in every critic's prompt: for each
+  criterion, write input → expected outcome BEFORE examining the artifact's
+  actual behavior. Per-critic accuracy is the first-order lever; adding
+  redundant same-lens critics is second-order — one critic forced into this
+  ordering matches a redundant panel. (The two critics above earn their
+  seats by lens diversity, not redundancy.)
 - Critic verdicts carry evidence: REFUTED requires a concrete counterexample
   (or the actual simpler replacement); assumptions the critic could not test
   are listed, not silently passed.

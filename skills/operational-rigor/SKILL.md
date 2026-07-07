@@ -72,6 +72,12 @@ When a rule conflicts with finishing sooner, the rule wins.
 
 ## 4. Verify by observation, never by intent
 
+- **Write the expected observation down BEFORE looking at the actual one** —
+  for every check, not only planned steps: test runs, file read-backs,
+  subagent results, your own script's output. Reading the actual result first
+  invites rationalizing it into "expected"; if you catch yourself back-filling
+  the expectation after peeking, that check is void — redo it or mark the
+  item unverified.
 - Between failed fix attempts, revert to a clean state — stacked half-fixes
   make the next diagnosis unreadable. A fix whose root cause you cannot
   state in one sentence is not a fix yet.
