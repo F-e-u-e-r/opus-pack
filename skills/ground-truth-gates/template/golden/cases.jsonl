@@ -1,0 +1,6 @@
+{"input": "I was charged twice for my subscription this month", "label": "billing"}
+{"input": "How do I export my data as CSV?", "label": "general"}
+{"input": "Requesting a refund for order #4821", "label": "billing"}
+{"input": "The dashboard is showing stale numbers since yesterday", "label": "general"}
+{"input": "My invoice lists the wrong company address", "label": "billing"}
+{"input": "Can you add dark mode to the mobile app?", "label": "general"}

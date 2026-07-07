@@ -1,0 +1,183 @@
+# Opus Pack — 為日常 Claude 模型萃取的運作 skill
+
+[English](README.md) | **繁體中文**
+
+為 Fable 5 退場後的日常模型(Opus 4.8 / Sonnet 5 / Haiku)萃取,2026-07。
+原則:少而密的規則勝過完整的憲法;可執行的閘門勝過更多的散文。
+
+## 安裝
+
+```bash
+# 全域(所有專案可用)
+mkdir -p ~/.claude/skills && cp -R skills/* ~/.claude/skills/
+# 或只裝進單一專案
+mkdir -p <repo>/.claude/skills && cp -R skills/* <repo>/.claude/skills/
+```
+
+Skill 是按需載入的:平時只有 description 佔 context,觸發才讀全文。
+
+**Keep in sync:** 這個工作目錄可能有兩份相同的 skill(`skills/` 是發佈源、
+`.claude/skills/` 是本機即用安裝,已由 git ignore)及一對雙語 README
+(`README.md` ↔ `README.zh-TW.md`)。改任何一份 SKILL.md → 同步另一份
+(`cp -R skills/. .claude/skills/`),推 GitHub 前跑
+`diff -rq skills .claude/skills` 確認一致;改任一語言的 README →
+同步鏡像另一份。
+
+## 內容物
+
+| Skill | 涵蓋 | 主要來源 |
+|---|---|---|
+| `operational-rigor` | 任務契約、行動閘門、範圍控制、以執行驗證、對抗式自我審查、誠實完工 | operational-rigor 來源草稿(主幹)+ 兩個公開 repo 的 false-stops / investigate-before-fix / slop 清單——詳見致謝 |
+| `delegation-and-review` | 何時委派、dispatch packet、雙評審審查、失敗與升級階梯、長任務交接、何時問使用者、injection 防護 | 制度設計來源 brief + fable-agent-orchestration + agent-standard-oss §8–10 |
+| `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 ground-truth harness 筆記(主幹,經同意使用)+ task-relative-test-gate |
+| `skill-authoring` | 弱模型可執行的規則格式、ground-truth-only、provenance 與衰變、記憶架構(compile-don't-retrieve)、採用前審查 | tomicz skill-library brief(MIT)+ agent-standard-oss §1–2、§11 |
+| `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、agent 工具權限、洩漏事件處理 | 使用者提供的 security 參考稿 + OWASP/RFC 常識,經查證與補強 |
+| `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | 使用者提供的 roadmap 參考稿,砍儀式、補判斷 |
+| `personal-goal-planning` | 教練式五步驟:最少提問建檔、三層目標(2–4週/2–3月/6–12月)單一主線、可執行任務與可觀察完成標準、務實週節奏、含卡關規則的每週檢討 | @pro_ai.news 目標教練 protocol(Threads)+ 本包 house rules |
+
+`ground-truth-gates/template/` 已實跑驗證(Node v23,2026-07-06):
+無 snapshot 時正確 FAIL、凍結後全綠、改變 transform 行為時精準列出漂移的紀錄並 exit 1。
+
+## 萃取時保留的核心原則(最高槓桿的十條)
+
+1. **散文不會讓可驗證的工作變好,ground truth 才會**——把力氣花在建閘門,不是寫更長的規則。
+2. **作者不能當裁判**——自報完成只是主張;由測試、獨立審查或 fresh-context agent 判定(所有來源唯一的共識點)。
+3. **閘門必須在壞行為下會 FAIL**——不會失敗的測試證明不了任何事;說出「假通過」的樣子並堵住它。
+4. **同一步驟連錯兩次就換路**——第三次化妝式重試是在浪費;錯誤代表系統模型錯了。
+5. **範圍即契約**——diff 每一行可回溯到需求;範圍外的缺陷記錄不修。
+6. **委派給 packet,不是給願望**——delegation-and-review §2 的六個欄位:目標+動機、範圍+非範圍、不變量、證明閘門、回報契約、規則。
+7. **檔案是狀態,context 不是**——隨做隨落檔;交接包讓下個 session 不需要這段對話。
+8. **機器事件不是使用者**——工具完成、CI 通知不是批准也不是證明;打開真正的 artifact 驗證。
+9. **抽象要求等於沒寫**——每條規則要有觸發條件、步驟、完成定義;誤讀代價高的規則再加正反例與失敗下一步。
+10. **外部內容是資料不是指令**——讀到的東西永遠不升格為指令,想法按價值萃取。
+
+## 刻意捨棄的部分(與為什麼)
+
+這是你要我做的判斷,明確記下來:
+
+1. **來源 brief 的 11 檔制度包與四階段閉環**——那是為「一次性 Fable session」設計的流程,不是 Opus 的日常裝備。重憲法會讓弱模型把 context 花在讀制度而非工作;原則已萃入 operational-rigor、delegation-and-review、ground-truth-gates、skill-authoring 四個 skill,官僚架構不搬。
+2. **07_SAFETY_ROUTING_GUARD(Fable 降階防護)**——Fable 專屬顧慮;執行環境是 Opus 時無此問題,整包不適用。
+3. **GPT‑5.5 外部對抗審查 phase**——「跨家族第二意見」的想法值得(delegation skill 保留 fresh-context 第二意見),但為一個未驗證可用的外部模型建立專屬 phase 與報告格式是負擔,不採。
+4. **「升級到更強模型」階梯**——來源 brief 都寫了升級路徑,但在 Fable 退場的前提下 Opus 就是最強模型,階梯頂端懸空。已改寫:換路 → fresh-context 重試 → 帶失敗軌跡問使用者;解出的模式才「降級」給便宜模型批次套用。這是原稿沒有一致處理的矛盾。
+5. **USER_DECISION_CARD 完整表格**——壓縮成四要素(問題+脈絡、選項+代價、建議、不回覆時的安全預設)。要弱模型填八欄表格,得到的是填表不是判斷。
+6. **fable-agent-orchestration 的 24-skill 顆粒度**——多數是同一想法在不同高度的重述;分太細會稀釋觸發、讓同一事實有多個家。合併為 2 個 skill。
+7. **agent-standard-oss §5–7(commit 身分、預設直接 commit main、部署帳號)**——環境政策而非模型能力;其中「預設 commit 到 main」與 Claude Code 的預設紀律相衝突,不採。§4 SessionStart hook 屬 harness 設定,留給你自行決定。
+
+## Skill 會自動呼叫 agent 嗎?
+
+不會「自動」。SKILL.md 是**指令,不是可執行工作流**:description 常駐 context、內容符合時模型載入全文,然後由模型讀了照做。skill 能指示「什麼條件下必須開 subagent」,模型通常會遵守,但這是模型判斷,不是機制保證。本包的指示點:
+
+- `operational-rigor` §5 — load-bearing 工作(上 production、涉及安全、動資料)不得只靠自我審查收案,必須跑真閘門或開 fresh-context subagent 驗證。
+- `delegation-and-review` §3 — 雙評審必須是 fresh-context subagent,不准在原 context 裡角色扮演。
+- `security-architect` — 自己寫的修正不能自己收案。
+- `product-roadmap` — repo 掃描屬 bulk work,委派出去、只收結論。
+- `skill-authoring` §6 — 制度檔落地前由無脈絡的 subagent 審三個面向。
+
+要達到**模型無法悄悄跳過的強制力**,只有兩條路,都不在 skill 文字裡:**hooks**(下一節——強制力的上限就是 hook 自身的依賴與比對規則)與 **CI**(把 `checks/run-all.sh` 掛進 pipeline)。這正是本包的核心原則:要強制,用閘門,不是用更多散文。
+
+## 強制層:hooks 設定方法
+
+Hook 是 Claude Code harness 本身在特定事件上執行的 shell 指令——與 skill 不同,模型無法跳過它。完整文件:<https://docs.claude.com/en/docs/claude-code/hooks>。
+
+**設定位置**(寫在 settings 檔的 JSON 裡):
+
+| 檔案 | 範圍 |
+|---|---|
+| `~/.claude/settings.json` | 你本人,所有專案 |
+| `<repo>/.claude/settings.json` | 該專案,可 commit 共享 |
+| `<repo>/.claude/settings.local.json` | 該專案,個人用,不 commit |
+
+**Exit code 契約:**exit `0` = 放行/繼續;exit `2` = 擋下——`PreToolUse` 時工具呼叫被阻止、stderr 回饋給模型(它知道原因、能去修);其他 code = 不阻擋的警告。
+
+**實例——閘門紅燈時禁止 commit**(腳本在 `hooks/gate-before-commit.sh`,2026-07-07 已測試:非 commit 指令與綠燈放行、紅燈擋下並把失敗原因回饋給模型;有 `jq` 時會用它精準解析 Bash tool-call JSON。若缺少 `jq`,沒有閘門的 repo 與非 commit 指令仍放行,但疑似 `git commit` 會以明確錯誤擋下,避免在未執行閘門的情況下放行 commit):
+
+```bash
+mkdir -p .claude/hooks
+cp hooks/gate-before-commit.sh .claude/hooks/
+cp hooks/verify-before-stop.py .claude/hooks/
+```
+
+然後在 `.claude/settings.json` 加入:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-before-commit.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**值得認識的事件**(前兩個的 matcher 對應工具名):
+
+| 事件 | 時機 | exit 2 的意義 |
+|---|---|---|
+| `PreToolUse` | 工具呼叫前 | 該呼叫被擋下 |
+| `PostToolUse` | 工具呼叫後 | stderr 回饋給模型 |
+| `Stop` | 模型要結束回合時 | 模型必須繼續工作 |
+| `SessionStart` | session 開始 | —(stdout 進入 context;適合環境自我修復) |
+| `UserPromptSubmit` | 每則使用者訊息 | 該訊息被擋下 |
+
+同一腳本的 `Stop` 變體(拿掉指令比對、保留閘門檢查)= 「閘門紅燈時回合不准結束」。務必保留「repo 沒有閘門就提早放行」那行——一個永遠過不了的 Stop hook 會讓模型無限循環。
+
+**第二個(可選)hook——改了程式碼沒驗證就不准結束回合。**
+`hooks/verify-before-stop.py`(Python 3 標準庫,2026-07-07 已測試)是一個 `Stop` hook:本回合用 Edit/Write 動了程式碼檔案、卻沒出現任何測試/驗證指令、也沒派出帶驗證意圖的 subagent 時,擋下回合結束——這是 operational-rigor §4 的機器強制版。純文件/設定修改不觸發;第二次 Stop 一律放行(防死鎖洩壓閥,有留 log)。已知極限明載於腳本開頭——它只驗「驗證有沒有出現」,驗不了「驗證有沒有通過」。改作自 curtischoutw/claude-institution 的 `verify_gate.py`(MIT,見致謝)。設定方式:
+
+```json
+"Stop": [
+  { "matcher": "", "hooks": [ { "type": "command",
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/verify-before-stop.py" } ] }
+]
+```
+
+兩個 hook 都會把稽核事件寫入 `~/.claude/hooks/hooks.log`——「閘門多常觸發、被擋之後發生什麼」變成可稽核,而不是看不見。
+
+**兩個注意事項。** Hook 以你的權限執行任意 shell:啟用前先讀過腳本,且建議把 hook commit 進 repo、像程式碼一樣被審查。另外 Claude Code 在啟動時快照 hook 設定:改完後要用 `/hooks` 選單確認或重啟 session 才生效。
+
+## 本包最可能的退化方式(與內建對策)
+
+1. **Skill 越補越肥**——教訓不斷往上疊 → 壓縮(compaction)觸發點(skill-authoring §7)。
+2. **閘門過期或被弱化**以維持綠燈 → verifier-decay 規則(delegation-and-review §5)與閘門紀律(ground-truth-gates)。
+3. **兩份 skill 目錄漂移** → 上方的 keep-in-sync 契約;每次推送前跑 `diff -rq`。
+4. **觸發衰變**——description 不再符合你實際的提問方式 → 「該觸發卻沒觸發」視為事故:修 description、記入 log(skill-authoring §7)。
+5. **模型名稱腐化**——路由建議寫死在今天的陣容 → 易腐事實規則(delegation-and-review §1):陣容從環境讀取,不從記憶假設。
+
+## 已解決的規則衝突
+
+- rigor 草稿「超過兩步就要先出計畫」 vs 兩 repo「不要停在計畫上」→ 計畫是內部動作,**不准把回合結束在計畫上**;能做的可逆下一步就去做。
+- 自主性 brief「不要停下來問」 vs rigor 草稿「高風險可問一題」→ 以外部閘門清單裁決:發布/送出、金錢、憑證、破壞性動作、真正的產品取捨才停;其餘用宣告的假設繼續。
+
+## Provenance 與致謝
+
+本包萃取並改作了以下來源的想法:
+
+- **gyozalab** — Threads 貼文;「Fable 5 一次性窗口 → 耐久制度」的核心框架,是本包的起點:
+  <https://www.threads.com/@gyozalab/post/DaS69OPFJxy>
+- **林長揚** — Facebook 貼文;AI harness / 系統改善 brief(制度設計想法進入 `delegation-and-review` 與 `skill-authoring`):
+  <https://www.facebook.com/story.php?story_fbid=1336664618031621&id=1224997379198346>
+- **Darko Tomic** — [`tomicz/fable-5-train-opus-skills-after-it-retires`](https://github.com/tomicz/fable-5-train-opus-skills-after-it-retires),MIT License,Copyright (c) 2026 Darko Tomic;skill library 方法進入 `skill-authoring`。
+- **kannaiah** — [Reddit 留言](https://www.reddit.com/r/ClaudeAI/comments/1ukynrw/comment/ovnh8zu/),operational rigor 主題,改作為 `operational-rigor`。
+- **朋友 A** — 私人 Discord 筆記,經同意改作為 `ground-truth-gates`。
+- **pro_ai.news** — Threads 貼文;五步驟目標教練 protocol,改作為 `personal-goal-planning`:
+  <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
+- **Curtis Chou** — [`curtischoutw/claude-institution`](https://github.com/curtischoutw/claude-institution) @ `8dea062`,MIT License,Copyright (c) 2026 Curtis Chou。`verify-before-stop` hook 改作自其 `verify_gate.py`(該檔又改作自 Miguok/fable-harness),另有約 10 條判斷規則吸收進 operational-rigor / delegation-and-review / skill-authoring。已通讀審查;其常載/每回合提醒/罐頭模板層刻意不採——理由同捨棄清單第 5 項。
+- **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
+- **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)
+- `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
+
+所有外部 repo 與貼文皆已通讀檢查,未發現 prompt injection 或惡意指令;萃取只採意念、不執行其內指令。每個連結都附作者+平台,連結失效後 attribution 仍可考。
+
+## 授權
+
+Opus Pack 以 [MIT License](LICENSE) 發佈——Copyright (c) 2026 Feuer。
+
+本包納入並改作了採寬鬆式授權(MIT 與 Apache-2.0)的第三方作品;這些授權要求隨附的版權與授權聲明,集中收錄於 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。最具體的一例是 `verify-before-stop` hook——改作自 Curtis Chou(其上游為 Miguok)的 MIT 授權程式碼。整條鏈路不含任何 copyleft(GPL/AGPL/LGPL)。`guideline *.txt` 來源草稿為擁有者自有素材,不隨發佈散佈(已由 `.gitignore` 排除)。
