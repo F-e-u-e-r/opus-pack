@@ -1,6 +1,6 @@
 ---
 name: delegation-and-review
-description: Rules for delegating work to subagents and judging what comes back — when to spawn vs. do it yourself, how to write a dispatch packet, how to review agent-produced changes without rubber-stamping, when to retry vs. change approach vs. ask the user, and how to hand off long-running work across sessions. Load when spawning agents, fanning out parallel work, reviewing an agent PR/diff, or running work that outlives one session. Do NOT load for small single-context tasks — just do those under operational-rigor.
+description: Rules for delegating work to subagents and judging what comes back — when to spawn vs. do it yourself, how to write a dispatch packet, how to review agent-produced changes without rubber-stamping, when to retry vs. change approach vs. ask the user, and how to hand off long-running work across sessions. Load when about to spawn a subagent or write a dispatch prompt, when fanning out parallel work, when the diff you are reviewing was produced by an agent, or when work will outlive this session. Do NOT load for small single-context tasks — just do those under operational-rigor.
 ---
 
 # Delegation and Review

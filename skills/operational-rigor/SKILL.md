@@ -1,6 +1,6 @@
 ---
 name: operational-rigor
-description: Core execution discipline for any non-trivial task — multi-step work, anything that modifies files or systems, debugging, or work whose correctness matters, even when the user does not ask for rigor. Governs the task contract, action gating, scope containment, verification by execution, adversarial self-review, and honest completion claims. Do NOT load for single-step questions, pure explanation, or trivial edits; for delegating to subagents or reviewing agent output, also load delegation-and-review.
+description: Core execution discipline for any non-trivial task — multi-step work, anything that modifies files or systems, debugging, or work whose correctness matters, even when the user does not ask for rigor. The load moment is observable — you are about to take the first mutating action (edit, write, state-changing command) of work with more than one step; load then, not after. Governs the task contract, action gating, scope containment, verification by execution, adversarial self-review, and honest completion claims. Do NOT load for single-step questions, pure explanation, or trivial edits; for delegating to subagents or reviewing agent output, also load delegation-and-review.
 ---
 
 # Operational Rigor
