@@ -39,6 +39,9 @@ Every packet names:
 - **Output contract** — conclusions + `file:line` refs, each tagged
   `[verified: ran <cmd>]`, `[verified: read <file:line>]`, or
   `[unverified: <reason>]`; long artifacts go to files, return paths.
+- **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
+  expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
+  weighted toward it, not split evenly.
 - **Rules** — do not merge, weaken gates, or revert unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
 
@@ -88,6 +91,10 @@ reviewers that they silently absorb as implementers.
 - Blocked workers (sandbox, permission, write refusal) escalate, never bypass.
 - Quiet is not dead: reconcile process state, output mtime, dirty tree, and logs
   before discarding or relaunching work.
+- Edit conflict ("file modified since read") → never retry blind: re-read, keep
+  what the concurrent editor achieved, re-anchor your edit on the current state.
+  After any concurrent worker finishes on files you also touched, audit for
+  double-edits (diff + targeted grep) before declaring clean.
 
 ## 5. Long-running work and handoff
 
@@ -99,6 +106,11 @@ reviewers that they silently absorb as implementers.
   deterministic boundary, never because the model feels finished.
 - Verifiers decay: turn reviewer misses into regression tests, refresh criteria,
   and spot-check what the verifier passes.
+- When a background result gates an approved action, also schedule a fallback
+  resumption carrying the full contingent plan ("if verdict=SHIP do X as
+  approved, else report") so a missed completion signal cannot orphan the work.
+  Any scheduled resumption validates ground truth first; if the work already
+  completed, it no-ops — never re-execute a stale scheduled prompt.
 
 ## 6. Asking the user
 
@@ -124,5 +136,7 @@ one-catch-one-class-one-sweep, stop-condition policy, verifier decay, injection
 rule), and a friend's measured-harness export (spec-review-first, critic framing,
 claim tags, batch spot-check, wave sequencing, empty-synthesis check); the
 stronger-tier advice-mode rung (2026-07) adapts echo-of-machines/fable-advisor
-and the official advisor-tool pattern. Stable behavioral rules; re-check only
-worktree/agent mechanics against the current harness.
+and the official advisor-tool pattern; a 2026-07 mining pass added packet
+cost-asymmetry, edit-conflict reconciliation, and fallback resumption (each
+rule probe-tested on a fresh weaker-tier agent). Stable behavioral rules;
+re-check only worktree/agent mechanics against the current harness.
