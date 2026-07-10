@@ -84,6 +84,8 @@ And where misreading is costly or the judgment boundary is subtle, add:
   to use.
 - The frontmatter `description` is the trigger: write it as the exact
   conditions under which a model should load the skill, not as a title.
+  Phrase triggers as observed states ("a test failed twice"), not topic
+  labels ("debugging") — states fire; labels drift.
   A skill that never fires is dead weight; a skill that always fires is a tax.
 - Prefer few dense skills over many fragments. A 20-file library of
   near-duplicates dilutes triggers and splits facts across homes.
@@ -146,5 +148,6 @@ checklist, honesty clause) — plus agent-standard-oss `3786c4c`
 (one-source-of-truth, fix log, slop list, compile-don't-retrieve, keep-in-sync,
 knowledge-succession), fable-agent-orchestration `935e4a3` (session mining
 rules), and a friend's measured-harness export (2026-07; correct-in-place,
-fresh weaker-tier gap probe, rule-misfire diagnosis). Stable method; no
-environment facts to re-verify.
+fresh weaker-tier gap probe, rule-misfire diagnosis); the state-phrased
+trigger rule (2026-07) adapts TheColliny/FableClaudeMDForOpus's event-phrased
+routing. Stable method; no environment facts to re-verify.

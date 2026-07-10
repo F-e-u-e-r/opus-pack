@@ -1,6 +1,6 @@
 ---
 name: operational-rigor
-description: Core execution discipline for any non-trivial task — multi-step work, anything that modifies files or systems, debugging, or work whose correctness matters, even when the user does not ask for rigor. Governs the task contract, action gating, scope containment, verification by execution, adversarial self-review, and honest completion claims. Do NOT load for single-step questions, pure explanation, or trivial edits; for delegating to subagents or reviewing agent output, also load delegation-and-review.
+description: Core execution discipline for any non-trivial task — multi-step work, anything that modifies files or systems, debugging, or work whose correctness matters, even when the user does not ask for rigor. The latest load moment is observable — you are about to take your first mutating action (edit, write, state-changing command); loading earlier is better, and if you notice you are already past it, load now. Governs the task contract, action gating, scope containment, verification by execution, adversarial self-review, and honest completion claims. Do NOT load for single-step questions, pure explanation, or trivial edits; for delegating to subagents or reviewing agent output, also load delegation-and-review.
 ---
 
 # Operational Rigor
@@ -28,6 +28,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
   or sends. Prefer dry-run/list-before-act modes and read their output first.
+- **Approval is not a verdict.** A go-ahead that arrives while a verification
+  artifact is still pending authorizes the action after the verdict lands, not
+  skipping the verification. Approval in one context does not extend to the next.
+- **Third-party executable content** (hooks, scripts, plugins) installs only
+  after: provenance check (owner/age/fork metadata), full source read, one
+  written sentence stating why it is inert or safe here, and a fixture test of
+  both the allow path and the block path.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
   replan. Before every retry, including the first, fill "attempt N failed because
   ___" with a mechanism; if it will not fill, reproduce the failure in isolation.
@@ -79,6 +86,10 @@ When rigor conflicts with finishing sooner, rigor wins.
 - **Scrutiny scales with novelty.** Thin prior art and effortless-looking output
   deserve harder verification. Ask: right step, or easy step?
 - A fix invalidates prior green results in its blast radius; re-run affected gates.
+- **Three defects, one mechanism → replace the mechanism.** A review returning
+  ≥3 defects that share one underlying mechanism means the mechanism is wrong:
+  do not patch each finding; rebuild on a sound base, prototype it standalone
+  against an input→expected matrix, then wire it in.
 - **Self-review is the floor, not the ceiling.** Load-bearing work needs a real
   gate or fresh-context check against the contract (delegation-and-review §3).
 - Report failures verbatim. Never present a workaround as the requested outcome.
@@ -104,5 +115,7 @@ When rigor conflicts with finishing sooner, rigor wins.
 Distilled 2026-07 from a sourced operational-rigor draft, fable-agent-orchestration
 `935e4a3` (false stops, investigate-before-fix, easy-vs-right),
 agent-standard-oss `3786c4c` (slop list, scrutiny-vs-novelty), and a friend's
-measured-harness export (expected-before-actual ordering, retry-mechanism gate).
+measured-harness export (expected-before-actual ordering, retry-mechanism gate),
+plus a 2026-07 mining pass (approval-timing, install gate, mechanism replacement;
+each rule probe-tested on a fresh weaker-tier agent before inclusion).
 Stable behavioral rules; no environment-specific facts to re-verify.

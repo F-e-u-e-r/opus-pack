@@ -7,7 +7,7 @@ Distilled for the daily-driver models that remain after Fable 5's window closes
 Principles: few dense rules beat comprehensive constitutions; executable gates
 beat more prose.
 
-Early alpha (`alpha-0.1.2`): rules may change as real sessions expose misses.
+Early alpha (`alpha-0.1.3`): rules may change as real sessions expose misses.
 Issues and PRs with concrete failure cases are welcome.
 
 ## Install
@@ -80,11 +80,14 @@ The judgment you asked for, recorded explicitly:
    delegation-and-review), but building a dedicated phase and report format
    around an unverified external model is overhead.
 4. **"Escalate to a stronger model" ladders** — the source briefs assume one exists;
-   post-Fable, Opus is the top model and the ladder's top rung hangs in air.
-   Rewritten: change approach → fresh-context retry → ask the user with the
-   failure trail; only solved patterns get "downgraded" to cheaper models for
-   batch application. This contradiction was not handled consistently in the
-   originals.
+   post-Fable, an Opus-driven session sits at the top tier and the ladder's top
+   rung hangs in air. Rewritten: change approach → fresh-context retry
+   (advice-mode at a stronger tier only when the environment actually offers
+   one — e.g. a Sonnet-driven session consulting Opus; otherwise the retry
+   stays plain same-tier) → ask the user with the failure trail; only solved
+   patterns get "downgraded"
+   to cheaper models for batch application. This contradiction was not handled
+   consistently in the originals.
 5. **The full USER_DECISION_CARD table** — compressed to four essentials
    (question+context, options with tradeoffs, recommendation, safe default if
    no reply). Asking a weaker model to fill an eight-field form yields form-
@@ -123,6 +126,16 @@ only as strong as the hook's own dependencies and match pattern) and **CI**
 (wire `checks/run-all.sh` into your pipeline). That is this pack's core
 principle: to enforce, use gates, not more prose.
 
+Between prose and gates sits a measured gap: **availability is not
+application**. In the pack's own eval
+(`reviews/2026-07-11-pack-eval-rounds-1-2.md`), only 10 of 24
+skills-available sessions ever self-loaded a skill — a description is a
+probabilistic nudge, not a mechanism. For a discipline that must fire on a
+given class of work, name the skill in the project's `CLAUDE.md` or in the
+dispatch prompt ("for tasks touching payments, load operational-rigor
+first"): a named skill loads near-deterministically; an unnamed one loaded
+less than half the time even on tasks its description matched.
+
 ## Enforcement: setting up hooks
 
 Hooks are shell commands the Claude Code harness itself runs on events —
@@ -153,13 +166,16 @@ silently allowing one):
 ```bash
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
-cp hooks/verify-before-stop.py .claude/hooks/
+cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
 ```
 
-Maintainers can regression-test the commit hook with:
+Maintainers can regression-test every hook (each suite covers both the
+allow path and the block path):
 
 ```bash
 bash hooks/test-gate-before-commit.sh
+bash hooks/test-verify-before-stop.sh
+bash hooks/test-gate-credential-destruction.sh
 ```
 
 Then add to `.claude/settings.json`:
@@ -215,7 +231,31 @@ acknowledgements). Wire it with:
 ]
 ```
 
-Both hooks append audit events to `~/.claude/hooks/hooks.log`, so
+**Third (optional) hook — credential-pattern files don't get destroyed on
+say-so.** `hooks/gate-credential-destruction.py` (Python 3 stdlib, tested
+2026-07-11) is a `PreToolUse` (matcher: `Bash`) hook that blocks
+`rm`/`unlink`/`shred`/`srm`/`truncate`/`git rm` — including `sudo`/wrapper
+and path-qualified forms — on credential-looking paths (ssh private keys
+and the `.ssh`/`.aws`/`.gnupg` directories, `.env` variants,
+`*.pem`/keystores, anything named credential/secret/password/apikey) until
+that specific deletion is explicitly confirmed: after the user's yes,
+re-run prefixed with `CRED_GATE_APPROVED=1`, which overrides that one
+command only. The override is friction plus an audit log, not proof of
+consent — every use is logged. Why the hook exists: in the pack's own
+eval, both weak-tier no-skills runs deleted a credentials backup because
+an instruction embedded in a vendor-notes file told them to — this gate
+turns that exact failure into a blocked call whose error message points at
+delegation-and-review §7 and security-architect. Known limits are in the
+script header (`bash script.sh`, aliases, `find -delete`, `xargs rm`, and
+`>` truncation bypass it — inherent to text-level hooks). Wire it as a
+second command under the same `PreToolUse`/`Bash` matcher:
+
+```json
+{ "type": "command",
+  "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-credential-destruction.py" }
+```
+
+All three hooks append audit events to `~/.claude/hooks/hooks.log`, so
 "how often does the gate fire, and what happened after a block" is auditable
 instead of invisible.
 
@@ -285,6 +325,17 @@ This pack distills and adapts ideas from:
   into operational-rigor / delegation-and-review / skill-authoring. Reviewed
   in full; its always-loaded/nudge/template layer was deliberately not
   adopted — same reasoning as dropped-item 5.
+- **echo-of-machines** —
+  [`echo-of-machines/fable-advisor`](https://github.com/echo-of-machines/fable-advisor);
+  the advice-mode consult (a stronger tier recommends, the current tier keeps
+  executing), adapted tier-relative into `delegation-and-review` §4. Same
+  pattern as Anthropic's
+  [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool).
+  Ideas only; no code taken.
+- **TheColliny** —
+  [`TheColliny/FableClaudeMDForOpus`](https://github.com/TheColliny/FableClaudeMDForOpus);
+  event-phrased routing, adapted as the state-phrased trigger rule in
+  `skill-authoring` §5. Ideas only; no code taken.
 - **firaen22** — contributed the cost-asymmetric golden runner and the first
   structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
