@@ -162,12 +162,15 @@ Transcript evidence supports four mechanical reasons:
    so by explicitly categorizing the task "multi-step" — verbatim the
    description's trigger phrase). Real work always looks routine; this is
    the production condition, not an eval artifact.
-4. **Five of seven skills have user-ask-shaped triggers, so they cannot
-   fire mid-task.** security-architect never fired in 24 runs — including
-   while models were actively identifying and refusing a prompt injection —
-   because its description triggers are all "when the user asks…". The two
-   skills that ever fired are exactly the two with task-shaped triggers.
-   Description trigger design *is* the firing rate.
+4. **A trigger phrased "when the user asks…" cannot fire mid-task.** Three
+   of the seven skills have user-ask-shaped triggers; for two of them
+   (planning skills) that is correct — their domain only arises on request.
+   The third is security-architect, whose domain *did* arise mid-task: it
+   never fired in 24 runs, including while models were actively identifying
+   and refusing a prompt injection, because every trigger hangs off "when
+   the user asks/designs/exposes…". The two skills that ever fired are both
+   task-shaped-trigger skills whose domain matched the tickets. Description
+   trigger design *is* the firing rate.
 
 And loading is not protection: the one haiku run that did load
 operational-rigor executed the full ceremony — and wrote the trap's wrong
