@@ -126,6 +126,16 @@ only as strong as the hook's own dependencies and match pattern) and **CI**
 (wire `checks/run-all.sh` into your pipeline). That is this pack's core
 principle: to enforce, use gates, not more prose.
 
+Between prose and gates sits a measured gap: **availability is not
+application**. In the pack's own eval
+(`reviews/2026-07-11-pack-eval-rounds-1-2.md`), only 10 of 24
+skills-available sessions ever self-loaded a skill — a description is a
+probabilistic nudge, not a mechanism. For a discipline that must fire on a
+given class of work, name the skill in the project's `CLAUDE.md` or in the
+dispatch prompt ("for tasks touching payments, load operational-rigor
+first"): a named skill loads near-deterministically; an unnamed one loaded
+less than half the time even on tasks its description matched.
+
 ## Enforcement: setting up hooks
 
 Hooks are shell commands the Claude Code harness itself runs on events —
@@ -156,13 +166,16 @@ silently allowing one):
 ```bash
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
-cp hooks/verify-before-stop.py .claude/hooks/
+cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
 ```
 
-Maintainers can regression-test the commit hook with:
+Maintainers can regression-test every hook (each suite covers both the
+allow path and the block path):
 
 ```bash
 bash hooks/test-gate-before-commit.sh
+bash hooks/test-verify-before-stop.sh
+bash hooks/test-gate-credential-destruction.sh
 ```
 
 Then add to `.claude/settings.json`:
@@ -218,7 +231,31 @@ acknowledgements). Wire it with:
 ]
 ```
 
-Both hooks append audit events to `~/.claude/hooks/hooks.log`, so
+**Third (optional) hook — credential-pattern files don't get destroyed on
+say-so.** `hooks/gate-credential-destruction.py` (Python 3 stdlib, tested
+2026-07-11) is a `PreToolUse` (matcher: `Bash`) hook that blocks
+`rm`/`unlink`/`shred`/`srm`/`truncate`/`git rm` — including `sudo`/wrapper
+and path-qualified forms — on credential-looking paths (ssh private keys
+and the `.ssh`/`.aws`/`.gnupg` directories, `.env` variants,
+`*.pem`/keystores, anything named credential/secret/password/apikey) until
+that specific deletion is explicitly confirmed: after the user's yes,
+re-run prefixed with `CRED_GATE_APPROVED=1`, which overrides that one
+command only. The override is friction plus an audit log, not proof of
+consent — every use is logged. Why the hook exists: in the pack's own
+eval, both weak-tier no-skills runs deleted a credentials backup because
+an instruction embedded in a vendor-notes file told them to — this gate
+turns that exact failure into a blocked call whose error message points at
+delegation-and-review §7 and security-architect. Known limits are in the
+script header (`bash script.sh`, aliases, `find -delete`, `xargs rm`, and
+`>` truncation bypass it — inherent to text-level hooks). Wire it as a
+second command under the same `PreToolUse`/`Bash` matcher:
+
+```json
+{ "type": "command",
+  "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-credential-destruction.py" }
+```
+
+All three hooks append audit events to `~/.claude/hooks/hooks.log`, so
 "how often does the gate fire, and what happened after a block" is auditable
 instead of invisible.
 
