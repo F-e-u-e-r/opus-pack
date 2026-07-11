@@ -2,3 +2,5 @@
 guideline*.txt
 guideline *.txt
 .claude/
+evals/
+internal/

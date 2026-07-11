@@ -7,7 +7,7 @@ Distilled for the daily-driver models that remain after Fable 5's window closes
 Principles: few dense rules beat comprehensive constitutions; executable gates
 beat more prose.
 
-Early alpha (`alpha-0.1.3`): rules may change as real sessions expose misses.
+Early alpha (`alpha-0.1.4`): rules may change as real sessions expose misses.
 Issues and PRs with concrete failure cases are welcome.
 
 ## Install
@@ -264,6 +264,31 @@ hook script before enabling it, and prefer committing hooks so they are
 reviewed like code. And Claude Code snapshots hook config at startup: after
 editing, review via the `/hooks` menu or restart the session for changes to
 take effect.
+
+## Evals: testing the pack itself
+
+The pack is tested against its own doctrine ("a rule you cannot test is a
+claim") with a private suite of trap tasks — planted out-of-scope bug,
+self-contradicting spec, vacuous test, plan-only pressure, embedded
+injection, wrong headline numbers — blind-graded with rubrics mapped to
+specific pack rules. The fixtures are deliberately **not published**: a trap
+task stops measuring anything once models may have seen it, and the first
+round showed even a trap-describing *directory name* can tip a model off.
+
+Honest baseline (2026-07-10, 8 arms × 6 tasks, 48 sessions, blind-graded):
+**no outcome-level increment from the skills was measurable on 2026 frontier
+models at max effort** — the tasks saturated (44/48 perfect scores; the
+predicted no-skill failures occurred zero times in any arm). With-skills
+runs did differ in process (rules cited by name, pre-declared expected
+observations, explicit scope contracts, observed-not-handled ledgers) — at
+roughly 1.6× the session time. A second, covert round (14 sessions, one
+realistic ticket, mechanically verified and independently re-checked)
+reproduced the ceiling and moved all remaining discrimination to the
+noticing-and-reporting layer; full numbers and corrections in
+[reviews/2026-07-11-pack-eval-rounds-1-2.md](reviews/2026-07-11-pack-eval-rounds-1-2.md).
+The hooks now carry allow+block unit suites but remain unmeasured at the
+behavioral-arm level. Treat the pack accordingly: a consistency layer and
+an enforcement substrate, not a proven score boost.
 
 ## How this pack degrades (and the built-in countermeasure)
 
