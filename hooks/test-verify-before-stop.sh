@@ -47,10 +47,17 @@ PY
 
 assert_block() {
   name="$1"; out="$2"
-  case "$out" in
-    *'"decision": "block"'*|*'"decision":"block"'*) echo "PASS $name" ;;
-    *) echo "FAIL $name: expected block, got: $out" >&2; exit 1 ;;
-  esac
+  # the whole stdout must be one valid JSON object with decision == "block"
+  if printf '%s' "$out" | python3 -c '
+import json, sys
+d = json.load(sys.stdin)
+sys.exit(0 if d.get("decision") == "block" and d.get("reason") else 1)
+' 2>/dev/null; then
+    echo "PASS $name"
+  else
+    echo "FAIL $name: expected a valid block JSON, got: $out" >&2
+    exit 1
+  fi
 }
 
 assert_pass() {

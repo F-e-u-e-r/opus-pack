@@ -16,12 +16,14 @@ Behavior:
 - Destructive verbs: rm, unlink, shred, srm, truncate, and `git rm` —
   matched case-insensitively on the token's basename, so `/bin/rm` and
   `RM` (case-insensitive filesystems run it) count. Wrapper commands
-  (sudo, doas, command, env, nice, nohup, time, busybox, stdbuf) pass
-  through to the real verb. Arguments (non-flag tokens) are matched
-  against credential patterns: names containing
-  credential/secret/password/apikey; ssh private keys
-  (id_rsa/id_dsa/id_ecdsa/id_ed25519, not .pub); .env and .env.* (except
-  the exact suffixes example/sample/template/dist); .netrc/.pgpass/
+  (sudo, doas, command, env, nice, nohup, time, busybox, stdbuf, exec)
+  and shell control syntax (if/then/for/do/while/{/}/!…) pass through to
+  the real verb; `--` ends option parsing, so `rm -- -secret.key` is a
+  filename. Arguments are matched against credential patterns: names
+  containing credential/secret/password/apikey; ssh private keys
+  (id_rsa/id_dsa/id_ecdsa/id_ed25519 — ssh public keys id_*.pub are
+  exempt, but other *.pub names are NOT); .env and .env.* (except the
+  exact suffixes example/sample/template/dist); .netrc/.pgpass/
   .htpasswd; extensions .pem/.p12/.pfx/.keystore/.jks/.kdbx/.ppk/.key;
   the directories .ssh/.aws/.gnupg themselves and any path under them.
 - On a hit: exit 2; stderr explains the rule and the two legitimate paths
@@ -64,6 +66,9 @@ import traceback
 DESTRUCTIVE = {"rm", "unlink", "shred", "srm", "truncate"}
 WRAPPERS = {"sudo", "doas", "command", "env", "nice", "nohup", "time",
             "busybox", "stdbuf", "ionice", "exec"}
+# shell control syntax that precedes the real command at command position
+RESERVED = {"if", "then", "elif", "else", "fi", "for", "while", "until",
+            "do", "done", "case", "esac", "{", "}", "!"}
 SEPARATORS = {";", "&", "&&", "|", "||", "(", ")"}
 OVERRIDE = "CRED_GATE_APPROVED=1"
 
@@ -102,7 +107,12 @@ def is_credential_path(arg):
     if not base:
         return False
     if base.endswith(".pub"):
-        return False
+        # exempt ssh PUBLIC keys only; "secret.pub"/"credentials.pub" still
+        # fall through to the normal pattern checks
+        stem = base[:-len(".pub")]
+        if any(stem == k or stem.startswith(k + ".") or stem.startswith(k + "_")
+               for k in SSH_KEY_BASENAMES):
+            return False
     if base == ".env" or (
         base.startswith(".env.") and base[len(".env."):] not in ENV_SAFE_SUFFIXES
     ):
@@ -139,6 +149,7 @@ def find_credential_targets(command):
     git_pending = False
     git_flag_value_pending = False
     override_this_command = False
+    options_ended = False
     for tok in tokens:
         if tok in SEPARATORS or all(c in ";|&()" for c in tok):
             at_command_position = True
@@ -146,8 +157,11 @@ def find_credential_targets(command):
             git_pending = False
             git_flag_value_pending = False
             override_this_command = False  # shell scoping: one command only
+            options_ended = False
             continue
         if at_command_position:
+            if tok in RESERVED:
+                continue  # control syntax: the real command is still ahead
             if "=" in tok and not tok.startswith("="):  # env assignment prefix
                 if tok == OVERRIDE:
                     override_this_command = True
@@ -161,6 +175,7 @@ def find_credential_targets(command):
                 continue
             verb_active = name in DESTRUCTIVE
             at_command_position = False
+            options_ended = False
             continue
         if git_pending:
             if git_flag_value_pending:
@@ -174,11 +189,16 @@ def find_credential_targets(command):
             verb_active = tok.lower() == "rm"
             git_pending = False
             continue
-        if verb_active and not tok.startswith("-") and is_credential_path(tok):
-            if override_this_command:
-                _log(f"PASS approved-override on: {tok}")
-            else:
-                targets.append(tok)
+        if verb_active:
+            if tok == "--":
+                options_ended = True  # everything after is a filename
+                continue
+            if ((options_ended or not tok.startswith("-"))
+                    and is_credential_path(tok)):
+                if override_this_command:
+                    _log(f"PASS approved-override on: {tok}")
+                else:
+                    targets.append(tok)
     return targets, True
 
 

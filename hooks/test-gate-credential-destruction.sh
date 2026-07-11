@@ -85,4 +85,15 @@ assert_exit 2 "unparseable + id_dsa (F7)"               'rm "id_dsa'
 assert_exit 2 "exec wrapper"                            'exec rm .env'
 assert_exit 2 "override does not extend across &&"      'CRED_GATE_APPROVED=1 rm .env && rm id_rsa'
 
+# --- second-reviewer regressions (gpt-5.5 findings, reproduced before fixing) ---
+assert_exit 2 "secret.pub is not an ssh pubkey (G1)"    'rm secret.pub'
+assert_exit 2 "credentials.pub under .aws (G1)"         'rm ~/.aws/credentials.pub'
+assert_exit 0 "ssh public key stays exempt (G1)"        'rm ~/.ssh/id_rsa.pub'
+assert_exit 2 "if-then control syntax (G2)"             'if rm .env; then echo ok; fi'
+assert_exit 2 "brace group (G2)"                        '{ rm .env; }'
+assert_exit 2 "negation (G2)"                           '! rm .env'
+assert_exit 2 "for-do loop (G2)"                        'for x in 1; do rm .env; done'
+assert_exit 2 "double-dash filename (G3)"               'rm -- -secret.key'
+assert_exit 0 "double-dash benign filename"             'rm -- notes.txt'
+
 echo "OK: all gate-credential-destruction tests passed"
