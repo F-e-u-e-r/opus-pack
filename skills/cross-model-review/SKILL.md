@@ -102,7 +102,8 @@ Packet → reviewers in parallel → reproduce + triage → fix must-fix →
 regenerate packet → re-review. Merge only when **every chosen reviewer
 produced a confirmed verdict** (§5 — non-empty body, identity confirmed; a
 timeout, empty, or error body is not a verdict, so it blocks a clean dual
-gate and drops you to the §6 recorded-gap rung, never a silent pass) **and**
+gate — record the missing lens per §5 partial-failure, then wait/retry or
+proceed single-lens per §6, never a silent pass) **and**
 each such verdict is either PROCEED or a FIX whose every item you have either
 reproduced and recorded as a justified gap, or adjudicated an irreproducible
 false positive with the counter-evidence recorded (§3 triage). A missing

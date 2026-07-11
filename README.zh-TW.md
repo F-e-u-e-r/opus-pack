@@ -1,14 +1,41 @@
-# Opus Pack — 為日常 Claude 模型萃取的運作 skill
+<h1 align="center">Opus Pack</h1>
 
-[English](README.md) | **繁體中文**
+<p align="center">
+  <em>為日常 Claude 模型萃取的運作 skill —<br><strong>少而密的規則,可執行的閘門勝過冗長散文。</strong></em>
+</p>
 
-為 Fable 5 退場後的日常模型(Opus 4.8 / Sonnet 5 / Haiku)萃取,2026-07。
-原則:少而密的規則勝過完整的憲法;可執行的閘門勝過更多的散文。
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <img alt="Version alpha-0.1.5" src="https://img.shields.io/badge/version-alpha--0.1.5-orange.svg">
+  <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
+  <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
+</p>
 
-早期 alpha(`alpha-0.1.5`):規則會隨真實 session 暴露出的缺口調整。
-歡迎用具體失敗案例開 issue 或 PR。
+<p align="center"><a href="README.md">English</a> · <strong>繁體中文</strong></p>
+
+---
+
+為 Fable 5 退場後的日常模型(Opus 4.8 / Sonnet 5 / Haiku)萃取的八個 skill 與
+三個 hook。它們押注一件事:強模型本就具備的判斷力,靠**更多散文**得到的提升,
+遠不如靠**在工作出錯時大聲失敗的閘門**。
+
+> [!NOTE]
+> **早期 alpha(`alpha-0.1.5`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
+> 歡迎用具體失敗案例開 issue 或 PR。
+
+## 目錄
+
+- [安裝](#安裝) · [Skill 一覽](#內容物)
+- [最高槓桿的十條原則](#萃取時保留的核心原則最高槓桿的十條)
+- [刻意捨棄的部分(與為什麼)](#刻意捨棄的部分與為什麼)
+- [Skill 會自動呼叫 agent 嗎?](#skill-會自動呼叫-agent-嗎) · [強制層:hooks](#強制層hooks-設定方法)
+- [Evals:測試這個 pack 本身](#evals測試這個-pack-本身) · [本包如何退化](#本包最可能的退化方式與內建對策)
+- [維護者筆記](#維護者筆記) · [Provenance 與致謝](#provenance-與致謝) · [授權](#授權)
 
 ## 安裝
+
+把 skill 複製到位——全域,或單一專案:
 
 ```bash
 # 全域(所有專案可用)
@@ -18,6 +45,7 @@ mkdir -p <repo>/.claude/skills && cp -R skills/* <repo>/.claude/skills/
 ```
 
 Skill 是按需載入的:平時只有 description 佔 context,觸發才讀全文。
+三個 hook 是選配、另外安裝——見[強制層:hooks](#強制層hooks-設定方法)。
 
 ## 內容物
 

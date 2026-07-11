@@ -1,16 +1,42 @@
-# Opus Pack — distilled operating skills for daily-driver Claude models
+<h1 align="center">Opus Pack</h1>
 
-**English** | [繁體中文](README.zh-TW.md)
+<p align="center">
+  <em>Distilled operating skills for daily-driver Claude models —<br><strong>few dense rules, executable gates over long prose.</strong></em>
+</p>
 
-Distilled for the daily-driver models that remain after Fable 5's window closes
-(Opus 4.8 / Sonnet 5 / Haiku), 2026-07.
-Principles: few dense rules beat comprehensive constitutions; executable gates
-beat more prose.
+<p align="center">
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+  <img alt="Version alpha-0.1.5" src="https://img.shields.io/badge/version-alpha--0.1.5-orange.svg">
+  <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
+  <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
+</p>
 
-Early alpha (`alpha-0.1.5`): rules may change as real sessions expose misses.
-Issues and PRs with concrete failure cases are welcome.
+<p align="center"><strong>English</strong> · <a href="README.zh-TW.md">繁體中文</a></p>
+
+---
+
+Eight skills and three hooks for the daily-driver models that remain after
+Fable 5's window closes (Opus 4.8 / Sonnet 5 / Haiku). They encode one bet:
+the judgment strong models already have improves less from **more prose** than
+from **gates that fail loudly when the work is wrong.**
+
+> [!NOTE]
+> **Early alpha (`alpha-0.1.5`).** Rules change as real sessions expose misses,
+> and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
+> — honest null result included. Issues and PRs with concrete failure cases are welcome.
+
+## Contents
+
+- [Install](#install) · [The skills](#the-skills)
+- [The ten highest-leverage principles](#the-ten-highest-leverage-principles-kept)
+- [Deliberately dropped (and why)](#deliberately-dropped-and-why)
+- [Do skills auto-call agents?](#do-skills-auto-call-agents) · [Enforcement: hooks](#enforcement-setting-up-hooks)
+- [Evals: testing the pack itself](#evals-testing-the-pack-itself) · [How this pack degrades](#how-this-pack-degrades-and-the-built-in-countermeasure)
+- [Maintainer notes](#maintainer-notes) · [Provenance & acknowledgements](#provenance-and-acknowledgements) · [License](#license)
 
 ## Install
+
+Copy the skills into place — globally, or per project:
 
 ```bash
 # Global (available in every project)
@@ -20,8 +46,10 @@ mkdir -p <repo>/.claude/skills && cp -R skills/* <repo>/.claude/skills/
 ```
 
 Skills load on demand: only the description occupies context until triggered.
+The three hooks are optional and installed separately — see
+[Enforcement: hooks](#enforcement-setting-up-hooks).
 
-## Contents
+## The skills
 
 | Skill | Covers | Main source |
 |---|---|---|
