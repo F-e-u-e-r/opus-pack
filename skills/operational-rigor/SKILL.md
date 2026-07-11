@@ -33,8 +33,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   skipping the verification. Approval in one context does not extend to the next.
 - **Third-party executable content** (hooks, scripts, plugins) installs only
   after: provenance check (owner/age/fork metadata), full source read, one
-  written sentence stating why it is inert or safe here, and a fixture test of
-  both the allow path and the block path.
+  written sentence stating why it is inert or safe here, and a fixture test
+  of its load-bearing behavior — for hooks/gates, both the allow path and
+  the block path.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
   replan. Before every retry, including the first, fill "attempt N failed because
   ___" with a mechanism; if it will not fill, reproduce the failure in isolation.
