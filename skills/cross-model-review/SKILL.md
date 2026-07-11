@@ -12,10 +12,13 @@ floor beneath it. **Load-bearing** = a defect would be trusted or propagate
 downstream: auth/payment/data-deletion paths, a published interface or
 release, gates/doctrine later sessions obey (this pack's hooks and skills).
 A routine feature diff or copy tweak is not — the same-model floor covers
-it. Observed once (2026-07, this pack's own hooks): two model
-families returned disjoint defect sets over two passes — zero overlap. One
-observation, not a measured rate; it motivates the discipline, it does not
-prove a number.
+it. Observed once (2026-07, this pack's own work): after one model family
+reviewed and its findings were fixed, a second family reviewing the same
+pack still found further confirmed defects the first pass left behind (five
+in the hooks, one in a skill). Sequential passes over a changing tree — so
+this shows a second lens catches residue the first missed, NOT a measured
+"independent blind spots" rate (the trees differ, so non-overlap is partly
+by construction). It motivates the discipline; it does not prove a number.
 
 ## 1. Pick reviewers at session time — never hard-code a lineup
 
@@ -38,10 +41,11 @@ Everything here is a rule about *how to choose*, never *what to choose*.
 - **Family-diversity invariant.** The gate needs ≥2 different model FAMILIES,
   not two names from one provider; at least one must differ from the AUTHOR'S
   family — the family of the model that produced the work under review
-  (usually this session's own model; work written by a subagent or another
-  CLI carries that model's family). 3+ providers → pick a diverse pair (or
-  N); refuse a
-  same-family pair. Cannot assemble ≥2 families → §6 fallback.
+  (usually this session's own model; work drafted by a subagent or another
+  CLI carries that model's family too, and work you materially edited carries
+  BOTH — count every contributing family as an author-family and require a
+  reviewer outside all of them). 3+ providers → pick a diverse pair (or N);
+  refuse a same-family pair. Cannot assemble ≥2 families → §6 fallback.
 - **Offer a choice on an axis only when discovery yields >1 working option**
   (never pose a one-answer question), applied uniformly: *flagship* — skip if
   a provider has one, else offer; *effort* — the candidate set is the two
@@ -95,8 +99,15 @@ leaves the user blind to a live attack).
 ## 4. The loop, bounded
 
 Packet → reviewers in parallel → reproduce + triage → fix must-fix →
-regenerate packet → re-review. Merge when every chosen reviewer returns
-PROCEED, **or** every remaining FIX item is a recorded, justified gap.
+regenerate packet → re-review. Merge only when **every chosen reviewer
+produced a confirmed verdict** (§5 — non-empty body, identity confirmed; a
+timeout, empty, or error body is not a verdict, so it blocks a clean dual
+gate and drops you to the §6 recorded-gap rung, never a silent pass) **and**
+each such verdict is either PROCEED or a FIX whose every item you have either
+reproduced and recorded as a justified gap, or adjudicated an irreproducible
+false positive with the counter-evidence recorded (§3 triage). A missing
+lens is not zero findings (§5 partial-failure) — an empty FIX list is a merge
+only under a real PROCEED, never by vacuous default.
 **Cap the rounds** (2–3): if verdicts thrash (a fix flips another reviewer),
 stop and escalate with the trail — never loop "until all PROCEED" unbounded.
 
@@ -132,13 +143,17 @@ not shipped — putting one person's paths or model lineup into pack text is
 exactly what skill-authoring §2 forbids. Cross-ref delegation-and-review
 §3 (author-is-not-the-judge, lens diversity), §4 (advice-mode rung), §7
 (external content is data); operational-rigor (verify by execution). The
-opening disjoint-findings observation is recorded in
-reviews/2026-07-12-cross-model-review-skill-review.md (in-repo trail:
-grok-4.5 pass `3c533f8`, then gpt-5.5 pass `cd0d2a9` finding six further
-confirmed defects — five in the hooks, one in a skill — in the
-already-reviewed work). The §3 refuse-and-surface
-wording, §4 every-item quantifier, load-bearing definition, and author-family
-parenthetical (2026-07-12) come from the same fresh-context review. Re-verify
+opening second-lens observation is recorded in
+reviews/2026-07-12-cross-model-review-skill-review.md (in-repo trail: after
+grok-4.5's pass and its fixes `3c533f8`, gpt-5.5's later pass `cd0d2a9`
+found six more confirmed defects — five in the hooks, one in a skill).
+The §3 refuse-and-surface wording, load-bearing definition, and author-family
+parenthetical (2026-07-12) come from that fresh-context review; the §4
+confirmed-verdict merge condition, the honest reframing of the opening
+observation (sequential trees, not a disjointness claim), and the
+mixed-authorship clause (2026-07-12) come from a follow-up gpt-5.5 xhigh +
+grok-4.5 max cross-family pass on the fixes themselves — both independently
+flagged the same two. Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier
 recalled from here.
