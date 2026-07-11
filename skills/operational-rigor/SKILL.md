@@ -35,7 +35,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   after: provenance check (owner/age/fork metadata), full source read, one
   written sentence stating why it is inert or safe here, and a fixture test
   of its load-bearing behavior — for hooks/gates, both the allow path and
-  the block path.
+  the block path. For security-critical parsers/gates, the fixture step is
+  author-imagination-bound: add a cross-family adversarial review of the
+  source, and re-run the gate when upstream ships fixes — a passed gate
+  certifies the version read, not the file path.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
   replan. Before every retry, including the first, fill "attempt N failed because
   ___" with a mechanism; if it will not fill, reproduce the failure in isolation.
