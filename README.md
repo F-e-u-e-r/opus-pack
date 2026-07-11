@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.5" src="https://img.shields.io/badge/version-alpha--0.1.5-orange.svg">
+  <img alt="Version alpha-0.1.6" src="https://img.shields.io/badge/version-alpha--0.1.6-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -21,7 +21,7 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.5`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.6`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -394,6 +394,18 @@ This pack distills and adapts ideas from:
   [`TheColliny/FableClaudeMDForOpus`](https://github.com/TheColliny/FableClaudeMDForOpus);
   event-phrased routing, adapted as the state-phrased trigger rule in
   `skill-authoring` §5. Ideas only; no code taken.
+- **2026-07 security-skill audit** — a 12-source sweep of community
+  "security" skills preceding the 2026-07-12 doctrine batch. Idea-level
+  adoptions only, no code: **eddygk/skill-vetting** (anti-override rule →
+  `delegation-and-review` §7), **UnitOneAI/SecuritySkills** (load-time
+  execution audit → `operational-rigor` §2),
+  **mukul975/Anthropic-Cybersecurity-Skills** (JWT `kid`/`jku`/`x5u` item,
+  zero-width/bidi sweep), **gitgoodordietrying** (SCA-in-CI),
+  **jgarrison929** (magic-byte upload validation). The same audit judged 3
+  of the 12 to be live trojans — all self-described security tools; nothing
+  from those was adopted, and the finding itself became doctrine
+  (`operational-rigor` §2: self-described security tools earn stricter
+  scrutiny, not less).
 - **firaen22** — contributed the cost-asymmetric golden runner and the first
   structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
@@ -401,10 +413,10 @@ This pack distills and adapts ideas from:
 - `security-architect` and `product-roadmap` were built from reference drafts
   supplied directly by the pack's owner.
 
-All external repos and posts were read and checked; no prompt injection or
-malicious instructions found. Extraction took ideas only — no embedded
-instructions were executed. Author + platform accompany every link so the
-attribution survives link rot.
+All adopted sources were read and checked; no embedded instructions were
+executed, and nothing was taken from the sources the 2026-07 audit judged
+malicious. Extraction took ideas only. Author + platform accompany every
+link so the attribution survives link rot.
 
 ## License
 

@@ -31,7 +31,7 @@ commit/ship gate: "all green" stops being a claim and becomes a checked fact.
 |---|---|---|
 | **golden** | "Is this prompt/classifier actually better, by how much, and which cases does it miss?" | LLM-judgment steps. |
 | **replay** | "Did my change alter output on real logged inputs, and exactly where?" | Refactors and regex/prompt tweaks over production data — catches silent drift reading the code cannot see. |
-| **project** | "Do build/tests/types/lint pass?" | Drop a `checks/project.sh` with `npm test`, `tsc --noEmit`, etc. |
+| **project** | "Do build/tests/types/lint pass?" | Drop a `checks/project.sh` with `npm test`, `tsc --noEmit`, an SCA scan (`npm audit` / `pip-audit`), etc. |
 
 A starter implementation lives in this skill's `template/` directory —
 copy it into the project as `checks/` and wire it up (~15 min per gate):

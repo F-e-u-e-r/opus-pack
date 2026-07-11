@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.5" src="https://img.shields.io/badge/version-alpha--0.1.5-orange.svg">
+  <img alt="Version alpha-0.1.6" src="https://img.shields.io/badge/version-alpha--0.1.6-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -20,7 +20,7 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.5`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.6`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
@@ -242,12 +242,13 @@ Hooks 現已具備放行/擋下兩路單元測試,但行為層(實測 arm)尚未
 - **Curtis Chou** — [`curtischoutw/claude-institution`](https://github.com/curtischoutw/claude-institution) @ `8dea062`,MIT License,Copyright (c) 2026 Curtis Chou。`verify-before-stop` hook 改作自其 `verify_gate.py`(該檔又改作自 Miguok/fable-harness),另有約 10 條判斷規則吸收進 operational-rigor / delegation-and-review / skill-authoring。已通讀審查;其常載/每回合提醒/罐頭模板層刻意不採——理由同捨棄清單第 5 項。
 - **echo-of-machines** — [`echo-of-machines/fable-advisor`](https://github.com/echo-of-machines/fable-advisor);顧問模式諮詢(更強一階出建議、目前一階續執行),以 tier-relative 形式改作進 `delegation-and-review` §4;與 Anthropic 官方 [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool) 同一模式。只採意念,未取任何程式碼。
 - **TheColliny** — [`TheColliny/FableClaudeMDForOpus`](https://github.com/TheColliny/FableClaudeMDForOpus);事件措辭路由,改作為 `skill-authoring` §5 的狀態措辭觸發規則。只採意念,未取任何程式碼。
+- **2026-07 安全 skill 稽查** — 對 12 個社群「安全」skill 的通盤審查,先於 2026-07-12 的 doctrine 批次。只採意念、未取任何程式碼:**eddygk/skill-vetting**(anti-override 規則 → `delegation-and-review` §7)、**UnitOneAI/SecuritySkills**(載入時執行稽核 → `operational-rigor` §2)、**mukul975/Anthropic-Cybersecurity-Skills**(JWT `kid`/`jku`/`x5u` 檢查項、零寬/雙向 Unicode 清查)、**gitgoodordietrying**(SCA 進 CI)、**jgarrison929**(magic-byte 上傳驗證)。同次稽查判定 12 個中 3 個為活體木馬——全部自稱安全工具;未從中採用任何內容,此發現本身成為 doctrine(`operational-rigor` §2:自稱安全工具受更嚴檢視,而非更寬)。
 - **firaen22** — 透過 GitHub PR 貢獻 cost-asymmetric golden runner 與第一版結構化 commit-hook parser。
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)
 - `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
 
-所有外部 repo 與貼文皆已通讀檢查,未發現 prompt injection 或惡意指令;萃取只採意念、不執行其內指令。每個連結都附作者+平台,連結失效後 attribution 仍可考。
+所有被採用的來源皆已通讀檢查;未執行任何內嵌指令,2026-07 稽查判為惡意的來源亦未被採用任何內容。萃取只採意念。每個連結都附作者+平台,連結失效後 attribution 仍可考。
 
 ## 授權
 

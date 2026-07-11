@@ -84,6 +84,10 @@ to the device is extractable; "obfuscated" is not "secret".
 - [ ] Algorithm pinned server-side; token's `alg` header never trusted
       (blocks `alg:none` and RS256→HS256 confusion).
 - [ ] Signature, `iss`, `aud`, `exp` all verified on every request.
+- [ ] Key-resolution headers (`kid`, `jku`, `x5u`) never dereferenced raw:
+      `kid` is an allowlisted lookup key (no paths, no SQL), and key-source
+      URLs resolve only against a pinned JWKS allowlist — attacker-supplied
+      key material turns signature checks into theater.
 - [ ] Access token short-lived (minutes, not days); refresh token rotated on
       use, stored in platform secure storage (table above), revocable
       server-side.
@@ -99,8 +103,9 @@ to the device is extractable; "obfuscated" is not "secret".
 XSS (escape by default, framework auto-escaping on, CSP as backstop) ·
 CSRF (`SameSite=Lax` + token for cross-site state changes) · CORS (explicit
 allowlist, never `*` with credentials) · cookie flags (`HttpOnly; Secure;
-SameSite`) · CSP present · file uploads (validate type/size server-side,
-serve from a separate origin, never execute) · SSRF if the backend fetches
+SameSite`) · CSP present · file uploads (validate type by content — magic
+bytes — not extension or client Content-Type, cap size server-side, serve
+from a separate origin, never execute) · SSRF if the backend fetches
 user-supplied URLs (allowlist hosts, block internal ranges).
 
 ## Backend checklist
@@ -110,7 +115,9 @@ this, to this resource" on **every** endpoint · input validation at the
 boundary (schema, length, type) · rate limiting on auth and expensive
 endpoints · webhooks verified by HMAC signature + timestamp tolerance
 (replay window) · idempotency keys on money/side-effect endpoints · audit
-log for admin and destructive actions.
+log for admin and destructive actions · dependency vulnerability scan (SCA)
+in CI — `npm audit` / `pip-audit` / `govulncheck` / `trivy` per stack,
+failing the build on known-exploited or critical findings.
 
 ## Database rules (Supabase RLS / Firestore / Postgres policies)
 
@@ -182,4 +189,8 @@ line (2026-07) come from the pack's own eval rounds 1–2
 user-ask-shaped triggers while injections were actively being handled; the
 strongest model refused an embedded directive without surfacing it; one run
 read a credentials file it did not need.
+The JWT key-resolution item, the SCA-in-CI line, and the magic-byte upload
+wording (2026-07-12) adopt ideas surfaced in a 12-source community
+security-skill audit (mukul975 / gitgoodordietrying / jgarrison929 — ideas
+only, no code; see README acknowledgements).
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
