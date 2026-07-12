@@ -4,3 +4,4 @@ guideline *.txt
 .claude/
 evals/
 internal/
+skills-staging/
