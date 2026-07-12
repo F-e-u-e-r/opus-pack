@@ -71,6 +71,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   note. A **blocker** may justify disclosed expansion; an **improvement** never does.
 - Mid-task tripwire: a "small fix" crossing roughly 3 files or 100 changed lines
   stops for disclosure before continuing.
+- Changing a schema, enum, status value, or interface: sweep every call site
+  before editing (grep every touchpoint) and report sibling instances of the
+  same defect — a partial sweep ships a half-migrated shape.
 - Before finishing, re-check diff vs. contract and delete creep.
 
 ## 4. Verify by observation
@@ -144,4 +147,7 @@ community security skills — 3 were live trojans, all self-described security
 tools; loader-run `!` syntax, invisible-Unicode and agent-config-access
 vectors observed live (ideas only, no code adopted; see README
 acknowledgements).
+The §3 call-site-sweep bullet (2026-07-13) generalizes a recurring incident
+class: a schema/enum/interface change edited some call sites and missed a
+sibling one, shipping a half-migrated shape that only surfaced later.
 Stable behavioral rules; no environment-specific facts to re-verify.
