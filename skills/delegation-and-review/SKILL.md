@@ -48,6 +48,12 @@ Every packet names:
   weighted toward it, not split evenly.
 - **Rules** — do not merge, weaken gates, or revert unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
+  For an implementation task, after bounded discovery (interfaces read, ambiguity
+  resolved), require a concrete artifact by an early checkpoint — a reproduced
+  failing test or an evidence-backed implementation note counts; production edits
+  still wait on the readiness gates. A long analysis producing nothing is a known
+  stall mode, but "edit first, read the real interface later" is the opposite
+  failure (operational-rigor: reading precedes writing).
 
 If any field cannot be filled, the task is not ready. Before non-trivial
 implementation, have fresh context review the packet; models volunteer risks as
@@ -73,6 +79,17 @@ reviewers that they silently absorb as implementers.
   caught → sweep the codebase: one catch, one class, one sweep.
 - **Machinery is not the user.** Tool completions, CI events, and agent statuses
   are state changes, not approval or proof. Open the artifact and verify.
+- **Unit-green is not integration.** A worker's component tests can all pass
+  while the bridge that wires the component in hardcodes a value that bypasses
+  the very behavior under test — a hollow integration. Verify by following ONE
+  real input from the entry surface to its observable output and confirming the
+  seam passed the real value, not a constant — not by the unit-test count.
+  ✅ "drove one real request through and watched the adapter's actual value reach
+  the output." ❌ "all its unit tests pass, so the integration is fine."
+- A copied or reimplemented block does not carry the origin's fix-history —
+  before trusting the clone, find the origin's fixes (`git log -S <symbol>`, or
+  its linked fix PRs) and confirm each guarded edge is present or explicitly N/A,
+  or you reintroduce bugs that were already paid for.
 - Before trusting fan-out synthesis, confirm inputs arrived: non-empty and in the
   expected count.
 - **Miss-is-costly audits** ("find ALL of X": security holes, money paths,
@@ -179,5 +196,10 @@ recurring dispatch-time failure: a spec built on a misremembered interface
 reaches the worker, which silently fills the gap with a plausible guess;
 and a single review pass under-covers "find ALL of X" work because
 redundant same-angle checks share the same blind spots and a clean round
-is mistaken for convergence. Stable behavioral rules; re-check only
+is mistaken for convergence.
+The 2026-07-13 additions (§2 planning-prone-worker stall clause; §3
+unit-green-is-not-integration and copy-doesn't-carry-fix-history) come from a
+cross-repo mining pass over seven independent retiring-architect `skills-staging/`
+libraries (class-distilled convergence; no single citable commit).
+Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.

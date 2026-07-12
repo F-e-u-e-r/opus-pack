@@ -101,7 +101,26 @@ When comparable projects exist, their repos are free research:
   sync?") before you prototype.
 - Calibrate: stars ≠ quality, activity ≠ direction; a popular repo's
   *unsolved* issues are your differentiation candidates.
-- License check before borrowing anything beyond ideas.
+- **License & IP hygiene before borrowing anything beyond ideas** (a conservative
+  agent default, not legal counsel — confirm the actual license and target
+  compatibility, and honor each license's exact terms):
+  - Preserve the source's required notices: MIT needs its copyright + permission
+    notice carried along; Apache-2.0 adds redistribution duties (and NOTICE
+    handling when the upstream ships one). As a safe default, treat strong
+    copyleft (AGPL/GPL) and unlicensed source as *ideas only* unless the user
+    clears the obligations — that is our conservative policy, not a claim the
+    license forbids all use.
+  - An AI rewrite/translation of copyrighted source is still a derivative — you
+    cannot launder it by paraphrase. True clean-room = an independent
+    implementation from an independently-written spec, not "I read it, then
+    rewrote it from memory."
+  - Code-license compatibility does NOT open a project's art, characters, or
+    trademarks.
+  - Adopt on *mechanism*, never a source's benchmark numbers — copy no metric you
+    did not reproduce, or you launder an unverified claim into your docs as fact.
+  - ✅ "Independent reimplementation from a spec I wrote, carrying the upstream's
+    required notice." ❌ "It's AGPL, but I had the model rewrite it in a new
+    style, so it's clean."
 
 Summarize insights with links; never vendor code or copy positioning wholesale.
 
@@ -128,4 +147,10 @@ P0–P3, repo checklist layers, agent/human/needs-info split, "what not to do
 yet"; added: riskiest-assumption framing, vertical-slice sequencing,
 cut-scope-not-quality, stalled-work-as-evidence, adjacent-repo mining with
 calibration; dropped: fixed 7-section report ceremony — verdicts over
-paperwork). Method is stable; nothing environment-specific to re-verify.
+paperwork).
+The 2026-07-13 license/IP-hygiene expansion (§6) — classify-license-before-
+copying, AI-rewrite-doesn't-launder-a-derivative, clean-room, code-license ≠
+art/character IP, adopt-mechanism-not-unreproduced-numbers — comes from a
+cross-repo mining pass over seven staged libraries (class-distilled; the pack
+had no IP doctrine before).
+Method is stable; nothing environment-specific to re-verify.

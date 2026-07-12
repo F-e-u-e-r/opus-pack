@@ -79,6 +79,18 @@ browser gives the user a trusted URL bar and keeps the app out of the
 credential path. App bundles cannot hold long-lived secrets: anything shipped
 to the device is extractable; "obfuscated" is not "secret".
 
+To hand a secret to a **child process**, prefer a protected channel the child
+supports — its stdin (then close the handle) or a dedicated secret FD — over CLI
+args or a freshly-set env var. Args are worst: the command line is visible to
+other local users via the process listing on typical systems. A fresh env var is
+narrower but still surfaces in crash dumps and is inherited by every descendant
+(exact visibility is platform-dependent — `/proc/<pid>/environ` access is
+ptrace-governed on Linux, and `/proc` doesn't exist everywhere). (Env *from a
+secret manager* for a process's own config is the accepted pattern —
+non-negotiable 6; this rule is about *handing* a secret to a child, not storing
+one.) Verify on the target platform: process listing, logs, crash dumps, and
+descendants expose no secret.
+
 ## Auth / JWT checklist
 
 - [ ] Algorithm pinned server-side; token's `alg` header never trusted
@@ -118,6 +130,37 @@ endpoints · webhooks verified by HMAC signature + timestamp tolerance
 log for admin and destructive actions · dependency vulnerability scan (SCA)
 in CI — `npm audit` / `pip-audit` / `govulncheck` / `trivy` per stack,
 failing the build on known-exploited or critical findings.
+
+## Secure ingestion of untrusted contributions
+
+When untrusted content flows past a human or model reviewer into execution
+(PR-based contributions, plugin/marketplace submissions, CMS content, config):
+
+- **What executes must be verifiably bound to what was reviewed.** For
+  compiled/bundled/generated code that means a provenance chain from reviewed
+  source + build recipe to the running artifact; for a data submission it means
+  no indirection field — a `src`, a redirect, a `{...spread}` of unknown keys —
+  silently swaps the approved content for something else. At a **trust boundary**,
+  reject unknown fields (`additionalProperties: false`), project the input
+  through an allowlist into a trusted internal shape, and *derive* security-
+  sensitive fields yourself rather than copying them from the submission. (A
+  versioned protocol that must *preserve* unknown fields is the opposite case —
+  the unknown-field policy is boundary-specific.) Unvalidated pass-through is the
+  default danger; close the whole class, don't patch one field.
+- **Prefer prevention-by-construction over detection.** Make unwanted input
+  structurally unable to reach the trusted surface (capability tokens, provenance
+  minting) rather than bolting on a classifier to detect it. Concretely: when
+  combining sources, take the **lowest** declared trust level — a producer's
+  self-reported trust may be downgraded by the system, never self-raised — and do
+  not grant an API-shape/schema check the trust you would give a real sandbox. A
+  control one property away from failing is not defense-in-depth.
+  ❌ "the submission's metadata says it's trusted, so I'll skip re-checking it."
+- **Minimize by type.** Decode untrusted data into a narrow type that OMITS
+  fields you don't need, so sensitive content is not *retained or propagated*
+  beyond the parse boundary (the raw bytes transit memory during decode — the
+  goal is they never reach storage, logs, or downstream); guard with a sentinel
+  test that fails if a content field ever appears. Don't add a network egress to
+  enrich data when local-only is the contract.
 
 ## Database rules (Supabase RLS / Firestore / Postgres policies)
 
@@ -193,4 +236,9 @@ The JWT key-resolution item, the SCA-in-CI line, and the magic-byte upload
 wording (2026-07-12) adopt ideas surfaced in a 12-source community
 security-skill audit (mukul975 / gitgoodordietrying / jgarrison929 — ideas
 only, no code; see README acknowledgements).
+The 2026-07-13 additions (subprocess-secret-via-stdin; the "secure ingestion of
+untrusted contributions" section — reviewer-sees-equals-what-runs, allowlist
+projection, prevention-by-construction, self-downgrade-only, minimize-by-type)
+distill a cross-repo mining pass over seven independent retiring-architect
+`skills-staging/` libraries (class-distilled convergence; no single citable commit).
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
