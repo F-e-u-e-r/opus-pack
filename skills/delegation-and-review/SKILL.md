@@ -76,15 +76,17 @@ reviewers that they silently absorb as implementers.
 - Before trusting fan-out synthesis, confirm inputs arrived: non-empty and in the
   expected count.
 - **Miss-is-costly audits** ("find ALL of X": security holes, money paths,
-  data leaving the machine) need a different loop than one review pass: scout
-  the work-list once in-context first (fan out over a known list, not a
-  guess), run axis-diverse finders — by-container, by-content, by-entity,
-  by-time, one axis per finder so blind spots don't line up — dedup new
-  findings against everything ever surfaced including ones already rejected
-  (dedup against confirmed-only never converges), and stop only after two
-  consecutive empty rounds; one clean round is not convergence. State
-  anything you bounded (top-N, sampling, a round cap) — a bounded sweep
-  reported as exhaustive reads as complete when it wasn't.
+  data leaving the machine) need a different loop than one review pass:
+  - Scout the work-list once in-context first — fan out over a known list,
+    not a guess.
+  - Run axis-diverse finders — by-container, by-content, by-entity,
+    by-time — one axis per finder so blind spots don't line up.
+  - Dedup new findings against everything ever surfaced, including ones
+    already rejected: dedup against confirmed-only never converges.
+  - Stop only after two consecutive empty rounds; one clean round is not
+    convergence.
+  - State anything you bounded (top-N, sampling, a round cap) — a bounded
+    sweep reported as exhaustive reads as complete when it wasn't.
 
 ## 4. Failure and escalation
 
@@ -172,9 +174,10 @@ outcome-first-writing and plain-handoff; the §7 cannot-vouch-for-itself
 lines (2026-07-12) adapt eddygk/skill-vetting's anti-override rule ("real
 code doesn't talk to its reviewers" — ideas only, no code). The §2
 interfaces-confirmed-not-recalled bullet and the §3 miss-is-costly-audit
-loop (2026-07-13) generalize a recurring dispatch-time failure: a spec built
-on a misremembered interface reaches the worker, which silently fills the
-gap with a plausible guess; and a single review pass under-covers "find ALL
-of X" work because redundant same-angle checks share the same blind spots
-and a clean round is mistaken for convergence. Stable behavioral rules;
-re-check only worktree/agent mechanics against the current harness.
+loop (2026-07-12, class-distilled; no single citable commit) generalize a
+recurring dispatch-time failure: a spec built on a misremembered interface
+reaches the worker, which silently fills the gap with a plausible guess;
+and a single review pass under-covers "find ALL of X" work because
+redundant same-angle checks share the same blind spots and a clean round
+is mistaken for convergence. Stable behavioral rules; re-check only
+worktree/agent mechanics against the current harness.
