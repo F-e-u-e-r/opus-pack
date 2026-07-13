@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.8" src="https://img.shields.io/badge/version-alpha--0.1.8-orange.svg">
+  <img alt="Version alpha-0.1.9" src="https://img.shields.io/badge/version-alpha--0.1.9-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -20,7 +20,7 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.8`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.9`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
