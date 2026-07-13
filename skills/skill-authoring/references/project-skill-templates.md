@@ -190,7 +190,9 @@ The parity-map file exists to stop that.
   the reference artifact and textbook/doctrine/docs disagree, parity wins — a
   "more correct" change is a regression here. (A real epoch "correction"
   toward the historically-accurate constant was reverted for exactly this;
-  the snapshot gate caught it.)
+  the snapshot gate caught it.) **The one carve-out:** never replicate a
+  security, privacy, or legal defect for parity's sake — diverge from the
+  reference there, and record the deliberate divergence in the map.
 - **Subsystem → oracle → gate map** — for each subsystem: what its ground
   truth is (the binary, a capture corpus, a lookup table) and which
   executable gate pins it.

@@ -61,8 +61,12 @@ These rules make the golden gate earn its keep:
   regardless of accuracy.
 - **Validate the capture instrument, then taint on defect.** When cases are
   minted through a lossy reader (OCR, screenshot parsing, scraping), validate
-  the reader against known-answer inputs first and keep the raw artifact per
-  row. A reader defect taints every conclusion derived from its output —
+  the reader against known-answer inputs first and keep a per-row capture
+  artifact **anonymized** per the Anonymize rule above (PII replaced with
+  same-shape stand-ins) — not the raw original; if a true raw artifact must be
+  retained to re-validate the instrument later, hold it in a separate,
+  minimized, access-controlled store, never as raw PII/secrets in the corpus.
+  A reader defect taints every conclusion derived from its output —
   re-derive them; never resurrect pre-fix conclusions. And a human reading of
   a low-res artifact never overturns a pinned value without machine capture
   or independent cross-validation (a "fix" was once shipped off a misread

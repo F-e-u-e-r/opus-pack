@@ -129,9 +129,13 @@ AuthN and authZ are separate questions — "who are you" then "may you do
 this, to this resource" on **every** endpoint · input validation at the
 boundary (schema, length, type) · rate limiting on auth and expensive
 endpoints · webhooks verified by HMAC signature + timestamp tolerance
-(replay window) · webhook handlers **ack before slow work** — the platform
-retries unacked deliveries and duplicates the work; the dedup backstop is an
-atomic create-if-absent on durable storage, never check-then-write
+(replay window) · webhook handlers **durably enqueue (or persist) the event,
+then ack** — ack too late and the platform retries on timeout and duplicates
+the work, but ack before the durable handoff and a crash after the 2xx loses
+the event with no retry; the processing then runs as a **separate
+queue-driven worker**, never as fire-and-forget after the 2xx in the same
+handler (on serverless that work dies with the response); the dedup backstop
+is an atomic create-if-absent on durable storage, never check-then-write
 (in-memory dedup state is per-instance and cold starts wipe it) · fan-in
 dispatchers: when many handlers share one routing entry point, locate where
 auth actually lives *before* adding a handler — if auth is per-handler, a
@@ -158,8 +162,17 @@ failing the build on known-exploited or critical findings.
 - Counters that cap **money spend** never share an eviction or bulk-clear
   policy with sprayable abuse counters — an attacker spraying unique keys to
   trigger a size-based clear resets the spend caps (that exact bypass has
-  shipped). Multi-cap checks are peek-then-commit: never charge budget on a
-  request another cap rejects.
+  shipped). Enforce each cap with an **atomic check-and-decrement** (one
+  operation — a conditional/transactional debit) — a read-then-write check
+  lets concurrent serverless requests all observe budget and overspend, even
+  on a single cap. Spanning multiple caps, make the whole charge
+  **all-or-nothing**: a single transaction across the caps, or durable
+  reservation state with idempotent reserve/commit/cancel **and** a
+  lease/TTL (or a reaper) that reclaims an orphaned hold — so a crash
+  mid-charge's hold expires or is reaped, freeing the capacity for a safe
+  retry, instead of leaking into a stuck hold that wedges the cap (idempotent
+  cancel alone never runs after a crash) — never charge budget on a request
+  another cap denies.
 - A shared cache written by unauthenticated requests and served to *other*
   readers is a poisoning surface: include a content hash in the cache/storage
   key so a writer can only affect readers of identical content, and write the
