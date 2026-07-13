@@ -38,7 +38,11 @@ Behavior:
 - Unparseable commands (unbalanced quotes): fall back to a raw-text scan;
   destructive verb + credential-ish token together fail toward blocking,
   same posture as gate-before-commit's "can't tell" exits.
-- Any other internal error fails open, with the traceback logged.
+- Any other internal error runs that same degraded raw-scan over the decoded
+  command (or, if the envelope was unparseable, the raw stdin): a clearly
+  destructive match blocks, anything else fails open with the traceback logged —
+  so a bug in this hook cannot freeze every Bash call. An envelope larger than
+  the 1 MiB cap is blocked unread (no override path — split the call).
 
 Known limits (inherent to text-level hooks; do not treat as omniscient):
 - `bash script.sh`, aliases, `find -delete`, `xargs rm`, and redirection
@@ -51,6 +55,17 @@ Known limits (inherent to text-level hooks; do not treat as omniscient):
   slip; the quoted form is matched.
 - It gates Bash only; Write/Edit overwrites of credential files are governed
   by prose rules, not this hook.
+- A destructive command separated only by a NEWLINE (not `;`/`&&`), an override
+  leaking across such a newline, and adversarially-crafted shell syntax
+  (redirections that separate the verb from the path, `bash -c`/`eval`,
+  variable / `$'…'` / substitution indirection, Windows-CRLF tricks) are NOT
+  caught: a newline is treated as whitespace, and this is a text-level heuristic,
+  not a shell parser.
+
+This is an **accidental-destruction gate** — it stops the model being tricked by
+an embedded directive or acting carelessly on a single line or `;`-separated
+commands — NOT an adversarial security boundary. Real protection is filesystem
+isolation / keeping credentials outside the tool's reach.
 
 Python 3.8+, stdlib only. Audit events append to ~/.claude/hooks/hooks.log.
 """
@@ -71,6 +86,7 @@ RESERVED = {"if", "then", "elif", "else", "fi", "for", "while", "until",
             "do", "done", "case", "esac", "{", "}", "!"}
 SEPARATORS = {";", "&", "&&", "|", "||", "(", ")"}
 OVERRIDE = "CRED_GATE_APPROVED=1"
+MAX_STDIN = 1 << 20  # 1 MiB cap on the tool-call envelope read (bounds regex work)
 
 NAME_SUBSTRINGS = ("credential", "secret", "password", "apikey", "api_key", "api-key")
 SSH_KEY_BASENAMES = ("id_rsa", "id_dsa", "id_ecdsa", "id_ed25519")
@@ -210,8 +226,21 @@ Files that look stale are often pending rotation or audit — verify before dest
 
 
 def main():
+    raw = ""
+    command = None
     try:
-        raw = sys.stdin.read()
+        raw = sys.stdin.read(MAX_STDIN + 1)
+        if len(raw) > MAX_STDIN:
+            # Oversized envelope: a destructive command could hide past the cap,
+            # so a truncated scan would miss it. Fail toward blocking — a >1 MiB
+            # Bash command is anomalous; there is no override here (the size check
+            # precedes parsing), so the user must split the call.
+            _log("BLOCK oversized envelope (exceeds inspection cap)")
+            try:
+                sys.stderr.write(BLOCK_MESSAGE.format(target="<oversized command>"))
+            except Exception:
+                pass
+            return 2
         data = json.loads(raw) if raw.strip() else {}
         command = ((data.get("tool_input") or {}).get("command")) or ""
         if not command:
@@ -233,6 +262,28 @@ def main():
         return 0
     except Exception:
         _log("ERROR " + traceback.format_exc().replace("\n", " | "))
+        # Degraded backstop: an internal error must not silently wave a
+        # destructive credential command through. Scan the decoded command if we
+        # got that far, else the raw envelope (coarse — a malformed envelope
+        # can't be reliably parsed, and unrelated fields may over-match). Fail
+        # toward blocking a clearly-destructive match; otherwise allow, so a bug
+        # in this hook cannot freeze every Bash call.
+        # A non-string command (e.g. a JSON array) can't be regex-scanned, so
+        # fall back to the raw stdin; the decision must not depend on the
+        # diagnostic write succeeding.
+        scan = command if isinstance(command, str) and command else raw
+        suspicious = False
+        try:
+            suspicious = bool(scan) and RAW_SUSPICIOUS_RE.search(scan) is not None
+        except Exception:
+            suspicious = False
+        if suspicious:
+            _log("BLOCK degraded raw-scan on internal error")
+            try:
+                sys.stderr.write(BLOCK_MESSAGE.format(target="<unreadable command>"))
+            except Exception:
+                pass
+            return 2
         return 0
 
 

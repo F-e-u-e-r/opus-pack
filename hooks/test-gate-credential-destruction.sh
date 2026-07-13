@@ -40,6 +40,26 @@ assert_exit() {
   echo "PASS $name"
 }
 
+# Feed RAW stdin straight to the hook (bypasses json_for) — for malformed
+# envelopes and non-JSON input that exercise the degraded-scan / fail path.
+assert_exit_raw() {
+  expected="$1"
+  name="$2"
+  raw_stdin="$3"
+
+  set +e
+  out=$(printf '%s' "$raw_stdin" | HOME="$tmp" python3 "$root/hooks/gate-credential-destruction.py" 2>&1)
+  code=$?
+  set -e
+
+  if [ "$code" -ne "$expected" ]; then
+    echo "FAIL $name: expected exit $expected, got $code" >&2
+    printf '%s\n' "$out" >&2
+    exit 1
+  fi
+  echo "PASS $name"
+}
+
 # --- allow path ---
 assert_exit 0 "benign rm"                    'rm build/cache.txt'
 assert_exit 0 "read-only on credential file" 'ls -la tmp/credentials.bak'
@@ -95,5 +115,28 @@ assert_exit 2 "negation (G2)"                           '! rm .env'
 assert_exit 2 "for-do loop (G2)"                        'for x in 1; do rm .env; done'
 assert_exit 2 "double-dash filename (G3)"               'rm -- -secret.key'
 assert_exit 0 "double-dash benign filename"             'rm -- notes.txt'
+
+# --- malformed envelope / internal-error degraded scan (raw stdin) ---
+# the pre-fix hook returned 0 (fail-open) on these; the degraded raw-scan blocks
+# a clearly-destructive one while still allowing a benign / unreadable one.
+assert_exit_raw 2 "malformed JSON, destructive payload" '{"tool_input": {"command": "rm ~/.ssh/id_rsa"'
+assert_exit_raw 0 "malformed JSON, benign payload"      '{"tool_input": {"command": "ls -la build"'
+assert_exit_raw 2 "non-JSON stdin but destructive text" 'oops rm ~/.aws/credentials oops'
+assert_exit_raw 0 "unrelated field mentions rm (command-scoped)" \
+  '{"tool_input": {"command": "echo ok"}, "description": "rm ~/.ssh/id_rsa"}'
+assert_exit_raw 2 "command is a non-string (JSON array) -> raw scan" \
+  '{"tool_input": {"command": ["rm ~/.ssh/id_rsa"]}}'
+assert_exit_raw 0 "command is a benign non-string" \
+  '{"tool_input": {"command": ["ls", "-la"]}}'
+
+# oversized envelope: a destructive command hidden past the 1 MiB read cap must
+# block, not scan a truncated benign prefix and allow.
+set +e
+python3 -c "import sys; sys.stdout.write('{\"tool_input\": {\"command\": \"echo ' + 'x'*1100000 + '; rm .env\"}}')" \
+  | HOME="$tmp" python3 "$root/hooks/gate-credential-destruction.py" >/dev/null 2>&1
+oversize_code=$?
+set -e
+[ "$oversize_code" -eq 2 ] && echo "PASS oversized envelope blocks" \
+  || { echo "FAIL oversized envelope: expected 2, got $oversize_code" >&2; exit 1; }
 
 echo "OK: all gate-credential-destruction tests passed"
