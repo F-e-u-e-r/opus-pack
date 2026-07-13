@@ -185,76 +185,17 @@ When rigor conflicts with finishing sooner, rigor wins.
     infer "fresh/healthy/present/safe" from inability to check.
   - ✅ blank / `—` when genuinely unknown. ❌ "null rate → show 0% so the chart
     still renders."
-- **A third-party tool's exit code is a contract to verify, not assume.** Some
-  tools exit non-zero on success-with-warnings while writing valid output
-  (qpdf exits 3); gating on `=== 0` then misclassifies success as failure — a
-  shipped gate once made legitimately-owned locked files permanently
-  unprocessable this way. For exit-code gates on external tools, read the
-  documented exit table, and confirm success by validating the output
-  artifact's integrity — not its mere existence, since a partial or corrupt
-  artifact can be written on failure.
-- **Never tighten a timeout below the measured success-latency tail.** Before
-  setting or "tidying" a timeout constant, measure the distribution of
-  *successful* runs on real payloads, over multiple runs — high-variance
-  backends make one run meaningless (a 25s "tidy" once aborted a measured
-  42s slow-but-successful call). A timeout under the success tail converts
-  slow successes into failures; record the dated measurement beside the
-  constant, and never retune from old numbers alone.
-- **Cache-write discipline: never cache a failure, an *unvalidated* empty
-  result, or an unvalidated payload** — a long TTL converts a transient flake
-  into a locked-in wrong answer. The distinction that resolves the apparent
-  conflict: an unvalidated empty (a flake, a parse failure on read) is a miss
-  to retry/overwrite, while a *validated* known-empty (the input legitimately
-  has no answer) is cached as an explicit sentinel. So a cache in front of a
-  paid producer needs **three states** (miss/error → retry; validated
-  known-empty → cached sentinel; value), or it either re-spends budget on
-  known-empty inputs or permanently caches transient errors. Scope the key by
-  every dimension that can fail independently (a shared key lets one path's
-  failure poison the other's success), and store the producer output minimized
-  and access-controlled per §4 (never third-party PII/secrets at rest by
-  default), applying curation/policy overrides at read time — baking them in
-  freezes old policy into the cache until TTL.
-  ❌ "cache whatever came back — empty is a valid result and saves an API call."
-- **A fallback chain is a set of unexercised dependencies that rot silently.**
-  A dead or capability-mismatched leg is invisible until the primary fails —
-  it errors on every call and falls through with zero visible errors, pure
-  quota waste (a chain's highest-quota model once went unused for weeks this
-  way). On any add/remove/reorder: live-probe every leg end-to-end with a real
-  payload and record dated results. Within the fallback chain (and only there —
-  not on an auth/payment/security path, where §4 fail-loud/fail-closed governs),
-  each tier helper normalizes its own failure to the chain's advance signal
-  (return empty so the next tier runs, never throw — a throw skips the
-  remaining tiers and drops the item entirely), but a terminal empty after
-  every tier has failed is an observed failure to log and meter, not a success;
-  and a last-resort tier with a
-  hard quota is invoked at batch granularity, or one refresh cycle exhausts
-  the emergency budget exactly when it is needed.
-- **On a UTC server handling a local-wall-clock domain, expect two time
-  conventions to coexist** (shifted-epoch values read via UTC accessors vs.
-  raw instants plus a timezone formatter): document which convention each
-  helper uses and never feed one convention's value to the other's reader —
-  the failure is a silent ±offset double-shift. Validate dates by calendar
-  round-trip, not component ranges alone (a day ≤ 31 still admits Feb 30):
-  construct, then confirm the constructor did not silently normalize it to a
-  different date (lenient constructors roll Feb 30 → Mar 2), or the scheduled
-  action fires on the wrong day with no error. Run time-logic tests under at
-  least two TZ environment values, and state an explicit policy for DST
-  gap/fold instants (which two TZ values alone do not cover).
-- **A deploy target is a contract to verify, not a bigger laptop.** On
-  response-terminates-execution platforms (serverless), fire-and-forget work
-  after the response silently never runs, and in-memory state is per-instance
-  and mortal — cold starts wipe it, concurrent instances multiply it; await
-  side effects before responding, and document each in-memory structure's
-  behavior when it vanishes or multiplies. Bundler file-tracers follow only
-  statically-analyzable imports, so runtime-resolved assets silently vanish
-  from the deployed artifact while local dev AND local build both pass. And
-  "every route 500s" points at a module-load or shared-init failure (module
-  load, shared middleware, config, runtime init) rather than one route's
-  logic — suspect that first, and probe a route that MATCHES (an unmatched
-  route's clean 404 comes from the platform fallthrough and masks a
-  fully-broken deploy); the truthful repro is building
-  the production artifact and importing it — dev-mode resolvers prove nothing
-  about production module loading.
+- **Building, configuring, or verifying work that crosses a boundary into an
+  external tool, cache, fallback chain, clock/timezone, or deploy target? Load
+  `references/external-systems.md`.** Each of those boundaries reports success
+  while lying about it in a specific, incident-backed way; the reference holds
+  the verify-before-trust rule for each — exit-code contracts (a tool that
+  exits non-zero on success), success-latency tails (a timeout that aborts slow
+  successes), three-state cache discipline (never cache an unvalidated empty),
+  fallback-chain rot (a dead leg invisible until the primary fails), the
+  two-time-convention + calendar round-trip (Feb 30 normalizes silently), and
+  deploy-target contracts (serverless fire-and-forget after the response never
+  runs).
 - **A clue about external data is a map, not a schema.** A field shape learned
   from docs, a blog, another repo's code, or memory tells you where to look,
   never what is there — sample the real shape on a real instance before writing a
@@ -332,16 +273,17 @@ independent retiring-architect `skills-staging/` libraries — a rule's weight i
 how many of the seven independently rediscovered it (class-distilled
 convergence; no single citable commit).
 The 2026-07-13 second batch (§2 delete-semantics sync gate, git-cherry clause,
-resolved-to-first diagnosis; §3 ordered-chain invariant; §4 exit-code contract,
-timeout-vs-success-tail, cache-write discipline, fallback-chain rot, two-time-
-convention rule, deploy-target contract) is mined from five further private
-production retiring-architect libraries (a link-shortener, a market dashboard,
-a Telegram bot, an engine-parity port, a learning lab); every rule is backed by
-a cited incident commit in its source library, and two (cache discipline,
-fallback rot) were independently rediscovered by two libraries (private repos —
-verifiable by the contributor, not linkable here).
-Stable behavioral rules — EXCEPT the 2026-07-13 external-systems batch, which
-cites environment-specific facts to re-verify against current tooling (tools'
-exit-code tables like qpdf's, mount-check commands, date-constructor
-normalization and TZ/DST behavior, serverless lifecycle semantics, bundler
-file-tracing).
+resolved-to-first diagnosis; §3 ordered-chain invariant; and a §4
+external-systems set — exit-code contracts, timeout-vs-success-tail,
+cache-write discipline, fallback-chain rot, two-time-convention, deploy-target,
+split into `references/external-systems.md` on 2026-07-14 to keep §4 lean) is
+mined from five further private production retiring-architect libraries (a
+link-shortener, a market dashboard, a Telegram bot, an engine-parity port, a
+learning lab); every rule is backed by a cited incident commit in its source
+library, and two (cache discipline, fallback rot) were independently
+rediscovered by two libraries (private repos — verifiable by the contributor,
+not linkable here).
+Stable behavioral rules; the environment-specific facts to re-verify now travel
+with the rules that cite them — the external-systems set in
+`references/external-systems.md`, plus §2's mount-check commands
+(`mountpoint`/`findmnt`/`df`) inline here.
