@@ -176,6 +176,35 @@ actual invariants — these are the common ones, not universals):
 
 ---
 
+## parity-map / oracle-map (for ported or reverse-engineered codebases)
+
+Purpose: when a codebase's spec is another artifact's *observed behavior* (a
+port of a closed binary, a re-implementation matched to a shipped app, a
+byte-parity migration), the single most dangerous contributor is one who
+"fixes" the code toward doctrine, docs, or the historically-correct answer.
+The parity-map file exists to stop that.
+
+**Shape:**
+
+- **The prime rule, stated first: the shipped artifact is the spec.** Where
+  the reference artifact and textbook/doctrine/docs disagree, parity wins — a
+  "more correct" change is a regression here. (A real epoch "correction"
+  toward the historically-accurate constant was reverted for exactly this;
+  the snapshot gate caught it.)
+- **Subsystem → oracle → gate map** — for each subsystem: what its ground
+  truth is (the binary, a capture corpus, a lookup table) and which
+  executable gate pins it.
+- **The deliberately-NOT-pinned list** — subsystems with no oracle, named
+  explicitly, so nobody hunts for an oracle that doesn't exist and no
+  parity-free feature is used to justify touching a pinned engine.
+- **Tables outrank formulas** — a lookup table captured from the artifact
+  outranks an inferred formula until the formula reproduces the *entire*
+  corpus exactly; keep the table as the gate even after the formula lands.
+- **Tripwire** — any proposal containing "the correct value is", "per the
+  standard", or "the original is wrong here" re-loads this file.
+
+---
+
 ## Library packaging — the entry/manifest/uncertainty trio (5/7 flagged it)
 
 Five of the seven mined libraries independently flagged this as worth doing; all
@@ -215,3 +244,7 @@ convergence (a shape's weight is how many of the seven independently produced
 it), no single citable commit. Those staging dirs are **local scratch
 (gitignored, not shipped)**, so this is historical provenance, not a
 downstream-runnable reference — the templates stand on their own.
+The parity-map / oracle-map category (2026-07-13) is mined from a further
+private retiring-architect library for an engine-parity port (its reverted
+doctrine-correction incident is cited inline above; private repo, verifiable
+by the contributor).
