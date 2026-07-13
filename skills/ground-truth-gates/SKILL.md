@@ -44,7 +44,7 @@ deterministic per input). Set the team's bar by editing `MIN_DEFAULT` in
 `golden/run.mjs` — that is what `run-all.sh` (and any hook/CI on top of it)
 enforces; the `--min` flag only overrides ad-hoc runs.
 
-Three rules make the golden gate earn its keep:
+These rules make the golden gate earn its keep:
 
 - **Anonymize structure-preserving** — replace PII values with same-shape
   stand-ins (digits for digits, `client@example.com` for an email, a
@@ -59,14 +59,40 @@ Three rules make the golden gate earn its keep:
   average away. The starter `run.mjs` implements this: set `DEFER_LABEL` to
   your safe-fallback label and the gate hard-fails on any false route
   regardless of accuracy.
+- **Validate the capture instrument, then taint on defect.** When cases are
+  minted through a lossy reader (OCR, screenshot parsing, scraping), validate
+  the reader against known-answer inputs first and keep the raw artifact per
+  row. A reader defect taints every conclusion derived from its output —
+  re-derive them; never resurrect pre-fix conclusions. And a human reading of
+  a low-res artifact never overturns a pinned value without machine capture
+  or independent cross-validation (a "fix" was once shipped off a misread
+  screenshot and had to be reverted).
+- **Every row records how it was captured.** A hand-written "plausible" row
+  converts the gate into a mirror of your own guess — gate corruption, not
+  coverage. When the capture rig is unavailable, the honest state is BLOCKED
+  naming the exact rig and recipe to unblock — never synthesis.
+- **Hold out a distribution-disjoint slice as the ship decider.** When the
+  corpus was consulted during development, passing it alone is the overfit
+  warning above; the deciding gate is a slice disjoint on a real dimension
+  (date range, source, tenant) that development never saw.
 
 The golden runner doubles as an experiment grader: pre-register expected
 outputs as cases before any runs, then grade with code, not impressions —
-no harness, no experiment.
+no harness, no experiment. Pre-register the full **outcome → action table**
+too (what each result will make you do), so a result cannot be rationalized
+into a favored action afterward. Calibrate difficulty per arm before
+comparing: a comparison where every arm passes — or every arm fails —
+measures nothing; halt at that precondition and report "untestable at this
+tier/difficulty" as a valid outcome instead of publishing a null. Grade
+blind to which arm produced each output.
 
 **replay:** replace `replay/corpus.jsonl` with a representative sample of
 real logged inputs. Replace `transform()` with the step being changed. Run
-`node replay/run.mjs --update` once to freeze current behavior; after each
+`node replay/run.mjs --update` once to freeze current behavior — and eyeball
+that first freeze line by line: a baseline freezes *current* behavior, not
+*correct* behavior, and it will protect any bug it contains as ground truth
+(one committed baseline enshrined a real redaction bug this way — fix the
+transform first, then freeze); after each
 edit, plain `node replay/run.mjs` — **0 diffs = safe; any diff = the exact
 records that moved.** Re-`--update` only after eyeballing an *intended*
 change, and only as the orchestrator/reviewer — never the editing worker's
@@ -81,6 +107,12 @@ diffs). It is the replay gate for code you are refactoring when you have nothing
 logged. (Freezing the old source *text* as a string is not a parity test — it
 never runs the old code.)
 
+**Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
+be removed wholesale (inline locale ternaries, stray global listeners), pin its
+current grep count as a dated baseline with the hits enumerated; the executable
+done-check on every diff is "the count did not grow" — and nobody "fixes" the
+enumerated baseline hits as a side quest either.
+
 ## What makes a gate real (task-relative test discipline)
 
 A generic green test is not proof. A gate is real only if:
@@ -91,7 +123,13 @@ A generic green test is not proof. A gate is real only if:
    broken arm fails, fixed arm passes — and prove a *negative* test can fail by
    running it against a known-bad arm. Instrument the failure's **own** signal,
    not a proxy: an unchanged field or intact-looking output can pass while the
-   failure still occurred.
+   failure still occurred. A suite that *grades* candidates is two-sided:
+   before it scores anything, show it PASSES on at least two structurally
+   distinct valid solutions (a too-strict suite silently rejects valid
+   alternatives — false collapse) **and** FAILS on a known-broken state (false
+   parity), both by execution. And confirm the corpus exercises the changed
+   branch: a change "verified" only on inputs where the new code never fires
+   is unverified — synthesize or capture firing inputs first.
 3. The **easy fake pass is named** and closed — hardcoded expected value,
    weakened assertion, testing the mock, a test that compiled but was never
    registered/run, a permanently `#[ignore]`/`.skip`ped backlog test that reads
@@ -99,7 +137,18 @@ A generic green test is not proof. A gate is real only if:
    fails when you deliberately break the code — not merely that it compiles. For
    a guard/error path, assert three things, not just the exit code: the
    returncode, a message string unique to THIS check (many errors share exit 2),
-   and that the dangerous side-effect did NOT occur (`assertNotIn`).
+   and that the dangerous side-effect did NOT occur (`assertNotIn`). Three more
+   fake-pass shapes: a **warm-state pass on init-only code** — a zero-violation
+   observation window proves nothing about code that only executes at
+   initialization (cold start, first run, migration); exercise the cold path in
+   a fresh context before enforcing (a CSP enforced after a clean Report-Only
+   window broke the whole engine, because the loader it blocked had been warm
+   the entire window). A **CI/automation config that has never executed** —
+   count runs (the platform's runs API), not files; a config can be structurally
+   undiscoverable (wrong directory in a monorepo) and inert forever while
+   reading as coverage. A **snapshot gate that silently re-freezes when its
+   baseline is missing** — deleting the baseline must be an error at gate time,
+   never a vacuous green.
 4. **Nobody weakens a gate to turn it green.** A worker satisfies the gate, never
    edits it — gate changes are the orchestrator's call. Three corollaries:
    - For an *immutable policy-checker* (not an ordinary test), run it from a
@@ -219,5 +268,14 @@ version-the-classifier, regenerate-and-diff; the "designing the guard itself"
 section) distill a cross-repo mining pass over seven independent
 retiring-architect `skills-staging/` libraries (class-distilled convergence — a
 rule's weight is how many of the seven independently rediscovered it).
+The 2026-07-13 case-set integrity rules (instrument validation + taint,
+row capture-provenance, distribution-disjoint holdout), the two-sided
+suite-soundness and fire-path clauses, the saturation/blind-grading and
+outcome→action pre-registration lines, the first-freeze eyeball, the
+grep-count ratchet, and the three added fake-pass shapes are mined from five
+further private retiring-architect libraries (an engine-parity port, a market
+dashboard, a learning-lab experiment harness, a Telegram bot, a link-shortener);
+each is backed by a cited incident or experiment in its source library (private
+repos — verifiable by the contributor, not linkable here).
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
