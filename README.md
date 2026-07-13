@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.7" src="https://img.shields.io/badge/version-alpha--0.1.7-orange.svg">
+  <img alt="Version alpha-0.1.8" src="https://img.shields.io/badge/version-alpha--0.1.8-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -21,7 +21,7 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.7`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.8`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -57,7 +57,7 @@ The three hooks are optional and installed separately — see
 | `delegation-and-review` | When to delegate, dispatch packets, two-critic review, failure/escalation ladder, long-task handoff, when to ask the user, injection defense | institution-design source briefs + fable-agent-orchestration + agent-standard-oss §8–10 |
 | `ground-truth-gates` | golden / replay / project gates and task-relative test discipline; ships a runnable `template/` | a privately shared ground-truth harness note (backbone) + task-relative-test-gate |
 | `skill-authoring` | Executable-rule format for weaker models, ground-truth-only, provenance and decay, memory architecture (compile-don't-retrieve), review before adopting | the tomicz skill-library brief (MIT) + agent-standard-oss §1–2, §11 |
-| `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, agent tool permissions, leak incident response | user-supplied security reference draft + OWASP/RFC common knowledge, verified and extended |
+| `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, secure ingestion of untrusted contributions, agent tool permissions, leak incident response | user-supplied security reference draft + OWASP/RFC common knowledge, verified and extended |
 | `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | user-supplied roadmap reference draft — ceremony cut, judgment added |
 | `personal-goal-planning` | Coach-style five steps: minimal intake, tiered goals (2–4w / 2–3m / 6–12m) with one mainline, executable tasks with observable done-criteria, realistic weekly rhythm, weekly review with a stuck rule | @pro_ai.news goal-coaching protocol (Threads) + this pack's house rules |
 | `cross-model-review` | Adversarial review from a *different model family* before a load-bearing merge: session-time reviewer discovery (no hard-coded lineup), self-contained packet, findings-are-claims, bounded review-and-fix loop (merge only when every reviewer returned a confirmed verdict — each one PROCEED, or a FIX whose every remaining item is a recorded, justified gap; a timeout/empty body is not a verdict), exit-code≠pass. Doctrine only — concrete CLIs stay out of the pack | promoted from the owner's private cross-model-review CLI notes; doctrine generalized, machine recipes kept personal |

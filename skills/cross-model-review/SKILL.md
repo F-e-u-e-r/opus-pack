@@ -163,7 +163,7 @@ confirmed-verdict merge condition, the honest reframing of the opening
 observation (sequential trees, not a disjointness claim), and the
 mixed-authorship clause (2026-07-12) come from a follow-up gpt-5.5 xhigh +
 grok-4.5 max cross-family pass on the fixes themselves — both independently
-flagged the same two. The §3 reviewer-selection-test (embedded-directive
+flagged the same two. The §3 compromised-reviewer substitution rule (embedded-directive
 handling) and finding-disposition / don't-re-litigate additions (2026-07-13)
 come from a cross-repo mining pass over seven staged libraries (class-distilled).
 Re-verify

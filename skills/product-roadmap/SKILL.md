@@ -148,8 +148,9 @@ yet"; added: riskiest-assumption framing, vertical-slice sequencing,
 cut-scope-not-quality, stalled-work-as-evidence, adjacent-repo mining with
 calibration; dropped: fixed 7-section report ceremony — verdicts over
 paperwork).
-The 2026-07-13 license/IP-hygiene expansion (§6) — classify-license-before-
-copying, AI-rewrite-doesn't-launder-a-derivative, clean-room, code-license ≠
+The 2026-07-13 license/IP-hygiene expansion (§6) —
+classify-license-before-copying, AI-rewrite-doesn't-launder-a-derivative,
+clean-room, code-license ≠
 art/character IP, adopt-mechanism-not-unreproduced-numbers — comes from a
 cross-repo mining pass over seven staged libraries (class-distilled; the pack
 had no IP doctrine before).

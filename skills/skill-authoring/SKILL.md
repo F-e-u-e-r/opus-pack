@@ -123,8 +123,9 @@ And where misreading is costly or the judgment boundary is subtle, add:
   **How to write each well is not obvious from its name.** The converged
   entry shapes — failure-archaeology's disposition-tag / failure-mechanism /
   residue-location / tripwire fields; the debugging-playbook's keying on the
-  verbatim observed symptom; the architecture-contract's trigger-is-the-
-  tempting-change form; and the library's START-HERE / MANIFEST / UNCERTAINTY
+  verbatim observed symptom; the architecture-contract's
+  trigger-is-the-tempting-change form; and the library's START-HERE / MANIFEST /
+  UNCERTAINTY
   trio — are in `references/project-skill-templates.md`. Read it before
   authoring or reviewing a project-skill library.
 

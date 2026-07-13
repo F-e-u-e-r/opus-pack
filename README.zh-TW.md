@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.7" src="https://img.shields.io/badge/version-alpha--0.1.7-orange.svg">
+  <img alt="Version alpha-0.1.8" src="https://img.shields.io/badge/version-alpha--0.1.8-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -20,7 +20,7 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.7`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.8`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
@@ -55,7 +55,7 @@ Skill 是按需載入的:平時只有 description 佔 context,觸發才讀全文
 | `delegation-and-review` | 何時委派、dispatch packet、雙評審審查、失敗與升級階梯、長任務交接、何時問使用者、injection 防護 | 制度設計來源 brief + fable-agent-orchestration + agent-standard-oss §8–10 |
 | `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 ground-truth harness 筆記(主幹)+ task-relative-test-gate |
 | `skill-authoring` | 弱模型可執行的規則格式、ground-truth-only、provenance 與衰變、記憶架構(compile-don't-retrieve)、採用前審查 | tomicz skill-library brief(MIT)+ agent-standard-oss §1–2、§11 |
-| `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、agent 工具權限、洩漏事件處理 | 使用者提供的 security 參考稿 + OWASP/RFC 常識,經查證與補強 |
+| `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、不可信投稿的安全接收、agent 工具權限、洩漏事件處理 | 使用者提供的 security 參考稿 + OWASP/RFC 常識,經查證與補強 |
 | `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | 使用者提供的 roadmap 參考稿,砍儀式、補判斷 |
 | `personal-goal-planning` | 教練式五步驟:最少提問建檔、三層目標(2–4週/2–3月/6–12月)單一主線、可執行任務與可觀察完成標準、務實週節奏、含卡關規則的每週檢討 | @pro_ai.news 目標教練 protocol(Threads)+ 本包 house rules |
 | `cross-model-review` | load-bearing merge 前找**不同模型家族**做對抗審查:session 時偵測審查者(不寫死陣容)、自足 packet、findings 視為主張、有界的審查-修正迴圈(每位審查者都給出確認過的 verdict——各自為 PROCEED,或其每個剩餘 FIX 項皆為記錄在案且有正當理由的 gap,才 merge;timeout/空回應不算 verdict)、exit code≠通過。只放 doctrine——具體 CLI 不進 pack | 由 owner 私有 cross-model-review CLI 筆記提升;doctrine 一般化,機器 recipe 保留在個人端 |

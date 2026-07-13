@@ -30,7 +30,7 @@ When rigor conflicts with finishing sooner, rigor wins.
   or sends. Prefer dry-run/list-before-act modes and read their output first.
 - **Approval is not a verdict.** A go-ahead that arrives while a verification
   artifact is still pending authorizes the action after the verdict lands, not
-  skipping the verification. Approval in one context does not extend to the next.
+  skipping the verification (per-invocation scope is the next bullet).
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
   destructive, spending, publishing, or credential action, it exists to make a
@@ -221,8 +221,9 @@ class (class-distilled; no single citable commit): a schema/enum/interface
 change edited some call sites and missed a sibling one, shipping a
 half-migrated shape that only surfaced later.
 The 2026-07-13 additions (§2 confirmation-gate + authorization scope/freshness,
-baseline-before-mutate; §3 documented-decision-is-load-bearing, output-text-is-
-an-interface, credential-swap-is-a-trigger-change; §4 data-path integrity, the
+baseline-before-mutate; §3 documented-decision-is-load-bearing,
+output-text-is-an-interface, credential-swap-is-a-trigger-change; §4 data-path
+integrity, the
 external-shape/field-semantics gate) distill a cross-repo mining pass over seven
 independent retiring-architect `skills-staging/` libraries — a rule's weight is
 how many of the seven independently rediscovered it (class-distilled

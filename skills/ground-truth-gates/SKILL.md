@@ -1,6 +1,6 @@
 ---
 name: ground-truth-gates
-description: Build executable verification gates (golden set, replay corpus, project checks) so "it works" becomes a checked fact instead of a claim. Load when changing any LLM-judgment step (classify/extract/route/prompt), refactoring logic that processes real logged data, designing tests for a fix, setting up a commit/ship gate for a project, or when you are about to trust a passing test that has never been shown able to fail. Also the reference for what "proof gate" means in delegation-and-review packets. Do NOT load for one-off scripts or exploratory spikes — plain operational-rigor covers those.
+description: Build executable verification gates (golden set, replay corpus, project checks) so "it works" becomes a checked fact instead of a claim. Load when changing any LLM-judgment step (classify/extract/route/prompt), refactoring logic that processes real logged data, designing tests for a fix, setting up a commit/ship gate for a project, designing a runtime guard (a hook, validator, or auth check) and its fail direction, or when you are about to trust a passing test that has never been shown able to fail. Also the reference for what "proof gate" means in delegation-and-review packets. Do NOT load for one-off scripts or exploratory spikes — plain operational-rigor covers those.
 ---
 
 # Ground-Truth Gates
@@ -72,7 +72,7 @@ records that moved.** Re-`--update` only after eyeballing an *intended*
 change, and only as the orchestrator/reviewer — never the editing worker's
 own call (rule 4 below: gate changes are not the worker's to make).
 
-**parity (no corpus):** a refactor of pure-ish logic (config parsing, path
+**replay variant — parity (no corpus):** a refactor of pure-ish logic (config parsing, path
 handling, formatting) often has no logged corpus to replay. Keep the pre-change
 implementation *callable* — a pinned import, a second checkout, or
 `git show <base>:<path>` copied into a `_old` module — and run old vs new over a
@@ -162,23 +162,34 @@ enforces one at runtime — and has its own failure design:
   surface** — the untrusted HTTP/MCP/CLI/webhook boundary where its parameter
   was never wired. Exercise it through that surface; malformed / typo /
   explicit-null input there must fail **closed**, never be silently treated as
-  "omitted". A CI that mocks the external dependency proves your logic, not the
-  live integration — run a live smoke before trusting it.
-- **Choose the fail-direction per failure mode and record why.** Every security,
+  "omitted" — except a guard that itself gates every action, whose fail-direction
+  (and its documented fail-open gap) is the next bullet. A CI that mocks the
+  external dependency proves your logic, not the live integration — run a live
+  smoke before trusting it.
+- **Choose the fail-direction per failure mode and record why.** A security,
   integrity, destructive, spending, publishing, or gate-enforcement control fails
-  **closed** even when that blocks the action — a credential or commit gate that
-  hits an internal error must deny, not wave through. Fail **open** only for an
-  explicitly-advisory guard (telemetry, an optional productivity hook) whose own
-  crash would otherwise halt all work; when unsure which class a guard is, treat
-  it as fail-closed. ✅ "the credential hook errored → it denies and logs."
-  ❌ "the hook is flaky and blocks my commands, so I'll make it fail-open" — that
-  converts a guard into a rationalized bypass.
-- **A relief valve is a pre-existing, owner-designed, audited, human-gated
-  override — never one an agent invents to unblock itself**, and never present on
-  a non-bypassable (security / destructive / spending) control. Removing an
-  existing audited valve "to harden" re-creates the deadlock it was designed to
-  prevent; *adding* an `*_ACK` / `--force` path to get past a gate is the
-  confirmation-gate violation (operational-rigor §2), not hardening.
+  **closed** on the threats and malformed input it detects — deny, don't wave
+  through. The hard case is a guard that *itself gates every action* (a Bash
+  pre-tool hook): it can't hard-fail-closed on every internal error without
+  bricking the agent, so it fails closed on what it detects and raw-scans an
+  unparseable *command*, while a malformed envelope or other internal error still
+  fails open — a documented gap to narrow, never a licence to widen. Keep that
+  fail-open surface minimal. A purely-advisory guard (telemetry) may fail open
+  freely; when unsure, treat it as fail-closed. ✅ "the credential gate blocks the
+  deletion it detects and raw-scans an unparseable command; its malformed-envelope
+  path fails open today — a disclosed gap." ❌ "the hook is flaky and blocks my
+  commands, so I'll make it fail-open" — that converts a guard into a
+  rationalized bypass.
+- **A relief valve is a pre-existing, owner-designed, friction-plus-log override
+  — never one an agent invents to unblock itself**, and never added to a control
+  the owner designated non-bypassable (an immutable policy-checker). Security /
+  destructive / spending controls default to non-bypassable *unless* the owner
+  ships such an override (like this pack's own `CRED_GATE_APPROVED`, whose value
+  is the friction and the audit line, not tamper-proofing — a determined agent
+  can still set it). Removing an existing owner-shipped valve "to harden"
+  re-creates the deadlock it was designed to prevent; *adding* an `*_ACK` /
+  `--force` path to get past a gate is the confirmation-gate violation
+  (operational-rigor §2), not hardening.
 - **State what the guard does NOT guarantee** and its known-accepted bypasses in
   its header, so maintainers neither over-trust it nor destabilize it by chasing
   inherent bypasses into the parser. (At a trust boundary, prefer structural
@@ -201,9 +212,9 @@ experiment-grader rule), fable-agent-orchestration `935e4a3`
 (task-relative-test-gate, fail-under-broken, two truth sources).
 The project-gate SCA example (2026-07-12) mirrors security-architect's
 SCA-in-CI line (same 12-source audit; ideas only, no code).
-The 2026-07-13 additions (the parity gate; the extended gate-real rules —
+The 2026-07-13 additions (the parity replay-variant; the extended gate-real rules —
 mock≠sign-off, error-path three-part assertion, base-ref execution,
-correlated-model-bias, compiled-but-not-run, false-FAIL registry,
+correlated-model-bias, compiled-but-not-run, environmental-FAIL quarantine,
 version-the-classifier, regenerate-and-diff; the "designing the guard itself"
 section) distill a cross-repo mining pass over seven independent
 retiring-architect `skills-staging/` libraries (class-distilled convergence — a

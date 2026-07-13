@@ -186,7 +186,7 @@ mandate for every doc.
 
 - **START-HERE / router** (`00-start-here.md` or the always-loaded index):
   orients by the **engineering core, not the domain** ("the hard part here isn't
-  the religious content, it's the machine-guarantee of citation trust"); a
+  the domain content, it's the machine-guaranteed provenance of every answer"); a
   **canonical-source map** (what | where its source-of-truth lives | don't-touch
   caveat); a **current-state triage** of the dirty/red worktree so a fresh agent
   doesn't misread pre-existing breakage as its own; the top disciplines; and a
@@ -198,10 +198,11 @@ mandate for every doc.
 - **UNCERTAINTY register** — everything the library deliberately does NOT treat
   as settled, quarantined from the confident content, in labeled buckets:
   confirmed-contradiction-awaiting-owner / not-yours-to-decide / env-dependent or
-  user-must-provide / will-go-stale-reverify-before-use / locally-unverifiable-
-  provenance / do-not-commit-residue. **Every item ends in a safe default**, so a
-  zero-context reader can act ("KV-publish command is unverified → safe default:
-  hand to the operator; use the CLI only if the user asks and it's authed").
+  user-must-provide / will-go-stale-reverify-before-use /
+  locally-unverifiable-provenance / do-not-commit-residue. **Every item ends in a
+  safe default**, so a zero-context reader can act ("a deploy/publish command is
+  unverified → safe default: hand it to the operator; use the CLI only if the user
+  asks and the session is authed").
 
 ---
 
