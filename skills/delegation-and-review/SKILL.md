@@ -43,6 +43,14 @@ Every packet names:
   packet names was read from source this session (`file:line`), not
   remembered; a misremembered interface is exactly the gap a worker silently
   fills with a plausible guess.
+- **Edge behavior named** — every edge the task can meet (empty / zero /
+  negative / NaN / undefined / oversized / malformed) with its required
+  behavior. Unstated edges are the shared blind spot of every model tier: the
+  worker picks SOMETHING plausible and you find out at the gate — in one
+  bench, 9 of 10 models infinite-looped on an unstated `size=0`, and even the
+  strongest tier hung on a negative capacity. Post-hoc review of edges is too
+  late; spec them or lose them.
+  ❌ "the function is obvious, it'll handle empty input sensibly."
 - **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
@@ -201,5 +209,10 @@ The 2026-07-13 additions (§2 planning-prone-worker stall clause; §3
 unit-green-is-not-integration and copy-doesn't-carry-fix-history) come from a
 cross-repo mining pass over seven independent retiring-architect `skills-staging/`
 libraries (class-distilled convergence; no single citable commit).
+The §2 edge-behavior field (2026-07-13) is mined from a delegation-routing
+library in a further private learning-lab repo; the numbers come from its
+1000+-run delegation benchmarks (edge-case robustness was the single weakest
+axis across every model pool tested — private repo, verifiable by the
+contributor).
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
