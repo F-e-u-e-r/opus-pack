@@ -37,16 +37,20 @@ And where misreading is costly or the judgment boundary is subtle, add:
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
   mechanism that itself fails on exactly the case it targets (`git cherry`
-  for squash-merge residue — per-commit patch-ids never match a squash
-  commit; "ack a webhook before the slow work" — a post-2xx crash then loses
-  the event; "peek-then-commit" a spend cap — a TOCTOU overspend race under
-  concurrent fan-out). One reviewed batch of 27 incident-mined rules shipped
-  4 of exactly this shape, each past the author's own self-review. Before a
-  rule ships for an agent to execute verbatim: run or trace the prescribed
-  mechanism against its own motivating case AND the nearest adjacent edge
-  (two-sided — the rule must both fire on the case it targets and survive
-  the case one step away), and have a reviewer from a different model family
-  attack the MECHANISM, not the prose.
+  for squash-merge residue on a multi-commit branch — its per-commit
+  patch-ids never match the single squash commit; "ack a webhook before the
+  slow work" — a post-2xx crash then loses the event; "peek-then-commit" a
+  spend cap — a TOCTOU overspend race under concurrent fan-out). One
+  reviewed batch of 27 incident-mined rules had 4 of exactly this shape, each
+  passing the author's own self-review and caught only by a cross-family
+  mechanism review before merge. Before an incident-mined rule that
+  prescribes a mechanism ships for an agent to execute verbatim: run or
+  trace the prescribed mechanism against its own motivating case AND the
+  nearest adjacent edge (two-sided — the rule must both fire on the case it
+  targets and survive the case one step away), and get a cross-family
+  mechanism review (`cross-model-review`) attacking the MECHANISM, not the
+  prose. No second family available → `cross-model-review` §6's fallback
+  (same-model fresh-context critic, gap recorded) applies here too.
 - What cannot be verified is labeled `unverified` or `user-must-provide` —
   never silently invented. Unproven ideas stay labeled open/candidate; no
   oversell.
@@ -213,8 +217,9 @@ MANIFEST+UNCERTAINTY packaging rule — distill a cross-repo mining pass over se
 independent retiring-architect `skills-staging/` libraries whose entry shapes
 independently converged (class-distilled; no single citable commit).
 The §2 verifying-the-incident-does-not-verify-the-prescription rule (2026-07-14)
-generalizes this repo's own PR #26 review: 4 of the 27 rules that PR shipped
+generalizes this repo's own PR #26 review: 4 of the 27 rules that PR proposed
 cited real incidents but prescribed mechanisms that failed on their own
-motivating case, caught only by a cross-model-family review of the mechanism
-itself (see that PR's review thread for the specific misses).
+motivating case — caught in PR #26's own review and fixed before merge, never
+reaching main — by a cross-model-family review of the mechanism itself (see
+that PR's review thread for the specific misses).
 Stable method; no environment facts to re-verify.
