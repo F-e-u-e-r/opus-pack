@@ -33,6 +33,20 @@ And where misreading is costly or the judgment boundary is subtle, add:
 - Verify every command, flag, path, and claim against the actual repo/system
   before writing it down. **A wrong runbook is worse than none, because it is
   trusted.**
+- **Verifying the incident does not verify the prescription.** Distilling an
+  incident into a rule is a lossy transform that can introduce a bug the
+  incident never had: the rule cites a real failure yet prescribes a
+  mechanism that itself fails on exactly the case it targets (`git cherry`
+  for squash-merge residue — per-commit patch-ids never match a squash
+  commit; "ack a webhook before the slow work" — a post-2xx crash then loses
+  the event; "peek-then-commit" a spend cap — a TOCTOU overspend race under
+  concurrent fan-out). One reviewed batch of 27 incident-mined rules shipped
+  4 of exactly this shape, each past the author's own self-review. Before a
+  rule ships for an agent to execute verbatim: run or trace the prescribed
+  mechanism against its own motivating case AND the nearest adjacent edge
+  (two-sided — the rule must both fire on the case it targets and survive
+  the case one step away), and have a reviewer from a different model family
+  attack the MECHANISM, not the prose.
 - What cannot be verified is labeled `unverified` or `user-must-provide` —
   never silently invented. Unproven ideas stay labeled open/candidate; no
   oversell.
@@ -198,4 +212,9 @@ the stale-absolute-path and don't-paraphrase-a-load-bearing-clause rules, and th
 MANIFEST+UNCERTAINTY packaging rule — distill a cross-repo mining pass over seven
 independent retiring-architect `skills-staging/` libraries whose entry shapes
 independently converged (class-distilled; no single citable commit).
+The §2 verifying-the-incident-does-not-verify-the-prescription rule (2026-07-14)
+generalizes this repo's own PR #26 review: 4 of the 27 rules that PR shipped
+cited real incidents but prescribed mechanisms that failed on their own
+motivating case, caught only by a cross-model-family review of the mechanism
+itself (see that PR's review thread for the specific misses).
 Stable method; no environment facts to re-verify.
