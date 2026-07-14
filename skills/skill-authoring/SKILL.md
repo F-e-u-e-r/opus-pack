@@ -38,19 +38,26 @@ And where misreading is costly or the judgment boundary is subtle, add:
   incident never had: the rule cites a real failure yet prescribes a
   mechanism that itself fails on exactly the case it targets (`git cherry`
   for squash-merge residue on a multi-commit branch — its per-commit
-  patch-ids never match the single squash commit; "ack a webhook before the
-  slow work" — a post-2xx crash then loses the event; "peek-then-commit" a
-  spend cap — a TOCTOU overspend race under concurrent fan-out). One
-  reviewed batch of 27 incident-mined rules had 4 of exactly this shape, each
-  passing the author's own self-review and caught only by a cross-family
-  mechanism review before merge. Before an incident-mined rule that
-  prescribes a mechanism ships for an agent to execute verbatim: run or
-  trace the prescribed mechanism against its own motivating case AND the
-  nearest adjacent edge (two-sided — the rule must both fire on the case it
-  targets and survive the case one step away), and get a cross-family
-  mechanism review (`cross-model-review`) attacking the MECHANISM, not the
-  prose. No second family available → `cross-model-review` §6's fallback
-  (same-model fresh-context critic, gap recorded) applies here too.
+  patch-ids never match the single squash commit, canonical rule in
+  operational-rigor §2; "ack a webhook before durably recording it" — a
+  post-2xx crash then loses the event; "peek-then-commit" a spend cap — a
+  TOCTOU overspend race under concurrent fan-out). One reviewed batch of 27
+  incident-mined rules had 4 of exactly this shape, each passing the author's
+  own self-review and caught only by a cross-family mechanism review before
+  merge. So when a rule's fix is a specific mechanism — a command, protocol,
+  or algorithm distilled from a failure — before it ships for an agent to
+  execute verbatim: (1) fix the correct OUTCOME in advance for both its own
+  motivating scenario — traced through the failure mode it names (the crash,
+  the concurrent fan-out, the squash), not merely confirmed that the incident
+  was real — AND the nearest variant with one property flipped (multi-commit →
+  single-commit, crash → no crash, concurrent fan-out → one worker); (2) run the
+  mechanism against both and confirm it matches each — correctness that flips
+  across that boundary is the trap this catches (git cherry is wrong on the
+  multi-commit squash it targets yet right on a single-commit branch); (3) get
+  a cross-family mechanism review (`cross-model-review`) attacking the
+  MECHANISM, not the prose. No second
+  family available → `cross-model-review` §6's fallback (same-model
+  fresh-context critic, gap recorded) applies here too.
 - What cannot be verified is labeled `unverified` or `user-must-provide` —
   never silently invented. Unproven ideas stay labeled open/candidate; no
   oversell.
