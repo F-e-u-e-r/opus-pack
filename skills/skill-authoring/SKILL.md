@@ -164,6 +164,14 @@ author re-reading — checks three lenses:
    anything invented or stale.
 2. **Doctrine** — contradictions between rules or with the project's
    standards; overstated claims; anything that routes around a ship gate.
+   When the change adds to an existing rules file, a general contradiction
+   scan is not enough: walk the target file's own rules one by one against
+   the addition — the file is its own sharpest rubric, and authors
+   demonstrably do not self-apply it (one reviewed addition to this file
+   passed the author's self-review while violating three of the file's own
+   rules — a topic-label trigger, a paraphrased load-bearing clause, a
+   non-executable test — each caught only when the rules were applied
+   individually).
 3. **Usability** — would a zero-context reader know the first step? Trigger
    quality of descriptions; duplication; ambiguous sentences a weaker model
    will misread.
@@ -229,4 +237,10 @@ cited real incidents but prescribed mechanisms that failed on their own
 motivating case — caught in PR #26's own review and fixed before merge, never
 reaching main — by a cross-model-family review of the mechanism itself (see
 that PR's review thread for the specific misses).
+The §6 rule-by-rule self-consistency check (2026-07-15) generalizes PR #29's
+own review: three of the four must-fixes on that PR's new §2 bullet were the
+bullet violating this file's existing rules (§5 state-phrased triggers, §3
+don't-paraphrase-a-load-bearing-clause, §1 executable-rule format), each
+passing the author's self-review and surfaced only by applying the file's
+rules individually to the addition (see that PR's thread).
 Stable method; no environment facts to re-verify.
