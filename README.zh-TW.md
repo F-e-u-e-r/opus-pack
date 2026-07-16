@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.9" src="https://img.shields.io/badge/version-alpha--0.1.9-orange.svg">
+  <img alt="Version alpha-0.1.10" src="https://img.shields.io/badge/version-alpha--0.1.10-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -20,7 +20,7 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.9`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.10`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
@@ -205,6 +205,12 @@ covert 測試(14 場 session、單一擬真工單,機械判定並經獨立複驗
 Hooks 現已具備放行/擋下兩路單元測試,但行為層(實測 arm)尚未量測。請據
 此看待本包:它是一層一致性保障與可執行的強制基底,不是已證明的分數提升。
 
+本包公約(2026-07-16,採自 fable-method 的「prime directive」——見致謝):
+新的行為規則出貨時,必須附上「沒有這條就會失敗」的 probe 或 trap;做不到
+就明確標記 `unprobed`。公約的量具是私有套件的接班輪——自 fable-method
+已公開的 eval 計畫改作其 trap 機制、重新實作成全新私有 fixtures——與套件
+其餘部分一樣由擁有者執行、不公開。
+
 ## 本包最可能的退化方式(與內建對策)
 
 1. **Skill 越補越肥**——教訓不斷往上疊 → 壓縮(compaction)觸發點(skill-authoring §7)。
@@ -247,6 +253,7 @@ Hooks 現已具備放行/擋下兩路單元測試,但行為層(實測 arm)尚未
 - **echo-of-machines** — [`echo-of-machines/fable-advisor`](https://github.com/echo-of-machines/fable-advisor);顧問模式諮詢(更強一階出建議、目前一階續執行),以 tier-relative 形式改作進 `delegation-and-review` §4;與 Anthropic 官方 [advisor tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/advisor-tool) 同一模式。只採意念,未取任何程式碼。
 - **TheColliny** — [`TheColliny/FableClaudeMDForOpus`](https://github.com/TheColliny/FableClaudeMDForOpus);事件措辭路由,改作為 `skill-authoring` §5 的狀態措辭觸發規則。只採意念,未取任何程式碼。
 - **2026-07 安全 skill 稽查** — 對 12 個社群「安全」skill 的通盤審查,先於 2026-07-12 的 doctrine 批次。只採意念、未取任何程式碼:**eddygk/skill-vetting**(anti-override 規則 → `delegation-and-review` §7)、**UnitOneAI/SecuritySkills**(載入時執行稽核 → `operational-rigor` §2)、**mukul975/Anthropic-Cybersecurity-Skills**(JWT `kid`/`jku`/`x5u` 檢查項、零寬/雙向 Unicode 清查)、**gitgoodordietrying**(SCA 進 CI)、**jgarrison929**(magic-byte 上傳驗證)。同次稽查判定 12 個中 3 個為活體木馬——全部自稱安全工具;未從中採用任何內容,此發現本身成為 doctrine(`operational-rigor` §2:自稱安全工具受更嚴檢視,而非更寬)。
+- **Sahir619** — [`Sahir619/fable-method`](https://github.com/Sahir619/fable-method),MIT License;另一個平行的 Fable 退役蒸餾,附已發布的 trap-scenario eval 計畫(勝敗皆錄)。只採意念、未取任何檔案:`ground-truth-gates` 的行為層 trap-armed 條款(源自其已發布的負結果——安全結局可能只是從未遇上陷阱)、Evals 段的「附失敗測試才出貨」公約,以及其已公開 eval 計畫的 trap 機制——重新實作為本包私有套件的全新 fixtures。
 - **firaen22** — 透過 GitHub PR 貢獻 cost-asymmetric golden runner 與第一版結構化 commit-hook parser。
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)

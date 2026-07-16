@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.9" src="https://img.shields.io/badge/version-alpha--0.1.9-orange.svg">
+  <img alt="Version alpha-0.1.10" src="https://img.shields.io/badge/version-alpha--0.1.10-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -21,7 +21,7 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.9`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.10`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -323,6 +323,14 @@ The hooks now carry allow+block unit suites but remain unmeasured at the
 behavioral-arm level. Treat the pack accordingly: a consistency layer and
 an enforcement substrate, not a proven score boost.
 
+House covenant (2026-07-16, adopted from fable-method's "prime directive"
+— see acknowledgements): a new behavioral rule ships with the probe or
+trap that would have failed without it, or it ships explicitly labeled
+`unprobed`. The covenant's instrument is the private suite's successor
+round — trap mechanisms adapted from fable-method's published eval
+program, re-implemented as fresh private fixtures — owner-run and
+unpublished like the rest of the suite.
+
 ## How this pack degrades (and the built-in countermeasure)
 
 1. **Skills bloat** as lessons get appended → compaction triggers (skill-authoring §7).
@@ -410,6 +418,16 @@ This pack distills and adapts ideas from:
   from those was adopted, and the finding itself became doctrine
   (`operational-rigor` §2: self-described security tools earn stricter
   scrutiny, not less).
+- **Sahir619** —
+  [`Sahir619/fable-method`](https://github.com/Sahir619/fable-method),
+  MIT License; a parallel Fable-sunset distillation with a published
+  trap-scenario eval program (wins and nulls both). Ideas adopted on
+  merit, no files copied: the behavioral trap-armed clause in
+  `ground-truth-gates` (from their published negative — safe outcomes
+  produced by runs that never met the trap), the
+  ships-with-its-failing-test covenant in the Evals section, and trap
+  mechanisms from their published eval program, re-implemented as fresh
+  fixtures in this pack's private suite.
 - **firaen22** — contributed the cost-asymmetric golden runner and the first
   structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
