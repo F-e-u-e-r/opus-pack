@@ -1,0 +1,19 @@
+{
+  "name": "opus-pack",
+  "description": "Home of the Opus Pack plugin: distilled operating skills for daily-driver Claude models - few dense rules, executable gates over long prose, measured against their own doctrine with the nulls published.",
+  "owner": {
+    "name": "F-e-u-e-r",
+    "url": "https://github.com/F-e-u-e-r"
+  },
+  "plugins": [
+    {
+      "name": "opus-pack",
+      "source": "./",
+      "description": "Eight agent-discipline skills: operational-rigor, delegation-and-review, ground-truth-gates, cross-model-review, skill-authoring, security-architect, product-roadmap, personal-goal-planning. Hooks stay manual-install by design (per-user consent).",
+      "version": "0.1.13",
+      "author": {
+        "name": "F-e-u-e-r"
+      }
+    }
+  ]
+}

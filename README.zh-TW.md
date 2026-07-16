@@ -6,9 +6,10 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.12" src="https://img.shields.io/badge/version-alpha--0.1.12-orange.svg">
+  <img alt="Version alpha-0.1.13" src="https://img.shields.io/badge/version-alpha--0.1.13-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
+  <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
 </p>
 
 <p align="center"><a href="README.md">English</a> · <strong>繁體中文</strong></p>
@@ -20,7 +21,7 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.12`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.13`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
@@ -35,7 +36,21 @@
 
 ## 安裝
 
-把 skill 複製到位——全域,或單一專案:
+**以 Claude Code plugin 安裝**(只含 skills;不需要 hooks 時建議用這個):
+
+```
+/plugin marketplace add F-e-u-e-r/opus-pack
+/plugin install opus-pack@opus-pack
+```
+
+Skills 會以 namespace 形式載入(`opus-pack:operational-rigor`……),用
+`/plugin marketplace update` 更新。Hooks 刻意不由 plugin 註冊或啟用——它們
+改變 harness 行為,必須由使用者手動逐一決定(見[強制層:hooks 設定方法](#強制層hooks-設定方法))。
+skills 擇一安裝即可:兩種同時裝會讓每個 skill 出現兩份
+(`opus-pack:<skill>` 與 `<skill>`),自動選用時可能取到任一份——保持單一
+來源,更新才不會漏。
+
+**或把 skill 複製到位**——全域,或單一專案:
 
 ```bash
 # 全域(所有專案可用)
@@ -220,6 +235,12 @@ Hooks 現已具備放行/擋下兩路單元測試,但行為層(實測 arm)尚未
 5. **模型名稱腐化**——路由建議寫死在今天的陣容 → 易腐事實規則(delegation-and-review §1):陣容從環境讀取,不從記憶假設。
 
 ## 維護者筆記
+
+推送前跑 `python3 .github/checks.py`——CI 跑的同一套一致性閘門(skill
+frontmatter、四處版本號一致、README 相對連結、零寬/雙向字符清查、hooks
+測試套件在 CI 另行執行)。常設不變量:plugin 套件永遠不得聲明或註冊
+hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
+安裝段聲明的同意姿態依賴這一點。
 
 這個工作目錄可能有兩份相同的 skill:`skills/` 是發佈源;`.claude/skills/`
 是本機即用安裝,已由 git ignore。改任何一份 SKILL.md → 同步另一份

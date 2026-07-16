@@ -6,9 +6,10 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.12" src="https://img.shields.io/badge/version-alpha--0.1.12-orange.svg">
+  <img alt="Version alpha-0.1.13" src="https://img.shields.io/badge/version-alpha--0.1.13-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
+  <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
 </p>
 
 <p align="center"><strong>English</strong> · <a href="README.zh-TW.md">繁體中文</a></p>
@@ -21,7 +22,7 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.12`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.13`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -36,7 +37,24 @@ from **gates that fail loudly when the work is wrong.**
 
 ## Install
 
-Copy the skills into place — globally, or per project:
+**As a Claude Code plugin** (skills only; recommended when you don't need
+the hooks):
+
+```
+/plugin marketplace add F-e-u-e-r/opus-pack
+/plugin install opus-pack@opus-pack
+```
+
+Skills arrive namespaced (`opus-pack:operational-rigor`, …) and update via
+`/plugin marketplace update`. The hooks are deliberately NOT registered or
+enabled by the plugin — they change harness behavior, so installing them
+stays a manual, per-user decision (see
+[Enforcement: hooks](#enforcement-setting-up-hooks)). Pick ONE method for
+the skills: installing both makes every skill available twice
+(`opus-pack:<skill>` and `<skill>`), and automatic skill selection may pick
+either copy — keep a single source so updates land once.
+
+**Or copy the skills into place** — globally, or per project:
 
 ```bash
 # Global (available in every project)
@@ -340,6 +358,14 @@ unpublished like the rest of the suite.
 5. **Model-name rot** — routing advice hardcoded to today's lineup → volatile-facts rule (delegation-and-review §1): read the lineup from the environment, never from memory.
 
 ## Maintainer Notes
+
+Before pushing, run `python3 .github/checks.py` — the same consistency gate
+CI runs (skill frontmatter, version agreement across all four sites plus the
+plugin manifests, README relative links, zero-width/bidi sweep; the hook
+test suites run as separate CI steps). Standing invariant: the plugin
+package must never declare or register hooks (no `hooks/hooks.json`, no
+hooks field in `plugin.json`) — the consent posture stated in the install
+section depends on it.
 
 This working tree may hold two identical skill sets: `skills/` is the publish
 source; `.claude/skills/` is the local live install and is ignored by git. Edit

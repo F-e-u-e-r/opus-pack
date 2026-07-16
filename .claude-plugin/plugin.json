@@ -1,0 +1,11 @@
+{
+  "name": "opus-pack",
+  "description": "Eight agent-discipline skills for daily-driver Claude models: operational-rigor, delegation-and-review, ground-truth-gates, cross-model-review, skill-authoring, security-architect, product-roadmap, personal-goal-planning. Few dense rules, executable gates over long prose; measured against its own doctrine, nulls included. The repo's hooks are NOT registered or enabled by this plugin - they change harness behavior and need per-user consent; see the README's hooks section for manual install.",
+  "version": "0.1.13",
+  "author": {
+    "name": "F-e-u-e-r"
+  },
+  "homepage": "https://github.com/F-e-u-e-r/opus-pack",
+  "repository": "https://github.com/F-e-u-e-r/opus-pack",
+  "license": "MIT"
+}
