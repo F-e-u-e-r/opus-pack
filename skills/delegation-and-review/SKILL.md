@@ -84,7 +84,13 @@ reviewers that they silently absorb as implementers.
 - Critic verdicts carry evidence: REFUTED needs a counterexample; untested
   assumptions are listed. Verify critics too; stale or missing review is not approval.
 - Review against the packet contract, not line-by-line theater. New bug class
-  caught → sweep the codebase: one catch, one class, one sweep.
+  caught → sweep the codebase: one catch, one class, one sweep. The worker's
+  sweep report obeys operational-rigor §5 (the canonical copy, verbatim:
+  "report the search: the pattern run and what it found (files, or
+  'none')"). The reviewer re-runs that named search, never takes it on
+  trust — then challenges its coverage with one differently-shaped query (a
+  broader or structural pattern, or a class-aware check): re-running a
+  narrow pattern reproduces its hits AND its misses.
 - **Machinery is not the user.** Tool completions, CI events, and agent statuses
   are state changes, not approval or proof. Open the artifact and verify.
 - **Unit-green is not integration.** A worker's component tests can all pass
@@ -214,5 +220,9 @@ library in a further private learning-lab repo; the numbers come from its
 1000+-run delegation benchmarks (edge-case robustness was the single weakest
 axis across every model pool tested — private repo, verifiable by the
 contributor).
+The §3 named-search amendment (2026-07-16) is the review-side half of
+operational-rigor §5's twin-sweep rule — same probe evidence, recorded in
+that skill's provenance (a weak-tier probe's named search missed a
+differently-written twin that the fixture's checker caught in one command).
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
