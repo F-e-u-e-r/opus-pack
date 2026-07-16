@@ -132,15 +132,25 @@ and would have paraphrased a clause another file owns (skill-authoring §3).
 **Two remedies for one defect are a free cross-check** (`unprobed` — see
 Provenance). When a fix you are holding is overtaken by someone else's
 landed fix for the same finding — a maintainer's gate commit, a parallel
-reviewer's patch — neither discard nor land yours on seniority alone:
-diff the two remedies first. Agreement is cheap corroboration; divergence
-means at least one remedy is wrong, and the divergence names exactly
-where to look — adjudicate it against the spec and the full tree (the
-authored-fix judgment above), keep the survivor, and record the discarded
-remedy's defect with its reason, which is what stops the losing remedy's
-misconception from re-entering at the next edit. Done when the diff ran,
-any divergence is adjudicated with a stated reason, and the discarded
-remedy's defect is on record.
+reviewer's patch — neither discard nor land yours on arrival order
+alone: diff the two remedies first. Agreement is cheap corroboration
+only when the remedies were independently authored — otherwise it is
+mere consistency, not corroboration. Divergence is evidence, not proof
+either remedy is wrong: it names exactly what to adjudicate against the
+spec and the full tree (the authored-fix judgment above). Adjudication
+ends one of three ways — one remedy wins; both are valid and one is
+selected with the reason recorded; or a composed remedy takes the best
+of both. Record a defect only where adjudication established one — that
+record is what stops a losing remedy's misconception from re-entering
+at the next edit; never invent a defect for a valid alternative. A
+non-selected remedy takes the disposition the authored-fix rule above
+defines (`rejected-with-reason` naming why it lost). This rule governs
+the semantic comparison of the two remedies; when parallel remedies
+also touched shared files, delegation-and-review §4's edit-conflict
+re-read/re-anchor and double-edit audit apply as well — the two rules
+are cumulative, never alternatives. Done when the diff ran, any
+divergence is adjudicated with a stated reason and outcome, and any
+established defect is on record.
 neg: "theirs landed, so mine is moot — drop it unexamined." Dropping a
 superseded fix without the diff discards the one artifact positioned to
 falsify the landed one — or, as in the observed case, the landed one
