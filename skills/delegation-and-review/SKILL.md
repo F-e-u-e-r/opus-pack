@@ -109,12 +109,13 @@ reviewers that they silently absorb as implementers.
   without the per-invocation authorization operational-rigor §2 requires,
   spec betrayal (operational-rigor §4's authority order names the sides),
   debris (scratch files and debug leftovers the report never mentions).
-  Verdict precedence, strict: any material claim contradicted → REFUTED
-  (name the claim, show the contradicting output); nothing contradicted
-  but any material claim unverifiable — a missing pristine base included →
-  VERIFIED-WITH-CAVEATS, every gap listed; complete corroboration →
-  VERIFIED. The delivered tree stays untouched — no edits, no new files;
-  findings go in the reply, not the tree.
+  Verdict = an explicit otherwise-chain over the MATERIAL claims: any
+  contradicted → REFUTED (name the claim, show the contradicting output);
+  otherwise any unverifiable — a missing pristine base included →
+  VERIFIED-WITH-CAVEATS, every gap listed; otherwise → VERIFIED.
+  Immaterial discrepancies go in the findings, never into the verdict.
+  The delivered tree stays untouched — no edits, no new files; findings
+  go in the reply, not the tree.
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
