@@ -44,9 +44,11 @@
 ```
 
 Skills 會以 namespace 形式載入(`opus-pack:operational-rigor`……),用
-`/plugin marketplace update` 更新。Hooks 刻意不隨 plugin 安裝——它們改變
-harness 行為,必須由使用者手動逐一決定(見[強制層:hooks 設定方法](#強制層hooks-設定方法))。
-skills 擇一安裝即可:plugin 與複製進來的 `skills/` 並存會重複載入。
+`/plugin marketplace update` 更新。Hooks 刻意不由 plugin 註冊或啟用——它們
+改變 harness 行為,必須由使用者手動逐一決定(見[強制層:hooks 設定方法](#強制層hooks-設定方法))。
+skills 擇一安裝即可:兩種同時裝會讓每個 skill 出現兩份
+(`opus-pack:<skill>` 與 `<skill>`),自動選用時可能取到任一份——保持單一
+來源,更新才不會漏。
 
 **或把 skill 複製到位**——全域,或單一專案:
 
@@ -236,7 +238,9 @@ Hooks 現已具備放行/擋下兩路單元測試,但行為層(實測 arm)尚未
 
 推送前跑 `python3 .github/checks.py`——CI 跑的同一套一致性閘門(skill
 frontmatter、四處版本號一致、README 相對連結、零寬/雙向字符清查、hooks
-測試套件在 CI 另行執行)。
+測試套件在 CI 另行執行)。常設不變量:plugin 套件永遠不得聲明或註冊
+hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
+安裝段聲明的同意姿態依賴這一點。
 
 這個工作目錄可能有兩份相同的 skill:`skills/` 是發佈源;`.claude/skills/`
 是本機即用安裝,已由 git ignore。改任何一份 SKILL.md → 同步另一份

@@ -5,29 +5,49 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   consistency:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - name: Repo consistency checks
         run: python3 .github/checks.py
 
   hook-suites:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: gate-before-commit suite
-        run: bash hooks/test-gate-before-commit.sh
-      - name: gate-credential-destruction suite
-        run: bash hooks/test-gate-credential-destruction.sh
-      - name: verify-before-stop suite
-        run: bash hooks/test-verify-before-stop.sh
+        with:
+          persist-credentials: false
+      - name: Run every hook test suite (discovered, not hard-coded)
+        run: |
+          set -euo pipefail
+          found=0
+          for t in hooks/test-*.sh; do
+            echo "== $t"
+            bash "$t"
+            found=1
+          done
+          [ "$found" = "1" ] || { echo "no hook test suites discovered"; exit 1; }
 
   gate-template:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: "22"

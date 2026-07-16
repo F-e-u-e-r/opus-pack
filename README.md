@@ -46,11 +46,13 @@ the hooks):
 ```
 
 Skills arrive namespaced (`opus-pack:operational-rigor`, …) and update via
-`/plugin marketplace update`. The hooks are deliberately NOT part of the
-plugin — they change harness behavior, so installing them stays a manual,
-per-user decision (see [Enforcement: hooks](#enforcement-setting-up-hooks)).
-Pick ONE method for the skills: the plugin plus a copied-in `skills/`
-double-loads them as duplicates.
+`/plugin marketplace update`. The hooks are deliberately NOT registered or
+enabled by the plugin — they change harness behavior, so installing them
+stays a manual, per-user decision (see
+[Enforcement: hooks](#enforcement-setting-up-hooks)). Pick ONE method for
+the skills: installing both makes every skill available twice
+(`opus-pack:<skill>` and `<skill>`), and automatic skill selection may pick
+either copy — keep a single source so updates land once.
 
 **Or copy the skills into place** — globally, or per project:
 
@@ -360,7 +362,10 @@ unpublished like the rest of the suite.
 Before pushing, run `python3 .github/checks.py` — the same consistency gate
 CI runs (skill frontmatter, version agreement across all four sites plus the
 plugin manifests, README relative links, zero-width/bidi sweep; the hook
-test suites run as separate CI steps).
+test suites run as separate CI steps). Standing invariant: the plugin
+package must never declare or register hooks (no `hooks/hooks.json`, no
+hooks field in `plugin.json`) — the consent posture stated in the install
+section depends on it.
 
 This working tree may hold two identical skill sets: `skills/` is the publish
 source; `.claude/skills/` is the local live install and is ignored by git. Edit

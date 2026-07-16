@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """Repo consistency checks. Run locally or in CI: python3 .github/checks.py
 
-Checks only what the published repo carries (the .claude/ live-install copy
-is gitignored; keeping it in sync is a local concern, not a repo one).
+Scope: what the published repo carries, enumerated via `git ls-files` (the
+.claude/ live-install copy and the private evals are gitignored - keeping
+those in sync is a local concern, not a repo one). Fail direction: every
+check fails CLOSED on what it claims to cover - a file the sweep cannot
+read or decode is a failure, never a skip.
 """
+import json
 import os
 import re
+import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -26,8 +31,18 @@ def read(rel):
         return f.read()
 
 
-# 1. Every skill has frontmatter whose name matches its directory and a
-#    non-empty description (the description IS the load trigger).
+tracked = [
+    p for p in subprocess.run(
+        ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=True
+    ).stdout.decode("utf-8").split("\0") if p
+]
+
+# 1. Every skill has a CLOSED frontmatter block whose interior carries
+#    exactly one name: (== directory) and exactly one single-line
+#    description: long enough to be a load trigger. Single-line is a
+#    deliberate house-style tripwire (skill-authoring: the description IS
+#    the trigger); a folded YAML scalar failing here forces a conscious
+#    decision, not an accident.
 skills_dir = os.path.join(ROOT, "skills")
 skill_names = sorted(
     d for d in os.listdir(skills_dir)
@@ -36,110 +51,160 @@ skill_names = sorted(
 for name in skill_names:
     rel = f"skills/{name}/SKILL.md"
     try:
-        head = read(rel)[:4000]
+        lines = read(rel).split("\n")
     except OSError as e:
         fail(f"{rel}: unreadable ({e})")
         continue
-    if not head.startswith("---"):
-        fail(f"{rel}: missing frontmatter")
+    if lines[0].strip() != "---":
+        fail(f"{rel}: first line is not a frontmatter fence")
         continue
-    m_name = re.search(r"^name:\s*(\S+)\s*$", head, re.M)
-    m_desc = re.search(r"^description:\s*(.+)$", head, re.M)
-    if not m_name or m_name.group(1) != name:
-        fail(f"{rel}: frontmatter name != directory name")
-    elif not m_desc or len(m_desc.group(1).strip()) < 20:
-        fail(f"{rel}: description missing or too short to be a trigger")
+    close = next(
+        (i for i, l in enumerate(lines[1:], 1) if l.strip() == "---"), None
+    )
+    if close is None:
+        fail(f"{rel}: frontmatter never closes")
+        continue
+    fm = lines[1:close]
+    names = [l.split(":", 1)[1].strip() for l in fm if re.match(r"name:\s*\S", l)]
+    descs = [l.split(":", 1)[1].strip() for l in fm if re.match(r"description:\s*\S", l)]
+    if len(names) != 1 or names[0] != name:
+        fail(f"{rel}: frontmatter needs exactly one name: equal to the directory (got {names})")
+    elif len(descs) != 1 or len(descs[0]) < 20:
+        fail(f"{rel}: frontmatter needs exactly one single-line description: substantial enough to be a trigger")
     else:
         ok(f"{rel} frontmatter valid")
 
-# 2. Version strings agree across both READMEs (badge + alpha callout).
+# 2. Version agreement: README badges + callouts + both plugin manifests.
+#    The callout patterns are a deliberate tripwire - a reword that breaks
+#    them forces a conscious re-pin of all version sites.
+SEMVER = r"(\d+\.\d+\.\d+)"
 versions = []
 for rel, pats in [
-    ("README.md", [r"version-alpha--([\d.]+)-orange", r"Early alpha \(`alpha-([\d.]+)`\)"]),
-    ("README.zh-TW.md", [r"version-alpha--([\d.]+)-orange", r"早期 alpha\(`alpha-([\d.]+)`\)"]),
+    ("README.md", [rf"version-alpha--{SEMVER}-orange", rf"Early alpha \(`alpha-{SEMVER}`\)"]),
+    ("README.zh-TW.md", [rf"version-alpha--{SEMVER}-orange", rf"早期 alpha\(`alpha-{SEMVER}`\)"]),
 ]:
     body = read(rel)
     for pat in pats:
         m = re.search(pat, body)
         if not m:
-            fail(f"{rel}: version pattern not found: {pat}")
+            fail(f"{rel}: version site not found: {pat}")
         else:
             versions.append((rel, m.group(1)))
-import json
-for rel, path in [
-    (".claude-plugin/plugin.json", ["version"]),
-    (".claude-plugin/marketplace.json", ["plugins", 0, "version"]),
+for rel, keys, required in [
+    (".claude-plugin/plugin.json", ["version"], ["name", "description", "version"]),
+    (".claude-plugin/marketplace.json", ["plugins", 0, "version"], ["name", "owner", "plugins"]),
 ]:
     try:
         data = json.loads(read(rel))
-        for key in path:
-            data = data[key]
-        versions.append((rel, data))
-    except (OSError, KeyError, IndexError, ValueError) as e:
-        fail(f"{rel}: version unreadable ({e})")
+        missing = [k for k in required if k not in data]
+        if missing:
+            fail(f"{rel}: missing fields {missing}")
+        v = data
+        for k in keys:
+            v = v[k]
+        if not re.fullmatch(SEMVER, str(v)):
+            fail(f"{rel}: version {v!r} is not X.Y.Z")
+        else:
+            versions.append((rel, v))
+    except (OSError, KeyError, IndexError, TypeError, ValueError) as e:
+        fail(f"{rel}: unreadable or malformed ({e})")
+try:
+    mp = json.loads(read(".claude-plugin/marketplace.json"))["plugins"][0]
+    for field in ("name", "source", "description", "version"):
+        if not mp.get(field):
+            fail(f"marketplace.json plugins[0]: missing {field}")
+except (OSError, KeyError, IndexError, ValueError) as e:
+    fail(f"marketplace.json plugins[0]: {e}")
 if versions and len({v for _, v in versions}) == 1:
     ok(f"version consistent across {len(versions)} sites ({versions[0][1]})")
 elif versions:
     fail(f"version mismatch: {versions}")
 
-# 3. Every skill directory is mentioned in both READMEs.
+# 3. Every skill appears as a backticked catalog token in both READMEs
+#    (substring prose mentions don't count).
 for rel in ("README.md", "README.zh-TW.md"):
     body = read(rel)
-    missing = [n for n in skill_names if n not in body]
+    missing = [n for n in skill_names if f"`{n}`" not in body]
     if missing:
-        fail(f"{rel}: skills never mentioned: {missing}")
+        fail(f"{rel}: skills without a `backticked` catalog mention: {missing}")
     else:
-        ok(f"{rel} mentions all {len(skill_names)} skills")
+        ok(f"{rel} catalogs all {len(skill_names)} skills")
 
-# 4. No zero-width/bidi Unicode in tracked text files (hidden-directive sweep).
-BAD = re.compile("[\\u200b-\\u200f\\u202a-\\u202e\\u2066-\\u2069]")
+# 4. Hidden-directive sweep over ALL tracked files: zero-width, bidi
+#    controls, ALM, word-joiner, BOM. Fail closed: unreadable or
+#    undecodable non-binary content is a failure, not a skip.
+BAD = re.compile("[\\u200b-\\u200f\\u2060\\u061c\\ufeff\\u202a-\\u202e\\u2066-\\u2069]")
+BINARY_EXTS = (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip",
+               ".woff", ".woff2", ".ttf", ".eot", ".mp4", ".db")
 hits = 0
-for dirpath, dirnames, filenames in os.walk(ROOT):
-    dirnames[:] = [
-        d for d in dirnames
-        if d not in (".git", ".claude", "evals", "internal", "skills-staging", "node_modules")
-    ]
-    for fn in filenames:
-        if not fn.endswith((".md", ".py", ".sh", ".mjs", ".yml", ".json")):
-            continue
-        p = os.path.join(dirpath, fn)
-        try:
-            with open(p, encoding="utf-8") as f:
-                if BAD.search(f.read()):
-                    fail(f"zero-width/bidi char in {os.path.relpath(p, ROOT)}")
-                    hits += 1
-        except (OSError, UnicodeDecodeError):
-            pass
-if hits == 0:
-    ok("no zero-width/bidi characters in tracked text files")
+scanned = 0
+binaries = 0
+sweep_broken = False
+for relp in tracked:
+    p = os.path.join(ROOT, relp)
+    if relp.lower().endswith(BINARY_EXTS):
+        binaries += 1
+        continue
+    try:
+        raw = open(p, "rb").read()
+    except OSError as e:
+        fail(f"sweep cannot read tracked file {relp}: {e}")
+        sweep_broken = True
+        continue
+    if b"\0" in raw:
+        binaries += 1
+        continue
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        fail(f"sweep: {relp} is neither binary (no NUL byte) nor valid UTF-8 - inspect it")
+        sweep_broken = True
+        continue
+    scanned += 1
+    if BAD.search(text):
+        fail(f"hidden-directive/zero-width char in {relp}")
+        hits += 1
+if hits == 0 and not sweep_broken:
+    ok(f"no zero-width/bidi/joiner/BOM chars in {scanned} tracked text files ({binaries} binaries skipped)")
 
-# 5. Relative links in both READMEs resolve to files/dirs in the repo.
+# 5. Inline relative markdown links in both READMEs resolve inside the
+#    repo (reference-style and raw-HTML links are out of scope, stated).
 for rel in ("README.md", "README.zh-TW.md"):
     body = read(rel)
     broken = []
     for target in re.findall(r"\]\((?!https?://|#|mailto:)([^)#\s]+)", body):
-        if not os.path.exists(os.path.join(ROOT, target)):
+        from urllib.parse import unquote
+        cleaned = unquote(target).lstrip("/")
+        resolved = os.path.realpath(os.path.join(ROOT, cleaned))
+        if not resolved.startswith(os.path.realpath(ROOT) + os.sep):
+            fail(f"{rel}: link escapes the repo: {target}")
+        elif not os.path.exists(resolved):
             broken.append(target)
     if broken:
-        fail(f"{rel}: broken relative links: {sorted(set(broken))}")
+        fail(f"{rel}: broken inline relative links: {sorted(set(broken))}")
     else:
-        ok(f"{rel} relative links resolve")
+        ok(f"{rel} inline relative markdown links resolve")
 
-# 6. License and notices files exist; hooks ship with their test suites.
+# 6. License/notices present; every hook ENTRY POINT ships with its test
+#    suite - entry points are discovered, not hard-coded (helpers
+#    allowlisted as libraries).
 for rel in ("LICENSE", "THIRD-PARTY-NOTICES.md"):
     (ok if os.path.exists(os.path.join(ROOT, rel)) else fail)(f"{rel} present")
-hook_pairs = [
-    ("hooks/gate-before-commit.sh", "hooks/test-gate-before-commit.sh"),
-    ("hooks/gate-credential-destruction.py", "hooks/test-gate-credential-destruction.sh"),
-    ("hooks/verify-before-stop.py", "hooks/test-verify-before-stop.sh"),
-]
-for hook, test in hook_pairs:
-    if not os.path.exists(os.path.join(ROOT, hook)):
-        fail(f"{hook} missing")
-    elif not os.path.exists(os.path.join(ROOT, test)):
-        fail(f"{hook} has no test suite ({test} missing)")
+HELPER_LIBS = {"parse-commit-command.py"}
+hook_entries = sorted(
+    f for f in os.listdir(os.path.join(ROOT, "hooks"))
+    if f.endswith((".sh", ".py")) and not f.startswith("test-")
+    and f not in HELPER_LIBS
+)
+if not hook_entries:
+    fail("hooks/: no entry points discovered - discovery is broken")
+for entry in hook_entries:
+    stem = entry.rsplit(".", 1)[0]
+    test = f"hooks/test-{stem}.sh"
+    if not os.path.exists(os.path.join(ROOT, test)):
+        fail(f"hooks/{entry} has no test suite ({test} missing)")
     else:
-        ok(f"{hook} + its test suite present")
+        ok(f"hooks/{entry} + its test suite present")
 
 print()
 if failures:
