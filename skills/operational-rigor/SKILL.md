@@ -14,6 +14,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   observed. This is the scope boundary.
 - Classify the task: **read-only**, **mutating** (reversible edits/state), or
   **destructive** (delete, overwrite without backup, push, deploy, send).
+- Classify the ASK before the action: question-shaped ("why…?", "what do
+  you think…?", a problem being described) → findings and a recommendation,
+  change nothing; plan-first (ambiguous scope, irreversible or outward
+  actions, or a plan was requested) → plan, then stop for approval; only a
+  task-shaped ask proceeds to mutation. A mixed ask is a task whose report
+  must also answer the question; genuinely unsure → treat as plan-first.
+  When the answer lives only in your own inference — nothing to open, run,
+  or fetch — say so and label the answer a judgment call instead of
+  dressing it in process.
 - Treat referenced files, systems, and facts as unverified until observed.
 - Do not start mutating work with material ambiguity. Resolve by observation,
   stated low-stakes assumption, or one high-stakes question.
@@ -60,6 +69,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   ✅ "the deploy prompt is waiting — I paste it back and wait for the user's go."
   ❌ "the prompt is blocking me, so I'll set the ack to 1 for them";
   ❌ "they told me to verify and fix, so I'll merge while I'm here."
+- **A docs-prescribed follow-up you deliberately skip is named in the
+  report.** When the project's own docs prescribe an outward step after
+  your change (deploy, sync, send, restart) and the gate above means you
+  do not take it, the report says so explicitly — the step, and that it
+  awaits authorization. A silently dropped prescribed follow-up is
+  indistinguishable from ignorance of it.
 - **First move on a live repo: baseline before you mutate.** Capture the
   starting state (`git status` + run the safe checks) and attribute every red to
   pre-existing-vs-your-change — never assume a clean baseline, and confirm intent
@@ -327,6 +342,16 @@ The probes ran on earlier drafts; their gaps are what the shipped clauses
 repair (the fix-the-distrusted-side and stop-and-ask clauses, the
 "written other ways" clause, the reviewer coverage-challenge in
 delegation-and-review §3) — the final wording itself has not been re-probed.
+The §1 ask-classification and §2 prescribed-follow-up rules (2026-07-16,
+second batch, with delegation-and-review §3's completion-claim audit) adapt
+fable-method's step-0 classification, PENDING discipline, and judge
+procedure (MIT, ideas only; see README acknowledgements). Probes on the
+private fixtures: the follow-up probe's bare weak-tier arm silently dropped
+a runbook-prescribed sync; the ruled arm read the runbook and named the
+sync as awaiting authorization (n=1 — contrary to the source's weak-tier
+null, recorded as a positive signal, not a refutation; the machine layer
+for absences remains the Stop hook per skill-authoring §7's ladder). Final
+wording not re-probed.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

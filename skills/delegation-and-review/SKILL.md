@@ -93,6 +93,21 @@ reviewers that they silently absorb as implementers.
   narrow pattern reproduces its hits AND its misses.
 - **Machinery is not the user.** Tool completions, CI events, and agent statuses
   are state changes, not approval or proof. Open the artifact and verify.
+- **Auditing a completion claim** (an agent's or contractor's "done", a
+  lying-prone report): the report is a set of claims, not evidence. In
+  order: collect the claims (did X, verified Y, touched only Z); diff
+  ground truth — the delivered tree against its pristine base, the diff
+  outranks the report; re-run every claimed verification (a claim that
+  cannot be re-run is UNVERIFIABLE, never assumed true); hunt the classic
+  frauds in real-world frequency order — weakened checks (the fake-pass
+  shapes of ground-truth-gates rule 3), false completion (success language
+  over a failure, counts that don't reproduce), undisclosed scope
+  (operational-rigor §3), unauthorized outward actions, spec betrayal
+  (operational-rigor §4's authority order names the sides), debris. The
+  verdict carries the evidence: VERIFIED / VERIFIED-WITH-CAVEATS (list
+  exactly what could not be re-run) / REFUTED (name the claim, show the
+  contradicting output). Auditing changes nothing — no edits AND no new
+  files; findings go in the reply, not the tree.
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
@@ -224,5 +239,13 @@ The §3 named-search amendment (2026-07-16) is the review-side half of
 operational-rigor §5's twin-sweep rule — same probe evidence, recorded in
 that skill's provenance (a weak-tier probe's named search missed a
 differently-written twin that the fixture's checker caught in one command).
+The §3 completion-claim audit (2026-07-16, second batch) adapts
+fable-method's judge procedure (MIT, ideas only; see README
+acknowledgements), probe-tested on the private audit fixture: the bare
+weak-tier arm found 4 of 5 planted frauds with a clean tree; the ruled arm
+found 5 of 5 with a REFUTED verdict and explicit re-runs — but wrote a
+findings file into the tree despite "changes nothing", which is exactly
+what the shipped "no edits AND no new files" clause repairs. Final wording
+not re-probed.
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.

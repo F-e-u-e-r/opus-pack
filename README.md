@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.11" src="https://img.shields.io/badge/version-alpha--0.1.11-orange.svg">
+  <img alt="Version alpha-0.1.12" src="https://img.shields.io/badge/version-alpha--0.1.12-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
 </p>
@@ -21,7 +21,7 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.11`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.12`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -427,11 +427,14 @@ This pack distills and adapts ideas from:
   produced by runs that never met the trap), the
   ships-with-its-failing-test covenant in the Evals section, trap
   mechanisms from their published eval program, re-implemented as fresh
-  fixtures in this pack's private suite, the authority-order and
-  twin-sweep rules in `operational-rigor` (probe-tested on those fixtures
-  before shipping), and the enforcement ladder, pointer caution, and
-  red-line authoring gate in `skill-authoring` (their published negatives,
-  cited as shape without restating numbers).
+  fixtures in this pack's private suite, and — across `operational-rigor`,
+  `delegation-and-review`, and `skill-authoring` — the authority-order,
+  twin-sweep, ask-classification, prescribed-follow-up, and
+  completion-claim-audit rules plus the enforcement ladder, pointer
+  caution, and red-line authoring gate (behavioral rules probe-tested on
+  those fixtures before shipping; design/normative ones labeled `unprobed`
+  in-body; their published negatives cited as shape, numbers not
+  restated).
 - **firaen22** — contributed the cost-asymmetric golden runner and the first
   structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
