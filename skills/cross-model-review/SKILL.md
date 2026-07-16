@@ -111,16 +111,19 @@ reviewer writes the remedy against only the lines you inlined (§2), so a real
 defect can arrive with a rewrite that breaks something outside the packet's
 frame. This is not the injection clause above: the remedy is offered in good
 faith and its finding reproduced. When a reproduced FIX item proposes
-replacement text or a patch (an unreproduced one gets no action at all —
-reproduce first, above), adopt the finding and author the minimal fix
-yourself. Authored means you produced the landed change after judging it
-against the full tree; identical text that survives that judgment is fine —
-what is forbidden is pasting on the finding's strength. A declined remedy is
-recorded `rejected-with-reason` naming what it would have broken — that
-disposition belongs to the remedy; the finding's own stays tracked per this
-section. Done when every reproduced finding is resolved under this section's
-triage — any landed fix authored by you — and every declined remedy is
-recorded.
+replacement text or a patch, adopt the finding and author the minimal fix
+yourself; while a finding stands unreproduced its remedy is never adopted —
+reproduce first (above), and a failed reproduction still gets its
+disposition recorded. Authored means you produced the landed change after
+judging it against the full tree; identical text that survives that
+judgment is fine — what is forbidden is pasting on the finding's strength.
+A declined remedy is recorded `rejected-with-reason` naming why it lost —
+e.g. breakage outside the packet frame, non-minimality, text owned
+elsewhere — that disposition belongs to the remedy; the finding's own stays
+tracked per this section. Done when every reproduced finding carries a
+disposition this section's triage permits (owner-accepted deferral
+included), any fix that lands is authored by you, and every declined remedy
+is recorded.
 neg: pasting in a reviewer's rewrite because its finding reproduced. Seen in
 this pack's own review (PR #30 round 1): a valid must-fix whose proposed
 rewrite reintroduced the very defect the rule under review existed to prevent,
