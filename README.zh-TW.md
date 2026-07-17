@@ -267,7 +267,7 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
   <https://www.facebook.com/story.php?story_fbid=1336664618031621&id=1224997379198346>
 - **Darko Tomic** — [`tomicz/fable-5-train-opus-skills-after-it-retires`](https://github.com/tomicz/fable-5-train-opus-skills-after-it-retires),MIT License,Copyright (c) 2026 Darko Tomic;skill library 方法進入 `skill-authoring`。
 - **kannaiah** — [Reddit 留言](https://www.reddit.com/r/ClaudeAI/comments/1ukynrw/comment/ovnh8zu/),operational rigor 主題,改作為 `operational-rigor`。
-- **朋友 A** — 私人 Discord 筆記(checks/-harness 設計筆記,及一份實測 harness 匯出),由維護者取得並改作為 `ground-truth-gates`、`operational-rigor`、`delegation-and-review` 與 `skill-authoring`;來源原文不隨發佈散佈。
+- **firaen22**(公開身分前以「朋友 A」記名)— 私人 Discord 筆記(checks/-harness 設計筆記,及一份實測 harness 匯出),由維護者取得並改作為 `ground-truth-gates`、`operational-rigor`、`delegation-and-review` 與 `skill-authoring`;來源原文不隨發佈散佈。後續透過 GitHub PR 貢獻 cost-asymmetric golden runner 與第一版結構化 commit-hook parser。
 - **pro_ai.news** — Threads 貼文;五步驟目標教練 protocol,改作為 `personal-goal-planning`:
   <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
 - **Curtis Chou** — [`curtischoutw/claude-institution`](https://github.com/curtischoutw/claude-institution) @ `8dea062`,MIT License,Copyright (c) 2026 Curtis Chou。`verify-before-stop` hook 改作自其 `verify_gate.py`(該檔又改作自 Miguok/fable-harness),另有約 10 條判斷規則吸收進 operational-rigor / delegation-and-review / skill-authoring。已通讀審查;其常載/每回合提醒/罐頭模板層刻意不採——理由同捨棄清單第 5 項。
@@ -276,7 +276,6 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
 - **2026-07 安全 skill 稽查** — 對 12 個社群「安全」skill 的通盤審查,先於 2026-07-12 的 doctrine 批次。只採意念、未取任何程式碼:**eddygk/skill-vetting**(anti-override 規則 → `delegation-and-review` §7)、**UnitOneAI/SecuritySkills**(載入時執行稽核 → `operational-rigor` §2)、**mukul975/Anthropic-Cybersecurity-Skills**(JWT `kid`/`jku`/`x5u` 檢查項、零寬/雙向 Unicode 清查)、**gitgoodordietrying**(SCA 進 CI)、**jgarrison929**(magic-byte 上傳驗證)。同次稽查判定 12 個中 3 個為活體木馬——全部自稱安全工具;未從中採用任何內容,此發現本身成為 doctrine(`operational-rigor` §2:自稱安全工具受更嚴檢視,而非更寬)。
 - **Sahir619** — [`Sahir619/fable-method`](https://github.com/Sahir619/fable-method),MIT License;另一個平行的 Fable 退役蒸餾,附已發布的 trap-scenario eval 計畫(勝敗皆錄)。只採意念、未取任何檔案:`ground-truth-gates` 的行為層 trap-armed 條款(源自其已發布的負結果——安全結局可能只是從未遇上陷阱)、Evals 段的「附失敗測試才出貨」公約,其已公開 eval 計畫的 trap 機制——重新實作為本包私有套件的全新 fixtures,以及跨 `operational-rigor`、`delegation-and-review`、`skill-authoring` 三個 skill 的 authority-order、twin-sweep、ask-classification、prescribed-follow-up、completion-claim-audit 規則,加上 enforcement ladder、指針警示與 red-line 授權門檻(行為規則出貨前已在該批 fixtures 上 probe 驗證;設計/規範性規則在本體標記 `unprobed`;其已發布的負結果只述形狀、不轉述數字)。
 - **Matt Pocock 的 Grill-me 模式;Superpowers(obra);OpenSpec** — 公開 spec-isolation/brainstorming 工作流的 grill/決策筆記層,改作為 `operational-rigor` 的 §1 grill pass 與 §5 decisions-note。只採意念、未取程式碼。
-- **firaen22** — 透過 GitHub PR 貢獻 cost-asymmetric golden runner 與第一版結構化 commit-hook parser。
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)
 - `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
@@ -287,4 +286,4 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
 
 Opus Pack 以 [MIT License](LICENSE) 發佈——Copyright (c) 2026 F-e-u-e-r。
 
-本包納入並改作了採寬鬆式授權(MIT 與 Apache-2.0)的第三方作品;這些授權要求隨附的版權與授權聲明,集中收錄於 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。最具體的一例是 `verify-before-stop` hook——改作自 Curtis Chou(其上游為 Miguok)的 MIT 授權程式碼。整條鏈路不含任何 copyleft(GPL/AGPL/LGPL)。`guideline *.txt` 來源草稿為私人來源素材(擁有者自有,及朋友 A 的私人筆記),不隨發佈散佈(已由 `.gitignore` 排除)。
+本包納入並改作了採寬鬆式授權(MIT 與 Apache-2.0)的第三方作品;這些授權要求隨附的版權與授權聲明,集中收錄於 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。最具體的一例是 `verify-before-stop` hook——改作自 Curtis Chou(其上游為 Miguok)的 MIT 授權程式碼。整條鏈路不含任何 copyleft(GPL/AGPL/LGPL)。`guideline *.txt` 來源草稿為私人來源素材(擁有者自有,及 firaen22 的私人筆記),不隨發佈散佈(已由 `.gitignore` 排除)。

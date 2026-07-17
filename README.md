@@ -405,11 +405,13 @@ This pack distills and adapts ideas from:
 - **kannaiah** —
   [Reddit comment](https://www.reddit.com/r/ClaudeAI/comments/1ukynrw/comment/ovnh8zu/)
   on operational rigor, adapted into `operational-rigor`.
-- **Friend A** — private Discord notes shared with the maintainer (a
-  checks/-harness design note and a measured Claude Code harness export),
-  adapted into `ground-truth-gates`, `operational-rigor`,
-  `delegation-and-review`, and `skill-authoring`; source text is not
-  distributed.
+- **firaen22** (credited as "Friend A" before going public) — private
+  Discord notes shared with the maintainer (a checks/-harness design note
+  and a measured Claude Code harness export), adapted into
+  `ground-truth-gates`, `operational-rigor`, `delegation-and-review`, and
+  `skill-authoring`; source text is not distributed. Later contributed the
+  cost-asymmetric golden runner and the first structural commit-hook
+  parser work through GitHub PRs.
 - **pro_ai.news** — Threads post; five-step goal-coaching protocol, adapted
   into `personal-goal-planning`:
   <https://www.threads.com/@pro_ai.news/post/DadQkGHjxq->
@@ -465,8 +467,6 @@ This pack distills and adapts ideas from:
   grill/decision-note layer of public spec-isolation and brainstorming
   workflows, adapted as `operational-rigor`'s §1 grill pass and §5
   decisions-note. Ideas only; no code taken.
-- **firaen22** — contributed the cost-asymmetric golden runner and the first
-  structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
 - **agent-standard-oss** @ `3786c4c` (github.com/anmoln7, MIT)
 - `security-architect` and `product-roadmap` were built from reference drafts
@@ -489,5 +489,5 @@ travel with the code are collected in
 the `verify-before-stop` hook — a derivative of MIT-licensed code by Curtis Chou
 (and, upstream, Miguok). No copyleft (GPL/AGPL/LGPL) exists anywhere in the
 chain. The `guideline *.txt` source drafts are private source material (the
-owner's, plus Friend A's private note) and are not distributed
+owner's, plus firaen22's private note) and are not distributed
 (excluded via `.gitignore`).

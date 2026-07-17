@@ -127,13 +127,14 @@ verbatim expression from these sources is reproduced:
 - **林長揚** — Facebook post (institution-design ideas).
 - **kannaiah** — Reddit comment (operational-rigor ideas).
 - **pro_ai.news** — Threads post (goal-coaching protocol).
-- **"Friend A"** — private Discord notes shared with the maintainer (a
-  checks/-harness design note and a measured Claude Code harness export),
+- **firaen22** (credited as "Friend A" before going public) — private
+  Discord notes shared with the maintainer (a checks/-harness design note
+  and a measured Claude Code harness export),
   adapted at idea/rule level into `ground-truth-gates`, `operational-rigor`,
   `delegation-and-review`, and `skill-authoring`; source text is not
   distributed.
 - **Private source drafts** — the owner's reference drafts for
   `security-architect` and `product-roadmap`, plus the collected
-  `guideline *.txt` source copies (guidelines 5 and 6 are Friend A's
+  `guideline *.txt` source copies (guidelines 5 and 6 are firaen22's
   notes; the rest were supplied by the owner). These source drafts are not
   distributed; they are excluded via `.gitignore`.
