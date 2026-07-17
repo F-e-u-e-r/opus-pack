@@ -241,8 +241,9 @@ default; an AI rewrite does not launder a derivative).
   overwrite). After editing, run
   `git diff --no-index --word-diff <file>.bak <file>` (exit 1 means
   differences were found — the expected outcome; delete only the snapshot
-  you created, after the check). Diffing against a git ref instead is valid only when the
-  file was clean at a recorded literal SHA — never against bare `HEAD`,
+  you created, after the check). Diffing against a git ref instead is
+  valid only when the file was clean at a recorded literal SHA — never
+  against bare `HEAD`,
   which after a commit compares the edit to itself and reports nothing,
   and never through an env var pinned in an earlier shell (each tool call
   runs a fresh shell; an unset var silently empties the baseline). Read
