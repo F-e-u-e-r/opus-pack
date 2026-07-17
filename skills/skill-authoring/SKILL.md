@@ -255,8 +255,9 @@ default; an AI rewrite does not launder a derivative).
   same-tree-only search misreads a relocation as a loss, and the restore
   it invites forks the clause into two homes) — or goes on the
   dropped-clause list with its why (the removal record the compaction
-  bullet above already requires); an unaccounted drop is the failure. Per the enforcement ladder later in
-  this section: prose asking for this is the weak tier this very rule
+  bullet above already requires); an unaccounted drop is the failure.
+  Per the enforcement ladder later in this section: prose asking for
+  this is the weak tier this very rule
   warns against, so the change record — the PR description or commit
   message when one is being created, otherwise the completion report —
   must name the command run and state either the dropped-clause list
