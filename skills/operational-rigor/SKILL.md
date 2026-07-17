@@ -40,13 +40,14 @@ When rigor conflicts with finishing sooner, rigor wins.
   mechanical edit) and the user is reachable, ask one batch of pointed
   questions — typically 3–5, never padded to a count — each targeting an
   unstated edge, scope boundary, or failure mode the request does not
-  answer, and fold the answers into the restated deliverable before treating
-  it as the scope boundary. Only ask what observation cannot answer —
-  checkable facts stay self-sourced. An autonomous or spawned session counts
-  as user-absent unless the orchestrator committed to answering the batch;
-  when user-absent, do not grill — the ambiguity rule above governs
-  unchanged (a high-stakes unknown with no one to ask is disclosed as a
-  stated assumption in the report, not silently locked into the spec).
+  answer, and fold the answers into a revised deliverable restatement that
+  replaces the initial scope boundary before mutating work begins. Only ask
+  what observation cannot answer — checkable facts stay self-sourced. An
+  autonomous or spawned session counts as user-absent unless the
+  orchestrator committed to answering the batch; when user-absent, do not
+  grill — the ambiguity rule above still binds: observation and stated
+  low-stakes assumptions only; a high-stakes unknown with no one to ask is
+  reported as a blocker, not locked into the spec as an assumption.
   Questions beat confidently stated assumptions here: a plausible assumption
   stated confidently is how a wrong spec gets locked.
   ✅ "Before I spec this: (1) concurrent editors — how many? (2) offline edits
