@@ -250,19 +250,22 @@ default; an AI rewrite does not launder a derivative).
   every removal it surfaces: each removed load-bearing clause either
   survives in a destination you opened and searched, not assumed — the
   remaining text, a reference file, the fix log it was demoted to, or
-  another skill's file when the clause was deliberately relocated (search
-  every file the pass touched, not only the edited skill's tree: a
-  same-tree-only search misreads a relocation as a loss, and the restore
-  it invites forks the clause into two homes) — or goes on the
-  dropped-clause list with its why (the removal record the compaction
-  bullet above already requires); an unaccounted drop is the failure.
+  another skill's file when that file is the clause's home (open the
+  claimed home and find the clause there; never count the snapshot or a
+  temporary copy as survival, and never limit the search to the edited
+  skill's tree — a same-tree-only search misreads a move or de-fork as a
+  loss, and the restore it invites forks the clause into two homes) — or
+  goes on the dropped-clause list with its why (the removal record the
+  compaction bullet above already requires); an unaccounted drop is the
+  failure.
   Per the enforcement ladder later in this section: prose asking for
   this is the weak tier this very rule
   warns against, so the change record — the PR description or commit
   message when one is being created, otherwise the completion report —
   must name the command run and state either the dropped-clause list
-  or "zero dropped clauses" — the forced line is what makes a skipped
-  check visible; the word-diff itself is the check.
+  or "zero dropped clauses", naming the destination path for any clause
+  that survived outside the edited file — the forced line is what makes
+  a skipped check visible; the word-diff itself is the check.
   ✅ ran `git diff --no-index --word-diff SKILL.md.bak SKILL.md`, found an
   ordering constraint missing from the condensed bullet, restored it,
   re-ran the same word-diff to confirm the restoration, then wrote "ran
