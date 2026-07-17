@@ -1,0 +1,31 @@
+name: Feature request
+description: Propose a new rule, skill improvement, or pack change.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This pack follows an evidence-first covenant: behavioral rules ship
+        with provenance — an observed failure, an incident, or a probe (see
+        the README). Proposals that name the failure they prevent are much
+        easier to adopt.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / observed failure
+      description: What went wrong (or would go wrong) without this? Concrete beats hypothetical.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Which skill or hook, and roughly what wording or behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false

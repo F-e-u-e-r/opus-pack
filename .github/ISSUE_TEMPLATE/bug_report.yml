@@ -1,0 +1,67 @@
+name: Bug report
+description: A skill, hook, or check behaves differently from what it documents.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. Please do **not** paste secrets, tokens, or
+        private transcript content — trim examples down to the minimal
+        fragment that shows the problem.
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - operational-rigor
+        - delegation-and-review
+        - ground-truth-gates
+        - cross-model-review
+        - security-architect
+        - skill-authoring
+        - product-roadmap
+        - personal-goal-planning
+        - hooks
+        - packaging / plugin manifest
+        - docs / README
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did the skill or hook do, and what does its doc say it should do?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: Prompt/task shape and the smallest context that triggers it.
+    validations:
+      required: true
+  - type: input
+    id: claude-code-version
+    attributes:
+      label: Claude Code version
+      description: Output of `claude --version`.
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      placeholder: e.g. Opus 4.8, Sonnet 5, Haiku 4.5
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How is the pack installed?
+      options:
+        - /plugin marketplace add (plugin)
+        - copied into ~/.claude manually
+        - cloned repo / other
+    validations:
+      required: true

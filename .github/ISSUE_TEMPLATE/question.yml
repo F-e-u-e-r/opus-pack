@@ -1,0 +1,17 @@
+name: Question / how-to
+description: Ask how a skill is meant to be used, or whether behavior is expected.
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Claude Code version, model, and what you tried. Do not paste secrets.
+    validations:
+      required: false

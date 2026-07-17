@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability (private)
+    url: https://github.com/F-e-u-e-r/opus-pack/security/advisories/new
+    about: Report security issues privately via GitHub security advisories. Do not open a public issue.
+  - name: Method & provenance covenant
+    url: https://github.com/F-e-u-e-r/opus-pack#readme
+    about: How rules earn their place in this pack — read before proposing doctrine changes.
