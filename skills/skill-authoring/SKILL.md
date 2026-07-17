@@ -248,10 +248,14 @@ default; an AI rewrite does not launder a derivative).
   and never through an env var pinned in an earlier shell (each tool call
   runs a fresh shell; an unset var silently empties the baseline). Read
   every removal it surfaces: each removed load-bearing clause either
-  survives — in the remaining text, or in a reference file you opened and
-  searched, not assumed — or goes on the dropped-clause list with its why
-  (the removal record the compaction bullet above already requires); an
-  unaccounted drop is the failure. Per the enforcement ladder later in
+  survives in a destination you opened and searched, not assumed — the
+  remaining text, a reference file, the fix log it was demoted to, or
+  another skill's file when the clause was deliberately relocated (search
+  every file the pass touched, not only the edited skill's tree: a
+  same-tree-only search misreads a relocation as a loss, and the restore
+  it invites forks the clause into two homes) — or goes on the
+  dropped-clause list with its why (the removal record the compaction
+  bullet above already requires); an unaccounted drop is the failure. Per the enforcement ladder later in
   this section: prose asking for this is the weak tier this very rule
   warns against, so the change record — the PR description or commit
   message when one is being created, otherwise the completion report —
@@ -346,4 +350,13 @@ weaker-tier executor performs the word-diff step (versus the superficially
 similar anchor-grep) when instructed is a behavioral claim this pack's own
 §6 fresh-weaker-tier-agent method could test — that probe has not yet been
 run, and this note records that gap rather than asserting it is untestable.
+The trace clause's destination scope (2026-07-18) was widened after a
+reviewer flagged it on PR #40 post-merge: as merged it named only the
+remaining text and "a reference file", yet the compaction bullet above it
+already demotes incident detail to the fix log and §5 relocates clauses
+across skill homes — destinations a same-tree-only search misreads as
+losses, inviting a duplicate-home restore (§4). The reviewer's motivating
+verification run is contributor-reported (not independently reproducible
+in this repo); the doctrine gap it points at is verified against the
+file's own demotion and relocation rules.
 Stable method; no environment facts to re-verify.
