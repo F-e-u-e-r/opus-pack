@@ -235,27 +235,30 @@ default; an AI rewrite does not launder a derivative).
   guards the writing, not the later edit). Grepping that anchors, pointers,
   section headers, and examples survived verifies *structure*, not *clauses* —
   a condensed bullet can keep every anchor and still drop the qualifying
-  clause that made it correct. Before editing, pin the pre-edit baseline:
-  `cp <file> <file>.bak`, or if the file is committed, note
-  `PRE=$(git rev-parse HEAD)`. After editing — and before committing it —
-  run `git diff --word-diff $PRE -- <file>` (bare `HEAD` works only while
-  the edit is uncommitted; after a commit it compares the edit to itself
-  and reports nothing), or `git diff --no-index --word-diff <file>.bak
-  <file>` for an untracked file. Read every removal it surfaces: each
-  removed load-bearing clause either survives — in the remaining text, or
-  in a reference file you opened and searched, not assumed — or goes on
-  the dropped-clause list with its why (the removal record the compaction
-  bullet above already requires); an unaccounted drop is the failure. Per
-  the enforcement ladder later in this section: prose asking for this is
-  the weak tier this very rule warns against, so the change record (PR
-  description, commit message, or the completion report when no VCS is in
-  play) must name the command run and state either the dropped-clause list
+  clause that made it correct. Before editing, snapshot the exact pre-edit
+  bytes: `cp <file> <file>.bak`. After editing, run
+  `git diff --no-index --word-diff <file>.bak <file>` (exit 1 means
+  differences were found — the expected outcome; delete the `.bak` after
+  the check). Diffing against a git ref instead is valid only when the
+  file was clean at a recorded literal SHA — never against bare `HEAD`,
+  which after a commit compares the edit to itself and reports nothing,
+  and never through an env var pinned in an earlier shell (each tool call
+  runs a fresh shell; an unset var silently empties the baseline). Read
+  every removal it surfaces: each removed load-bearing clause either
+  survives — in the remaining text, or in a reference file you opened and
+  searched, not assumed — or goes on the dropped-clause list with its why
+  (the removal record the compaction bullet above already requires); an
+  unaccounted drop is the failure. Per the enforcement ladder later in
+  this section: prose asking for this is the weak tier this very rule
+  warns against, so the change record — the PR description or commit
+  message when one is being created, otherwise the completion report —
+  must name the command run and state either the dropped-clause list
   or "zero dropped clauses" — the forced line is what makes a skipped
   check visible; the word-diff itself is the check.
-  ✅ ran `git diff --word-diff $PRE -- SKILL.md`, found an ordering
-  constraint missing from the condensed bullet, restored it, then wrote
-  "ran git diff --word-diff <pre-edit ref> -- SKILL.md; zero dropped
-  clauses" in the commit message.
+  ✅ ran `git diff --no-index --word-diff SKILL.md.bak SKILL.md`, found an
+  ordering constraint missing from the condensed bullet, restored it, then
+  wrote "ran git diff --no-index --word-diff SKILL.md.bak SKILL.md; zero
+  dropped clauses" in the commit message.
   ❌ "the extracted file still has a heading for this section, so the content
   made it" — headings survive; the sentence under them doesn't have to.
 - A rule that misfired once is not yet wrong: reproduce the incident and
