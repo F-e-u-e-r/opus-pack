@@ -461,6 +461,10 @@ This pack distills and adapts ideas from:
   those fixtures before shipping; design/normative ones labeled `unprobed`
   in-body; their published negatives cited as shape, numbers not
   restated).
+- **Matt Pocock's Grill-me pattern; Superpowers (obra); OpenSpec** — the
+  grill/decision-note layer of public spec-isolation and brainstorming
+  workflows, adapted as `operational-rigor`'s §1 grill pass and §5
+  decisions-note. Ideas only; no code taken.
 - **firaen22** — contributed the cost-asymmetric golden runner and the first
   structural commit-hook parser work through GitHub PRs.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
