@@ -460,16 +460,17 @@ This pack distills and adapts ideas from:
   `delegation-and-review`, and `skill-authoring` — the authority-order,
   twin-sweep, ask-classification, prescribed-follow-up, and
   completion-claim-audit rules plus the enforcement ladder, pointer
-  caution, and red-line authoring gate, and — from the v1.4.0 delta —
-  the AUTH-quote artifact, the owed-lines artifact gate, the
-  installed-skill non-authorization vector, the gate-placement rule,
-  the `domain-evidence-discipline` skill (their domain-adapter schema
-  condensed to one four-nouns pattern), and the follow-up
-  declared-scope, orient-first, and debris rules
-  (behavioral rules probe-tested on those fixtures before shipping;
-  design/normative ones labeled `unprobed` in-body; their published
-  results cited as shape — where a number is restated, it carries the
-  source's own smoke-grade label).
+  caution, and red-line authoring gate (that batch's behavioral rules
+  probe-tested on those fixtures before shipping; its design/normative
+  ones labeled `unprobed` in-body). From the v1.4.0 delta and its
+  follow-ups — the AUTH-quote artifact, the owed-lines artifact gate,
+  the installed-skill non-authorization vector, the gate-placement
+  rule, the `domain-evidence-discipline` skill (their domain-adapter
+  schema condensed to one four-nouns pattern), and the declared-scope,
+  orient-first, and debris rules — all shipping explicitly `unprobed`
+  in-body per the covenant, with the source's published results cited
+  as shape (a restated number carries the source's own smoke-grade
+  label).
 - **Matt Pocock's Grill-me pattern; Superpowers (obra); OpenSpec** — the
   grill/decision-note layer of public spec-isolation and brainstorming
   workflows, adapted as `operational-rigor`'s §1 grill pass and §5

@@ -12,10 +12,13 @@ When rigor conflicts with finishing sooner, rigor wins.
 
 - Restate the deliverable in 1-2 sentences: what will exist and how success is
   observed. This is the scope boundary. For mutating work, also name the
-  files or surfaces you expect to touch — §3's expansion tripwire has a
-  baseline only if that list exists, and needing something outside it
-  mid-work is disclosed as it happens, never silently absorbed.
-  (`unprobed` — see Provenance.)
+  surfaces you expect to MUTATE — provisional at contract time, pinned
+  after orientation (§2) and any grill-revised restatement. Discovery
+  reads are not scope expansion; a write, delete, or send target outside
+  the pinned list is disclosed before acting — §3's expansion tripwire
+  has a baseline only if the list exists, and this clause adds no new
+  report line (disclosure rides the tripwire). (`unprobed` — see
+  Provenance.)
 - Classify the task: **read-only**, **mutating** (reversible edits/state), or
   **destructive** (delete, overwrite without backup, push, deploy, send).
 - Classify the ASK before the action — by intent, not grammar ("can you
@@ -65,10 +68,11 @@ When rigor conflicts with finishing sooner, rigor wins.
   observation**. Version/path/schema/config dependencies must be observed first.
 - Put cheap, reversible information gathering before expensive or irreversible
   steps. Reading precedes writing; writing precedes deleting. Orient
-  before you dive: enumerate what actually exists (list the directory,
-  glob the tree) before reading specific files — which files matter is
-  not recallable from what projects usually contain. (`unprobed` — see
-  Provenance.)
+  before you dive: when the relevant surfaces are not already named in
+  the contract or the user's message, enumerate what actually exists
+  (list the directory, glob the relevant subtree) before reading
+  specific files — which files matter is not recallable from what
+  projects usually contain. (`unprobed` — see Provenance.)
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -235,9 +239,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   wording). When touching such a chain, re-check every ordering constraint and
   pin each one with a regression case.
 - Before finishing, re-check diff vs. contract and delete creep, and
-  remove the scratch files and probe artifacts you created — leftover
-  debris reads as abandoned work to the next agent and as a fraud signal
-  to an auditor. (`unprobed` — see Provenance.)
+  remove the scratch you created — files made only to probe or verify
+  that the contract does not name as deliverables and that are not
+  repository fixtures or retained audit evidence; look at each before
+  deleting (§2's gates apply to your own litter too). Leftover debris
+  reads as abandoned work to the next agent and as a fraud signal to an
+  auditor. (`unprobed` — see Provenance.)
 
 ## 4. Verify by observation
 
