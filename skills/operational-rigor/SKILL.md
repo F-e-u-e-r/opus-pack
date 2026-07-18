@@ -11,7 +11,11 @@ When rigor conflicts with finishing sooner, rigor wins.
 ## 1. Task contract
 
 - Restate the deliverable in 1-2 sentences: what will exist and how success is
-  observed. This is the scope boundary.
+  observed. This is the scope boundary. For mutating work, also name the
+  files or surfaces you expect to touch — §3's expansion tripwire has a
+  baseline only if that list exists, and needing something outside it
+  mid-work is disclosed as it happens, never silently absorbed.
+  (`unprobed` — see Provenance.)
 - Classify the task: **read-only**, **mutating** (reversible edits/state), or
   **destructive** (delete, overwrite without backup, push, deploy, send).
 - Classify the ASK before the action — by intent, not grammar ("can you
@@ -60,7 +64,11 @@ When rigor conflicts with finishing sooner, rigor wins.
 - For more than two dependent actions, plan **precondition → action → expected
   observation**. Version/path/schema/config dependencies must be observed first.
 - Put cheap, reversible information gathering before expensive or irreversible
-  steps. Reading precedes writing; writing precedes deleting.
+  steps. Reading precedes writing; writing precedes deleting. Orient
+  before you dive: enumerate what actually exists (list the directory,
+  glob the tree) before reading specific files — which files matter is
+  not recallable from what projects usually contain. (`unprobed` — see
+  Provenance.)
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -226,7 +234,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   removed healthy keys, because the provider's quota errors carried auth
   wording). When touching such a chain, re-check every ordering constraint and
   pin each one with a regression case.
-- Before finishing, re-check diff vs. contract and delete creep.
+- Before finishing, re-check diff vs. contract and delete creep, and
+  remove the scratch files and probe artifacts you created — leftover
+  debris reads as abandoned work to the next agent and as a fraud signal
+  to an auditor. (`unprobed` — see Provenance.)
 
 ## 4. Verify by observation
 
@@ -477,6 +488,17 @@ All three ship `unprobed` here in that sense: adopted on the source's external
 measurement plus mechanism fit with this pack's existing owed-disclosure
 rules (twin-search line, prescribed-follow-up naming); not yet probed on
 this pack's private fixtures — the marker records that debt.
+The §1 declared-scope list, §2 orient-first clause, and §3 debris rule
+(2026-07-18) close the residuals the PR #42 review ledger recorded, each
+adapting fable-method v1.4.0 (MIT, ideas only; see README
+acknowledgements): their Step 3 scope line (the judge diffs the change
+set against it), their round-10 observation study's orient-first
+correction (bare frontier traces enumerated before reading — their
+observation, their runs), and their Step 6 cleanup rule (the judge
+treats leftover debris as a fraud signal). All three ship `unprobed`
+in-house per the covenant; the private suite's fixtures could probe
+each (scope expansion, memory-picked file paths, scratch litter) — none
+has run; the markers record that debt.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
