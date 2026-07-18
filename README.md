@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.13" src="https://img.shields.io/badge/version-alpha--0.1.13-orange.svg">
+  <img alt="Version alpha-0.1.14" src="https://img.shields.io/badge/version-alpha--0.1.14-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -16,13 +16,13 @@
 
 ---
 
-Eight skills and three hooks for the daily-driver models that remain after
+Nine skills and three hooks for the daily-driver models that remain after
 Fable 5's window closes (Opus 4.8 / Sonnet 5 / Haiku). They encode one bet:
 the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.13`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.14`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -78,6 +78,7 @@ The three hooks are optional and installed separately — see
 | `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, secure ingestion of untrusted contributions, agent tool permissions, leak incident response | user-supplied security reference draft + OWASP/RFC common knowledge, verified and extended |
 | `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | user-supplied roadmap reference draft — ceremony cut, judgment added |
 | `personal-goal-planning` | Coach-style five steps: minimal intake, tiered goals (2–4w / 2–3m / 6–12m) with one mainline, executable tasks with observable done-criteria, realistic weekly rhythm, weekly review with a stuck rule | @pro_ai.news goal-coaching protocol (Threads) + this pack's house rules |
+| `domain-evidence-discipline` | Evidence discipline for non-code deliverables (marketing / research / data / ops): per-domain minimum evidence set, authority order, what verification-by-observation means, and the fraud table a reviewer hunts; red-line professional judgment refused and routed to a qualified human | Sahir619/fable-method's domain-adapter schema (MIT, ideas only) condensed into one pattern skill; the worked instances are this pack's own compressions |
 | `cross-model-review` | Adversarial review from a *different model family* before a load-bearing merge: session-time reviewer discovery (no hard-coded lineup), self-contained packet, findings-are-claims, bounded review-and-fix loop (merge only when every reviewer returned a confirmed verdict — each one PROCEED, or a FIX whose every remaining item is a recorded, justified gap; a timeout/empty body is not a verdict), exit-code≠pass. Doctrine only — concrete CLIs stay out of the pack | promoted from the owner's private cross-model-review CLI notes; doctrine generalized, machine recipes kept personal |
 
 `ground-truth-gates/template/` was verified by execution (Node v23, 2026-07-06):
@@ -459,13 +460,17 @@ This pack distills and adapts ideas from:
   `delegation-and-review`, and `skill-authoring` — the authority-order,
   twin-sweep, ask-classification, prescribed-follow-up, and
   completion-claim-audit rules plus the enforcement ladder, pointer
-  caution, and red-line authoring gate, and — from the v1.4.0 delta —
-  the AUTH-quote artifact, the owed-lines artifact gate, the
-  installed-skill non-authorization vector, and the gate-placement rule
-  (behavioral rules probe-tested on those fixtures before shipping;
-  design/normative ones labeled `unprobed` in-body; their published
-  results cited as shape — where a number is restated, it carries the
-  source's own smoke-grade label).
+  caution, and red-line authoring gate (that batch's behavioral rules
+  probe-tested on those fixtures before shipping; its design/normative
+  ones labeled `unprobed` in-body). From the v1.4.0 delta and its
+  follow-ups — the AUTH-quote artifact, the owed-lines artifact gate,
+  the installed-skill non-authorization vector, the gate-placement
+  rule, the `domain-evidence-discipline` skill (their domain-adapter
+  schema condensed to one four-nouns pattern), and the declared-scope,
+  orient-first, and debris rules — all shipping explicitly `unprobed`
+  in-body per the covenant, with the source's published results cited
+  as shape (a restated number carries the source's own smoke-grade
+  label).
 - **Matt Pocock's Grill-me pattern; Superpowers (obra); OpenSpec** — the
   grill/decision-note layer of public spec-isolation and brainstorming
   workflows, adapted as `operational-rigor`'s §1 grill pass and §5
