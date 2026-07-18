@@ -11,8 +11,9 @@ When rigor conflicts with finishing sooner, rigor wins.
 ## 1. Task contract
 
 - Restate the deliverable in 1-2 sentences: what will exist and how success is
-  observed. This is the scope boundary. For mutating work, also name the
-  surfaces you expect to MUTATE — provisional at contract time, pinned
+  observed. This is the scope boundary. For mutating or destructive work,
+  also name the surfaces you expect to write, delete, or send to —
+  provisional at contract time, pinned
   after orientation (§2) and any grill-revised restatement. Discovery
   reads are not scope expansion; a write, delete, or send target outside
   the pinned list is disclosed before acting — §3's expansion tripwire
