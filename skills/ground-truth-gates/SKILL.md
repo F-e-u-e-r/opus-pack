@@ -160,7 +160,7 @@ A generic green test is not proof. A gate is real only if:
    fails when you deliberately break the code — not merely that it compiles. For
    a guard/error path, assert three things, not just the exit code: the
    returncode, a message string unique to THIS check (many errors share exit 2),
-   and that the dangerous side-effect did NOT occur (`assertNotIn`). Three more
+   and that the dangerous side-effect did NOT occur (`assertNotIn`). Four more
    fake-pass shapes: a **warm-state pass on init-only code** — a zero-violation
    observation window proves nothing about code that only executes at
    initialization (cold start, first run, migration); exercise the cold path in
@@ -171,7 +171,16 @@ A generic green test is not proof. A gate is real only if:
    undiscoverable (wrong directory in a monorepo) and inert forever while
    reading as coverage. A **snapshot gate that silently re-freezes when its
    baseline is missing** — deleting the baseline must be an error at gate time,
-   never a vacuous green.
+   never a vacuous green. A **scanner that matched zero inputs** — a gate whose
+   file pattern silently expands empty (`**` degrading in an old shell dialect
+   combined with a nullglob setting, a directory that moved) "passes" while
+   scanning nothing (a guard script once did this for the very file its outage
+   check was written for). A passing scan must also prove its input set is
+   non-empty — assert the matched count is non-zero; merely printing it is the
+   same vacuous green if nothing fails on 0. Worker-written guard scripts
+   especially: item 2's known-broken run applies before trust, no exemption —
+   whoever wrote a guard has never seen it fail. (`unprobed` — private
+   incident as shape; see Provenance.)
 4. **Nobody weakens a gate to turn it green.** A worker satisfies the gate, never
    edits it — gate changes are the orchestrator's call. Three corollaries:
    - For an *immutable policy-checker* (not an ordinary test), run it from a
@@ -295,7 +304,8 @@ The 2026-07-13 case-set integrity rules (instrument validation + taint,
 row capture-provenance, distribution-disjoint holdout), the two-sided
 suite-soundness and fire-path clauses, the saturation/blind-grading and
 outcome→action pre-registration lines, the first-freeze eyeball, the
-grep-count ratchet, and the three added fake-pass shapes are mined from five
+grep-count ratchet, and three of the added fake-pass shapes (warm-state,
+never-executed CI config, snapshot re-freeze) are mined from five
 further private retiring-architect libraries (an engine-parity port, a market
 dashboard, a learning-lab experiment harness, a Telegram bot, a link-shortener);
 each is backed by a cited incident or experiment in its source library (private
@@ -309,5 +319,11 @@ negative from Sahir619/fable-method's eval log — safe outcomes produced by
 runs that never read the prescribing doc, blindness scored as discipline
 until a transcript check was added (MIT; ideas only, no files copied; see
 README acknowledgements).
+The rule-3 zero-input-scanner shape (2026-07-18) comes from a private
+incident: a worker-written guard's `**` pattern expanded empty under an old
+shell dialect with nullglob, and the guard "passed" while scanning zero
+files, including the one its outage check existed for. Private evidence,
+cited as shape per the README covenant's second branch; no in-repo probe
+has run, so the shape carries an in-body `unprobed` marker.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.

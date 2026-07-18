@@ -184,6 +184,15 @@ reviewers that they silently absorb as implementers.
   what the concurrent editor achieved, re-anchor your edit on the current state.
   After any concurrent worker finishes on files you also touched, audit for
   double-edits (diff + targeted grep) before declaring clean.
+- **A constrained worker can clobber you with no conflict signal.** At least
+  one worker sandbox has been observed restoring every file outside its
+  declared write scope to the last commit on exit — concurrent edits in the
+  same tree vanished with no "modified since read" error and no conflict
+  marker. So "disjoint files" is not a safe split while any subordinate holds
+  write access to the tree: commit anything you must keep before dispatch,
+  keep new edits of your own in a scratch copy outside the tree, and merge
+  them in after the worker exits — then run the double-edit audit above.
+  (`unprobed` — private incident as shape; see Provenance.)
 
 ## 5. Long-running work and handoff
 
@@ -284,5 +293,13 @@ error; the report read as complete coverage of work that never ran.
 Private evidence, cited as shape per the README covenant's second branch;
 no in-repo probe has run, so the rule carries an in-body `unprobed`
 marker.
+The §4 silent-clobber bullet (2026-07-18) comes from a private incident: a
+sandboxed worker restored every file outside its declared write scope to the
+last commit on exit, silently discarding the orchestrator's concurrent edits
+in the same tree. One observed occurrence; whether the restore is scope
+enforcement or a defect in that sandbox is unestablished, so the rule
+prescribes only the defensive split. Private evidence, cited as shape per
+the README covenant's second branch; no in-repo probe has run — in-body
+`unprobed` marker.
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
