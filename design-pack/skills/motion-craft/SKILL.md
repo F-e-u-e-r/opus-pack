@@ -51,18 +51,23 @@ Numbers first; taste second. Defaults for product UI:
 - **Never linear for spatial movement; never ease-in for entrances.** An
   ease-in dropdown at 300ms feels slower than ease-out at the same 300ms:
   it delays movement in the exact frames the user watches most closely.
-- Named defaults (checked against the vendors' current tokens - see
-  Provenance): Material 3 standard `cubic-bezier(0.2, 0, 0, 1)`; M3
-  emphasized-decelerate `cubic-bezier(0.05, 0.7, 0.1, 1)`; Apple HIG default
-  `cubic-bezier(0.25, 0.1, 0.25, 1)`. Note the common mislabel: `(0.4, 0,
-  0.2, 1)` is Material *2*'s standard, routinely pasted as "M3".
+- Named defaults: Material 3 standard `cubic-bezier(0.2, 0, 0, 1)`; M3
+  emphasized-decelerate `cubic-bezier(0.05, 0.7, 0.1, 1)`; Core Animation's
+  `kCAMediaTimingFunctionDefault` / CSS `ease` is `cubic-bezier(0.25, 0.1,
+  0.25, 1)` - Apple's HIG publishes principles, not bezier tokens, so any
+  "Apple HIG curve" value circulating online is reverse-engineered, not
+  vendor-published. Two mislabels to refuse: `(0.4, 0, 0.2, 1)` is
+  Material *2*'s standard routinely pasted as "M3", and `(0.25, 0.1, 0.25,
+  1)` labeled "the Apple HIG default" is the CSS `ease` curve wearing a
+  vendor costume.
 
 ## 3. Springs and gesture physics
 
 - Spring parameters below are **coefficients in the Framer Motion / React
   Spring convention** (stiffness + damping). A damping *ratio* (where <1.0
-  oscillates and 1.0 is critical) is a different unit - mixing the two
-  conventions is a recurring published error; name which one you are using.
+  oscillates and 1.0 is critical) is a different unit - an error that has
+  reached published tables (this pack's own LottieFiles source conflates
+  the two); name which convention you are using.
 
 | Feel | Stiffness | Damping |
 |---|---|---|
@@ -194,7 +199,8 @@ handoff forms (his distillation of Apple WWDC material; formulas quoted from
 his files); LottieFiles `motion-design-skill` (MIT) - element duration table,
 distance-duration multipliers, exit ratio, stagger and overshoot budgets,
 severity-tier gate shape (their damping-units conflation is corrected here,
-not copied); `referodesign/refero_skill` (MIT) - purpose triad, easing
+not copied; §1's duration rows are envelope syntheses across the three
+motion sources, not quotes of any single table); `referodesign/refero_skill` (MIT) - purpose triad, easing
 direction table, reduced-motion mapping, `transition: all` ban. §7's
 corrections and the M2/M3 mislabel are adopted from nexu-io/open-design's
 `craft/animation-discipline.md` primary-source review (Apache-2.0; facts and
@@ -202,8 +208,10 @@ citations restated in this pack's words, no text copied); the primary papers
 were not independently re-opened for this pack. greensock/gsap-skills was
 surveyed and deliberately not mined: library-usage doctrine, out of scope
 here. Numeric values (beziers, spring pairs, budgets) are the volatile
-facts - re-verify against Material 3 motion tokens and Apple HIG on major
-vendor releases. Probe status: probe-tested 2026-07-19 on a
+facts - re-verify beziers against the published Material 3 motion tokens
+(m3.material.io) and, for Apple, the SwiftUI Animation API's actual values
+(the HIG publishes no numeric curves); spring pairs against the Framer
+Motion / Motion docs - on major vendor releases. Probe status: probe-tested 2026-07-19 on a
 private over-budget motion-spec fixture (fresh weak-tier agent, n=1 per
 arm, smoke grade): the bare arm caught ~3 of 7 planted violations, loosely
 phrased - though it did catch the missing reduced-motion variant, recorded

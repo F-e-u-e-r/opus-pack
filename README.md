@@ -116,9 +116,11 @@ Notes that keep this honest:
   points at it as non-authoritative research material — concrete and
   useful, and exactly the "unofficial observation" class design-review-gate
   §4 teaches you to verify before trusting. Nothing from it is vendored.
-- **Probe status:** each skill's load-bearing gates were probe-tested at
-  smoke grade (fresh weak-tier agent, bare-vs-ruled arms, expected outcomes
-  written before any run) on private fixtures. The record includes one
+- **Probe status:** ui-design-craft's and motion-craft's gates, and
+  design-review-gate §4's contract rules, were probe-tested at smoke grade
+  (fresh weak-tier agent, bare-vs-ruled arms, expected outcomes written
+  before any run) on private fixtures; design-review-gate's §§1-3 review
+  loop is not yet probed. The record includes one
   voided round (an answer key leaked into the fixtures, caught by the
   expected-before-actual discrepancy, not the score) and one NULL (the
   drift-direction clause's trap under-armed) — both published in the

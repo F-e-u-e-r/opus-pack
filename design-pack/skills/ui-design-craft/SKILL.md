@@ -66,10 +66,13 @@ override is the recorded reason, never silent).
 - Decorative left accent stripe (`border-left: 4px solid <accent>`): stripes
   carry meaning (status, priority, selection) or they go.
 - The 3-column icon-in-colored-circle feature grid, repeated symmetrically -
-  the most recognizable AI layout of all.
+  the single most recognizable signature of generated marketing pages.
 - "Split header" (huge left headline + small floating right paragraph) as a
   section-header default; stack vertically instead, max-width ~65ch.
 - Hairline borders above AND below every row of a list or spec table.
+- Standard emoji standing in for icons: use an icon set or a plain
+  Unicode glyph (an arrow, a bullet, a diamond) - emoji as UI iconography
+  reads as unfinished work.
 
 **Label and meta tells**
 - Eyebrow labels (small caps tracking-wide strings above headlines) above
@@ -129,14 +132,18 @@ override is the recorded reason, never silent).
 
 - Hierarchy has 3-4 distinct levels, differentiated by weight and spacing,
   not size alone.
-- **Accent budget: at most 2 visible accent uses per screen** (one
-  eyebrow/chip + one primary CTA is the typical pair). Links count; demote
-  them to foreground-color underlines if the budget is spent.
+- **Accent budget: at most 2 visible accent uses per screen.** Spend them
+  deliberately - a highlighted label plus the primary action is the usual
+  allocation. Links draw from the same budget; once it is spent, style
+  them as underlined foreground text instead.
 - One lock each per page: ONE theme (no section flipping to inverted
   mid-page), ONE accent applied identically, ONE corner-radius system.
-- Contrast floors (WCAG AA): 4.5:1 body text, 3:1 large text and UI
-  components - including placeholders, focus rings, and text over images
-  or scrims; secondary text in dark mode still clears 3:1.
+- Contrast floors (WCAG AA): text needs 4.5:1 at normal size and 3:1 only
+  at large size - placeholder text and text over images or scrims
+  included, with no exemption for either; non-text UI (focus rings,
+  component boundaries, state indicators) needs 3:1; secondary BODY-size
+  text needs 4.5:1 in both color modes - dark-mode secondary text is
+  where this fails silently.
 - Micro text is whitelisted, not vibes-based: the smallest size (11px and
   below) appears only in an enumerated role list you can state (timestamps,
   badge pills, axis labels...) - any other use upgrades a size.
@@ -163,8 +170,11 @@ rendering.
 
 - Touch targets: 44x44pt (iOS) / 48x48dp (Android) minimum - vendor floors,
   not suggestions.
-- Modal scrims strong enough to isolate the foreground (roughly 40-60%
-  black-equivalent); content behind stays visibly inert.
+- Modal scrims visibly isolate the foreground: content behind reads as
+  inert, and any text sitting over the scrim still meets the §3 floors.
+  Material's published scrim token (black at 32% opacity) is the vendor
+  anchor to start from; heavier is a legitimate brand choice, while a
+  missing or near-invisible scrim is a defect.
 - Press/hover states never shift layout (no border-width or size jumps -
   swap colors/elevation instead).
 - Both color modes rendered and looked at before done, with every state of
@@ -181,7 +191,8 @@ colors FIRST - a purple brand stays purple, overriding §1's indigo ban.
 Never regress accessibility already present (focus states, alt text,
 keyboard paths, contrast). These names are interfaces with hidden consumers
 - operational-rigor's call-site sweep applies to them, verbatim: "Interfaces
-include observable output text and names."
+include observable output text and names." (canonical copy in
+operational-rigor §3; on disagreement that file wins).
 
 ## 7. The pre-flight gate (mechanical)
 

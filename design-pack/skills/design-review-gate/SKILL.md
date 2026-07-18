@@ -22,11 +22,14 @@ facts first, in the running page:
   + '/' + s.fontWeight; }))].sort()`
   More than ~6-8 distinct size/weight combos on one screen is a hierarchy
   finding.
-- **Touch-target audit** (app surfaces):
-  `[...document.querySelectorAll('a,button,[role="button"],input,select')]
+- **Touch-target audit** (app surfaces; set MIN = 48 for Android-targeted
+  surfaces, 44 for iOS-only - the floor's home is ui-design-craft §5):
+  `const MIN = 48;
+  [...document.querySelectorAll('a,button,[role="button"],input,select')]
   .map(e => ({ t: (e.textContent || e.ariaLabel || '').trim().slice(0, 24),
-  r: e.getBoundingClientRect() })).filter(x => x.r.width < 44 || x.r.height
-  < 44)`
+  r: e.getBoundingClientRect() })).filter(x => x.r.width > 0 && x.r.height
+  > 0 && (x.r.width < MIN || x.r.height < MIN))`
+  (zero-area rects are hidden elements - excluded, not findings).
   Non-empty result = findings, each with its element named.
 - Color census (computed color/background values), accent-use count, and
   em-dash search are the same move: a computed fact beats an impression.
@@ -37,13 +40,18 @@ facts first, in the running page:
 
 ## 2. The passes, in order
 
-1. **Static pass** - run `ui-design-craft` §7's mechanical gate per screen.
-2. **States pass** - the five states of `ui-design-craft` §4, rendered and
+1. **Contract pass** - discover and classify the governing design contract
+   FIRST (§4; the discovery-and-precedence rules are
+   domain-evidence-discipline's). Every later pass judges against it, and
+   §3's Block keys on its deviations - a review that never looked for the
+   contract cannot claim one is absent.
+2. **Static pass** - run `ui-design-craft` §7's mechanical gate per screen.
+3. **States pass** - the five states of `ui-design-craft` §4, rendered and
    looked at, both color modes.
-3. **Motion pass** - `motion-craft` §8's gate; trigger each interaction.
-4. **Flow pass** - walk the primary user journey end to end once; note
+4. **Motion pass** - `motion-craft` §8's gate; trigger each interaction.
+5. **Flow pass** - walk the primary user journey end to end once; note
    every point of friction or surprise with its screen.
-5. **Consistency pass** - across screens: one accent, one radius system,
+6. **Consistency pass** - across screens: one accent, one radius system,
    one theme, one spacing rhythm, same component = same treatment.
 
 Each pass emits findings; no pass emits a verdict alone.

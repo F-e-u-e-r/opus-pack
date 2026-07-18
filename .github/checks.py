@@ -50,13 +50,16 @@ tracked = [
 # marketplace file falls back to the root plugin's skills/ so this check
 # still runs; check 2 fails loudly on the manifest itself.
 try:
+    _mp = json.loads(read(".claude-plugin/marketplace.json"))
     _mp_sources = [
         e.get("source", "")
-        for e in json.loads(read(".claude-plugin/marketplace.json")).get("plugins", [])
+        for e in (_mp.get("plugins", []) if isinstance(_mp, dict) else [])
         if isinstance(e, dict)
     ]
 except (OSError, ValueError):
-    _mp_sources = ["./"]
+    _mp_sources = []
+if not _mp_sources:
+    _mp_sources = ["./"]  # fallback so check 1 still covers the root pack
 skill_roots = []
 for _src in _mp_sources:
     _norm = os.path.normpath(_src) if _src else "."
@@ -149,6 +152,9 @@ except (OSError, ValueError) as e:
     fail(f"plugin.json: unreadable or malformed ({e})")
 try:
     marketplace = json.loads(read(".claude-plugin/marketplace.json"))
+    if not isinstance(marketplace, dict):
+        fail("marketplace.json: top level is not a JSON object")
+        marketplace = {}
     entries = marketplace.get("plugins")
     if not isinstance(entries, list) or not entries:
         fail("marketplace.json: plugins[] must be a non-empty list")
