@@ -51,13 +51,12 @@ tracked = [
 # still runs; check 2 fails loudly on the manifest itself.
 try:
     _mp = json.loads(read(".claude-plugin/marketplace.json"))
+    _pl = _mp.get("plugins") if isinstance(_mp, dict) else None
+    if not isinstance(_pl, list):
+        _pl = []  # null/number/etc: check 2 emits the structured failure
     _mp_sources = [
         s
-        for s in (
-            e.get("source", "")
-            for e in (_mp.get("plugins", []) if isinstance(_mp, dict) else [])
-            if isinstance(e, dict)
-        )
+        for s in (e.get("source", "") for e in _pl if isinstance(e, dict))
         if isinstance(s, str) and s
     ]
 except (OSError, ValueError):
@@ -106,6 +105,8 @@ for _rel_root, name in skill_names:
                 vals.append(v.split(" #", 1)[0].strip())
         return vals
 
+    if fm_values("hooks"):
+        fail(f"{rel}: frontmatter declares hooks - plugins must never register hooks (standing invariant)")
     names = fm_values("name")
     descs = fm_values("description")
     if len(names) != 1 or names[0] != name:
@@ -216,14 +217,13 @@ try:
             fail(f"{ctx}: declares a hooks component - plugins must never register hooks (standing invariant)")
         if "skills" in mp or "skills" in pj:
             fail(f"{ctx}: a skills path override is declared - keep skills under <source>/skills/ so the frontmatter sweep (check 1) covers them")
-        if norm != ".":
-            hooks_file = f"{norm}/hooks/hooks.json"
-            if os.path.exists(os.path.join(ROOT, hooks_file)):
-                fail(f"{hooks_file} exists - plugins must never register hooks (standing invariant)")
+        hooks_file = "hooks/hooks.json" if norm == "." else f"{norm}/hooks/hooks.json"
+        if os.path.exists(os.path.join(ROOT, hooks_file)):
+            fail(f"{hooks_file} exists - plugins must never register hooks (standing invariant)")
         if pname == "opus-pack":
             if src != "./":
                 fail(f"{ctx}: the root opus-pack plugin's source must be './', got {src!r}")
-            if re.fullmatch(SEMVER, mp.get("version", "")):
+            if isinstance(mp.get("version"), str) and re.fullmatch(SEMVER, mp["version"]):
                 versions.append(("marketplace.json[opus-pack]", mp["version"]))
     if entries and "opus-pack" not in seen_names:
         fail("marketplace.json: root plugin entry 'opus-pack' is missing")

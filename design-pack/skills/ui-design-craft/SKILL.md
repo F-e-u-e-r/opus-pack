@@ -20,9 +20,10 @@ First action, before any code or mockup:
 - **APP UI** (dashboard, admin, dense product screens - including the
   chrome AROUND embedded tables and editors): route the visual system to
   an established design system (Material, Fluent, Carbon, Polaris, or the
-  project's own); from this file apply only §1 bans, §3 discipline, §4
-  states, §5 floors. The §2 marketing budgets do NOT apply - a dashboard
-  is allowed to be dense and repetitive.
+  project's own); from this file everything EXCEPT §2 applies - the §1
+  bans, §3 discipline, §4 states, §5 floors, §6 preservation on restyles,
+  and §7's gate minus its MARKETING group. The §2 marketing budgets do
+  NOT apply - a dashboard is allowed to be dense and repetitive.
 - **HYBRID** (product site with embedded app screens): classify each section.
 - Out of scope entirely - say so and route: the INTERNALS of data-grid
   and code-editor widgets (TanStack/AG Grid, Monaco/CodeMirror - theme
@@ -145,10 +146,14 @@ override is the recorded reason, never silent).
 - Contrast floors (WCAG AA): text needs 4.5:1 at normal size and 3:1 only
   at large size (large = at least 24px, or 18.66px bold) - placeholder
   text and text over images or scrims
-  included, with no exemption for either; non-text UI (focus rings,
-  component boundaries, state indicators) needs 3:1; secondary BODY-size
-  text needs 4.5:1 in both color modes - dark-mode secondary text is
-  where this fails silently.
+  included, with no exemption for either; non-text UI needs 3:1 where
+  the visual carries identification or state (WCAG 1.4.11's scope -
+  inactive controls and unmodified browser defaults are exempt, and a
+  decorative boundary not needed to identify the control is too; this
+  pack treats focus and state indicators as always in scope, a
+  deliberately stricter pack floor); secondary BODY-size text needs
+  4.5:1 in both color modes - dark-mode secondary text is where this
+  fails silently.
 - Micro text is whitelisted, not vibes-based: the smallest size (11px and
   below) appears only in an enumerated role list you can state (timestamps,
   badge pills, axis labels...) - any other use upgrades a size.
@@ -177,9 +182,10 @@ rendering.
   not suggestions.
 - Modal scrims visibly isolate the foreground: content behind reads as
   inert, and any text sitting over the scrim still meets the §3 floors.
-  Material's published scrim token (black at 32% opacity) is the vendor
-  anchor to start from; heavier is a legitimate brand choice, while a
-  missing or near-invisible scrim is a defect.
+  Vendor anchor: Material defines scrim as a color ROLE, commonly
+  rendered at a 32%-black component default (Compose drawers, container
+  transform) - start there; heavier is a legitimate brand choice, while
+  a missing or near-invisible scrim is a defect.
 - Press/hover states never shift layout (no border-width or size jumps -
   swap colors/elevation instead).
 - Every SUPPORTED color mode rendered and looked at before done, with
@@ -213,8 +219,10 @@ All surfaces:
 
 - [ ] Surface classified (§0) and, for APP UI, a design system named?
 - [ ] Zero em-dashes in page copy (search the output for the character)?
-- [ ] Accent count per screen <= 2, and accent is none of the §1 hexes
-      (grep the stylesheet for them)?
+- [ ] Accent count per screen <= 2, and accent is none of the §1 hexes -
+      or the §1 brand override is quoted in writing? Check the COMPUTED
+      color (getComputedStyle), not only a hex grep - rgb()/hsl()
+      spellings evade a literal search.
 - [ ] One theme lock, one accent lock, one radius system?
 - [ ] WCAG AA floors pass for text, CTAs, forms, placeholders, focus rings?
 - [ ] §4 states: all five rendered and looked at on every surface that

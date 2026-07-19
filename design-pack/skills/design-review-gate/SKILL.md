@@ -25,12 +25,18 @@ facts first, in the running page:
 - **Touch-target audit** (app surfaces; set MIN = 48 for Android-targeted
   surfaces, 44 for iOS-only - the floor's home is ui-design-craft §5):
   `const MIN = 48;
-  [...document.querySelectorAll('a,button,[role="button"],input,select')]
+  [...document.querySelectorAll('a,button,textarea,summary,input,select,
+  [role="button"],[role="link"],[role="tab"],[role="switch"],
+  [role="checkbox"],[role="menuitem"]')]
   .map(e => ({ t: (e.textContent || e.ariaLabel || '').trim().slice(0, 24),
   r: e.getBoundingClientRect() })).filter(x => x.r.width > 0 && x.r.height
   > 0 && (x.r.width < MIN || x.r.height < MIN))`
-  (zero-area rects are hidden elements - excluded, not findings).
-  Non-empty result = findings, each with its element named.
+  (zero-area rects are hidden elements - excluded, not findings). The
+  snippet is a screen, not the law: a small control wrapped in a large
+  clickable label passes on its EFFECTIVE hit area - confirm each flagged
+  item by clicking the real target, and custom widgets under other ARIA
+  roles still need a manual look. Non-empty confirmed result = findings,
+  each with its element named.
 - Color census (computed color/background values), accent-use count, and
   em-dash search are the same move: a computed fact beats an impression.
 - Screenshot every screen before touching anything - the before half of
@@ -58,6 +64,10 @@ facts first, in the running page:
 
 Each pass emits findings; no pass emits a verdict alone.
 
+Document-only reviews - a contract being adopted or authored before any
+surface exists - run pass 1 and §4 alone; passes 2-6 are recorded N/A. No
+screenshot is owed on a document.
+
 ## 3. Findings and the bounded fix loop
 
 - **The fix loop needs an authorization the review ask does not carry.** A
@@ -75,12 +85,14 @@ Each pass emits findings; no pass emits a verdict alone.
   that regresses anything else reverts immediately. Two consecutive
   reverted fixes = stop and rediagnose (operational-rigor's two-failure
   rule governs; do not push through with a third variation).
-- Verdict is explicit: **Block** (a deviation from the PROJECT-GOVERNING
-  contract - §4's class 1 only, never from an advisory reference or an
-  unofficial observation - a CRITICAL gate failure, or a missing required
-  state) or **Approve** - and an approval names the point nearest failure
-  (delegation-and-review: all-clear verdicts that name nothing are rubber
-  stamps).
+- Verdict is explicit, three-valued: **Block** (a deviation from the
+  PROJECT-GOVERNING contract - §4's class 1 only, never from an advisory
+  reference or an unofficial observation - a CRITICAL gate failure, or a
+  missing required state); **Changes required** (any other unmet
+  mandatory gate item - a §7 box, a motion HIGH - without a recorded
+  waiver); or **Approve** - and an approval names the point nearest
+  failure (delegation-and-review: all-clear verdicts that name nothing
+  are rubber stamps).
 
 ## 4. The design contract
 

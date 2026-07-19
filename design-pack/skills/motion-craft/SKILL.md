@@ -19,7 +19,7 @@ Numbers first; taste second. Defaults for product UI:
 | Tooltip, micro popover | 80-200ms |
 | Dropdown, select, small panel | 150-250ms |
 | Accordion, tab switch | 160-240ms |
-| Card / list item enter-exit | 180-350ms |
+| Card / list item entrance | 180-350ms |
 | Modal, drawer, sheet | 200-400ms |
 | Route / page transition | 240-500ms |
 
@@ -121,8 +121,11 @@ Numbers first; taste second. Defaults for product UI:
 
 ## 5. Performance traps
 
-- Animate `transform` and `opacity` only; anything animating layout
-  properties (width, height, top, padding) is rewritten, not accepted.
+- `transform` and `opacity` are the workhorses; paint-only properties
+  (color, background-color, border-color) are acceptable for state
+  feedback. What is BANNED is animating layout-triggering properties
+  (width, height, top, left, margin, padding) - those are rewritten, not
+  accepted.
 - **`transition: all` is banned.**
   ❌ `transition: all 300ms ease` - it animates every property that
   happens to change, layout-affecting ones you never intended included,
@@ -191,7 +194,9 @@ watch it. Severity-tiered; every CRITICAL verified by observation before
 "done".
 
 - **CRITICAL:** reduced-motion variant exists and was toggled on and
-  observed; nothing exceeds 500ms; no spring fails to settle; no
+  observed; nothing exceeds 500ms (unless the When-NOT spectacle
+  exception was invoked in writing - the purpose test and reduced-motion
+  floor still bind there); no spring fails to settle; no
   keyboard-initiated action animates; no `transition: all`.
 - **HIGH:** durations inside §1 budgets; easing direction per §2; exits
   faster than entrances; layout-property animation absent.
