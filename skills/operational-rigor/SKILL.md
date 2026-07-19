@@ -272,6 +272,21 @@ When rigor conflicts with finishing sooner, rigor wins.
   change: confirm the override, then bring the spec along with the code.
 - Verify by execution wherever possible. If impossible, say so and state what the
   user must run.
+- **An interactive or client-runtime path is unverified until driven in its real
+  runtime** (`unprobed` — private incident as shape; see Provenance). Client
+  behavior that turns on framework identity or lifecycle — a callback's stable
+  identity across renders, a ref's mount/unmount timing, an effect's dependency
+  capture — can pass every static gate (unit tests, the build, a cross-family
+  review of the diff) and still break in a way none of them can surface, because
+  the fault lives in runtime interaction the static artifact never exercises. A
+  green build, a clean diff, and passing unit tests are all silent on it — only
+  exercising the path in its real runtime surfaces the fault. Treat a freshly-
+  shipped interactive path as unverified until it has been driven where it runs
+  (a browser e2e gate, a real click, a real navigation, the real deploy target),
+  and disclose that repro limit rather than reporting it verified.
+  ✅ "the new toggle handler is shipped but unverified until I drive it in the
+  deployed UI." ❌ "the handler's diff reviewed clean and its unit tests pass, so
+  the interaction works."
 - Confirm mutating effects from system responses, not command intent. Exit code 0
   is evidence; "issued" is not.
 - Do not conflate **runs** (no crash), **passes** (checks green), and **correct**
@@ -507,6 +522,13 @@ treats leftover debris as a fraud signal). All three ship `unprobed`
 in-house per the covenant; the private suite's fixtures could probe
 each (scope expansion, memory-picked file paths, scratch litter) — none
 has run; the markers record that debt.
+The §4 interactive-runtime rule (2026-07-19) generalizes a private production
+incident: a client callback-identity/lifecycle bug survived the full local gate
+suite and a cross-family review of the diff, surfacing only when a user drove
+the deployed path (contributor-reported shape; the private repo is verifiable by
+the contributor, not linkable here). It ships `unprobed` — the pack's private
+fixtures have no interactive arm to drive it (cf. the grill-pass note above); the
+marker records that debt, not an exemption.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
