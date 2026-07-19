@@ -1,6 +1,6 @@
 {
   "name": "opus-pack",
-  "description": "Home of the Opus Pack plugin: distilled operating skills for daily-driver Claude models - few dense rules, executable gates over long prose, measured against their own doctrine with the nulls published.",
+  "description": "Home of the Opus Pack plugins: distilled operating skills for daily-driver Claude models - few dense rules, executable gates over long prose, measured against their own doctrine with the nulls published.",
   "owner": {
     "name": "F-e-u-e-r",
     "url": "https://github.com/F-e-u-e-r"
@@ -10,7 +10,16 @@
       "name": "opus-pack",
       "source": "./",
       "description": "Nine agent-discipline skills: operational-rigor, delegation-and-review, ground-truth-gates, cross-model-review, skill-authoring, security-architect, product-roadmap, personal-goal-planning, domain-evidence-discipline. Hooks stay manual-install by design (per-user consent).",
-      "version": "0.1.14",
+      "version": "0.1.15",
+      "author": {
+        "name": "F-e-u-e-r"
+      }
+    },
+    {
+      "name": "design-pack",
+      "source": "./design-pack",
+      "description": "Three design-craft skills: ui-design-craft, motion-craft, design-review-gate. Domain doctrine in the opus-pack style - numeric budgets, prohibited patterns, observable gates; the design-contract evidence rules live in design-review-gate. Installable separately; designed to run alongside opus-pack. Registers no hooks.",
+      "version": "0.1.0",
       "author": {
         "name": "F-e-u-e-r"
       }

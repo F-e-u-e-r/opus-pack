@@ -1,0 +1,11 @@
+{
+  "name": "design-pack",
+  "description": "Three design-craft skills for daily-driver Claude models: ui-design-craft (static visual judgment - layout, typography, color, AI-slop bans, state coverage, a mechanical pre-flight gate), motion-craft (implementation-agnostic motion budgets and easing doctrine), design-review-gate (turning design review into observable checks, plus the design-contract evidence rules). Domain doctrine in the opus-pack style: numeric budgets, prohibited patterns, executable gates over long prose. Registers no hooks.",
+  "version": "0.1.0",
+  "author": {
+    "name": "F-e-u-e-r"
+  },
+  "homepage": "https://github.com/F-e-u-e-r/opus-pack",
+  "repository": "https://github.com/F-e-u-e-r/opus-pack",
+  "license": "MIT"
+}

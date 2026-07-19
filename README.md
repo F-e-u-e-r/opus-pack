@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.14" src="https://img.shields.io/badge/version-alpha--0.1.14-orange.svg">
+  <img alt="Version alpha-0.1.15" src="https://img.shields.io/badge/version-alpha--0.1.15-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -22,13 +22,13 @@ the judgment strong models already have improves less from **more prose** than
 from **gates that fail loudly when the work is wrong.**
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.14`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.15`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
 ## Contents
 
-- [Install](#install) · [The skills](#the-skills)
+- [Install](#install) · [The skills](#the-skills) · [The design pack](#the-design-pack-a-second-plugin-installable-on-its-own)
 - [The ten highest-leverage principles](#the-ten-highest-leverage-principles-kept)
 - [Deliberately dropped (and why)](#deliberately-dropped-and-why)
 - [Do skills auto-call agents?](#do-skills-auto-call-agents) · [Enforcement: hooks](#enforcement-setting-up-hooks)
@@ -84,6 +84,53 @@ The three hooks are optional and installed separately — see
 `ground-truth-gates/template/` was verified by execution (Node v23, 2026-07-06):
 correctly FAILs without a snapshot, goes all-green after freezing, and lists
 drifted records precisely (exit 1) when transform behavior changes.
+
+## The design pack (a second plugin, installable on its own)
+
+`design-pack/` is a sibling plugin in this marketplace: three domain-craft
+skills applying the pack's doctrine style — numeric budgets, prohibited
+patterns, observable gates — to visual design work. It versions
+independently (currently 0.1.0) and installs separately at the plugin
+level; a few review-time rules lean on opus-pack's discipline skills - the
+two load-bearing clauses travel as verbatim quotes, the rest degrades to
+context without them - so the packs are designed to run together:
+
+```
+/plugin marketplace add F-e-u-e-r/opus-pack
+/plugin install design-pack@opus-pack
+```
+
+| Skill | Covers | Main sources |
+|---|---|---|
+| `ui-design-craft` | Surface classification (marketing vs app UI), the AI-tell ban corpus with signatures (hexes, fonts, layouts, labels), layout budgets (hero/nav/section rhythm), accent and contrast discipline, five-state coverage, restyle preservation rules, a mechanical pre-flight gate | Leonxlnx/taste-skill + referodesign/refero_skill (both MIT; curated, not imported wholesale); open-design (ideas + one attributed Apache-2.0 adaptation - the five-state table); ideas only: gstack, creative-tim |
+| `motion-craft` | Duration budgets by surface, easing direction rules, spring/gesture physics (projection, rubber-band, velocity handoff), choreography and stagger caps, performance traps, the reduced-motion floor, misquoted-research corrections, a severity-tiered pre-ship gate | Emil Kowalski's skills + LottieFiles motion-design-skill + refero_skill (all MIT); misquote corrections adapted from open-design's primary-source review (an attributed Apache-2.0 adaptation - notice in THIRD-PARTY-NOTICES) |
+| `design-review-gate` | Measurement before judgment (browser census snippets), ordered review passes, rule-anchored findings with a bounded fix loop, and the design-contract rules: authority classes, verify-observational-tokens, drift direction, anti-impersonation | Emil Kowalski's review posture (MIT) + gstack/agentation/archify ideas; the contract section is this pack's own synthesis, shaped by a dual-model consultation |
+
+Notes that keep this honest:
+
+- **The brand-corpus question was consulted out, not guessed.** Whether
+  per-brand DESIGN.md coverage deserved a fourth skill went to a
+  cross-family consultation (grok-4.5 at high + gpt-5.6-sol at max,
+  isolated runs); both independently converged on "no fourth skill — a
+  design-contract evidence section inside design-review-gate", which is
+  what shipped.
+- **[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)**
+  (MIT) hosts 74 (as of 2026-07-19) reverse-engineered per-brand
+  DESIGN.md files. The pack
+  points at it as non-authoritative research material — concrete and
+  useful, and exactly the "unofficial observation" class design-review-gate
+  §4 teaches you to verify before trusting. Nothing from it is vendored.
+- **Probe status:** ui-design-craft's and motion-craft's gates, and
+  design-review-gate §4's contract rules, were probe-tested at smoke grade
+  (fresh weak-tier agent, bare-vs-ruled arms, expected outcomes written
+  before any run) on private fixtures; design-review-gate's §§1-3 review
+  loop is not yet probed. The record includes one
+  voided round (an answer key leaked into the fixtures, caught by the
+  expected-before-actual discrepancy, not the score) and one NULL (the
+  drift-direction clause's trap under-armed) — both published in the
+  skills' provenance notes and the PR trail. The hex and font-fashion bans
+  are the fastest-decaying facts in the pack: they track model training
+  data, so re-verify them each model generation.
 
 ## The ten highest-leverage principles kept
 
@@ -475,6 +522,29 @@ This pack distills and adapts ideas from:
   grill/decision-note layer of public spec-isolation and brainstorming
   workflows, adapted as `operational-rigor`'s §1 grill pass and §5
   decisions-note. Ideas only; no code taken.
+- **Design-pack sources (2026-07-19 survey of 14 design repos)** — text
+  adapted under MIT with notices (see `THIRD-PARTY-NOTICES.md`):
+  **Emil Kowalski** ([`emilkowalski/skills`](https://github.com/emilkowalski/skills)),
+  **Leonxlnx** ([`Leonxlnx/taste-skill`](https://github.com/leonxlnx/taste-skill)),
+  **LottieFiles** ([`LottieFiles/motion-design-skill`](https://github.com/LottieFiles/motion-design-skill)),
+  **Refero Design** ([`referodesign/refero_skill`](https://github.com/referodesign/refero_skill)).
+  **nexu-io/open-design** (Apache-2.0): ideas - accent budget,
+  linter-promotion architecture - plus two attributed Apache-2.0
+  adaptations (the five-state table; the misquote-correction items),
+  notice in `THIRD-PARTY-NOTICES.md`. Ideas only, no text:
+  **garrytan/gstack** (MIT; measurement pairing, surface classifier,
+  fix-loop shape, anti-convergence test, preference-poisoning defense — its
+  self-described-unmeasured numeric heuristics deliberately not adopted),
+  **benjitaylor/agentation** (PolyForm Shield — source-available, so ideas
+  only by necessity as well as policy: pitfall-table form, critic/fixer
+  loop), **tt-a1i/archify** (MIT; rule-paired-with-validator),
+  **creativetimofficial/ui** (MIT; enumerated micro-text whitelist),
+  **VoltAgent/awesome-design-md** (MIT; referenced as research corpus,
+  nothing vendored). Surveyed and deliberately not mined:
+  greensock/gsap-skills (library-usage doctrine plus embedded promotional
+  steering), ui-ux-pro-max (breadth taxonomy), facebook/astryx (agent-infra
+  patterns, noted for future eval work). Every embedded agent-directed
+  marketing directive in mined sources was stripped per skill-authoring §6.
 - **fable-agent-orchestration** @ `935e4a3` (git.wearein.space/elias, Apache-2.0)
 - **agent-standard-oss** @ `3786c4c` (github.com/anmoln7, MIT)
 - `security-architect` and `product-roadmap` were built from reference drafts

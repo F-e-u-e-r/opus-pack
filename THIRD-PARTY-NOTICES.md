@@ -61,6 +61,52 @@ Copyright (c) 2026 agent-standard contributors
 - **How used:** ideas from its §1–2, §8–10, and §11 informing the
   `delegation-and-review` and `skill-authoring` skills.
 
+### Emil Kowalski — `emilkowalski/skills`
+
+```
+Copyright (c) 2026 Emil Kowalski
+```
+
+- **How used:** duration budgets, gesture-physics forms (momentum
+  projection, rubber-band, velocity handoff), performance-trap material,
+  and the review posture adapted into design-pack's `motion-craft` and
+  `design-review-gate`. His in-skill course-marketing directives were
+  stripped in adaptation.
+
+### Leonxlnx — `Leonxlnx/taste-skill`
+
+```
+Copyright (c) 2026 Leonxlnx
+```
+
+- **How used:** layout hard rules (hero/nav/zigzag/bento/eyebrow caps with
+  their mechanical counts), the production-test tell corpus (curated, not
+  imported wholesale), the em-dash binary and its phrasing lesson,
+  preservation rules, and the pre-flight-gate framing adapted into
+  design-pack's `ui-design-craft`.
+
+### LottieFiles — `LottieFiles/motion-design-skill`
+
+```
+Copyright (c) 2025 LottieFiles
+```
+
+- **How used:** timing/easing tables (element durations, distance
+  multipliers, exit ratio), stagger and overshoot budgets, and the
+  severity-tier gate shape adapted into design-pack's `motion-craft`
+  (their damping-units conflation is corrected there, not copied).
+
+### Refero Design — `referodesign/refero_skill`
+
+```
+Copyright (c) 2026 Refero
+```
+
+- **How used:** the anti-AI-slop tell list and litmus tests, the motion
+  purpose triad, easing-direction and duration structure, and the
+  reduced-motion mapping adapted into design-pack's `ui-design-craft` and
+  `motion-craft`.
+
 ---
 
 ## 2. Works under the Apache License 2.0
@@ -80,6 +126,26 @@ Copyright (c) 2026 agent-standard contributors
   under the Apache License 2.0, and the corresponding upstream copyright and
   `NOTICE` entries must be reproduced with it.
 
+### open-design — `nexu-io/open-design`
+
+- **License:** Apache License, Version 2.0
+  (https://www.apache.org/licenses/LICENSE-2.0).
+- **How used:** ideas and facts informing design-pack's `ui-design-craft`
+  (accent budget), `motion-craft`, and `design-review-gate` (the
+  promote-rules-into-a-linter stance) - AND two passages of **adapted
+  expression** carried under Apache-2.0 with this notice:
+  `ui-design-craft` §4's five-state table (adapted from
+  `craft/state-coverage.md`) and `motion-craft` §7's misquote-correction
+  items (adapted from `craft/animation-discipline.md`, with this pack's
+  own correction of that file's Doherty citation). Its `craft/` layer
+  credits the MIT-licensed refero_skill, which this pack also mined
+  directly.
+- **Notice:** except for the two adapted passages identified above (which
+  remain licensed under the Apache License 2.0, reproduced by pointer
+  here), no other expression from this project is included; the remaining
+  borrowings are non-copyrightable ideas and factual claims with their
+  citations.
+
 ---
 
 ## 3. MIT License text
@@ -94,6 +160,10 @@ Copyright (c) 2026 Curtis Chou
 Copyright (c) 2026 Miguok
 Copyright (c) 2026 Darko Tomic
 Copyright (c) 2026 agent-standard contributors
+Copyright (c) 2026 Emil Kowalski
+Copyright (c) 2026 Leonxlnx
+Copyright (c) 2025 LottieFiles
+Copyright (c) 2026 Refero
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -138,3 +208,18 @@ verbatim expression from these sources is reproduced:
   `guideline *.txt` source copies (guidelines 5 and 6 are firaen22's
   notes; the rest were supplied by the owner). These source drafts are not
   distributed; they are excluded via `.gitignore`.
+- **garrytan/gstack** (MIT) — design-review ideas only (measurement
+  pairing, surface classifier, fix-loop shape, anti-convergence test,
+  preference-poisoning defense) in design-pack's `design-review-gate` and
+  `ui-design-craft`; no text copied.
+- **benjitaylor/agentation** (PolyForm Shield 1.0.0 — source-available) —
+  ideas only (pitfall-table findings form, critic/fixer loop) in
+  design-pack's `design-review-gate`; no text or code copied, so no
+  license text travels.
+- **tt-a1i/archify** (MIT) — the rule-paired-with-validator idea in
+  design-pack's `design-review-gate`; no text copied.
+- **creativetimofficial/ui** (MIT) — the enumerated micro-text whitelist
+  technique in design-pack's `ui-design-craft`; no text copied.
+- **VoltAgent/awesome-design-md** (MIT) — referenced in `README.md` as a
+  research corpus for design-review-gate's "unofficial observation" class;
+  nothing vendored or copied.

@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.14" src="https://img.shields.io/badge/version-alpha--0.1.14-orange.svg">
+  <img alt="Version alpha-0.1.14" src="https://img.shields.io/badge/version-alpha--0.1.15-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -21,13 +21,13 @@
 遠不如靠**在工作出錯時大聲失敗的閘門**。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.14`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.15`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
 ## 目錄
 
-- [安裝](#安裝) · [Skill 一覽](#內容物)
+- [安裝](#安裝) · [Skill 一覽](#內容物) · [設計包](#設計包獨立安裝的第二個-plugin)
 - [最高槓桿的十條原則](#萃取時保留的核心原則最高槓桿的十條)
 - [刻意捨棄的部分(與為什麼)](#刻意捨棄的部分與為什麼)
 - [Skill 會自動呼叫 agent 嗎?](#skill-會自動呼叫-agent-嗎) · [強制層:hooks](#強制層hooks-設定方法)
@@ -78,6 +78,44 @@ Skill 是按需載入的:平時只有 description 佔 context,觸發才讀全文
 
 `ground-truth-gates/template/` 已實跑驗證(Node v23,2026-07-06):
 無 snapshot 時正確 FAIL、凍結後全綠、改變 transform 行為時精準列出漂移的紀錄並 exit 1。
+
+## 設計包(獨立安裝的第二個 plugin)
+
+`design-pack/` 是同一個 marketplace 裡的姊妹 plugin:三個領域工藝 skill,把本包的
+doctrine 風格——數值預算、禁用模式、可觀測閘門——應用到視覺設計工作。版本獨立
+(目前 0.1.0),plugin 層可單獨安裝;少數審查時規則倚賴 opus-pack 的紀律
+skill——兩條 load-bearing 條款以逐字引文旅行、其餘在缺席時退化為脈絡——
+兩包是設計成一起跑的:
+
+```
+/plugin marketplace add F-e-u-e-r/opus-pack
+/plugin install design-pack@opus-pack
+```
+
+| Skill | 涵蓋 | 主要來源 |
+|---|---|---|
+| `ui-design-craft` | 表面分類(marketing vs app UI)、附特徵的 AI-tell 禁令語料(hex/字體/版面/標籤)、版面預算(hero/nav/段落節奏)、accent 與對比紀律、五狀態覆蓋、改版保存規則、機械式 pre-flight 閘門 | Leonxlnx/taste-skill + referodesign/refero_skill(皆 MIT;策展式吸收,非整批進口);open-design(意念 + 一處具名 Apache-2.0 改作——五狀態表);純意念:gstack、creative-tim |
+| `motion-craft` | 依表面分類的時長預算、easing 方向規則、彈簧/手勢物理(投影、rubber-band、速度交接)、編排與 stagger 上限、效能陷阱、reduced-motion 底線、研究誤引修正、分級 pre-ship 閘門 | Emil Kowalski skills + LottieFiles motion-design-skill + refero_skill(皆 MIT);誤引修正改作自 open-design 的一級文獻查核(具名 Apache-2.0 改作——notice 見 THIRD-PARTY-NOTICES) |
+| `design-review-gate` | 先量測後判斷(瀏覽器普查 snippets)、有序審查 pass、規則錨定的 findings 與有界修復迴圈,以及 design-contract 規則:權威分類、觀察性 token 驗證、drift 方向、反模仿 | Emil Kowalski 的審查姿態(MIT)+ gstack/agentation/archify 意念;contract 段為本包自行綜合,經雙模型諮詢定形 |
+
+誠實備註:
+
+- **brand-corpus 的去留是諮詢出來的,不是猜的。**「per-brand DESIGN.md 是否值得
+  第四個 skill」交給跨家族諮詢(grok-4.5 high + gpt-5.6-sol max,隔離執行);
+  兩者獨立收斂到「不做第四技能——放進 design-review-gate 的 design-contract
+  段」,即最終出貨形狀。
+- **[VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)**
+  (MIT)托管 74 份(2026-07-19 當時)逆向工程的 per-brand DESIGN.md。本包只把它當非權威研究材料
+  指路——具體、有用,而且正是 design-review-gate §4 教你先驗證再信任的
+  「unofficial observation」類。不 vendor 任何內容。
+- **Probe 狀態**:ui-design-craft 與 motion-craft 的閘門、以及
+  design-review-gate §4 的 contract 規則,已以 smoke 等級 probe 驗證(全新
+  弱層 agent、bare/ruled 兩臂、預期先寫);design-review-gate §§1-3 的審查
+  迴圈尚未 probe。紀錄包含一輪作廢(答案鍵洩入
+  fixture,由 expected-before-actual 的落差抓到,不是靠分數)與一個
+  NULL(drift-direction 條款的陷阱未上膛)——皆公開於各 skill 的 provenance
+  與 PR trail。hex 與字體時尚禁令是本包衰變最快的事實:它們追蹤模型訓練
+  資料,每個模型世代都要重驗。
 
 ## 萃取時保留的核心原則(最高槓桿的十條)
 
@@ -277,6 +315,7 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
 - **2026-07 安全 skill 稽查** — 對 12 個社群「安全」skill 的通盤審查,先於 2026-07-12 的 doctrine 批次。只採意念、未取任何程式碼:**eddygk/skill-vetting**(anti-override 規則 → `delegation-and-review` §7)、**UnitOneAI/SecuritySkills**(載入時執行稽核 → `operational-rigor` §2)、**mukul975/Anthropic-Cybersecurity-Skills**(JWT `kid`/`jku`/`x5u` 檢查項、零寬/雙向 Unicode 清查)、**gitgoodordietrying**(SCA 進 CI)、**jgarrison929**(magic-byte 上傳驗證)。同次稽查判定 12 個中 3 個為活體木馬——全部自稱安全工具;未從中採用任何內容,此發現本身成為 doctrine(`operational-rigor` §2:自稱安全工具受更嚴檢視,而非更寬)。
 - **Sahir619** — [`Sahir619/fable-method`](https://github.com/Sahir619/fable-method),MIT License;另一個平行的 Fable 退役蒸餾,附已發布的 trap-scenario eval 計畫(勝敗皆錄)。只採意念、未取任何檔案:`ground-truth-gates` 的行為層 trap-armed 條款(源自其已發布的負結果——安全結局可能只是從未遇上陷阱)、Evals 段的「附失敗測試才出貨」公約,其已公開 eval 計畫的 trap 機制——重新實作為本包私有套件的全新 fixtures,以及跨 `operational-rigor`、`delegation-and-review`、`skill-authoring` 三個 skill 的 authority-order、twin-sweep、ask-classification、prescribed-follow-up、completion-claim-audit 規則,加上 enforcement ladder、指針警示與 red-line 授權門檻(該批次的行為規則出貨前已在該批 fixtures 上 probe 驗證;其設計/規範性規則在本體標記 `unprobed`)。v1.4.0 增量與其後續批次——AUTH 逐字引述 artifact、owed-lines artifact gate、installed-skill 非授權向量、gate-placement 規則、`domain-evidence-discipline` skill(其 domain-adapter schema 濃縮為單一四名詞 pattern)與 declared-scope、orient-first、debris 三規則——全部在本體明標 `unprobed` 出貨(依 covenant),其已發布結果只述形狀(若轉述數字,必附對方自標的 smoke-grade 等級)。
 - **Matt Pocock 的 Grill-me 模式;Superpowers(obra);OpenSpec** — 公開 spec-isolation/brainstorming 工作流的 grill/決策筆記層,改作為 `operational-rigor` 的 §1 grill pass 與 §5 decisions-note。只採意念、未取程式碼。
+- **設計包來源(2026-07-19 對 14 個設計 repo 的調查)** — 以 MIT 改作文字並附 notices(見 `THIRD-PARTY-NOTICES.md`):**Emil Kowalski**([`emilkowalski/skills`](https://github.com/emilkowalski/skills))、**Leonxlnx**([`Leonxlnx/taste-skill`](https://github.com/leonxlnx/taste-skill))、**LottieFiles**([`LottieFiles/motion-design-skill`](https://github.com/LottieFiles/motion-design-skill))、**Refero Design**([`referodesign/refero_skill`](https://github.com/referodesign/refero_skill))。**nexu-io/open-design**(Apache-2.0):意念——accent 預算、規則升級為 linter 的架構——外加兩處具名的 Apache-2.0 改作(五狀態表;誤引修正項),notice 見 `THIRD-PARTY-NOTICES.md`。只採意念、未取文字:**garrytan/gstack**(MIT;量測配對、表面分類器、修復迴圈形狀、anti-convergence 測試、偏好投毒防禦——其自承未量測的數值啟發式刻意不採)、**benjitaylor/agentation**(PolyForm Shield,source-available——依政策也依必要僅採意念:pitfall 表格式、critic/fixer 迴圈)、**tt-a1i/archify**(MIT;規則配 validator)、**creativetimofficial/ui**(MIT;微字級白名單技法)、**VoltAgent/awesome-design-md**(MIT;僅作研究語料指路,未 vendor)。調查後刻意不採:greensock/gsap-skills(函式庫用法教條、內嵌推銷導向)、ui-ux-pro-max(廣度分類學)、facebook/astryx(agent-infra 模式,記為未來 eval 參考)。被挖掘來源中所有內嵌的 agent 導向行銷指令依 skill-authoring §6 一律剝除。
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT)
 - `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
