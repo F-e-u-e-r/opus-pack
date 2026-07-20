@@ -272,21 +272,27 @@ When rigor conflicts with finishing sooner, rigor wins.
   change: confirm the override, then bring the spec along with the code.
 - Verify by execution wherever possible. If impossible, say so and state what the
   user must run.
-- **An interactive or client-runtime path is unverified until driven in its real
-  runtime** (`unprobed` — private incident as shape; see Provenance). Client
-  behavior that turns on framework identity or lifecycle — a callback's stable
-  identity across renders, a ref's mount/unmount timing, an effect's dependency
-  capture — can pass every static gate (unit tests, the build, a cross-family
-  review of the diff) and still break in a way none of them can surface, because
-  the fault lives in runtime interaction the static artifact never exercises. A
-  green build, a clean diff, and passing unit tests are all silent on it — only
-  exercising the path in its real runtime surfaces the fault. Treat a freshly-
-  shipped interactive path as unverified until it has been driven where it runs
-  (a browser e2e gate, a real click, a real navigation, the real deploy target),
-  and disclose that repro limit rather than reporting it verified.
-  ✅ "the new toggle handler is shipped but unverified until I drive it in the
-  deployed UI." ❌ "the handler's diff reviewed clean and its unit tests pass, so
-  the interaction works."
+- **A new or changed interactive/client path whose correctness depends on
+  runtime identity or lifecycle is unverified until that transition is driven
+  and its result observed** (`unprobed` — private incident as shape; see
+  Provenance). The class: a callback's identity across renders, a ref's
+  mount/unmount timing, an effect's dependency capture. A gate that never
+  exercises the transition cannot establish it — the build, a clean diff, and
+  tests that don't drive it stay silent; a re-render+event component test or a
+  dependency lint catches SOME, which is exactly the point (exercise the
+  transition; don't take a green static artifact as its stand-in). Duty keeps
+  the execute-or-say ordering above: when a faithful runtime is reachable — a
+  browser e2e gate, a dev UI, or an in-process render harness running the real
+  framework, usually a local one — drive the relevant sequence (re-render then
+  invoke, mount/unmount/remount, change the dependency) and observe the
+  expected result; fall back to disclosing it unverified and naming what the
+  user must run ONLY when no faithful runtime is reachable. Distinct from
+  delegation-and-review §3's unit-green seam-bypass (a wiring defect); this is
+  the runtime the static artifact never ran.
+  ✅ "re-rendered after the parent changed, clicked the toggle, watched the
+  handler read the current value, not a captured one."
+  ❌ "diff's clean and unit tests pass, so the interaction works" — or
+  "disclosed as unverified" when a dev server was one command away.
 - Confirm mutating effects from system responses, not command intent. Exit code 0
   is evidence; "issued" is not.
 - Do not conflate **runs** (no crash), **passes** (checks green), and **correct**
