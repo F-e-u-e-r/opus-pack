@@ -272,6 +272,30 @@ When rigor conflicts with finishing sooner, rigor wins.
   change: confirm the override, then bring the spec along with the code.
 - Verify by execution wherever possible. If impossible, say so and state what the
   user must run.
+- **A new or changed interactive/client path whose correctness depends on
+  runtime identity or lifecycle is unverified until that transition is driven
+  and its result observed** (`unprobed` — private incident as shape; see
+  Provenance). The class: a callback's identity across renders, a ref's
+  mount/unmount timing, an effect's dependency capture. A gate that never
+  exercises the transition cannot establish it — the build, a clean diff, and
+  non-driving tests may catch other defects but can't certify this one; a
+  re-render+event component test or a dependency lint catches SOME, which is
+  why the rule is exercise-the-transition, not distrust-every-test. Duty keeps
+  the execute-or-say ordering above: when a faithful runtime can drive and
+  observe the transition — a browser e2e gate, a dev UI, or an in-process
+  render harness running the real framework, usually a local one — drive the
+  relevant sequence (re-render then invoke, mount/unmount/remount, change the
+  dependency) and observe the expected result; disclose it unverified and name
+  what the user must run only when the transition genuinely cannot be driven
+  and observed in any reachable runtime (required state, credentials, or
+  hardware unavailable), never merely because a reachable one was skipped.
+  Distinct from
+  delegation-and-review §3's unit-green seam-bypass (a wiring defect); this is
+  the runtime the static artifact never ran.
+  ✅ "re-rendered after the parent changed, clicked the toggle, watched the
+  handler read the current value, not a captured one."
+  ❌ "diff's clean and unit tests pass, so the interaction works" — or
+  "disclosed as unverified" when a dev server was one command away.
 - Confirm mutating effects from system responses, not command intent. Exit code 0
   is evidence; "issued" is not.
 - Do not conflate **runs** (no crash), **passes** (checks green), and **correct**
@@ -507,6 +531,13 @@ treats leftover debris as a fraud signal). All three ship `unprobed`
 in-house per the covenant; the private suite's fixtures could probe
 each (scope expansion, memory-picked file paths, scratch litter) — none
 has run; the markers record that debt.
+The §4 interactive-runtime rule (2026-07-19) generalizes a private production
+incident: a client callback-identity/lifecycle bug survived the full local gate
+suite and a cross-family review of the diff, surfacing only when a user drove
+the deployed path (contributor-reported shape; the private repo is verifiable by
+the contributor, not linkable here). It ships `unprobed` — the pack's private
+fixtures have no interactive arm to drive it (cf. the grill-pass note above); the
+marker records that debt, not an exemption.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
