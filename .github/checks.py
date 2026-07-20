@@ -163,7 +163,7 @@ SEMVER = rf"({NUM}\.{NUM}\.{NUM})"
 versions = []
 for rel, pats in [
     ("README.md", [rf"version-alpha--{SEMVER}-orange", rf"Early alpha \(`alpha-{SEMVER}`\)"]),
-    ("README.zh-TW.md", [rf"version-alpha--{SEMVER}-orange", rf"早期 alpha\(`alpha-{SEMVER}`\)"]),
+    ("README.zh-Hant.md", [rf"version-alpha--{SEMVER}-orange", rf"早期 alpha\(`alpha-{SEMVER}`\)"]),
 ]:
     body = read(rel)
     for pat in pats:
@@ -301,7 +301,7 @@ if isinstance(marketplace, dict) and isinstance(marketplace.get("plugins"), list
 if _dp and isinstance(_dp.get("version"), str):
     for rel, pat in [
         ("README.md", rf"currently {re.escape(_dp['version'])}"),
-        ("README.zh-TW.md", rf"目前 {re.escape(_dp['version'])}"),
+        ("README.zh-Hant.md", rf"目前 {re.escape(_dp['version'])}"),
     ]:
         if re.search(pat, read(rel)):
             ok(f"{rel} design-pack version callout matches {_dp['version']}")
@@ -310,7 +310,7 @@ if _dp and isinstance(_dp.get("version"), str):
 
 # 3. Every skill has a backticked mention in both READMEs (a mention
 #    check, deliberately - not a table-structure parse).
-for rel in ("README.md", "README.zh-TW.md"):
+for rel in ("README.md", "README.zh-Hant.md"):
     body = read(rel)
     missing = [f"{r}/{n}" for r, n in skill_names if f"`{n}`" not in body]
     if missing:
@@ -367,7 +367,7 @@ if hits == 0 and not sweep_broken:
 # 5. Inline relative markdown links in both READMEs resolve inside the
 #    repo (reference-style and raw-HTML links are out of scope, stated;
 #    leading whitespace inside the parens is legal CommonMark and covered).
-for rel in ("README.md", "README.zh-TW.md"):
+for rel in ("README.md", "README.zh-Hant.md"):
     body = read(rel)
     broken = []
     link_bad = False

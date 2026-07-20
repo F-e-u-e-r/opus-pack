@@ -1,7 +1,7 @@
 <h1 align="center">Opus Pack</h1>
 
 <p align="center">
-  <em>Distilled operating skills for daily-driver Claude models —<br><strong>few dense rules, executable gates over long prose.</strong></em>
+  <em>Distilled skills for daily-driver Claude models —<br><strong>few dense rules, executable gates over long prose.</strong></em>
 </p>
 
 <p align="center">
@@ -12,14 +12,27 @@
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
 </p>
 
-<p align="center"><strong>English</strong> · <a href="README.zh-TW.md">繁體中文</a></p>
+<p align="center"><strong>English</strong> · <a href="README.zh-Hant.md">繁體中文</a></p>
 
 ---
 
-Nine skills and three hooks for the daily-driver models that remain after
-Fable 5's window closes (Opus 4.8 / Sonnet 5 / Haiku). They encode one bet:
-the judgment strong models already have improves less from **more prose** than
-from **gates that fail loudly when the work is wrong.**
+**Opus Pack is a Claude Code plugin marketplace** — one repo, two plugins you
+install independently, 12 skills in total, for the daily-driver models that
+remain after Fable 5's window closes (Opus 4.8 / Sonnet 5 / Haiku):
+
+| Plugin | Focus | Installs |
+|---|---|---|
+| **`opus-pack`** | Agent discipline — how work gets done: rigor, delegation, verification, evidence | 9 skills |
+| **`design-pack`** | Design-craft — visual/UI judgment in the same style: layout, motion, review | 3 skills |
+
+Plus **three optional hooks** — repo-level, installed by hand; neither plugin
+registers them (see [Enforcement: hooks](#enforcement-setting-up-hooks)). All of
+it encodes one bet: the judgment strong models already have improves less from
+**more prose** than from **gates that fail loudly when the work is wrong.**
+Install either plugin alone or both — `design-pack` shares this marketplace with
+`opus-pack`, not a hard dependency on it (its review skill's cross-references to
+opus-pack simply resolve when opus-pack is present; see
+[`design-pack`](#design-pack-the-design-skills)).
 
 > [!NOTE]
 > **Early alpha (`alpha-0.1.15`).** Rules change as real sessions expose misses,
@@ -28,7 +41,7 @@ from **gates that fail loudly when the work is wrong.**
 
 ## Contents
 
-- [Install](#install) · [The skills](#the-skills) · [The design pack](#the-design-pack-a-second-plugin-installable-on-its-own)
+- [Install](#install) · [`opus-pack`: the discipline skills](#opus-pack-the-discipline-skills) · [`design-pack`: the design skills](#design-pack-the-design-skills)
 - [The ten highest-leverage principles](#the-ten-highest-leverage-principles-kept)
 - [Deliberately dropped (and why)](#deliberately-dropped-and-why)
 - [Do skills auto-call agents?](#do-skills-auto-call-agents) · [Enforcement: hooks](#enforcement-setting-up-hooks)
@@ -37,37 +50,41 @@ from **gates that fail loudly when the work is wrong.**
 
 ## Install
 
-**As a Claude Code plugin** (skills only; recommended when you don't need
-the hooks):
+This repo is a **marketplace**; add it once, then install whichever plugins you
+want. Install targets use `plugin@marketplace`, and the marketplace ID is
+`opus-pack`:
 
 ```
 /plugin marketplace add F-e-u-e-r/opus-pack
 /plugin install opus-pack@opus-pack
+/plugin install design-pack@opus-pack
 ```
 
-Skills arrive namespaced (`opus-pack:operational-rigor`, …) and update via
-`/plugin marketplace update`. The hooks are deliberately NOT registered or
-enabled by the plugin — they change harness behavior, so installing them
-stays a manual, per-user decision (see
-[Enforcement: hooks](#enforcement-setting-up-hooks)). Pick ONE method for
-the skills: installing both makes every skill available twice
-(`opus-pack:<skill>` and `<skill>`), and automatic skill selection may pick
-either copy — keep a single source so updates land once.
+`opus-pack@opus-pack` installs the discipline plugin (9 skills);
+`design-pack@opus-pack` installs the design plugin (3 skills). Install either,
+or both. Skills arrive namespaced (`opus-pack:operational-rigor`,
+`design-pack:ui-design-craft`, …) and update via `/plugin marketplace update`.
+Neither plugin registers the hooks — they change harness behavior, so
+installing them stays a manual, per-user decision (see
+[Enforcement: hooks](#enforcement-setting-up-hooks)).
 
-**Or copy the skills into place** — globally, or per project:
+**Or copy skills into place** — globally, or per project. Each block is
+self-contained:
 
 ```bash
-# Global (available in every project)
+# opus-pack (discipline) skills, global:
 mkdir -p ~/.claude/skills && cp -R skills/* ~/.claude/skills/
-# Or into a single project
-mkdir -p <repo>/.claude/skills && cp -R skills/* <repo>/.claude/skills/
+# design-pack (design) skills, global:
+mkdir -p ~/.claude/skills && cp -R design-pack/skills/* ~/.claude/skills/
+# per project instead: swap ~/.claude for <repo>/.claude
 ```
 
-Skills load on demand: only the description occupies context until triggered.
-The three hooks are optional and installed separately — see
-[Enforcement: hooks](#enforcement-setting-up-hooks).
+Pick ONE method per plugin: installing a plugin AND copying its skills makes
+every skill available twice (`opus-pack:<skill>` and `<skill>`), and automatic
+selection may pick either copy. Skills load on demand: only the description
+occupies context until triggered.
 
-## The skills
+## `opus-pack`: the discipline skills
 
 | Skill | Covers | Main source |
 |---|---|---|
@@ -85,20 +102,16 @@ The three hooks are optional and installed separately — see
 correctly FAILs without a snapshot, goes all-green after freezing, and lists
 drifted records precisely (exit 1) when transform behavior changes.
 
-## The design pack (a second plugin, installable on its own)
+## `design-pack`: the design skills
 
-`design-pack/` is a sibling plugin in this marketplace: three domain-craft
-skills applying the pack's doctrine style — numeric budgets, prohibited
-patterns, observable gates — to visual design work. It versions
-independently (currently 0.1.0) and installs separately at the plugin
-level; a few review-time rules lean on opus-pack's discipline skills - the
-two load-bearing clauses travel as verbatim quotes, the rest degrades to
-context without them - so the packs are designed to run together:
-
-```
-/plugin marketplace add F-e-u-e-r/opus-pack
-/plugin install design-pack@opus-pack
-```
+Three design-craft skills applying the same doctrine style — numeric budgets,
+prohibited patterns, observable gates — to visual design work. Install it like
+any plugin ([Install](#install) above); it versions independently
+(currently 0.1.0). The skills stand on their own: `design-review-gate`'s
+contract rules quote two load-bearing clauses from opus-pack verbatim (so those
+travel intact), and its remaining cross-references to opus-pack resolve to plain
+context when opus-pack isn't installed. They're sharper with opus-pack
+alongside, but they don't require it.
 
 | Skill | Covers | Main sources |
 |---|---|---|
@@ -133,6 +146,12 @@ Notes that keep this honest:
   data, so re-verify them each model generation.
 
 ## The ten highest-leverage principles kept
+
+*The doctrine sections that follow — principles, deliberately-dropped,
+enforcement, evals, degradation — are `opus-pack`'s discipline lineage and the
+marketplace's shared house rules. Each plugin's skill inventory sits in its own
+section above; each plugin's probe evidence is scoped where that plugin reports
+it — opus-pack's in the Evals section below, design-pack's in its own section.*
 
 1. **Prose does not improve verifiable work; ground truth does** — invest in
    gates, not longer rules.
@@ -387,7 +406,9 @@ noticing-and-reporting layer; full numbers and corrections in
 [reviews/2026-07-11-pack-eval-rounds-1-2.md](reviews/2026-07-11-pack-eval-rounds-1-2.md).
 The hooks now carry allow+block unit suites but remain unmeasured at the
 behavioral-arm level. Treat the pack accordingly: a consistency layer and
-an enforcement substrate, not a proven score boost.
+an enforcement substrate, not a proven score boost. (This round measured
+`opus-pack`'s discipline skills; `design-pack` postdates it and carries its own
+smoke-grade probe record in [its section](#design-pack-the-design-skills).)
 
 House covenant (2026-07-16, adopted from fable-method's "prime directive"
 — see acknowledgements): a new behavioral rule ships with the probe or
