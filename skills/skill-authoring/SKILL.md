@@ -229,6 +229,22 @@ The sharpest usability probe is behavioral: give a fresh weaker-tier
 behavior down first, then patch the gaps the probe surfaces — not the ones
 you imagine.
 
+**Name the deployment runtime before the review concludes** (`unprobed` —
+private incident as shape; see Provenance). A skill or plugin verified only
+on the author's machine can pass every lens above and still be wrong where
+it will actually run: one reviewed-and-finalized skill was reworked
+wholesale when its real target — a sandboxed Linux VM, not the author's
+macOS — surfaced only after sign-off. Ask where it will run as a review
+input, not a deploy-time discovery, then sweep the file for assumptions
+that silently bind it to the author's machine: absolute paths (§2's rule),
+OS-specific launchers and helpers (URL-scheme opens, clipboard or
+notification tools), host identity, wall-clock and timezone, and
+hard-coded MCP tool names — a connector's tool prefix can be unique to the
+author's instance, so a distributable skill discovers its tools at runtime
+instead of naming one machine's. Done when the review names the target
+runtime(s) and each machine-bound assumption is either portable or labeled
+with the runtime it requires.
+
 Fix what blocks, then read back the final files to confirm they landed
 complete. When mining sessions or external material into skills, strip
 names/slogans first and keep a procedure only if it still has an apply-when,
@@ -397,4 +413,14 @@ marker per the README covenant: the external measurement is of one
 skill's one gate, and whether placement generalizes across gate types is
 exactly what an in-house probe would test — that probe has not been run;
 the marker records the debt.
+The §6 deployment-runtime rule (2026-07-21) comes from a private incident:
+a skill was authored, reviewed through the lenses above, and finalized for
+the author's local macOS environment, then rebuilt wholesale the same week
+when the user mentioned it would run inside a sandboxed Linux VM — host
+identity, launcher mechanism, and machine-local MCP tool-name assumptions
+all failed on the real target (contributor-reported; the private repo is
+verifiable by the contributor, not linkable here). Ships `unprobed` per the
+README covenant's second branch: no in-repo probe has run; the probe shape
+(give a weak-tier reviewer a machine-bound skill plus a named foreign
+runtime, observe whether the sweep fires) is recorded as debt.
 Stable method; no environment facts to re-verify.
