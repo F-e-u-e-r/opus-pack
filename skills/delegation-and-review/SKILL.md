@@ -33,6 +33,19 @@ Every packet names:
 
 - **Goal + motivation** — what and why.
 - **Owned scope + explicit non-scope** — files/modules it may and may not touch.
+  For a find-and-fix-every-instance sweep, scope means every surface that can
+  generate the target pattern, not one search pattern: a 53-file styling sweep,
+  three review rounds, and a merged fix all missed the actual defect because it
+  lived in a shared utility class the token grep never matched, and each
+  follow-up round found a different category (a color-tier band, a
+  class-emitting helper function) the prior round's pattern structurally
+  excluded (`unprobed` — private incident as shape; see Provenance). Before
+  dispatching or accepting such a sweep, enumerate every generator (literals,
+  shared/global definitions, helper functions returning the pattern) and the
+  full value space (every tier/variant in the family, not a sample), and gate
+  acceptance on observing the effect (render it, run it) rather than on the
+  search returning zero — a clean grep proves one spelling is gone, not that
+  the defect is.
 - **Invariant** — property to close and properties to preserve.
 - **Proof gate** — concrete check that would fail under the broken behavior;
   worker-chosen "tests pass" is not a gate.
@@ -301,5 +314,13 @@ enforcement or a defect in that sandbox is unestablished, so the rule
 prescribes only the defensive split. Private evidence, cited as shape per
 the README covenant's second branch; no in-repo probe has run — in-body
 `unprobed` marker.
+The §2 sweep-scope bullet (2026-07-21) comes from a private incident: a
+find-and-fix-every-instance styling sweep (53 files), three review rounds, and
+a merged fix all missed the actual defect — it lived in a shared global
+utility class the token grep pattern never touched, and each follow-up round's
+"still broken?" surfaced a different category (a color-tier band, a
+class-emitting helper function) the prior round's search structurally
+excluded. Private evidence, cited as shape per the README covenant's second
+branch; no in-repo probe has run — in-body `unprobed` marker.
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
