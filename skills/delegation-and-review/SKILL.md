@@ -83,6 +83,25 @@ reviewers that they silently absorb as implementers.
   verdicts name the point nearest failure or they are rubber stamps.
 - Critic verdicts carry evidence: REFUTED needs a counterexample; untested
   assumptions are listed. Verify critics too; stale or missing review is not approval.
+- **Freeze the tree for a read-only review dispatch, or shard it disjointly**
+  (`unprobed` — private incident as shape; see Provenance). Editing a file a
+  fresh-context critic is still reading contaminates its verdict: one
+  read-only critic re-read a file the orchestrator had already fixed
+  mid-review and voted REFUTED on a bug already confirmed elsewhere. A
+  separate critic committed the very worktree it was reviewing, moving the
+  tree out from under the orchestrator's expected end-state. Neither is
+  §4's write-write clobber below (a subordinate overwriting concurrent
+  edits with no conflict signal): the first is a read verdict going stale
+  mid-read, the second a "read-only" reviewer writing anyway — nothing
+  overwritten, but the tree moved. Land or hold pending edits before
+  dispatching a read-only wave; if edits must continue, shard the review
+  over files disjoint from what you are touching (safe only if the
+  dispatch is enforced read-only — hence the check below), or re-dispatch
+  a fresh wave against the settled state rather than trust a verdict
+  formed on a moving tree. After any reviewer returns, confirm the tree
+  still matches what you expect before trusting its verdict.
+  ✅ "held my own edits until the critic's wave returned, then applied
+  them." ❌ "kept fixing files while the critic was still reading them."
 - Review against the packet contract, not line-by-line theater. New bug class
   caught → sweep the codebase: one catch, one class, one sweep. The worker's
   sweep report obeys operational-rigor §5 (the canonical copy, verbatim:
@@ -301,5 +320,17 @@ enforcement or a defect in that sandbox is unestablished, so the rule
 prescribes only the defensive split. Private evidence, cited as shape per
 the README covenant's second branch; no in-repo probe has run — in-body
 `unprobed` marker.
+The §3 settled-tree review bullet (2026-07-21) comes from a private
+mining pass over two independent incidents in the same review-fan-out
+harness: a refuter critic re-read a file the orchestrator had already
+fixed mid-dispatch and voted REFUTED on an already-confirmed bug, and a
+separate critic committed the reviewed worktree to a branch mid-review,
+leaving the requested end-state unreachable. Both observed in a private
+audit harness (contributor-verifiable, not linkable here); the fix
+(freeze-or-shard, re-check on return) is the defensive split, not a
+mechanism finding, mirroring how the §4 silent-clobber bullet above
+handles its own single-sandbox observation. Private evidence, cited as
+shape per the README covenant's second branch; no in-repo probe has
+run — in-body `unprobed` marker.
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
