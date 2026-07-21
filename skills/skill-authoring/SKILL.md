@@ -150,6 +150,21 @@ artifact-producing step.
 - One skill, one topic; no duplicate homes for a fact — cross-reference the
   sibling instead. Each skill states **when NOT to use it** and which sibling
   to use.
+- **Keyword-grep absence is not absence** (`unprobed` — private incidents as
+  shape; see Provenance). The no-duplicate-homes rule above needs a dup-check
+  before every addition, and a grep that returns nothing is not that check:
+  an existing rule phrased differently from the search term produced three
+  false "not covered" verdicts in one week — one a proposed addition whose
+  content already sat in the target file under other wording, caught only
+  when the section was actually read at drafting time. Before concluding a
+  fact has no home, grep the target file AND its siblings for the concept's
+  synonyms, and when any hit lands near the topic — or the fact plausibly
+  belongs to an existing section — read that section in full first. A
+  "not covered" verdict cites the section read, not the grep that found
+  nothing.
+  ✅ "grepped 'revert', hit §3's regression bullet, read §3 — the rule is
+  already there under 'restore'; no addition needed."
+  ❌ "grep returned nothing, so the file doesn't cover it."
 - **A cross-reference is not a load** (`unprobed` in-house; external
   evidence — see Provenance). On weak tiers, discovering that a sibling
   skill applies is a judgment act: fable-method published a smoke-grade
@@ -397,4 +412,15 @@ marker per the README covenant: the external measurement is of one
 skill's one gate, and whether placement generalizes across gate types is
 exactly what an in-house probe would test — that probe has not been run;
 the marker records the debt.
+The §5 keyword-grep-absence rule (2026-07-21) generalizes three private
+incidents in one week, each the same shape: a keyword grep of a rules file
+returned nothing, "not covered here" was concluded, and the content existed
+under different phrasing — including one proposed upstream addition whose
+substance was already in the target file, caught only by reading the
+section during drafting (contributor-reported; the private repos are
+verifiable by the contributor, not linkable here). It ships `unprobed` per
+the README covenant's second branch — no in-repo probe has run; the
+executable probe shape (seed a reworded twin of a rule, instruct a
+weak-tier agent to dup-check an addition, observe grep-only vs read) is
+noted here as the debt, not claimed as run.
 Stable method; no environment facts to re-verify.
