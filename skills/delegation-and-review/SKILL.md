@@ -55,19 +55,33 @@ Every packet names:
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
 - **Recurring sweeps carry ledgers** (`unprobed` — private incident as shape;
-  see Provenance). On repeated review sweeps over the same codebase, reviewers
-  re-litigate history: in one iteration, one reviewer re-raised a finding
-  class an earlier iteration had refuted against the dependency's own source,
-  and another flagged as a defect the exact code a prior iteration had shipped
-  as a fix — each costing a fresh reproduction cycle to re-refute. A packet
-  block listing known prior fixes ("do not re-flag") prevented exactly this
-  where it was present; the misses were on surfaces without one. So a
-  recurring-sweep packet carries two ledgers, each entry with a one-line
-  reason: prior fixes (do not re-flag) and refuted finding-classes (do not
-  re-raise without new evidence).
-  ❌ "the reviewer gets fresh context each round, so the packet doesn't need
-  the sweep's history."
-- **Rules** — do not merge, weaken gates, or revert unrelated work; report
+  see Provenance). A field for RECURRING dispatches only: a first-pass
+  packet writes "first pass — no ledger" and is complete; this never
+  blocks a non-recurring task. When the packet re-dispatches a named,
+  ongoing review campaign (the same declared sweep over later rounds),
+  reviewers with fresh context re-litigate its history: in one iteration,
+  one reviewer re-raised a finding class an earlier round had refuted
+  against the dependency's own source, and another flagged as a defect
+  the exact code a prior round had shipped as a fix — each costing a
+  fresh reproduction cycle. So the recurring packet carries two ledgers,
+  and every entry names its target (file/revision or class), its
+  evidence (the fix commit; the refuting counterexample), and its
+  current applicability: prior fixes — do not re-flag WITHOUT evidence
+  the fix failed, regressed, or left a residual; refuted finding-classes
+  — do not re-raise the same finding without new evidence. The ledger is
+  dedup context, never authority: current artifact evidence overrides
+  ledger history, an entry with no evidence binds nothing, and the §3
+  canonical set still governs the audit loop itself ("Dedup new findings
+  against everything ever surfaced, including ones already rejected") —
+  confirmed-but-unfixed findings stay open, and a distinct new
+  occurrence is not "the same class". Done when every applicable prior
+  round's record is reconciled into the two ledgers or the packet says
+  none/unknown explicitly.
+  ✅ "ledger entry: utils/palette.ts@abc123 — shipped as the round-2 fix
+  (commit link); do not re-flag absent evidence of regression. Reviewer
+  later found the residual anyway — new evidence, so it ran."
+  ❌ "the reviewer gets fresh context each round, so the packet doesn't
+  need the sweep's history."- **Rules** — do not merge, weaken gates, or revert unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
   For an implementation task, after bounded discovery (interfaces read, ambiguity
   resolved), require a concrete artifact by an early checkpoint — a reproduced
