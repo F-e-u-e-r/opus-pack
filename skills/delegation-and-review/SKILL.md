@@ -23,16 +23,30 @@ treat every returned result as a claim until verified.
   slices only need to stay within review capacity. Parallel writers get isolated
   worktrees.
 - **Isolated trees do not isolate ports** (`unprobed` — private incident as
-  shape; see Provenance). Sibling sessions contend for the same configured
-  dev-server port; once auto-port-fallback moves yours, any hardcoded
-  `localhost:<port>` proxy or target elsewhere in the app's config now
-  silently reaches ANOTHER session's server — the page loads blank or shows
-  the wrong build while every request returns 200, which reads as a bug in
-  your own change. In a worktree fan-out: enable auto-port assignment from
-  the start, verify against the port you were ACTUALLY assigned, and when a
-  fanned-out preview misbehaves with all-green requests, check cross-port
-  references before debugging your own code — stopping your preview cannot
-  stop a sibling's server, so the wrong upstream stays up.
+  shape; see Provenance). When sibling sessions run servers sharing a
+  port namespace and a configured port, they contend for it; once one is
+  displaced (auto-port fallback, a restart elsewhere), any reference
+  meant for THAT session's server — a `localhost:<port>` proxy, target,
+  or env entry — still aims at the configured port and now silently
+  reaches the sibling's server: the page loads blank or shows the wrong
+  build while every request returns 200, which reads as a bug in your
+  own change. Defense, either arm: give each worktree a unique fixed
+  port AND propagate it to every session-local reference (proxy, env,
+  browser entry), or run fail-loud (strict port, no fallback) so a
+  collision stops the server instead of silently rerouting — auto-port
+  fallback alone is the displacement mechanism, never the repair. Done
+  when an endpoint-identity check passes: the preview response carries
+  this session's own marker (a build id, the worktree name), not just
+  any 200. On mismatch, fix this session's references — never kill the
+  sibling's server (it is another session's work). When a fanned-out
+  preview misbehaves with all-green requests, check cross-port
+  references before debugging your own code — stopping your preview
+  cannot stop a sibling's server, so the wrong upstream stays up. A
+  reference to an intentionally shared local service (one database for
+  all worktrees) is not a cross-port defect; the rule covers references
+  meant for the displaced session-owned server.
+  ✅ "each worktree pinned to its own port, proxy and env updated; the
+  preview page shows this worktree's build id."
   ❌ "every request is 200, so the proxy target must be my server."
 - Route by task: mechanical clear-spec work → cheapest capable model; user-facing
   output → high-taste model; reviews and hard debugging → strongest available.
