@@ -20,7 +20,10 @@ the verdict on any surface.
 set, not just the reviewed paths** (a reviewed file that depends on dirty
 config in the read scope is otherwise copied against the wrong state).
 When the requested end-state permits a commit, commit the content under
-review on the reviewed branch and note the revision; an end-state
+review on the reviewed branch and note the revision — staging exactly
+the content under review; unrelated dirty or untracked material is
+attributed first (operational-rigor's baseline rule), never swept into
+the settle commit; an end-state
 requiring unchanged history or uncommitted work takes the restorable
 capture — working content, index state, and untracked files across the
 protected read set, plus the baseline refs — verified to hold everything

@@ -24,7 +24,9 @@ backfills the ledger from the first round's report.
   fix's own correctness evidence from its round (a commit shows intent,
   not correctness — an incomplete fix still present is exactly what the
   re-examination must catch, so "unchanged since the fix" narrows the
-  re-check to the judged-against set; it never skips the locus).
+  re-check to the judged-against set; it never skips the locus — and
+  the narrowing governs re-flagging this entry only: a current
+  round's own proof gate is never narrowed by history).
 - REFUTED FINDING-CLASSES — a refutation binds exactly what its evidence
   established: the same claim about the same dependency artifact set
   (call path and controlling configuration included); a different
@@ -44,6 +46,12 @@ evidence overrides history, and an entry with no evidence binds
 nothing. §3's canonical set still governs the audit loop itself ("Dedup
 new findings against everything ever surfaced, including ones already
 rejected").
+
+Write-back moves entries across categories: an OPEN finding whose fix
+landed this round moves to PRIOR FIXES carrying the fix's correctness
+evidence; an OPEN or UNRESOLVED item refuted this round moves to
+REFUTED FINDING-CLASSES carrying the counterexample; everything else
+stays where it is.
 
 **Two phases, two checks.** Dispatch-time (the §2 field's readiness):
 the packet names the ledger path and campaign identifier, and the

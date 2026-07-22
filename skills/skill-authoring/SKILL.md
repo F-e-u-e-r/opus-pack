@@ -104,15 +104,19 @@ artifact-producing step.
   from a capability that now exists, and nothing ever exercises it to
   expose the rot. One playbook's "model switching only works in the
   interactive UI; no flag" was actively wrong at the tool's current version
-  and had been routing sessions into a degraded path. Writing one: pin
+  and had been routing sessions into a degraded path. A negative about
+  a hosted model's BEHAVIOR is the one class a version pin cannot
+  hold — hosted endpoints drift behind unchanged strings; that class
+  follows delegation-and-review §1's pinned-string rule (decision-time
+  re-probe), not this protocol. Writing one: pin
   it to the version and probe it was observed on. Acting on one: read
   its pin; the tool's version has changed, or the pin is missing →
   re-verify with one probe (`--help`, a trial invocation) before
   obeying it; probe unavailable or inconclusive → the capability is
   unknown, not absent — record that where the claim is used and do not
-  repeat the negative as fact. Done when the claim carries its version
-  pin and the session acting on it has verified the pin against the
-  current version.
+  repeat the negative as fact. Done: writing — the claim carries its
+  version pin and the probe that observed it; acting — the pin is
+  matched to the current version, or re-probed, or recorded unknown.
   ✅ "playbook says no flag (pinned v0.2.98); current binary v0.2.101 —
   ran --help: the flag exists now; corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."

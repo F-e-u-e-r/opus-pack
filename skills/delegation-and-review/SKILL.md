@@ -21,7 +21,8 @@ treat every returned result as a claim until verified.
 - **Bounded fan-out:** launch no more agents than you can review/merge. If a wave
   depends on the last, accept/reject the last wave before the next; independent
   slices only need to stay within review capacity. Parallel writers get isolated
-  worktrees.
+  worktrees (a write-capable review critic needs more — an independent
+  copy per §3's settled-tree reference, not a linked worktree).
 - **Isolated trees do not isolate ports** (`unprobed` — private incident as
   shape; see Provenance). When sibling sessions run servers sharing a
   port namespace and a configured port, they contend for it; once one is
@@ -30,15 +31,16 @@ treat every returned result as a claim until verified.
   proxy, target, or env entry still naming the configured port — now
   silently reaches the sibling's server: the page loads blank or shows
   the wrong build while every request returns 200, which reads as a bug
-  in your own change. Defenses (pick one, apply it fully — what you
-  persist differs by defense): a unique fixed port per worktree, run
+  in your own change. Defenses (pick one of the two, apply it fully —
+  what you persist differs by defense): (1) a unique fixed port per
+  worktree, run
   with fallback disabled so a collision fails loud, the NUMBER
   persisted and propagated to every session-local reference (proxy,
   env, browser entry) — an explicit address-in-use bind error is the
   contention diagnostic (any other bind error — permissions, bad
   address, exhaustion — is its own failure, not a cue to switch
   ports): then pick a different free unique port, propagate, restart;
-  or runtime derivation, where the MECHANISM is what persists — every
+  or (2) runtime derivation, where the MECHANISM is what persists — every
   reference re-derived from the actually-bound port after every bind,
   never a bound number frozen into a static ref. Auto-port fallback
   alone is the displacement mechanism, never the repair; writing
@@ -95,7 +97,9 @@ treat every returned result as a claim until verified.
   with flag and battery unchanged, and a second vendor's reproduced
   failure inverted to a pass days later, strings unchanged). Date-stamp
   every such measurement where it is recorded; at decision time, re-run
-  the probe and cite the fresh result's timestamp and configuration —
+  the probe — its route first verified per the labels rule below (an
+  unattributed answer measures an unknown model, not the slug's) —
+  and cite the fresh result's timestamp and configuration —
   the fresh result informs the routing, it never replaces §2's edge
   specification and proof gate for the work itself, and no measurement
   pins the endpoint's behavior on the next request. Probe unavailable
@@ -192,8 +196,8 @@ Every packet names:
   escalation, never edited on discovery.
   ✅ "seed inventory: the 53-file hit list (reference search), the
   shared class (style audit), the emitting helper (trace); tiers from
-  the sealed palette enum at its definition site; round ledger in the
-  packet."
+  the sealed palette enum at its definition site; per-round hunt-log
+  in the packet."
   ❌ "the inventory is the grep hit list — the shared utility never made
   the list."
 - **Invariant** — property to close and properties to preserve.
