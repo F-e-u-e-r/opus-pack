@@ -90,69 +90,17 @@ reviewers that they silently absorb as implementers.
   file the orchestrator had already fixed mid-review and voted REFUTED
   on a bug already confirmed elsewhere; a separate critic committed the
   very worktree it was reviewing, moving the tree out from under the
-  requested end-state. Neither is §4's silent-clobber below — that one
-  is a sandbox restoring out-of-scope files on exit; these are a read
-  verdict going stale mid-read, and a "read-only" reviewer writing
-  anyway. A wave already reading with no pre-read baseline recorded
-  cannot be settled retroactively — treat its verdict as void, settle
-  now, re-dispatch. Definitions: the PROTECTED READ SET is the reviewed
-  paths plus the wave's declared read scope; the BASELINE REFS are HEAD
-  and the reviewed branch as recorded at dispatch; WITHHELD means
-  harness-enforced (a sandbox or filesystem control), not asked in a
-  prompt; a wave's writes are legitimate only in scratch locations
-  predeclared in its packet, outside the protected read set — scratch
-  feeding back into a reviewed input voids the verdict, on either
-  surface. (1) Settle in place and record the baseline: when the
-  requested end-state permits a commit, commit the content under review
-  on the reviewed branch and note the revision; an end-state requiring
-  unchanged history or uncommitted work takes the restorable capture —
-  working content, index, and untracked files of the reviewed paths,
-  plus the baseline refs — verified to hold everything under review;
-  never stash away the very change the wave reviews (a delivered tree
-  under §3's completion-claim audit below is settled by copying only —
-  that rule forbids mutating it). (2) Choose the read surface by what
-  you can enforce: a full copy verified against the baseline before
-  dispatch (a worktree pinned at a revision omits dirty content unless
-  the capture is applied into it, and a linked worktree shares the
-  repository's refs — a write-capable wave needs a fully independent
-  copy, one per write-capable critic, or the critics run serialized) —
-  required whenever any other writer (a user, a hook, a sibling
-  process) can touch the protected read set mid-read; the live tree
-  only when your edits are frozen until return AND the wave's write
-  access is withheld AND no other writer can touch the protected read
-  set. Enforcement unavailable → the independent-copy path with the
-  return check below is the working standard, its residual
-  mutate-and-restore risk recorded as a caveat on the verdict; a live
-  tree without enforcement runs provisional — never a clean gate pass.
-  (3) On return, check by read surface. Copy: compare its protected
-  read set (content, index, untracked) and its baseline refs — outside
-  predeclared scratch, any change means the copy was written:
-  quarantine it for attribution (never delete unexamined — the motion
-  may be another actor's work), void the verdict, cut a fresh verified
-  copy from the settled tree, re-dispatch; a clean copy binds the
-  verdict to the baseline, and live paths that moved since dispatch
-  (plus their dependents) are UNREVIEWED — fresh-context re-review
-  covers them, not the orchestrator's own glance. Live tree: any change
-  to the protected read set or baseline refs — your own edits included
-  → void; re-dispatch against a settled tree, never re-attribute to the
-  baseline. Motion you did not make is never proof the wave wrote —
-  investigate ownership before restoring anything (§4's edit-conflict
-  rule protects a concurrent editor's work). An endpoint match detects
-  only persistent drift — a write-capable reader can mutate and restore
-  without a trace; prevention is enforced withholding on the read
-  surface plus no third writer. Done when: baseline recorded; surface
-  matched to what was enforceable; return check run; and the verdict
-  either applied to the exact state it bound, or voided and
-  re-dispatched (moved state), or labeled provisional (unenforceable
-  live read) — never promoted past its label.
-  ✅ "committed the slice, noted the revision, dispatched one verified
-  copy per critic with write withheld, kept editing the live tree; on
-  return each copy's read set and baseline refs matched — verdicts bind
-  the baseline; my later edits go to the next review."
-  ✅ "write withheld and no third writer on the live tree; held my own
-  edits until the wave returned and the protected read set and baseline
-  refs diffed clean — then applied them (the applied edits are the next
-  change to review)."
+  requested end-state. Neither is §4's silent-clobber below (a sandbox
+  restoring out-of-scope files on exit). The dispatch protocol — the
+  baseline over the whole protected read set, enforced-copy-or-frozen-
+  tree surfaces, the two return comparisons, and recovery — is
+  `references/settled-tree-review.md`: load it before dispatching a
+  read-only review wave over a tree that you, a hook, a user, or a
+  sibling process may touch while it reads. Verdicts bind only the
+  exact state whose immutability was enforced; anything less runs
+  provisional — never a clean gate pass.
+  ✅ "loaded the reference, dispatched one enforced copy per critic,
+  applied the verdicts to the recorded baseline only."
   ❌ "kept fixing files in the live tree the critic was reading."
   ❌ "the tree matches what I intended, so the verdict stands" — a
   moved tree voids the verdict; it does not re-bind to the baseline.
@@ -381,12 +329,15 @@ fixed mid-dispatch and voted REFUTED on an already-confirmed bug, and a
 separate critic committed the reviewed worktree to a branch mid-review,
 leaving the requested end-state unreachable. Both observed in a private
 audit harness (contributor-verifiable, not linkable here); the fix
-(recorded baseline, enforced-copy-or-frozen-tree with write withheld
-and no third writer, read-surface-aware return checks that void a
-moved verdict) is the defensive split, not a mechanism finding,
-mirroring how the §4 silent-clobber bullet above
+(recorded baseline over the protected read set, enforced-copy-or-
+frozen-tree with write withheld and no third writer, two return
+comparisons that void a moved verdict) is the defensive split, not a
+mechanism finding, mirroring how the §4 silent-clobber bullet above
 handles its own single-sandbox observation. Private evidence, cited as
 shape per the README covenant's second branch; no in-repo probe has
-run — in-body `unprobed` marker.
+run — in-body `unprobed` marker. The protocol body lives in
+`references/settled-tree-review.md` per the pack's split precedent
+(protocol out of the lean core; the §3 bullet keeps the trigger, the
+claim, the incidents, and the pointer).
 Stable behavioral rules; re-check only
 worktree/agent mechanics against the current harness.
