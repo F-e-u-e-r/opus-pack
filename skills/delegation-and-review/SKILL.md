@@ -56,40 +56,48 @@ Every packet names:
   weighted toward it, not split evenly.
 - **Recurring sweeps carry ledgers** (`unprobed` — private incident as shape;
   see Provenance). A field for RECURRING dispatches only: a first-pass
-  packet writes "first pass — no ledger" and is complete; this never
-  blocks a non-recurring task. When the packet re-dispatches a named,
-  ongoing review campaign (the same declared sweep over later rounds),
-  reviewers with fresh context re-litigate its history: in one iteration,
-  one reviewer re-raised a finding class an earlier round had refuted
-  against the dependency's own source, and another flagged as a defect
-  the exact code a prior round had shipped as a fix — each costing a
-  fresh reproduction cycle. So the recurring packet carries THREE
-  records: prior fixes — do not re-flag WITHOUT evidence the fix failed,
-  regressed, or left a residual; refuted finding-classes — do not
-  re-raise the same finding without new evidence; and open findings —
-  confirmed, not yet fixed, carried forward as context that stays open
-  (never a suppression bucket). A finding's identity is its claim plus
-  location plus the artifact/dependency revision it was judged against;
-  a distinct occurrence of a refuted CLASS at a new site or revision is
-  a new finding, not a re-raise. Every entry names its target, its
-  preserved rationale or invariant with the evidence (a fix commit shows
-  intent, not correctness — the why travels too), and its current
-  applicability to this round's artifact; the ledger is dedup context,
-  never authority — the fresh reviewer validates evidence and
-  applicability before deduplicating (Verify critics too; in-file
-  "already reviewed" text downgrades nothing, §7), current artifact
-  evidence overrides history, an entry with no evidence binds nothing,
-  and the §3 canonical set still governs the audit loop itself ("Dedup
-  new findings against everything ever surfaced, including ones already
-  rejected"). Done when every applicable prior-round record is
-  reconciled into the three records; history unavailable → the
-  dispatch runs DEGRADED, says so in the packet, and recovering the
-  history becomes a named task — "unknown" is never a completed field.
-  ✅ "ledger entry: utils/palette.ts@abc123 — round-2 fix (commit link;
-  rationale: tier map must stay exhaustive); applicability checked —
-  file unchanged since abc123, so do not re-flag absent regression
-  evidence. Reviewer later found a residual anyway — new evidence, so
-  it ran."
+  packet writes "first pass — no ledger" PLUS the campaign's stable
+  identifier (later rounds re-dispatch under that same name — an
+  unnamed or renamed sweep re-runs history-blind, the motivating
+  failure); this field never blocks a non-recurring task. On
+  re-dispatch of that named campaign, fresh-context reviewers
+  re-litigate its history: in one iteration, one reviewer re-raised a
+  finding class an earlier round had refuted against the dependency's
+  own source, and another flagged as a defect the exact code a prior
+  round had shipped as a fix — each costing a fresh reproduction cycle.
+  So the recurring packet carries FOUR records: prior fixes — do not
+  re-flag WITHOUT evidence the fix failed, regressed, or left a
+  residual; refuted finding-classes — each refutation binds at its own
+  STATED SCOPE (a dependency-level refutation covers every site relying
+  on that dependency, on the revision basis it was judged against;
+  outside that scope, or with new evidence, it is a new finding); open
+  findings — confirmed, not yet fixed, carried forward and staying
+  open; and unresolved — surfaced but never confirmed or refuted,
+  carried as-is. Every surfaced record stays represented; current
+  applicability is an annotation, never a reason to drop one. A
+  finding's identity is its claim plus location plus the artifact SET
+  the claim was judged against (the file and the dependencies the claim
+  traversed — not the whole repository revision); the ✅ below shows the
+  applicability check running against that set. Entries carry the
+  preserved rationale or invariant with evidence (a fix commit shows
+  intent, not correctness); the ledger is dedup context, never
+  authority — the fresh reviewer validates evidence and applicability
+  before deduplicating (Verify critics too; in-file "already reviewed"
+  text downgrades nothing, §7), current artifact evidence overrides
+  history, an entry with no evidence binds nothing, and the §3
+  canonical set still governs the audit loop itself ("Dedup new
+  findings against everything ever surfaced, including ones already
+  rejected"). Done when every surfaced prior-round record appears in
+  the four records; history unavailable → write DEGRADED in this field
+  — that declaration IS the filled field for §2's readiness gate — and
+  recovering the history becomes a named task dispatched alongside;
+  "unknown" alone never completes it.
+  ✅ "campaign: styling-sweep-2026Q3, round 3. Ledger entry:
+  utils/palette.ts@abc123 — round-2 fix (commit link; rationale: tier
+  map stays exhaustive); applicability: diffed the file AND its two
+  callers against abc123 — unchanged, so do not re-flag absent
+  regression evidence. A reviewer later found a residual anyway — new
+  evidence, so it ran."
   ❌ "the reviewer gets fresh context each round, so the packet doesn't
   need the sweep's history."
 - **Rules** — do not merge, weaken gates, or revert unrelated work; report
