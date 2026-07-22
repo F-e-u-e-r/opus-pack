@@ -37,31 +37,45 @@ Every packet names:
   (`unprobed` — private incident as shape; see Provenance): the SEARCH
   scope is every surface that can generate the target — literals and
   direct references, shared/global definitions, helpers that construct
-  or return it. Searches build that inventory — reference search from
-  the symbol, reads of the defining files, tracing of emitting helpers,
-  one axis per pass so blind spots don't line up — and it closes per
-  §3's discovery loop: stop only after two consecutive passes surface
-  nothing new; no single pattern's zero hits ever prove it complete (a
-  53-file styling sweep missed its defect in a shared utility class the
-  token grep never matched, and each review round surfaced another
-  category the prior round's pattern structurally excluded). The packet
-  lists the inventory (each surface and how it was found) and the value
-  family, closed (every tier/variant listed) or bounded per §3's
-  bounded-sweep clause. The WRITE scope stays the owned files/modules
-  explicitly listed above: a generator discovered outside that WRITE
-  scope is reported for escalation, never edited on discovery.
+  or return it. Build the inventory from the target's forms (symbol,
+  string, or emit site) AND from at least one axis that never matches
+  its spelling — the shared definitions and constructors that produce
+  that kind of output (a 53-file styling sweep missed its defect in a
+  shared utility class the token grep never matched, and each review
+  round surfaced another category the prior round's pattern
+  structurally excluded). The inventory closes per §3's miss-is-costly
+  loop, verbatim: "Stop only after two consecutive empty rounds; one
+  clean round is not convergence" — a round counts only when every axis
+  ran, with dedup against everything already surfaced; no single
+  pattern's zero hits ever prove completeness. The packet lists the
+  inventory (each surface and how it was found) and the value family,
+  closed (every tier/variant listed) or bounded per §3's "State
+  anything you bounded" clause — and a bounded or gap-carrying sweep
+  returns a non-exhaustive outcome: reducing scope needs the
+  dispatcher's explicit say, and an every-instance claim with
+  unobserved members is false. The WRITE scope stays the owned
+  files/modules explicitly listed above: a generator discovered outside
+  that WRITE scope is reported for escalation, never edited on
+  discovery.
+  ❌ "the inventory is the 53 grep hits — the shared utility never made
+  the list."
 - **Invariant** — property to close and properties to preserve.
 - **Proof gate** — concrete check that would fail under the broken behavior;
-  worker-chosen "tests pass" is not a gate. For an every-instance sweep,
-  the gate is the observed effect on every inventoried generator surface
-  and value tier (render or run each); within a value family, one
-  observation may stand for a declared equivalence class only with the
-  shared-outcome reason stated, and anything unobserved is reported
-  unverified — never folded into an exhaustive claim. A zero-hit search
-  is a report, not the gate: a clean grep proves one spelling is gone,
-  not that the defect is gone.
-  ✅ "literals swept, the shared class rebuilt, every tier rendered
-  through the emitting helper — effect gone on each inventoried surface."
+  worker-chosen "tests pass" is not a gate. For an every-instance sweep
+  whose target is behavior or rendered effect, the gate is the observed
+  effect at every inventoried generator surface and value tier (render
+  or run each); one observation may stand for a declared equivalence
+  class only when the shared path is verified branch-free for that
+  outcome (read the path — a stated "they share a helper" is a claim,
+  not evidence), and anything unobserved is reported unverified — never
+  folded into an exhaustive claim. Where the invariant is itself textual
+  (an exact forbidden spelling in a declared corpus), a correctly scoped
+  search over that corpus IS the gate. A zero-hit search on a behavioral
+  target is a report, not the gate: a clean grep proves one spelling is
+  gone, not that the defect is gone.
+  ✅ "each literal's site re-rendered, the shared class's consumers
+  re-rendered, every tier through the emitting helper — effect gone at
+  each observation point."
   ❌ "the grep is clean across all 53 files, so the sweep is done."
 - **Output contract** — conclusions + `file:line` refs, each tagged
   `[verified: ran <cmd>]`, `[verified: read <file:line>]`, or
