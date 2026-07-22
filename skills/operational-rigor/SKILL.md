@@ -313,13 +313,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   task was separately dead on a stale hardcoded credential the whole
   time. The arming and audit protocol is the scheduled-process entry in
   `references/external-systems.md` — load it before arming, enabling,
-  relying on, or reviewing one; on any wording disagreement, that entry
-  is canonical. A green run history is evidence the runner reported
+  relying on, or reviewing one; on wording disagreement in the quoted
+  headline, that entry's headline is canonical (§2's authorization rules
+  are untouched by that winner clause). A green run history is evidence the runner reported
   success, never that downstream received anything (the earlier
   exit-code line governs the immediate command you just ran; a
   schedule's downstream is this rule).
   ✅ "authorized the fires; drove every channel emission-positive tied
-  to them; absence alarm proven once — then enabled the schedule."
+  to them; each alarm path proven — then enabled, with scheduler binding
+  held open until the first scheduled fire lands attributed effects."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
   silently-wrong value.** Honor an explicit, documented contract (a declared

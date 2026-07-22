@@ -165,8 +165,12 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   scheduler-enforced non-concurrency, not short runtime. Armed means:
   every inventoried channel emission-positive-verified; no human cleared
   a prompt mid-run; overlap guarded or scheduler-excluded; the absence
-  alarm below armed, its firing proven once, and its alert channel's
-  standing authorization in place (no authorized alert path → the alarm
+  alarm below armed, its firing proven once per independently configured
+  alarm path (one channel's alert does not prove another's mapping; a
+  synthetic destination proves a path only when its routing matches the
+  production configuration), and its alert channel's standing
+  authorization in place — the §2 project-policy-scoped kind, covering
+  exactly the automated alert (no authorized alert path → the alarm
   is unarmed and that gap is the report; no automated outward action
   invents itself). Anything short stays unarmed — and enabling is not
   the end: scheduler binding stays an open claim until the first
@@ -193,10 +197,16 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   missed check is unhealthy and gets the response documented and
   authorized at arming time — disarming or escalating needs its own
   authorization, and with no authorized response the gap itself is the
-  report, never a shrug. Relying on an armed schedule mid-flight uses this same review arm plus
-  the absence alarm's current health as the evidence. Reviewing an
+  report, never a shrug. Relying on an armed schedule mid-flight uses the ongoing
+  destination-and-deadline checks above plus the asymmetric evidence
+  rules below as the evidence — and "after the invocation" stays
+  necessary but never sufficient: the identifier-or-exclusion procedure
+  above applies unchanged. Reviewing an
   existing schedule without authorization to run it: inspect existing
-  evidence asymmetrically — stale evidence can refute; fresh evidence
+  evidence asymmetrically — stale evidence refutes only when an
+  independently established emission was due and its deadline passed (a
+  conditional channel whose condition never fired is not stale); fresh
+  evidence
   proves only when tied to the invocation under review (an established
   exclusive writer narrows the author, not the run — its artifact still
   needs a timestamp or state transition placing it after that
