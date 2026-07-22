@@ -264,17 +264,21 @@ When rigor conflicts with finishing sooner, rigor wins.
   already given to the user. Before citing a check, test, or CI job as
   evidence a change is safe, trace it through to its pass/fail oracle —
   the assertions (or, for a linter or build job, its rule set and
-  inputs), the invocation path and setup that feed them, and whether
-  that path executed in the cited run — and assert only the properties
+  inputs) inspected at the revision the cited run actually used, the
+  invocation path and setup that feed them, whether that path executed
+  in the cited run, and whether its assertions PASSED there with their
+  failure controlling the check's final status (a run is not a pass —
+  the runs/passes/correct line above) — and assert only the properties
   that trace established: whatever the check's NAME implies but the
-  trace did not show stays unverified, said so; two checks with
+  trace did not show stays unverified — say so; two checks with
   identical assertions differ when one drives the real integration and
   the other a pre-filter. A trace you cannot inspect leaves that
   coverage unverified — say so. "There is a check called X" is a claim
   about naming, not behavior.
-  ✅ "traced check X: it asserts A and B against the real adapter, and
-  run 1234's log shows that path executed; nothing in its path drives
-  C — C is unverified."
+  ✅ "traced check X at run 1234's revision: it asserts A and B against
+  the real adapter; the run's log shows that path executed and A, B
+  passed with failures propagating to the job status; nothing in its
+  path drives C — C is unverified."
   ❌ "the change is safe, check X covers it" (named, never read).
   ❌ "read the source — it asserts A — so the cited run covers A" (the
   run had that test conditionally skipped; static coverage is not the
