@@ -255,6 +255,17 @@ When rigor conflicts with finishing sooner, rigor wins.
 - Between failed fixes, return to a clean state; stacked half-fixes hide causes.
 - Reproduce reported bugs before fixing. Fix the observed failure, not the implied
   one. Refutation is valid: report confirmed non-bugs and ship nothing.
+- **A check's name is not its coverage** (`unprobed` — private incident as
+  shape; see Provenance). A named gate earns evidentiary weight only from
+  its assertion body: one session cited a check whose name implied it gated
+  a model integration's behavior, then read its source and found it
+  exercised only a regex pre-filter in which the model's name was a routing
+  label — and had to correct a safety claim already given to the user.
+  Before citing a check, test, or CI job as evidence a change is safe, read
+  what it actually asserts and cite that; "there is a check called X" is a
+  claim about naming, not behavior.
+  ✅ "read check X: it asserts A and B but never drives C — C is unverified."
+  ❌ "the change is safe, check X covers it" (named, never read).
 - **A failing check has two suspects: the code and the check itself.** Before
   editing either, open the statement of intended behavior (spec, README,
   docstring, type) and confirm which side it backs; a disagreement is the
@@ -538,6 +549,15 @@ the deployed path (contributor-reported shape; the private repo is verifiable by
 the contributor, not linkable here). It ships `unprobed` — the pack's private
 fixtures have no interactive arm to drive it (cf. the grill-pass note above); the
 marker records that debt, not an exemption.
+The §4 check-name rule (2026-07-22) comes from a private incident: a
+session presented a named CI check as gating a model integration's
+behavior, then read the check's source and found it exercised only a
+regex pre-filter in which the model's name was merely a routing label,
+and had to correct the safety framing it had already given the user.
+Private evidence, cited as shape per the README covenant's second branch;
+the executable probe — sample a repo's named checks and diff name-implied
+vs actual assertion coverage — has not been run; the in-body `unprobed`
+marker records that debt.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
