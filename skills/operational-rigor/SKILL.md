@@ -303,10 +303,10 @@ When rigor conflicts with finishing sooner, rigor wins.
 - Never fabricate observations or report outputs not produced. Report skipped
   verification as skipped.
 - **Arming, enabling, relying on, or reviewing a recurring scheduled
-  process → "A recurring schedule's own 'completed' report is not
-  evidence its side effects landed — verify at the destinations,
-  attributed to the invocation"** (the scheduled-process entry's
-  headline, quoted; that entry wins on disagreement) (`unprobed` —
+  process → the scheduled-process entry's headline holds, quoted: A
+  recurring schedule's own "completed" report is not evidence its side
+  effects landed — verify at the destinations, attributed to the
+  invocation** (that entry wins on disagreement) (`unprobed` —
   private incident as shape; see Provenance). A
   weekly task reported success for roughly three months while its write
   step silently never executed, and a second output channel on the same
@@ -316,9 +316,11 @@ When rigor conflicts with finishing sooner, rigor wins.
   relying on, or reviewing one; on wording disagreement in the quoted
   headline, that entry's headline is canonical (§2's authorization rules
   are untouched by that winner clause). A green run history is evidence the runner reported
-  success, never that downstream received anything (the earlier
-  exit-code line governs the immediate command you just ran; a
-  schedule's downstream is this rule).
+  success, never that downstream received anything — and that holds for
+  the supervised test fire too: exit 0 there is evidence the process
+  ran, while its downstream still needs the destination-attributed
+  checks (the earlier exit-code line speaks to command execution, never
+  to a schedule's delivery).
   ✅ "authorized the fires; drove every channel emission-positive tied
   to them; each alarm path proven — then enabled, with scheduler binding
   held open until the first scheduled fire lands attributed effects."

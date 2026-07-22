@@ -118,9 +118,13 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   incident: a weekly task reported success for roughly three months
   while its write step silently never executed; a second output channel
   on the same task was separately dead on a stale hardcoded credential —
-  contributor-reported shape.) Gates first: every consequential
-  supervised or test invocation — the repeat run below included —
-  carries its own per-invocation authorization
+  contributor-reported shape.) Gates first — and two branches exit here before any fire: reviewing
+  without authorization to run it goes straight to the inspection-only
+  arm at the end of this entry, and a schedule with no authorizable
+  alert path cannot complete arming — record that gap and stop before
+  any test fire. Otherwise every consequential supervised or test
+  invocation — the repeat run below included — carries its own
+  per-invocation authorization
   (destructive / spending / publishing / credential — operational-rigor
   §2's confirmation gate governs: its per-invocation grant, plus its
   AUTH: artifact for the outward or irreversible steps), and a
@@ -209,8 +213,10 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   evidence
   proves only when tied to the invocation under review (an established
   exclusive writer narrows the author, not the run — its artifact still
-  needs a timestamp or state transition placing it after that
-  invocation); otherwise it stays unverified.
+  needs an invocation identifier, or a transition bounded BEFORE the
+  next eligible invocation with every other invocation excluded —
+  merely "after" credits a later run's success to an earlier failed
+  one); otherwise it stays unverified.
 
 ## Provenance
 
