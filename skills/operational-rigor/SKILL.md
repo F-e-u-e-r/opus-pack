@@ -262,7 +262,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   source and found it exercised only a regex pre-filter in which the
   model's name was a routing label — and had to correct a safety claim
   already given to the user. Before citing a check, test, or CI job as
-  evidence a change is safe, trace it through to its pass/fail oracle —
+  evidence of a property of a change (safe, correct, covered), trace
+  it through to its pass/fail oracle —
   the assertions (or, for a linter or build job, its rule set and
   inputs) inspected at the revision the cited run actually used, the
   invocation path and setup that feed them, whether that path executed

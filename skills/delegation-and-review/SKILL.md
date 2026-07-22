@@ -37,9 +37,10 @@ treat every returned result as a claim until verified.
   with fallback disabled so a collision fails loud, the NUMBER
   persisted and propagated to every session-local reference (proxy,
   env, browser entry) — an explicit address-in-use bind error is the
-  contention diagnostic (any other bind error — permissions, bad
-  address, exhaustion — is its own failure, not a cue to switch
-  ports): then pick a different free unique port, propagate, restart;
+  contention diagnostic: then pick a different free unique port,
+  propagate, restart (any other bind error — permissions, bad
+  address, exhaustion — is its own failure, never a cue to switch
+  ports);
   or (2) runtime derivation, where the MECHANISM is what persists — every
   reference re-derived from the actually-bound port after every bind,
   never a bound number frozen into a static ref. Auto-port fallback
@@ -105,10 +106,12 @@ treat every returned result as a claim until verified.
   pins the endpoint's behavior on the next request. Probe unavailable
   or failing → the property is unknown: route as if unguarded and spec
   the edge per §2. Done when the decision record cites the fresh probe
-  (timestamp + configuration) or the unknown-property fallback — an
+  (timestamp + configuration, its route attributed per the labels
+  rule below) or the unknown-property fallback — an
   undated behavioral claim about a hosted endpoint is expired on
-  arrival.
-  ✅ "re-ran the edge battery this session, cited its timestamp in the
+  arrival, and an unattributed probe never satisfies the citation.
+  ✅ "re-ran the edge battery this session — the wrapper's route line
+  named the slug — cited its timestamp in the
   routing note, and specced the edge in the packet anyway."
   ❌ "we already measured that model guarding this edge, so route the
   edge-risky work to it" — any prior measurement reused for a routing
@@ -122,13 +125,18 @@ treat every returned result as a claim until verified.
   sending a fixed trivial prompt through the SAME wrapper, flags, auth,
   and execution context the work will use; the pass is two observations
   — a model ANSWER to that prompt, AND the wrapper's own route report
-  naming this route where the wrapper emits one — wrapper banners,
-  usage text, diagnostics, or error pages are not answers, and a
-  wrapper that silently falls back to a default model, or cannot say
-  which model answered, proves wrapper reachability only: the route
-  stays unverified. An error, a non-answer, or a route left unverified
-  — do not dispatch dependent work on it
-  (§4's retry/escalation ladder governs); and a pass expires with the
+  naming this route as what ANSWERED (a banner echoing the requested
+  slug is configuration, not attribution) — wrapper banners,
+  usage text, diagnostics, or error pages are not answers. A wrapper
+  WITH an attribution channel whose report is missing, ambiguous, or
+  names a silent fallback leaves the route unverified — like an error
+  or a non-answer, do not dispatch dependent work on it
+  (§4's retry/escalation ladder governs). A wrapper with NO
+  attribution channel by design can only ever yield a
+  reachability-only pass: the route stays unattributed — record that
+  limit wherever the pass is cited, and dependent dispatch on it
+  carries the recorded limitation, never a verified-route claim. A
+  pass expires with the
   session — a later session re-runs the probe before dispatching on
   it (re-reading the lineup, per the volatile-lineups rule above, is
   a separate duty, never the re-verification). About to use a wrapper's model

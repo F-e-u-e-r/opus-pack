@@ -1,6 +1,7 @@
 # delegation-and-review · references: recurring-sweep ledgers
 
-The lifecycle behind §2's recurring-ledgers field (`unprobed` — see the
+The lifecycle behind §2's "Recurring dispatches carry ledgers" field
+(`unprobed` — see the
 skill's Provenance; protocol body placed here per the pack's split
 precedent). Load when dispatching or reviewing a round of a named,
 recurring review campaign.
@@ -50,7 +51,10 @@ rejected").
 Write-back moves entries across categories: an OPEN finding whose fix
 landed this round moves to PRIOR FIXES carrying the fix's correctness
 evidence; an OPEN or UNRESOLVED item refuted this round moves to
-REFUTED FINDING-CLASSES carrying the counterexample; everything else
+REFUTED FINDING-CLASSES carrying the counterexample; a PRIOR-FIXES
+entry re-flagged this round with evidence the fix failed, regressed,
+or left a residual spawns a NEW OPEN finding carrying that evidence,
+the historical entry staying put with a pointer to it; everything else
 stays where it is.
 
 **Two phases, two checks.** Dispatch-time (the §2 field's readiness):
