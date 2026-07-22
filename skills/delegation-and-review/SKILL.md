@@ -30,30 +30,37 @@ treat every returned result as a claim until verified.
   proxy, target, or env entry still naming the configured port — now
   silently reaches the sibling's server: the page loads blank or shows
   the wrong build while every request returns 200, which reads as a bug
-  in your own change. Defenses (pick one, apply it fully, PERSIST it):
-  give each worktree a unique port and propagate it to every
-  session-local reference (proxy, env, browser entry); or derive every
-  reference at runtime from the port the server actually bound,
-  propagated to every consumer; or run a fixed port with fallback
-  disabled, so a collision stops the server — an explicit
-  address-in-use bind error IS the contention diagnostic (any other
-  bind error — permissions, bad address, exhaustion — is its own
-  failure, not a cue to switch ports): pick a free unique port,
-  propagate, restart. Auto-port fallback alone is the displacement
-  mechanism, never the repair, and retargeting references at an
-  ephemeral fallback port is not one of the defenses — the next restart
-  recreates the mismatch. To repair a mismatch: choose a defense,
-  persist its port choice, update every session-local reference,
-  restart or reload every consumer that read its target at startup, and
-  never kill the sibling's server — it is another session's work. Done
-  when fresh, target-originated identity evidence — a marker the final
-  server generates: the worktree name it serves, a session nonce; a
-  content build id shared by same-revision worktrees does not
-  discriminate — is observed THROUGH every relied session-local
+  in your own change. Defenses (pick one, apply it fully — what you
+  persist differs by defense): a unique fixed port per worktree, run
+  with fallback disabled so a collision fails loud, the NUMBER
+  persisted and propagated to every session-local reference (proxy,
+  env, browser entry) — an explicit address-in-use bind error is the
+  contention diagnostic (any other bind error — permissions, bad
+  address, exhaustion — is its own failure, not a cue to switch
+  ports): then pick a different free unique port, propagate, restart;
+  or runtime derivation, where the MECHANISM is what persists — every
+  reference re-derived from the actually-bound port after every bind,
+  never a bound number frozen into a static ref. Auto-port fallback
+  alone is the displacement mechanism, never the repair; writing
+  today's fallback port into static references is the forbidden
+  ephemeral retarget — the next restart recreates the mismatch. To
+  repair a mismatch: choose a defense, apply its own persistence shape
+  as above, update every session-local reference, restart or reload
+  every consumer that read its target at startup, and never kill the
+  sibling's server — it is another session's work. Identity check,
+  LAST, after all mutations including cleanup: record the expected
+  marker for THIS session first (the worktree name it serves, a
+  session nonce noted before the request — a fresh nonce from the
+  wrong sibling still looks fresh; a content build id shared by
+  same-revision worktrees does not discriminate), then observe exact
+  equality with that recorded value THROUGH every relied session-local
   consumer path (the API proxy included, not just the top page); a
   listener check (`lsof`-style) is port discovery, never identity
-  evidence. A marker served temporarily for this check is removed
-  afterward, with a clean-diff check that no instrumentation remains.
+  evidence; any restart or reload after the check — a marker cleanup
+  included — voids it: re-prove without mutating. A temporarily served
+  marker is removed afterward and its removal verified against the
+  pre-instrumentation state (tracked, untracked, and ignored files —
+  the declared persistent port configuration stays).
   When a fanned-out preview misbehaves with all-green requests, check
   cross-port references — references still naming the shared configured
   port instead of this session's bound port — before debugging your own
@@ -63,8 +70,9 @@ treat every returned result as a claim until verified.
   the rule covers references meant for the displaced session-owned
   server.
   ✅ "each worktree pinned to its own persisted port, proxy and env
-  updated and reloaded; the page AND a request through the API proxy
-  both return this worktree's name; the temporary marker removed."
+  updated and reloaded; marker cleaned up; final non-mutating check:
+  the page AND a request through the API proxy both returned the
+  nonce recorded for this session."
   ❌ "every request is 200, so the proxy target must be my server."
 - Route by task: mechanical clear-spec work → cheapest capable model; user-facing
   output → high-taste model; reviews and hard debugging → strongest available.
