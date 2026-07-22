@@ -309,36 +309,48 @@ When rigor conflicts with finishing sooner, rigor wins.
   mtime audit; a second, independent output channel on the same task was
   separately dead on a stale hardcoded credential the whole time (`unprobed`
   — private incident as shape; see Provenance). Arming one, gates first:
-  a consequential send or spend needs its own per-invocation authorization
-  for every test fire, and the unattended recurrence needs an explicitly
-  scoped standing authorization — §2's confirmation-gate rule governs
-  both, and neither substitutes for the other. Verify the existing
-  non-interactive grants under the schedule's principal; creating or
-  broadening a credential is itself a §2-gated action, and with no safely
-  scoped grant the schedule stays unarmed. Then drive and attribute:
-  confirm the schedule's configured entry (command, arguments, trigger,
-  enabled) invokes the thing you are testing; run it headless under the
-  schedule's own execution context (principal, environment, working
-  directory) or watch one real scheduled fire; verify every output channel
-  at its destination with evidence correlated to that invocation — a
-  before/after state or a run-tied receipt; a fresh artifact another
-  writer could have produced proves nothing, and an async 2xx acceptance
-  is not delivery. Repeat the run for existing-output and lock behavior
-  (a sequential repeat cannot exercise overlap — test concurrency
-  deliberately or state it unverified, never by overlapping consequential
-  actions). Any unverified channel, or a run that needed a human to clear
-  a prompt, leaves the schedule unarmed. Ongoing: a dead task cannot
-  report its own death — check each destination on a cadence independent
-  of the task, against that channel's documented emission condition and
-  deadline (a task-written health line shows the task ran, not that
-  anything arrived; stale-or-uncheckable reads as unhealthy, never
-  healthy). Reviewing an existing schedule without authorization to run
-  it: inspect the evidence that already exists — per-channel artifacts,
-  receipts, output mtimes — and treat a green run history as evidence the
-  runner reported success, never that downstream received anything.
-  ✅ "confirmed the cron entry runs this script, fired it headless as the
-  cron user, correlated both channels' new evidence to that run, repeat
-  pass clean — then armed the schedule."
+  a consequential test fire (destructive, spending, publishing,
+  credential — §2's confirmation gate and its AUTH: artifact govern)
+  needs its own per-invocation authorization, and a schedule whose
+  unattended fires are themselves consequential needs §2's
+  project-policy-scoped standing authorization before running unattended
+  — a request to arm covers the arming, not those future fires, and a
+  permission or credential in place is not authorization (§2). Verify
+  the credentials the work actually needs under the schedule's
+  principal; minting or broadening one is itself §2-gated, and
+  session-only credentials do not travel to headless runs. Then drive
+  and attribute: read the schedule's configured entry — command,
+  arguments, trigger, and its enabled/disabled state, with recurrence
+  left disabled until arming completes — and confirm it invokes what you
+  are testing; fire once headless under the schedule's own execution
+  context (principal, environment, working directory) or watch one real
+  fire; check each channel against that invocation's emission condition:
+  run-tied evidence where it should emit (a before/after state, a
+  run-correlated receipt — a fresh artifact another writer could have
+  produced proves nothing, and an async 2xx acceptance is not delivery),
+  a justified condition-matched absence where it should not. Repeat the
+  run against its stated existing-output and lock expectations; where
+  runs can overlap, observe the mutual-exclusion guard block a dry
+  second entry. Armed means: every channel verified, no human cleared a
+  prompt mid-run, overlap guarded or impossible, and the independent
+  watch below in place — anything short stays unarmed. Ongoing: a dead
+  task cannot report its own death — watch each destination from outside
+  the schedule's own failure domain (scheduler, host, principal; where
+  full independence is unavailable, use at least a different trigger
+  path and name the shared-fate residue), against each channel's
+  documented emission condition and deadline; a task-written health line
+  shows the task ran, not that anything arrived; stale-or-uncheckable,
+  or a missed watch, is unhealthy and gets a defined response (alert,
+  disarm, escalate), never a shrug. Reviewing an existing schedule
+  without authorization to run it: inspect existing evidence
+  asymmetrically — stale evidence can refute; fresh evidence proves only
+  when tied to an invocation or an established exclusive writer,
+  otherwise it stays unverified — and a green run history is evidence
+  the runner reported success, never that downstream received anything.
+  ✅ "authorized the test fire; cron entry read and left disabled; fired
+  headless as the cron user; both channels' evidence tied to that run;
+  repeat met its stated expectations; lock blocked a dry second entry;
+  dead-man watch armed outside the host — then enabled the schedule."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
   silently-wrong value.** Honor an explicit, documented contract (a declared
