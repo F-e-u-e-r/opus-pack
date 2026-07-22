@@ -27,15 +27,27 @@ treat every returned result as a claim until verified.
   Tie-break intelligence > taste > cost. Model lineups are volatile facts: read
   the environment at session time, not memory.
 - **Labels are routes, listings are claims** (`unprobed` — private incidents
-  as shape; see Provenance). A wrapper CLI's model strings are its internal
-  routing names, not necessarily the provider's API model IDs — pasting one
-  into a direct API call or a pricing/quota lookup queries a name that may
-  not exist on the provider's side. And a model's presence in a lineup
-  listing does not prove it is callable: across two independent tools, a
-  listed entry failed hard on first real invocation. The listing is the
-  tool's routing claim; before building on a model, invoke it once and see
-  output.
-  ❌ "the CLI lists it, so it's available — route tomorrow's batch to it."
+  as shape; see Provenance). Two separate boundaries, each with its own
+  check. About to route work through a listed model: a lineup listing is
+  the tool's routing claim, not callability — across two independent
+  tools, a listed entry failed hard on first real invocation. Verify by
+  one invocation through the SAME wrapper and execution context the work
+  will use, and success means an attributable model response, not just
+  output (a ghost route can print diagnostics); an error or non-response
+  leaves the route unverified — do not dispatch dependent work on it
+  (§4's retry/escalation ladder governs), and a pass is session-scoped
+  per the volatile-lineups rule above. About to use a wrapper's model
+  string OUTSIDE the wrapper — a direct provider API call, a pricing or
+  quota lookup: the string is the wrapper's internal routing name, not
+  necessarily the provider's ID; do not cross that namespace until the
+  provider's own ID list or docs confirm the identifier (resolve the
+  mapping first — a working wrapper invocation proves nothing about the
+  provider-side name).
+  ✅ "invoked it once through the wrapper we dispatch with — real
+  completion came back; and for the quota check, looked the ID up in
+  the provider's model list instead of pasting the wrapper's alias."
+  ❌ "the CLI lists it, so it's available — route tomorrow's batch to
+  it."
 
 ## 2. The dispatch packet
 
