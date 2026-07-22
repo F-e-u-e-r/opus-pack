@@ -95,17 +95,26 @@ artifact-producing step.
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
 - **Capability-negative claims rot the worst** (`unprobed` — private incident
-  as shape; see Provenance). "No such flag", "only works interactively",
-  "the API can't do X" are version-scoped observations that read as timeless
+  as shape; see Provenance). About to write "no such flag", "only works
+  interactively", "the API can't do X" into an instruction file — or
+  about to act on one already there: these are version-scoped
+  observations that read as timeless
   rules. A stale positive claim fails loud the first time someone follows
   it; a stale negative fails silent — it steers every later session away
   from a capability that now exists, and nothing ever exercises it to
   expose the rot. One playbook's "model switching only works in the
   interactive UI; no flag" was actively wrong at the tool's current version
-  and had been routing sessions into a degraded path. Pin every
-  capability-negative to the version it was observed on, and re-verify it
-  (one `--help` or probe call) when the tool's version changes, before
-  repeating it.
+  and had been routing sessions into a degraded path. Writing one: pin
+  it to the version and probe it was observed on. Acting on one: read
+  its pin; the tool's version has changed, or the pin is missing →
+  re-verify with one probe (`--help`, a trial invocation) before
+  obeying it; probe unavailable or inconclusive → the capability is
+  unknown, not absent — record that where the claim is used and do not
+  repeat the negative as fact. Done when the claim carries its version
+  pin and the session acting on it has verified the pin against the
+  current version.
+  ✅ "playbook says no flag (pinned v0.2.98); current binary v0.2.101 —
+  ran --help: the flag exists now; corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."
 - Correct a stale rule in place — never append the correction below the old
   line. A zero-context reader obeys whichever sentence it reads first, not
@@ -175,7 +184,11 @@ artifact-producing step.
   drafting time. The check: grep the target file and its sibling skills
   (the skills shipped beside it — list the parent skills directory,
   don't recall it, and include each searched skill's references files
-  when the topic plausibly lives there; a router file like CLAUDE.md has
+  when the topic plausibly lives there; when the repo also carries
+  router or entry instruction files — CLAUDE.md, AGENTS.md, a memory
+  index — those join the search too, since a fact canonical in an
+  entry file makes any skill addition a second home; a router file
+  like CLAUDE.md as the TARGET has
   no siblings — its "siblings" are the files it points into) for the
   concept's name plus at least two alternates drawn from how the file
   might phrase it (the outcome it produces, the operation's other names,
@@ -207,8 +220,8 @@ artifact-producing step.
   conditions never assert absence.
   ✅ "grep for 'revert', 'rollback', 'undo' across the playbook and its
   two siblings returned nothing; read all three files end to end — the
-  rule exists in the playbook under 'restore'; the change record lists
-  the three terms and the three files, each 'read in full'."
+  rule exists in the playbook under 'restore': duplicate found, no
+  addition; cross-referenced the playbook's rule instead."
   ✅ "all searches empty — read both searched files end to end; recorded
   'not found under the searches and sections listed: revert, rollback,
   undo; playbook.md (read in full), helpers.md (read in full)' — then
@@ -305,7 +318,8 @@ placement applies at authoring start: the target answer (or a recorded
 `user-must-provide`) is required before the first artifact-producing
 step; this review is the enforcement backstop, and it blocks adoption
 when the answer is missing. Confirm the review record — the same
-artifact as §7's change record, verbatim: "the PR description or commit
+artifact class as the change record used elsewhere in this file: "the
+PR description or commit
 message when one is being created, otherwise the completion report" —
 names the target runtime(s): the execution environment (OS, container,
 sandbox) and any governing connector or tool instance. Not named →

@@ -6,8 +6,13 @@ precedent). Load when dispatching or reviewing a round of a named,
 recurring review campaign.
 
 **The artifact.** Every recurring campaign keeps ONE durable ledger file
-at a concrete repository-relative path, named in every round's packet
-(files are state; context is not). First pass: create it at that path
+at a concrete repository-relative path in the dispatching side's own
+repository — never inside a tree under review, whose settled or
+delivered state review rules forbid mutating — named in every round's
+packet (files are state; context is not). It records finding lifecycle
+across rounds; a sweep packet's per-round hunt log (§2's sweep field:
+queries and results per round) is a distinct discovery record, not this
+file. First pass: create it at that path
 with the campaign's stable identifier and its four empty categories —
 the packet says "first pass — ledger initialized at <path>". A one-off
 that later recurs adopts an identifier at its second dispatch and

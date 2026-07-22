@@ -47,20 +47,26 @@ treat every returned result as a claim until verified.
   repair a mismatch: choose a defense, apply its own persistence shape
   as above, update every session-local reference, restart or reload
   every consumer that read its target at startup, and never kill the
-  sibling's server — it is another session's work. Identity check,
-  LAST, after all mutations including cleanup: record the expected
-  marker for THIS session first (the worktree name it serves, a
-  session nonce noted before the request — a fresh nonce from the
-  wrong sibling still looks fresh; a content build id shared by
-  same-revision worktrees does not discriminate), then observe exact
-  equality with that recorded value THROUGH every relied session-local
-  consumer path (the API proxy included, not just the top page); a
-  listener check (`lsof`-style) is port discovery, never identity
-  evidence; any restart or reload after the check — a marker cleanup
-  included — voids it: re-prove without mutating. A temporarily served
-  marker is removed afterward and its removal verified against the
+  sibling's server — it is another session's work. Identity check
+  comes after every repair mutation (reference updates, restarts,
+  reloads): record the expected marker for THIS session first (the
+  worktree name it serves, a session nonce noted before the request —
+  a fresh nonce from the wrong sibling still looks fresh; a content
+  build id shared by same-revision worktrees does not discriminate),
+  then observe exact equality with that recorded value THROUGH every
+  relied session-local consumer path (the API proxy included, not
+  just the top page); a listener check (`lsof`-style) is port
+  discovery, never identity evidence. Marker cleanup is the one
+  mutation that follows the check — use a marker whose removal
+  restarts or reloads nothing (a static file, a debug endpoint's
+  echo), remove it, and verify the removal against the
   pre-instrumentation state (tracked, untracked, and ignored files —
-  the declared persistent port configuration stays).
+  the declared persistent port configuration stays); a marker that
+  cannot be removed without a restart or reload is the wrong marker —
+  pick one that can be. Any restart or reload after the check — a cleanup that
+  broke the rule above included — voids the identity: re-prove it
+  (serve a fresh marker, check, clean up again) before relying on
+  the routing.
   When a fanned-out preview misbehaves with all-green requests, check
   cross-port references — references still naming the shared configured
   port instead of this session's bound port — before debugging your own
@@ -70,9 +76,10 @@ treat every returned result as a claim until verified.
   the rule covers references meant for the displaced session-owned
   server.
   ✅ "each worktree pinned to its own persisted port, proxy and env
-  updated and reloaded; marker cleaned up; final non-mutating check:
-  the page AND a request through the API proxy both returned the
-  nonce recorded for this session."
+  updated and reloaded; identity check: the page AND a request
+  through the API proxy both returned the nonce recorded for this
+  session; then the marker file removed — no reload needed — and its
+  removal verified."
   ❌ "every request is 200, so the proxy target must be my server."
 - Route by task: mechanical clear-spec work → cheapest capable model; user-facing
   output → high-taste model; reviews and hard debugging → strongest available.
@@ -109,16 +116,18 @@ treat every returned result as a claim until verified.
   the tool's routing claim, not callability — across two independent
   tools, a listed entry failed hard on first real invocation. Verify by
   sending a fixed trivial prompt through the SAME wrapper, flags, auth,
-  and execution context the work will use; the pass is a model ANSWER to
-  that prompt naming the route where the wrapper reports one — wrapper
-  banners, usage text, diagnostics, or error pages are not answers, and
-  a wrapper that silently falls back to a default model passes only
-  wrapper reachability, not this route (check the wrapper's own route
-  report where it emits one; where it cannot say which model answered,
-  say the check proved reachability only). An error or non-answer
-  leaves the route unverified — do not dispatch dependent work on it
-  (§4's retry/escalation ladder governs), and a pass is session-scoped
-  per the volatile-lineups rule above. About to use a wrapper's model
+  and execution context the work will use; the pass is two observations
+  — a model ANSWER to that prompt, AND the wrapper's own route report
+  naming this route where the wrapper emits one — wrapper banners,
+  usage text, diagnostics, or error pages are not answers, and a
+  wrapper that silently falls back to a default model, or cannot say
+  which model answered, proves wrapper reachability only: the route
+  stays unverified. An error, a non-answer, or a route left unverified
+  — do not dispatch dependent work on it
+  (§4's retry/escalation ladder governs); and a pass expires with the
+  session — a later session re-runs the probe before dispatching on
+  it (re-reading the lineup, per the volatile-lineups rule above, is
+  a separate duty, never the re-verification). About to use a wrapper's model
   string OUTSIDE the wrapper — a direct provider API call, a pricing or
   quota lookup: the string is the wrapper's internal routing name, not
   necessarily the provider's ID — and the same spelling existing on the
@@ -166,9 +175,10 @@ Every packet names:
   category the prior round's pattern structurally excluded). Searching
   stays inside the packet's readable scope: a surface outside it is a
   reported gap, never a silent crossing. The packet carries the seed
-  inventory, the hunt method, and a per-round ledger duty — each
-  round's queries and results, empty ones included; the worker
-  continues the loop to closure. It also names the value family (the
+  inventory, the hunt method, and a per-round hunt-log duty — each
+  round's queries and results, empty ones included (a discovery
+  record, distinct from the recurring-campaign ledger field below);
+  the worker continues the loop to closure. It also names the value family (the
   tiers/variants the target ranges over), closed only by a
   verified-finite source (a sealed enum or const union read at its
   `file:line` — an extensible registry or config is never closed), else
@@ -194,7 +204,11 @@ Every packet names:
   effect at every inventoried generator surface, across each declared
   variation axis where the outcome can differ (tier, theme, locale —
   untested combinations are unobserved, reported as such) — render or
-  run each inside a side-effect-contained harness; every outward
+  run each inside a side-effect-contained harness with the effect's
+  producing condition driven true at that surface (the input, branch,
+  or state under which the defect appeared; a render on empty data or
+  a disabled branch observes nothing — that surface stays
+  unobserved); every outward
   effect keeps operational-rigor §2's per-invocation authorization at
   the moment it fires, and one you cannot safely and authorizedly
   drive (a payment, a send, a delete) is reported unverified and
@@ -232,14 +246,16 @@ Every packet names:
 - **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
-- **Recurring sweeps carry ledgers** (`unprobed` — private incident as shape;
+- **Recurring dispatches carry ledgers** (`unprobed` — private incident as shape;
   see Provenance). A field for RECURRING dispatches only — it never
   blocks a one-off. Fresh-context reviewers re-litigate a campaign's
   history: one re-raised a finding class an earlier round had refuted
   against the dependency's own source; another flagged as a defect the
   exact code a prior round had shipped as a fix. So a recurring packet
   names the campaign's stable identifier and its durable ledger file
-  (a concrete repository-relative path) holding four categories of
+  (a concrete repository-relative path in the dispatching side's own
+  repository — never inside a tree under review, whose settled or
+  delivered state review rules forbid mutating) holding four categories of
   records — prior fixes, refuted finding-classes, open findings,
   unresolved — reconciled against the enumerated prior-round reports;
   the full lifecycle, entry requirements, and refutation-scope rules
@@ -292,8 +308,8 @@ reviewers that they silently absorb as implementers.
   baseline over the whole protected read set, enforced-copy-or-frozen-
   tree surfaces, the two return comparisons, and recovery — is
   `references/settled-tree-review.md`: load it before dispatching a
-  read-only review wave over a tree that you, a hook, a user, or a
-  sibling process may touch while it reads. Verdicts bind only the
+  review wave — read-only or write-capable — over a tree that you, a
+  hook, a user, or a sibling process may touch while it reads. Verdicts bind only the
   exact state whose immutability was enforced; anything less runs
   provisional — never a clean gate pass.
   ✅ "loaded the reference, dispatched one enforced copy per critic,

@@ -3,8 +3,8 @@
 The dispatch protocol behind §3's settled-tree bullet (`unprobed` — see the
 skill's Provenance; this entry is the protocol body, placed here per the
 pack's split precedent so the skill's §3 stays lean). Load this file before
-dispatching a read-only review wave over a tree that you, a hook, a user,
-or a sibling process may touch while it reads.
+dispatching a review wave — read-only or write-capable — over a tree that
+you, a hook, a user, or a sibling process may touch while it reads.
 
 **Definitions.** The PROTECTED READ SET is the reviewed paths plus the
 wave's declared read scope — the dispatch packet DECLARES that scope, and
