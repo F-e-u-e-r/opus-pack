@@ -272,9 +272,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   the other a pre-filter. A trace you cannot inspect leaves that
   coverage unverified — say so. "There is a check called X" is a claim
   about naming, not behavior.
-  ✅ "traced check X: it asserts A and B against the real adapter, but
-  nothing in its path drives C — C is unverified."
+  ✅ "traced check X: it asserts A and B against the real adapter, and
+  run 1234's log shows that path executed; nothing in its path drives
+  C — C is unverified."
   ❌ "the change is safe, check X covers it" (named, never read).
+  ❌ "read the source — it asserts A — so the cited run covers A" (the
+  run had that test conditionally skipped; static coverage is not the
+  cited run's coverage).
   ❌ "read it — it's a regex pre-filter, but the name says integration,
   so the integration is covered" — a trace read and then overridden by
   the name.
