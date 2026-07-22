@@ -78,6 +78,31 @@ treat every returned result as a claim until verified.
   output → high-taste model; reviews and hard debugging → strongest available.
   Tie-break intelligence > taste > cost. Model lineups are volatile facts: read
   the environment at session time, not memory.
+- **A pinned model string does not pin behavior** (`unprobed` — private
+  incidents as shape; see Provenance). A routing or safety decision is
+  about to rely on a previously measured behavioral property of a
+  hosted model — an edge-safety rate, a failure signature, a latency
+  class: that property is not a durable attribute of the slug (hosted
+  endpoints drift behind identical strings — in the contributor's
+  harnesses, one CLI's edge-guard measurement flipped on re-measurement
+  with flag and battery unchanged, and a second vendor's reproduced
+  failure inverted to a pass days later, strings unchanged). Date-stamp
+  every such measurement where it is recorded; at decision time, re-run
+  the probe and cite the fresh result's timestamp and configuration —
+  the fresh result informs the routing, it never replaces §2's edge
+  specification and proof gate for the work itself, and no measurement
+  pins the endpoint's behavior on the next request. Probe unavailable
+  or failing → the property is unknown: route as if unguarded and spec
+  the edge per §2. Done when the decision record cites the fresh probe
+  (timestamp + configuration) or the unknown-property fallback — an
+  undated behavioral claim about a hosted endpoint is expired on
+  arrival.
+  ✅ "re-ran the edge battery this session, cited its timestamp in the
+  routing note, and specced the edge in the packet anyway."
+  ❌ "we already measured that model guarding this edge, so route the
+  edge-risky work to it" — any prior measurement reused for a routing
+  or safety decision without a decision-time re-run, last week's or
+  this morning's.
 
 ## 2. The dispatch packet
 
@@ -482,5 +507,21 @@ is verifiable by the contributor, not linkable here). Ships `unprobed` per
 the README covenant's second branch: no in-repo probe has run — a probe
 would need two live servers and a displaced port, a fixture this pack does
 not yet carry; the marker records that debt.
-Stable behavioral rules; re-check only
-worktree/agent mechanics against the current harness.
+The §1 pinned-string bullet (2026-07-22) generalizes two private incidents
+from one contributor's subordinate-CLI benchmarks: a pre-registered
+re-measurement of one CLI's unstated-edge guard rate, run one day after the
+original probe with the model flag and prompt battery unchanged, flipped
+the result enough to force retraction of the prior day's published
+regression claim; and a second vendor's endpoint, over twelve days behind
+unchanged model strings, inverted a reproduced infinite-loop failure into a
+fully guarded pass. Both are contributor-reported (private harnesses,
+verifiable by the contributor, not linkable here); benchmark rates are not
+restated, and the elapsed intervals are contributor-reported shape — cited
+per the README covenant, in-body `unprobed` marker. The executable probe
+debt is behavioral: fixture a stale dated measurement beside a changed
+same-slug probe result and observe whether a weak executor re-runs before
+routing — distinct from re-verifying the drift premise itself, which only
+longitudinal re-measurement of live endpoints can do.
+Stable behavioral rules; re-check
+worktree/agent mechanics and any recorded hosted-endpoint behavioral
+claims against the current environment.
