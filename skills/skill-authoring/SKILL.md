@@ -229,21 +229,34 @@ The sharpest usability probe is behavioral: give a fresh weaker-tier
 behavior down first, then patch the gaps the probe surfaces — not the ones
 you imagine.
 
-**Name the deployment runtime before the review concludes** (`unprobed` —
-private incident as shape; see Provenance). A skill or plugin verified only
-on the author's machine can pass every lens above and still be wrong where
-it will actually run: one reviewed-and-finalized skill was reworked
-wholesale when its real target — a sandboxed Linux VM, not the author's
-macOS — surfaced only after sign-off. Ask where it will run as a review
-input, not a deploy-time discovery, then sweep the file for assumptions
-that silently bind it to the author's machine: absolute paths (§2's rule),
-OS-specific launchers and helpers (URL-scheme opens, clipboard or
-notification tools), host identity, wall-clock and timezone, and
-hard-coded MCP tool names — a connector's tool prefix can be unique to the
-author's instance, so a distributable skill discovers its tools at runtime
-instead of naming one machine's. Done when the review names the target
-runtime(s) and each machine-bound assumption is either portable or labeled
-with the runtime it requires.
+**A skill or plugin is under review here and its target runtime(s) are
+not yet named in the review record — name them before the review
+concludes** (`unprobed` — private incident as shape; see Provenance). A
+skill verified only on the author's machine can pass every lens above and
+still be wrong where it will actually run: one reviewed-and-finalized
+skill was reworked wholesale when its real target — a sandboxed Linux VM,
+not the author's macOS — surfaced only after sign-off. Obtain the target
+from the request or the user; when no answer is available, mark the
+runtime `user-must-provide` and conclude without a portability verdict —
+never default to the authoring host. Then sweep for assumptions that
+silently bind the file to the author's machine: hard-coded
+machine-absolute paths (§2's rule), OS-specific launchers and helpers
+(URL-scheme opens, clipboard or notification tools), host identity (a
+literal hostname or username), wall-clock or timezone assumptions (a
+hard-coded TZ, a locale), and instance-specific tool identifiers — a
+connector's tool prefix can be unique to the author's instance: keep a
+verified portable name, or label the dependency with the runtime or
+instance it requires; when no verified discovery mechanism or portable
+form exists, that label is the honest outcome — never invent one. Done
+when every named target runtime is compatible with every kept
+assumption — a labeled incompatibility with a named target blocks
+completion or explicitly shrinks the supported target scope — and
+everything machine-bound carries its label.
+✅ "target: sandboxed Linux VM; the notify helper is macOS-only —
+replaced with a portable path; the connector prefix labeled
+instance-specific."
+❌ "labeled the launcher 'requires macOS' and concluded — while the
+named target is a Linux VM."
 
 Fix what blocks, then read back the final files to confirm they landed
 complete. When mining sessions or external material into skills, strip
