@@ -151,19 +151,26 @@ artifact-producing step.
   sibling instead. Each skill states **when NOT to use it** and which sibling
   to use.
 - **Keyword-grep absence is not absence** (`unprobed` — private incidents as
-  shape; see Provenance). The no-duplicate-homes rule above needs a dup-check
-  before every addition, and a grep that returns nothing is not that check:
-  an existing rule phrased differently from the search term produced three
-  false "not covered" verdicts in one week — one a proposed addition whose
-  content already sat in the target file under other wording, caught only
-  when the section was actually read at drafting time. Before concluding a
-  fact has no home, grep the target file AND its siblings for the concept's
-  synonyms, and when any hit lands near the topic — or the fact plausibly
-  belongs to an existing section — read that section in full first. A
-  "not covered" verdict cites the section read, not the grep that found
-  nothing.
-  ✅ "grepped 'revert', hit §3's regression bullet, read §3 — the rule is
-  already there under 'restore'; no addition needed."
+  shape; see Provenance). The no-duplicate-homes rule above needs a
+  dup-check before every addition, and an empty grep is not that check:
+  rules phrased differently from the search term repeatedly produced
+  false "not covered" verdicts (three in one week in the contributor's
+  private log; see Provenance) — one a proposed addition whose content
+  already sat in the target file under other wording, caught only by
+  reading the section at drafting time. The check: grep the target file
+  and its sibling skills (the other skills in the same set — list the
+  directory, don't recall it) for the concept's synonyms; then, hits or
+  none, name the candidate homes — every section a hit landed in, plus
+  every section the fact would live in if it existed — and read each
+  named section in full before any verdict. The addition's change record
+  carries the result line: the sections read, and either the duplicate
+  found or "not found under the searches and sections listed". A bare
+  "not covered" backed only by empty greps is the failure this rule
+  exists to stop; no candidate home nameable at all → the placement is
+  unresolved — escalate it, never assert absence.
+  ✅ "grep for 'revert' and two synonyms returned nothing; still read the
+  rollback-shaped sections end to end — the rule already exists under
+  'restore'; no addition needed."
   ❌ "grep returned nothing, so the file doesn't cover it."
 - **A cross-reference is not a load** (`unprobed` in-house; external
   evidence — see Provenance). On weak tiers, discovering that a sibling
