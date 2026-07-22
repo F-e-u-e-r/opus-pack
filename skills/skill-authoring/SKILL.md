@@ -216,7 +216,10 @@ artifact-producing step.
   re-runs those searches against the pre-addition text (the file at the
   revision the change branches from — never the edited working copy) and
   reads at least one candidate of their own choosing — on empty
-  searches, one searched file in full; a standalone not-covered verdict
+  searches, one searched file in full; a batch landing multiple
+  additions to the same file also searches the merged result across
+  the added hunks (two additions can duplicate each other while
+  neither exists in the base); a standalone not-covered verdict
   with no reviewer stays provisional in the report until a fresh-context
   reader without the author's session confirms it there. A bare "not
   covered" backed only by empty greps is the failure this rule exists to

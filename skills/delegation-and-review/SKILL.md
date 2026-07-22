@@ -98,20 +98,23 @@ treat every returned result as a claim until verified.
   with flag and battery unchanged, and a second vendor's reproduced
   failure inverted to a pass days later, strings unchanged). Date-stamp
   every such measurement where it is recorded; at decision time, re-run
-  the probe — its route first verified per the labels rule below (an
+  the probe — its battery responses route-attributed per the labels
+  rule below, not just a preceding trivial check (an
   unattributed answer measures an unknown model, not the slug's) —
   and cite the fresh result's timestamp and configuration —
   the fresh result informs the routing, it never replaces §2's edge
   specification and proof gate for the work itself, and no measurement
   pins the endpoint's behavior on the next request. Probe unavailable
-  or failing → the property is unknown: route as if unguarded and spec
+  or failing → the property is unknown: route as if the property were
+  absent (no edge guard, no latency class, no failure signature) and spec
   the edge per §2. Done when the decision record cites the fresh probe
   (timestamp + configuration, its route attributed per the labels
   rule below) or the unknown-property fallback — an
   undated behavioral claim about a hosted endpoint is expired on
   arrival, and an unattributed probe never satisfies the citation.
   ✅ "re-ran the edge battery this session — the wrapper's route line
-  named the slug — cited its timestamp in the
+  named the slug as what answered each response — cited its timestamp
+  in the
   routing note, and specced the edge in the packet anyway."
   ❌ "we already measured that model guarding this edge, so route the
   edge-risky work to it" — any prior measurement reused for a routing
@@ -127,15 +130,25 @@ treat every returned result as a claim until verified.
   — a model ANSWER to that prompt, AND the wrapper's own route report
   naming this route as what ANSWERED (a banner echoing the requested
   slug is configuration, not attribution) — wrapper banners,
-  usage text, diagnostics, or error pages are not answers. A wrapper
-  WITH an attribution channel whose report is missing, ambiguous, or
-  names a silent fallback leaves the route unverified — like an error
-  or a non-answer, do not dispatch dependent work on it
-  (§4's retry/escalation ladder governs). A wrapper with NO
-  attribution channel by design can only ever yield a
+  usage text, diagnostics, or error pages are not answers. Channel
+  presence is established, never assumed: the wrapper's docs or config
+  declaring a what-answered report, or a prior same-wrapper invocation
+  that emitted one, establishes the channel; NO-channel-by-design is
+  established only by that same evidence positively showing none
+  exists. Channel established but this invocation's report missing,
+  ambiguous, or naming a silent fallback → the route is unverified —
+  like an error or a non-answer, do not dispatch dependent work on it
+  (§4's retry/escalation ladder governs); channel presence UNKNOWN →
+  the same, fail closed. Only a wrapper positively established as
+  never emitting attribution yields the
   reachability-only pass: the route stays unattributed — record that
   limit wherever the pass is cited, and dependent dispatch on it
-  carries the recorded limitation, never a verified-route claim. A
+  carries the recorded limitation, never a verified-route claim.
+  ✅ "wrapper docs define no route field and no invocation has ever
+  emitted one — recorded 'reachability-only, route unattributed' in
+  the dispatch note and proceeded on that recorded limit."
+  ❌ "no route line this time — must not have a channel; dispatched"
+  (unknown channel presence is a block, not a downgrade). A
   pass expires with the
   session — a later session re-runs the probe before dispatching on
   it (re-reading the lineup, per the volatile-lineups rule above, is
@@ -177,7 +190,9 @@ Every packet names:
   that construct or return it. Hunt generators per §3's miss-is-costly
   loop — its finders quoted verbatim: "Run axis-diverse finders — by-
   container, by-content, by-entity, by-time — one axis per finder so
-  blind spots don't line up", with dedup against everything surfaced
+  blind spots don't line up", with its dedup clause verbatim — "Dedup
+  new findings against everything ever surfaced, including ones
+  already rejected: dedup against confirmed-only never converges" —
   and its two-consecutive-empty-rounds stop rule — and at least one
   producer/effect axis (what shared definitions and constructors can
   produce this kind of output) MUST run before the loop may close: a

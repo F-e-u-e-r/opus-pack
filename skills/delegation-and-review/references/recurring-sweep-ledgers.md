@@ -55,7 +55,10 @@ REFUTED FINDING-CLASSES carrying the counterexample; a PRIOR-FIXES
 entry re-flagged this round with evidence the fix failed, regressed,
 or left a residual spawns a NEW OPEN finding carrying that evidence,
 the historical entry staying put with a pointer to it; everything else
-stays where it is.
+stays where it is. Write-backs of one campaign serialize: a round's
+write-back completes before the next round dispatches; concurrent
+writers over one ledger follow §4's edit-conflict rule (re-read,
+re-anchor — never last-writer-wins).
 
 **Two phases, two checks.** Dispatch-time (the §2 field's readiness):
 the packet names the ledger path and campaign identifier, and the
