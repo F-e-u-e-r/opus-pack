@@ -237,34 +237,46 @@ will actually run: one reviewed-and-finalized skill was reworked
 wholesale when its real target — a sandboxed Linux VM, not the author's
 macOS — surfaced only after sign-off. The target question belongs at
 authoring start (§1's gate placement: ask before the first
-artifact-producing step); this review verifies the answer landed and
-the sweep ran. Confirm the review record — the same artifact as §7's
-change record (the PR description or commit message, else the
-completion report) — names the target runtime(s): the execution
-environment (OS, container, sandbox) and any governing connector or
-tool instance. Not named → obtain it from the request or the user; no
-answer → write `user-must-provide` in the record, and adoption stays
-blocked until the owner resolves or explicitly defers it. Named or
+artifact-producing step); this review cannot retro-place that ask — it
+verifies the answer exists and blocks adoption when it does not.
+Confirm the review record — the same artifact as §7's change record,
+verbatim: "the PR description or commit message when one is being
+created, otherwise the completion report" — names the target
+runtime(s): the execution environment (OS, container, sandbox) and any
+governing connector or tool instance; a sweep that finds nothing
+machine-bound may record `runtime-agnostic` as the named outcome. Not
+named → obtain it from the requester; no answer → write
+`user-must-provide` in the record, and adoption stays blocked until
+the requester either supplies the target or records an explicit
+risk-acceptance deferral — silence is neither, and an empty target
+list never satisfies the compatibility check below vacuously. Named or
 not, always run the sweep for assumptions that silently bind the file
-to the author's machine: hard-coded machine-absolute paths get §2's
-remedy (anchor to the VCS root — a label never keeps one); OS-specific
+to the author's machine: an accidentally machine-local repository path
+gets §2's remedy, verbatim ("Anchor to the VCS root (`git rev-parse
+--show-toplevel`) and verify the path prefix before reading"), while
+an absolute path the target itself defines (a socket, device, or
+mount) is a machine-bound assumption like the rest; OS-specific
 launchers and helpers (URL-scheme opens, clipboard or notification
 tools), host identity (a literal hostname or username), wall-clock or
 timezone assumptions (a hard-coded TZ, a locale), and
 instance-specific tool identifiers (a connector's tool prefix can be
-unique to the author's instance) each keep a verified portable form or
-carry a label naming the exact runtime or instance required; when no
-verified portable form exists, that named label is the honest outcome
-— never an invented mechanism. Done when every named target runtime is
-compatible with every kept assumption — a labeled incompatibility with
-the actual deployment target blocks completion, and shrinking the
-supported scope can only exclude an optional target with the user's
-explicit say — and everything machine-bound carries its named label in
-the record.
+unique to the author's instance) each keep a verified portable form,
+or stay behind a verified target-scoped dispatch (an OS-conditional
+branch counts as compatible with targets that never reach it), or
+carry a label naming the exact runtime or instance required — written
+IN the skill file beside the dependency (§2's embed-the-knowledge; the
+review record points to it), verified against that instance where
+reachable and marked `unverified` (§2) where not: a label records a
+limitation, never proves compatibility. Done when every named target
+runtime is compatible with every assumption reachable on it — a
+labeled incompatibility with the actual deployment target blocks
+completion, and shrinking the supported scope can only exclude an
+optional target with the requester's explicit say — and everything
+machine-bound carries its named label in the file.
 ✅ "target: sandboxed Linux VM plus the team's shared connector
 instance; the macOS-only notify helper replaced with the project's CLI
-logger and run once on the target image; the connector prefix labeled
-'requires the shared instance'."
+logger; the connector prefix labeled in-file 'requires the shared
+instance' and resolved against it."
 ❌ "labeled the launcher 'requires macOS' and concluded — while the
 named target is a Linux VM."
 
