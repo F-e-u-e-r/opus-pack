@@ -302,55 +302,22 @@ When rigor conflicts with finishing sooner, rigor wins.
   (contract holds under adversarial input). Only correct permits "done".
 - Never fabricate observations or report outputs not produced. Report skipped
   verification as skipped.
-- **A recurring scheduled process's own "completed" report is not evidence its
-  side effects landed.** A weekly task reported success for roughly three
-  months while its write step silently never executed — every output file's
-  mtime frozen at the date the write path broke, caught only by an unrelated
-  mtime audit; a second, independent output channel on the same task was
-  separately dead on a stale hardcoded credential the whole time (`unprobed`
-  — private incident as shape; see Provenance). Arming one, gates first:
-  a consequential test fire (destructive, spending, publishing,
-  credential — §2's confirmation gate and its AUTH: artifact govern)
-  needs its own per-invocation authorization, and a schedule whose
-  unattended fires are themselves consequential needs §2's
-  project-policy-scoped standing authorization before running unattended
-  — a request to arm covers the arming, not those future fires, and a
-  permission or credential in place is not authorization (§2). Verify
-  the credentials the work actually needs under the schedule's
-  principal; minting or broadening one is itself §2-gated, and
-  session-only credentials do not travel to headless runs. Then drive
-  and attribute: read the schedule's configured entry — command,
-  arguments, trigger, and its enabled/disabled state, with recurrence
-  left disabled until arming completes — and confirm it invokes what you
-  are testing; fire once headless under the schedule's own execution
-  context (principal, environment, working directory) or watch one real
-  fire; check each channel against that invocation's emission condition:
-  run-tied evidence where it should emit (a before/after state, a
-  run-correlated receipt — a fresh artifact another writer could have
-  produced proves nothing, and an async 2xx acceptance is not delivery),
-  a justified condition-matched absence where it should not. Repeat the
-  run against its stated existing-output and lock expectations; where
-  runs can overlap, observe the mutual-exclusion guard block a dry
-  second entry. Armed means: every channel verified, no human cleared a
-  prompt mid-run, overlap guarded or impossible, and the independent
-  watch below in place — anything short stays unarmed. Ongoing: a dead
-  task cannot report its own death — watch each destination from outside
-  the schedule's own failure domain (scheduler, host, principal; where
-  full independence is unavailable, use at least a different trigger
-  path and name the shared-fate residue), against each channel's
-  documented emission condition and deadline; a task-written health line
-  shows the task ran, not that anything arrived; stale-or-uncheckable,
-  or a missed watch, is unhealthy and gets a defined response (alert,
-  disarm, escalate), never a shrug. Reviewing an existing schedule
-  without authorization to run it: inspect existing evidence
-  asymmetrically — stale evidence can refute; fresh evidence proves only
-  when tied to an invocation or an established exclusive writer,
-  otherwise it stays unverified — and a green run history is evidence
-  the runner reported success, never that downstream received anything.
-  ✅ "authorized the test fire; cron entry read and left disabled; fired
-  headless as the cron user; both channels' evidence tied to that run;
-  repeat met its stated expectations; lock blocked a dry second entry;
-  dead-man watch armed outside the host — then enabled the schedule."
+- **Arming, enabling, relying on, or reviewing a recurring scheduled
+  process → its side effects are unverified until checked at their
+  destinations; the process's own "completed" report is not that
+  evidence** (`unprobed` — private incident as shape; see Provenance). A
+  weekly task reported success for roughly three months while its write
+  step silently never executed, and a second output channel on the same
+  task was separately dead on a stale hardcoded credential the whole
+  time. The arming and audit protocol is the scheduled-process entry in
+  `references/external-systems.md` — load it before arming, enabling,
+  or auditing one. A green run history is evidence the runner reported
+  success, never that downstream received anything (the earlier
+  exit-code line governs the immediate command you just ran; a
+  schedule's downstream is this rule).
+  ✅ "loaded the reference, drove both channels emission-positive tied
+  to the test fire, dead-man alarm proven once — then enabled the
+  schedule."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
   silently-wrong value.** Honor an explicit, documented contract (a declared
@@ -367,7 +334,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   - ✅ blank / `—` when genuinely unknown. ❌ "null rate → show 0% so the chart
     still renders."
 - **Building, configuring, or verifying work that crosses a boundary into an
-  external tool, cache, fallback chain, clock/timezone, or deploy target? Load
+  external tool, cache, fallback chain, clock/timezone, deploy target, or
+  recurring schedule? Load
   `references/external-systems.md`.** Each of those boundaries reports success
   while lying about it in a specific, incident-backed way; the reference holds
   the verify-before-trust rule for each — exit-code contracts (a tool that
@@ -596,7 +564,11 @@ the same task was separately dead the entire time on a stale hardcoded
 credential (contributor-reported shape; the private repo is verifiable by the
 contributor, not linkable here). It ships `unprobed` — the pack's private
 fixtures have no long-running-schedule arm to drive it; the marker records
-that debt, not an exemption.
+that debt, not an exemption. The protocol body lives in
+`references/external-systems.md` (its scheduled-process entry) per the
+2026-07-14 split precedent — boundary-specific protocols out of the lean
+core; the §4 bullet keeps the trigger, the claim, the incident shape, and
+the pointer.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

@@ -1,7 +1,8 @@
 # operational-rigor · references: external-systems
 
 Verify-before-trust rules for work that crosses a boundary into an external
-tool, cache, fallback chain, timezone/clock, or deploy target. These are NOT
+tool, cache, fallback chain, timezone/clock, deploy target, or recurring
+schedule. These are NOT
 core discipline — each is an incident-backed trap specific to one boundary,
 where the boundary *reports success while lying about it* in a particular way,
 and the rule names the observation that catches it. They live here, out of the
@@ -111,6 +112,60 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   and importing it — dev-mode resolvers prove nothing about production module
   loading.
 
+- **A recurring schedule's own "completed" report is not evidence its side
+  effects landed — verify at the destinations, attributed to the
+  invocation.** (Motivating incident: a weekly task reported success for
+  roughly three months while its write step silently never executed; a
+  second output channel on the same task was separately dead on a stale
+  hardcoded credential — contributor-reported shape; see the skill's
+  Provenance.) Gates first: every consequential invocation — the repeat
+  run below included — carries its own per-invocation authorization
+  (destructive / spending / publishing / credential: operational-rigor
+  §2's confirmation gate and verbatim AUTH: artifact govern), and a
+  schedule whose unattended fires are themselves consequential needs §2's
+  project-policy-scoped standing authorization before running unattended;
+  a request to arm covers the arming, not those future fires; a
+  permission or credential in place is not authorization. Verify the
+  credentials the work actually needs under the schedule's principal;
+  minting or broadening one is itself gated; session-only credentials do
+  not travel to headless runs. Drive and attribute: read the configured
+  entry (command, arguments, trigger, enabled/disabled state) and confirm
+  it invokes what you test; recurrence stays disabled while arming — fire
+  the entry once yourself, headless, under the schedule's execution
+  context, meaning principal AND environment AND working directory
+  (running interactively as the right user can carry a session credential
+  the real schedule lacks — the incident's dead channel); "watch one real
+  fire" establishes scheduler binding only on an already-enabled schedule
+  you hold observation authority over. Verify each channel with its
+  emission condition driven TRUE at least once: run-tied destination
+  evidence (a before/after state, a run-correlated receipt; a fresh
+  artifact another writer could have produced proves nothing; an async
+  2xx acceptance is not delivery) — a condition-matched absence verifies
+  only the suppression branch, never the channel. Repeat the run (its own
+  grant if consequential) against stated existing-output and lock
+  expectations; a hung run overlaps the next fire regardless of average
+  runtime, so where overlap is possible the second entry must traverse
+  the real lock-acquisition path while the first holds the guard —
+  "impossible" means scheduler-enforced non-concurrency, not short
+  runtime. Armed means: every channel emission-positive-verified; no
+  human cleared a prompt mid-run; overlap guarded or scheduler-excluded;
+  the watch below armed and its alarm proven once. Anything short stays
+  unarmed. Ongoing: a dead task cannot report its own death, and a
+  watcher that can die silently moves the problem one layer down —
+  terminate the chain in a mechanism whose alarm fires on ABSENCE by
+  construction (an externally enforced missed-deadline alert), outside
+  the schedule's failure domain (scheduler, host, principal; where full
+  independence is unavailable, the nearest different trigger path, with
+  the shared-fate residue named); key it to each channel's documented
+  emission condition and deadline; prove it once by skipping a ping. A
+  task-written health line shows the task ran, not that anything arrived;
+  stale, uncheckable, or a missed watch is unhealthy and gets the defined
+  response (alert, disarm, escalate), never a shrug. Reviewing an
+  existing schedule without authorization to run it: inspect existing
+  evidence asymmetrically — stale evidence can refute; fresh evidence
+  proves only when tied to an invocation or an established exclusive
+  writer; otherwise it stays unverified.
+
 ## Provenance
 
 These six rules are the 2026-07-13 external-systems batch, mined from five
@@ -129,7 +184,14 @@ error-cooldown cache state, typed advance-signal vs. valid empty, executed
 DST gap/fold cases, and the durable-handoff scope of "await side effects" —
 trail in `reviews/2026-07-16-post-merge-validation-pr25-29.md`.
 
+The scheduled-process entry (2026-07-22) is the protocol body of the §4
+scheduled-process rule added in opus-pack #49 — placed here per the
+2026-07-14 split precedent (boundary-specific protocols out of the lean
+core); its incident provenance and `unprobed` marker live with that rule in
+the skill's Provenance.
+
 Environment-specific facts to re-verify against current tooling: a tool's
 exit-code table (qpdf's), real success-latency distributions, cache TTL/state
 semantics, fallback-provider quotas, date-constructor normalization + TZ/DST
-behavior, and serverless lifecycle + bundler file-tracing.
+behavior, serverless lifecycle + bundler file-tracing, and scheduler
+concurrency/one-shot semantics.
