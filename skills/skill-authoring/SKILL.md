@@ -229,32 +229,42 @@ The sharpest usability probe is behavioral: give a fresh weaker-tier
 behavior down first, then patch the gaps the probe surfaces — not the ones
 you imagine.
 
-**A skill or plugin is under review here and its target runtime(s) are
-not yet named in the review record — name them before the review
-concludes** (`unprobed` — private incident as shape; see Provenance). A
-skill verified only on the author's machine can pass every lens above and
-still be wrong where it will actually run: one reviewed-and-finalized
-skill was reworked wholesale when its real target — a sandboxed Linux VM,
-not the author's macOS — surfaced only after sign-off. Obtain the target
-from the request or the user; when no answer is available, mark the
-runtime `user-must-provide` and conclude without a portability verdict —
-never default to the authoring host. Then sweep for assumptions that
-silently bind the file to the author's machine: hard-coded
-machine-absolute paths (§2's rule), OS-specific launchers and helpers
-(URL-scheme opens, clipboard or notification tools), host identity (a
-literal hostname or username), wall-clock or timezone assumptions (a
-hard-coded TZ, a locale), and instance-specific tool identifiers — a
-connector's tool prefix can be unique to the author's instance: keep a
-verified portable name, or label the dependency with the runtime or
-instance it requires; when no verified discovery mechanism or portable
-form exists, that label is the honest outcome — never invent one. Done
-when every named target runtime is compatible with every kept
-assumption — a labeled incompatibility with a named target blocks
-completion or explicitly shrinks the supported target scope — and
-everything machine-bound carries its label.
-✅ "target: sandboxed Linux VM; the notify helper is macOS-only —
-replaced with a portable path; the connector prefix labeled
-instance-specific."
+**A skill or plugin is under this section's review — verify its
+deployment runtime before the review concludes** (`unprobed` — private
+incident as shape; see Provenance). A skill verified only on the
+author's machine can pass every lens above and still be wrong where it
+will actually run: one reviewed-and-finalized skill was reworked
+wholesale when its real target — a sandboxed Linux VM, not the author's
+macOS — surfaced only after sign-off. The target question belongs at
+authoring start (§1's gate placement: ask before the first
+artifact-producing step); this review verifies the answer landed and
+the sweep ran. Confirm the review record — the same artifact as §7's
+change record (the PR description or commit message, else the
+completion report) — names the target runtime(s): the execution
+environment (OS, container, sandbox) and any governing connector or
+tool instance. Not named → obtain it from the request or the user; no
+answer → write `user-must-provide` in the record, and adoption stays
+blocked until the owner resolves or explicitly defers it. Named or
+not, always run the sweep for assumptions that silently bind the file
+to the author's machine: hard-coded machine-absolute paths get §2's
+remedy (anchor to the VCS root — a label never keeps one); OS-specific
+launchers and helpers (URL-scheme opens, clipboard or notification
+tools), host identity (a literal hostname or username), wall-clock or
+timezone assumptions (a hard-coded TZ, a locale), and
+instance-specific tool identifiers (a connector's tool prefix can be
+unique to the author's instance) each keep a verified portable form or
+carry a label naming the exact runtime or instance required; when no
+verified portable form exists, that named label is the honest outcome
+— never an invented mechanism. Done when every named target runtime is
+compatible with every kept assumption — a labeled incompatibility with
+the actual deployment target blocks completion, and shrinking the
+supported scope can only exclude an optional target with the user's
+explicit say — and everything machine-bound carries its named label in
+the record.
+✅ "target: sandboxed Linux VM plus the team's shared connector
+instance; the macOS-only notify helper replaced with the project's CLI
+logger and run once on the target image; the connector prefix labeled
+'requires the shared instance'."
 ❌ "labeled the launcher 'requires macOS' and concluded — while the
 named target is a Linux VM."
 
