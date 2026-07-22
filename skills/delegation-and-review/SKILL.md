@@ -103,6 +103,38 @@ treat every returned result as a claim until verified.
   edge-risky work to it" — any prior measurement reused for a routing
   or safety decision without a decision-time re-run, last week's or
   this morning's.
+- **Labels are routes, listings are claims** (`unprobed` — private incidents
+  as shape; see Provenance). Two separate boundaries, each with its own
+  check. About to route work through a listed model: a lineup listing is
+  the tool's routing claim, not callability — across two independent
+  tools, a listed entry failed hard on first real invocation. Verify by
+  sending a fixed trivial prompt through the SAME wrapper, flags, auth,
+  and execution context the work will use; the pass is a model ANSWER to
+  that prompt naming the route where the wrapper reports one — wrapper
+  banners, usage text, diagnostics, or error pages are not answers, and
+  a wrapper that silently falls back to a default model passes only
+  wrapper reachability, not this route (check the wrapper's own route
+  report where it emits one; where it cannot say which model answered,
+  say the check proved reachability only). An error or non-answer
+  leaves the route unverified — do not dispatch dependent work on it
+  (§4's retry/escalation ladder governs), and a pass is session-scoped
+  per the volatile-lineups rule above. About to use a wrapper's model
+  string OUTSIDE the wrapper — a direct provider API call, a pricing or
+  quota lookup: the string is the wrapper's internal routing name, not
+  necessarily the provider's ID — and the same spelling existing on the
+  provider side proves nothing (an alias can collide with a different
+  provider model). Resolve the alias → provider-ID mapping from the
+  wrapper's OWN config, docs, or request trace, then validate that
+  resulting ID with the provider; mapping unresolved → the namespace
+  crossing stays blocked.
+  ✅ "sent 'reply OK' through the wrapper we dispatch with — the model
+  answered and the wrapper's route line named it; for the quota check,
+  read the wrapper config's alias map to get the provider ID, then
+  confirmed that ID in the provider's model list."
+  ❌ "the CLI lists it, so it's available — route tomorrow's batch to
+  it."
+  ❌ "the wrapper call worked and the alias exists in the provider's
+  list, so they're the same model."
 
 ## 2. The dispatch packet
 
@@ -554,6 +586,19 @@ has not been run; the in-body `unprobed` marker records that debt. The
 lifecycle body lives in `references/recurring-sweep-ledgers.md` per the
 pack's split precedent; the §2 field keeps the trigger, the claim, the
 category names, and the pointer.
+The §1 labels-and-listing rule (2026-07-22) comes from two private
+incidents in one contributor's subordinate tooling: a model entry listed
+by one wrapper CLI's lineup failed hard on its first real invocation (the
+second such ghost entry observed across two independent tools), and a
+session caught itself about to treat another wrapper's model strings as
+provider API IDs for a quota lookup before verifying they are the
+wrapper's internal routing names. Private evidence, cited as shape per
+the README covenant's second branch; two probes owed, one per boundary —
+invoke every listed model once and diff claimed-vs-callable (the listing
+half), and seed an alias-collision fixture and observe whether the
+mapping is resolved before a namespace crossing (the provider-ID half);
+neither has run in-repo, and the in-body `unprobed` marker stands until
+both have.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
