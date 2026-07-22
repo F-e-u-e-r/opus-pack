@@ -200,6 +200,25 @@ Every packet names:
 - **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
+- **Recurring sweeps carry ledgers** (`unprobed` — private incident as shape;
+  see Provenance). A field for RECURRING dispatches only — it never
+  blocks a one-off. Fresh-context reviewers re-litigate a campaign's
+  history: one re-raised a finding class an earlier round had refuted
+  against the dependency's own source; another flagged as a defect the
+  exact code a prior round had shipped as a fix. So a recurring packet
+  names the campaign's stable identifier and its durable ledger file
+  (a concrete repository-relative path) holding four categories of
+  records — prior fixes, refuted finding-classes, open findings,
+  unresolved — reconciled against the enumerated prior-round reports;
+  the full lifecycle, entry requirements, and refutation-scope rules
+  are `references/recurring-sweep-ledgers.md`: load it when
+  dispatching or reviewing a recurring round. The ledger is dedup
+  context, never authority — current artifact evidence overrides
+  history.
+  ✅ "packet names styling-sweep-2026Q3 and reviews/styling-ledger.md,
+  reconciled item-by-item against rounds 1-2's reports."
+  ❌ "the reviewer gets fresh context each round, so the packet doesn't
+  need the sweep's history."
 - **Rules** — do not merge, weaken gates, or revert unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
   For an implementation task, after bounded discovery (interfaces read, ambiguity
@@ -522,6 +541,19 @@ debt is behavioral: fixture a stale dated measurement beside a changed
 same-slug probe result and observe whether a weak executor re-runs before
 routing — distinct from re-verifying the drift premise itself, which only
 longitudinal re-measurement of live endpoints can do.
+The §2 recurring-sweep ledgers rule (2026-07-22) comes from a private
+incident: across iterations of a repeated review sweep, one reviewer
+re-raised a finding class an earlier iteration had refuted against the
+dependency's source, and a second flagged as a defect the exact code an
+earlier iteration had shipped as a fix; a do-not-re-flag block already
+present in one packet prevented exactly this on its surfaces, and both
+misses occurred where the block was absent. Private evidence, cited as
+shape per the README covenant's second branch; the executable probe — the
+same sweep run with and without ledgers, counting re-litigated findings —
+has not been run; the in-body `unprobed` marker records that debt. The
+lifecycle body lives in `references/recurring-sweep-ledgers.md` per the
+pack's split precedent; the §2 field keeps the trigger, the claim, the
+category names, and the pointer.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
