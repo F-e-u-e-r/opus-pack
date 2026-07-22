@@ -304,8 +304,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   verification as skipped.
 - **Arming, enabling, relying on, or reviewing a recurring scheduled
   process → its side effects are unverified until checked at their
-  destinations; the process's own "completed" report is not that
-  evidence** (`unprobed` — private incident as shape; see Provenance). A
+  destinations, attributed to the invocation; the process's own
+  "completed" report is not that evidence** (`unprobed` — private
+  incident as shape; see Provenance). A
   weekly task reported success for roughly three months while its write
   step silently never executed, and a second output channel on the same
   task was separately dead on a stale hardcoded credential the whole
@@ -316,9 +317,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   success, never that downstream received anything (the earlier
   exit-code line governs the immediate command you just ran; a
   schedule's downstream is this rule).
-  ✅ "loaded the reference, drove every channel emission-positive tied
-  to the test fire, destination watch proven once — then enabled the
-  schedule."
+  ✅ "authorized the fires; drove every channel emission-positive tied
+  to them; absence alarm proven once — then enabled the schedule."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
   silently-wrong value.** Honor an explicit, documented contract (a declared

@@ -114,11 +114,12 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
 
 - **A recurring schedule's own "completed" report is not evidence its side
   effects landed — verify at the destinations, attributed to the
-  invocation.** (Motivating incident: a weekly task reported success for
-  roughly three months while its write step silently never executed; a
-  second output channel on the same task was separately dead on a stale
-  hardcoded credential — contributor-reported shape; see the skill's
-  Provenance.) Gates first: every consequential invocation — the repeat
+  invocation** (`unprobed` — see the skill's Provenance). (Motivating
+  incident: a weekly task reported success for roughly three months
+  while its write step silently never executed; a second output channel
+  on the same task was separately dead on a stale hardcoded credential —
+  contributor-reported shape.) Gates first: every consequential
+  invocation — the repeat
   run below included — carries its own per-invocation authorization
   (destructive / spending / publishing / credential — operational-rigor
   §2's confirmation gate governs: its per-invocation grant, plus its
@@ -131,45 +132,63 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   minting or broadening one is itself gated; session-only credentials do
   not travel to headless runs. Drive and attribute: read the configured
   entry (command, arguments, trigger, enabled/disabled state) and confirm
-  it invokes what you test; recurrence stays disabled while arming — fire
-  the entry once yourself, headless, under the schedule's execution
-  context, meaning principal AND environment AND working directory
-  (running interactively as the right user can carry a session credential
-  the real schedule lacks — the incident's dead channel); "watch one real
-  fire" establishes scheduler binding only on an already-enabled schedule
-  you hold observation authority over. Verify each channel with its
-  emission condition driven TRUE at least once: run-tied destination
-  evidence (a before/after state, a run-correlated receipt; a fresh
-  artifact another writer could have produced proves nothing; an async
-  2xx acceptance is not delivery) — a condition-matched absence verifies
-  only the suppression branch, never the channel. Repeat the run (its own
-  grant if consequential) against stated existing-output and lock
-  expectations; a hung run overlaps the next fire regardless of average
-  runtime, so where overlap is possible the second entry must traverse
-  the real lock-acquisition path while the first holds the guard —
-  "impossible" means scheduler-enforced non-concurrency, not short
-  runtime. Armed means: every channel emission-positive-verified; no
-  human cleared a prompt mid-run; overlap guarded or scheduler-excluded;
-  the watch below armed and proven once. Anything short stays unarmed —
-  and enabling is not the end: scheduler binding stays an open claim
-  until the first scheduler-originated fire lands its attributed
-  effects by its deadline (the watch's first cycle checks exactly
-  that). Ongoing: a dead task cannot report its own death, and a
-  watcher that can die silently moves the problem one layer down —
-  terminate the chain in a mechanism whose alarm fires on ABSENCE by
-  construction (an externally enforced missed-deadline alert), outside
-  the schedule's failure domain (scheduler, host, principal; where full
-  independence is unavailable, the nearest different trigger path, with
-  the shared-fate residue named). Its signal derives from
-  destination-observed state or receipts, never from a ping the task
-  itself writes — a live task with a dead write step keeps pinging
-  green; key it to each channel's documented emission condition and
-  deadline, and prove it once by withholding a destination effect while
-  the task still runs. A task-written health line shows the task ran,
-  not that anything arrived; stale, uncheckable, or a missed watch is
-  unhealthy and gets the response documented and authorized at arming
-  time (absent one, the safe default is alert only — disarming or
-  escalating needs its own authorization), never a shrug. Reviewing an
+  it invokes what you test, then trace the invoked task's own config,
+  code, or runbook into a channel inventory — each destination, emission
+  condition, deadline, and credential; the scheduler entry names the
+  script, not the channels, and the incident's second channel (with its
+  stale hardcoded credential) lived in the task's own config. Recurrence
+  stays disabled while arming — fire the entry once yourself, headless,
+  under the schedule's execution context, meaning principal AND
+  environment AND working directory (running interactively as the right
+  user can carry a session credential the real schedule lacks — a
+  related trap, distinct from the incident's); "watch one real fire"
+  establishes scheduler binding only on an already-enabled schedule you
+  hold observation authority over. Verify each inventoried channel with
+  its emission condition driven TRUE at least once: destination evidence
+  carrying that invocation's identifier where the channel supports one,
+  else a before/after transition plus confirmation that no other
+  eligible invocation ran in the window (a fresh artifact another writer
+  or run could have produced proves nothing; an async 2xx acceptance is
+  not delivery) — a condition-matched absence verifies only the
+  suppression branch, never the channel. Consequential outbound channels
+  are driven in separately authorized fires, never batched (§2's
+  one-at-a-time rule). Repeat the run (its own grant if consequential)
+  against stated existing-output and lock expectations; a hung run
+  overlaps the next fire regardless of average runtime, so where overlap
+  is possible the second entry must traverse the real lock-acquisition
+  path while the first holds the guard — "impossible" means
+  scheduler-enforced non-concurrency, not short runtime. Armed means:
+  every inventoried channel emission-positive-verified; no human cleared
+  a prompt mid-run; overlap guarded or scheduler-excluded; the absence
+  alarm below armed, its firing proven once, and its alert channel's
+  standing authorization in place (no authorized alert path → the alarm
+  is unarmed and that gap is the report; no automated outward action
+  invents itself). Anything short stays unarmed — and enabling is not
+  the end: scheduler binding stays an open claim until the first
+  scheduler-originated fire lands its attributed effects by its deadline
+  (the alarm's first cycle checks exactly that). Ongoing: a dead task
+  cannot report its own death, and a watcher that can die silently moves
+  the problem one layer down — terminate the chain in a mechanism whose
+  alarm fires on ABSENCE by construction (an externally enforced
+  missed-deadline alert), outside the schedule's failure domain
+  (scheduler, host, principal; where full independence is unavailable,
+  the nearest different trigger path, with the shared-fate residue
+  named). Its signal derives from destination-observed state or
+  receipts, never from a ping the task itself writes — a live task with
+  a dead write step keeps pinging green; key it to each channel's
+  documented emission condition and deadline, and a conditional channel
+  needs an independently observed condition signal or a periodic
+  positive canary, else it stays explicitly unverified in the alarm's
+  coverage. Prove the alarm once by withholding a destination effect
+  while the task runs — the suppression is its own consequential
+  action: use a synthetic or test destination where one exists, a
+  separately authorized suppression where not, and re-drive the channel
+  emission-positive after the fault. A task-written health line shows
+  the task ran, not that anything arrived; stale, uncheckable, or a
+  missed check is unhealthy and gets the response documented and
+  authorized at arming time — disarming or escalating needs its own
+  authorization, and with no authorized response the gap itself is the
+  report, never a shrug. Reviewing an
   existing schedule without authorization to run it: inspect existing
   evidence asymmetrically — stale evidence can refute; fresh evidence
   proves only when tied to the invocation under review (an established
