@@ -303,22 +303,35 @@ When rigor conflicts with finishing sooner, rigor wins.
 - Never fabricate observations or report outputs not produced. Report skipped
   verification as skipped.
 - **A recurring scheduled process's own "completed" report is not evidence its
-  side effects landed.** A weekly task reported success for three months while
-  its write step silently never executed — every output file's mtime frozen at
-  the date the write path broke, caught only by an unrelated mtime audit; a
-  second, independent output channel on the same task was separately dead on a
-  stale hardcoded credential the whole time (`unprobed` — private incident as
-  shape; see Provenance). Arming or reviewing any recurring automation: run it
-  supervised once and verify each output channel by its actual artifact or
-  response body, not the runner's exit status; have the task write a dated
-  health line whose absence itself is the failure signal (an "OK" it can only
-  ever emit is not one); pre-confirm every permission-gated call it makes,
-  since a headless run cannot clear an interactive prompt; and when auditing an
-  existing schedule, check output mtimes before trusting its run history — a
-  green log proves the process executed, not that anything downstream received
-  what it produced.
-  ✅ "ran it once watched, confirmed a new file appeared with today's mtime and
-  the correct content, then armed the schedule."
+  side effects landed.** A weekly task reported success for roughly three
+  months while its write step silently never executed — every output file's
+  mtime frozen at the date the write path broke, caught only by an unrelated
+  mtime audit; a second, independent output channel on the same task was
+  separately dead on a stale hardcoded credential the whole time (`unprobed`
+  — private incident as shape; see Provenance). Arming one: run it once
+  under the schedule's own execution context — its principal, environment,
+  working directory, and headless path, or one real scheduled fire — and
+  verify every output channel at its destination (the artifact's content, a
+  delivery receipt or observed destination state; an async 2xx acceptance is
+  not delivery), then repeat the run and watch the second pass behave
+  (existing output, locks, overlap): any unverified channel leaves the
+  schedule unarmed. A consequential send or spend in a supervised run stays
+  behind §2's gates — arming is not authorization to fire it. Permission
+  gates: a headless run cannot clear an interactive prompt, so the scheduled
+  path must hold durable non-interactive grants under the schedule's
+  principal for its technical permissions, while consequential actions still
+  need §2's explicitly scoped standing authorization — "pre-confirmed once
+  while watched" is neither. Ongoing: a dead task cannot report its own
+  death, so check each destination's freshness on a cadence independent of
+  the task (a dated health line the task writes shows the task ran, not
+  that anything arrived). Reviewing an existing schedule without
+  authorization to run it: inspect the evidence that already exists —
+  per-channel artifacts, receipts, output mtimes — and treat a green run
+  history as evidence the runner reported success, never that downstream
+  received anything.
+  ✅ "ran it under the cron user's environment: today's file content
+  verified AND the second channel's receipt checked; repeat run clean; then
+  armed the schedule."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
   silently-wrong value.** Honor an explicit, documented contract (a declared
