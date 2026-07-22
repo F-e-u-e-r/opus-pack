@@ -120,8 +120,9 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   hardcoded credential — contributor-reported shape; see the skill's
   Provenance.) Gates first: every consequential invocation — the repeat
   run below included — carries its own per-invocation authorization
-  (destructive / spending / publishing / credential: operational-rigor
-  §2's confirmation gate and verbatim AUTH: artifact govern), and a
+  (destructive / spending / publishing / credential — operational-rigor
+  §2's confirmation gate governs: its per-invocation grant, plus its
+  AUTH: artifact for the outward or irreversible steps), and a
   schedule whose unattended fires are themselves consequential needs §2's
   project-policy-scoped standing authorization before running unattended;
   a request to arm covers the arming, not those future fires; a
@@ -149,26 +150,36 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   "impossible" means scheduler-enforced non-concurrency, not short
   runtime. Armed means: every channel emission-positive-verified; no
   human cleared a prompt mid-run; overlap guarded or scheduler-excluded;
-  the watch below armed and its alarm proven once. Anything short stays
-  unarmed. Ongoing: a dead task cannot report its own death, and a
+  the watch below armed and proven once. Anything short stays unarmed —
+  and enabling is not the end: scheduler binding stays an open claim
+  until the first scheduler-originated fire lands its attributed
+  effects by its deadline (the watch's first cycle checks exactly
+  that). Ongoing: a dead task cannot report its own death, and a
   watcher that can die silently moves the problem one layer down —
   terminate the chain in a mechanism whose alarm fires on ABSENCE by
   construction (an externally enforced missed-deadline alert), outside
   the schedule's failure domain (scheduler, host, principal; where full
   independence is unavailable, the nearest different trigger path, with
-  the shared-fate residue named); key it to each channel's documented
-  emission condition and deadline; prove it once by skipping a ping. A
-  task-written health line shows the task ran, not that anything arrived;
-  stale, uncheckable, or a missed watch is unhealthy and gets the defined
-  response (alert, disarm, escalate), never a shrug. Reviewing an
+  the shared-fate residue named). Its signal derives from
+  destination-observed state or receipts, never from a ping the task
+  itself writes — a live task with a dead write step keeps pinging
+  green; key it to each channel's documented emission condition and
+  deadline, and prove it once by withholding a destination effect while
+  the task still runs. A task-written health line shows the task ran,
+  not that anything arrived; stale, uncheckable, or a missed watch is
+  unhealthy and gets the response documented and authorized at arming
+  time (absent one, the safe default is alert only — disarming or
+  escalating needs its own authorization), never a shrug. Reviewing an
   existing schedule without authorization to run it: inspect existing
   evidence asymmetrically — stale evidence can refute; fresh evidence
-  proves only when tied to an invocation or an established exclusive
-  writer; otherwise it stays unverified.
+  proves only when tied to the invocation under review (an established
+  exclusive writer narrows the author, not the run — its artifact still
+  needs a timestamp or state transition placing it after that
+  invocation); otherwise it stays unverified.
 
 ## Provenance
 
-These six rules are the 2026-07-13 external-systems batch, mined from five
+The first six rules are the 2026-07-13 external-systems batch, mined from five
 private production retiring-architect libraries (a link-shortener, a market
 dashboard, a Telegram bot, an engine-parity port, a learning lab), merged in
 opus-pack #26 and maintainer-fixed under cross-model review; two (cache
@@ -184,7 +195,9 @@ error-cooldown cache state, typed advance-signal vs. valid empty, executed
 DST gap/fold cases, and the durable-handoff scope of "await side effects" —
 trail in `reviews/2026-07-16-post-merge-validation-pr25-29.md`.
 
-The scheduled-process entry (2026-07-22) is the protocol body of the §4
+The scheduled-process entry (2026-07-22; one addition with its §4 rule,
+which carries the contributor's 2026-07-21 date — the entry records its
+placement during review) is the protocol body of the §4
 scheduled-process rule added in opus-pack #49 — placed here per the
 2026-07-14 split precedent (boundary-specific protocols out of the lean
 core); its incident provenance and `unprobed` marker live with that rule in

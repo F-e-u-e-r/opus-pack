@@ -311,12 +311,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   task was separately dead on a stale hardcoded credential the whole
   time. The arming and audit protocol is the scheduled-process entry in
   `references/external-systems.md` — load it before arming, enabling,
-  or auditing one. A green run history is evidence the runner reported
+  relying on, or reviewing one; on any wording disagreement, that entry
+  is canonical. A green run history is evidence the runner reported
   success, never that downstream received anything (the earlier
   exit-code line governs the immediate command you just ran; a
   schedule's downstream is this rule).
-  ✅ "loaded the reference, drove both channels emission-positive tied
-  to the test fire, dead-man alarm proven once — then enabled the
+  ✅ "loaded the reference, drove every channel emission-positive tied
+  to the test fire, destination watch proven once — then enabled the
   schedule."
   ❌ "the log shows 200/exit-0 every week, so it's working."
 - **Data-path integrity — fail loud on *unspecified* ambiguity, never emit a
@@ -342,9 +343,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   exits non-zero on success), success-latency tails (a timeout that aborts slow
   successes), three-state cache discipline (never cache an unvalidated empty),
   fallback-chain rot (a dead leg invisible until the primary fails), the
-  two-time-convention + calendar round-trip (Feb 30 normalizes silently), and
+  two-time-convention + calendar round-trip (Feb 30 normalizes silently),
   deploy-target contracts (serverless fire-and-forget after the response never
-  runs).
+  runs), and the scheduled-process protocol (a recurring schedule's green
+  history vs destination-attributed side effects).
 - **A clue about external data is a map, not a schema.** A field shape learned
   from docs, a blog, another repo's code, or memory tells you where to look,
   never what is there — sample the real shape on a real instance before writing a
