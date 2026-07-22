@@ -81,7 +81,8 @@ Every packet names:
   (commit link); do not re-flag absent evidence of regression. Reviewer
   later found the residual anyway — new evidence, so it ran."
   ❌ "the reviewer gets fresh context each round, so the packet doesn't
-  need the sweep's history."- **Rules** — do not merge, weaken gates, or revert unrelated work; report
+  need the sweep's history."
+- **Rules** — do not merge, weaken gates, or revert unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
   For an implementation task, after bounded discovery (interfaces read, ambiguity
   resolved), require a concrete artifact by an early checkpoint — a reproduced
