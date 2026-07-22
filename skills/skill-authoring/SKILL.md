@@ -150,6 +150,58 @@ artifact-producing step.
 - One skill, one topic; no duplicate homes for a fact — cross-reference the
   sibling instead. Each skill states **when NOT to use it** and which sibling
   to use.
+- **Keyword-grep absence is not absence** (`unprobed` — private incidents as
+  shape; see Provenance). About to add a new fact or rule to an
+  instruction file, or to conclude one does not cover a fact
+  (wording-only and provenance edits are out of scope): an empty grep is
+  not the dup-check the no-duplicate-homes rule above needs — rules
+  phrased differently from the search term repeatedly produced false
+  "not covered" verdicts in the contributor's private log (see
+  Provenance), one a proposed addition whose content already sat in the
+  target file under other wording, caught only by reading the section at
+  drafting time. The check: grep the target file and its sibling skills
+  (the skills shipped beside it — list the parent skills directory,
+  don't recall it, and include each searched skill's references files
+  when the topic plausibly lives there; a router file like CLAUDE.md has
+  no siblings — its "siblings" are the files it points into) for the
+  concept's name plus at least two alternates drawn from how the file
+  might phrase it (the outcome it produces, the operation's other names,
+  its domain jargon); list the actual section headings of the target AND
+  of every file searched; from that real outline — never from memory —
+  name the candidate homes (every section with a hit, plus every section
+  the fact would live in if it existed) and read each in full before any
+  verdict. A headingless file is read in full. When every search came
+  back empty, read every searched file in full before concluding
+  anything — the incidents' catch was the read, not the grep. Duplicate
+  found → no second home, wherever it lives: in the target, no addition;
+  in a sibling, cross-reference it — the "A cross-reference is not a
+  load" rule below still applies as written. Otherwise the change record
+  — the PR description or commit message when one is being created,
+  otherwise the completion report — carries the result line: the terms
+  searched, each file searched with what was read of it (named sections,
+  or "read in full"), and "not found under the searches and sections
+  listed". For a landing addition, the fresh-context reviewer (§6)
+  re-runs those searches against the pre-addition text (the file at the
+  revision the change branches from — never the edited working copy) and
+  reads at least one candidate of their own choosing — on empty
+  searches, one searched file in full; a standalone not-covered verdict
+  with no reviewer stays provisional in the report until a fresh-context
+  reader without the author's session confirms it there. A bare "not
+  covered" backed only by empty greps is the failure this rule exists to
+  stop; no plausible home in the outline for a fact the task says is
+  covered or being relocated, or doubt that the candidate list is
+  complete → the placement is unresolved — escalate it, and under those
+  conditions never assert absence.
+  ✅ "grep for 'revert', 'rollback', 'undo' across the playbook and its
+  two siblings returned nothing; read all three files end to end — the
+  rule exists in the playbook under 'restore'; the change record lists
+  the three terms and the three files, each 'read in full'."
+  ✅ "all searches empty — read both searched files end to end; recorded
+  'not found under the searches and sections listed: revert, rollback,
+  undo; playbook.md (read in full), helpers.md (read in full)' — then
+  added the rule."
+  ❌ "grep returned nothing, so the file doesn't cover it."
+  ❌ "three synonyms, all empty — not covered" (no file was ever read).
 - **A cross-reference is not a load** (`unprobed` in-house; external
   evidence — see Provenance). On weak tiers, discovering that a sibling
   skill applies is a judgment act: fable-method published a smoke-grade
@@ -397,4 +449,15 @@ marker per the README covenant: the external measurement is of one
 skill's one gate, and whether placement generalizes across gate types is
 exactly what an in-house probe would test — that probe has not been run;
 the marker records the debt.
+The §5 keyword-grep-absence rule (2026-07-21) generalizes three private
+incidents in one week, each the same shape: a keyword grep of a rules file
+returned nothing, "not covered here" was concluded, and the content existed
+under different phrasing — including one proposed upstream addition whose
+substance was already in the target file, caught only by reading the
+section during drafting (contributor-reported; the private repos are
+verifiable by the contributor, not linkable here). It ships `unprobed` per
+the README covenant's second branch — no in-repo probe has run; the
+executable probe shape (seed a reworded twin of a rule, instruct a
+weak-tier agent to dup-check an addition, observe grep-only vs read) is
+noted here as the debt, not claimed as run.
 Stable method; no environment facts to re-verify.
