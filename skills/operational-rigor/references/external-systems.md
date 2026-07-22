@@ -119,15 +119,17 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   while its write step silently never executed; a second output channel
   on the same task was separately dead on a stale hardcoded credential —
   contributor-reported shape.) Gates first: every consequential
-  invocation — the repeat
-  run below included — carries its own per-invocation authorization
+  supervised or test invocation — the repeat run below included —
+  carries its own per-invocation authorization
   (destructive / spending / publishing / credential — operational-rigor
   §2's confirmation gate governs: its per-invocation grant, plus its
   AUTH: artifact for the outward or irreversible steps), and a
   schedule whose unattended fires are themselves consequential needs §2's
-  project-policy-scoped standing authorization before running unattended;
-  a request to arm covers the arming, not those future fires; a
-  permission or credential in place is not authorization. Verify the
+  project-policy-scoped standing authorization before running unattended —
+  that standing authorization is the canonical exception covering the
+  unattended fires themselves; a request to arm covers the arming, not
+  those future fires; a permission or credential in place is not
+  authorization. Verify the
   credentials the work actually needs under the schedule's principal;
   minting or broadening one is itself gated; session-only credentials do
   not travel to headless runs. Drive and attribute: read the configured
@@ -146,8 +148,11 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   hold observation authority over. Verify each inventoried channel with
   its emission condition driven TRUE at least once: destination evidence
   carrying that invocation's identifier where the channel supports one,
-  else a before/after transition plus confirmation that no other
-  eligible invocation ran in the window (a fresh artifact another writer
+  else a before/after transition plus exclusion of every other
+  producer AND of earlier invocations' still-outstanding effects (an
+  effect queued before the window can land inside it — asynchronous
+  delivery without an identifier stays unverified when that exclusion
+  cannot be established) (a fresh artifact another writer
   or run could have produced proves nothing; an async 2xx acceptance is
   not delivery) — a condition-matched absence verifies only the
   suppression branch, never the channel. Consequential outbound channels
@@ -188,7 +193,8 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   missed check is unhealthy and gets the response documented and
   authorized at arming time — disarming or escalating needs its own
   authorization, and with no authorized response the gap itself is the
-  report, never a shrug. Reviewing an
+  report, never a shrug. Relying on an armed schedule mid-flight uses this same review arm plus
+  the absence alarm's current health as the evidence. Reviewing an
   existing schedule without authorization to run it: inspect existing
   evidence asymmetrically — stale evidence can refute; fresh evidence
   proves only when tied to the invocation under review (an established
@@ -214,6 +220,9 @@ error-cooldown cache state, typed advance-signal vs. valid empty, executed
 DST gap/fold cases, and the durable-handoff scope of "await side effects" —
 trail in `reviews/2026-07-16-post-merge-validation-pr25-29.md`.
 
+Sync contract: the §4 scheduled-process bullet's opening claim quotes
+this entry's headline verbatim — change the headline here → update that
+quote (this entry wins on disagreement).
 The scheduled-process entry (2026-07-22; one addition with its §4 rule,
 which carries the contributor's 2026-07-21 date — the entry records its
 placement during review) is the protocol body of the §4

@@ -303,10 +303,11 @@ When rigor conflicts with finishing sooner, rigor wins.
 - Never fabricate observations or report outputs not produced. Report skipped
   verification as skipped.
 - **Arming, enabling, relying on, or reviewing a recurring scheduled
-  process → its side effects are unverified until checked at their
-  destinations, attributed to the invocation; the process's own
-  "completed" report is not that evidence** (`unprobed` — private
-  incident as shape; see Provenance). A
+  process → "A recurring schedule's own 'completed' report is not
+  evidence its side effects landed — verify at the destinations,
+  attributed to the invocation"** (the scheduled-process entry's
+  headline, quoted; that entry wins on disagreement) (`unprobed` —
+  private incident as shape; see Provenance). A
   weekly task reported success for roughly three months while its write
   step silently never executed, and a second output channel on the same
   task was separately dead on a stale hardcoded credential the whole
