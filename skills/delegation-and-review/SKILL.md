@@ -35,26 +35,33 @@ Every packet names:
 - **Owned scope + explicit non-scope** — files/modules it may and may not touch.
   For a find-and-fix-every-instance sweep, scope splits in two
   (`unprobed` — private incident as shape; see Provenance): the SEARCH
-  scope is every surface that can generate the target — literals,
-  shared/global definitions, helpers that construct or return it —
-  inventoried from the definition surfaces themselves, never from the
-  token grep (a 53-file styling sweep missed its defect in a shared
-  utility class the token grep never matched, and each review round
-  surfaced another category the prior round's pattern structurally
-  excluded); the WRITE scope stays this field, and a generator discovered
-  outside it is reported for escalation, never edited on discovery. Name
-  the value family and close it (every tier/variant listed), or declare
-  the bound per §3's bounded-sweep clause — an unresolved discovery gap
-  blocks any exhaustive claim.
+  scope is every surface that can generate the target — literals and
+  direct references, shared/global definitions, helpers that construct
+  or return it. Searches build that inventory — reference search from
+  the symbol, reads of the defining files, tracing of emitting helpers,
+  one axis per pass so blind spots don't line up — and it closes per
+  §3's discovery loop: stop only after two consecutive passes surface
+  nothing new; no single pattern's zero hits ever prove it complete (a
+  53-file styling sweep missed its defect in a shared utility class the
+  token grep never matched, and each review round surfaced another
+  category the prior round's pattern structurally excluded). The packet
+  lists the inventory (each surface and how it was found) and the value
+  family, closed (every tier/variant listed) or bounded per §3's
+  bounded-sweep clause. The WRITE scope stays the owned files/modules
+  explicitly listed above: a generator discovered outside that WRITE
+  scope is reported for escalation, never edited on discovery.
 - **Invariant** — property to close and properties to preserve.
 - **Proof gate** — concrete check that would fail under the broken behavior;
   worker-chosen "tests pass" is not a gate. For an every-instance sweep,
   the gate is the observed effect on every inventoried generator surface
-  and value tier (render or run each; a declared coverage partition with
-  its gaps stated is the only shortcut) — a zero-hit search is a report,
-  not the gate: a clean grep proves one spelling is gone, not that the
-  defect is gone.
-  ✅ "every tier rendered through the shared helper path — effect gone."
+  and value tier (render or run each); within a value family, one
+  observation may stand for a declared equivalence class only with the
+  shared-outcome reason stated, and anything unobserved is reported
+  unverified — never folded into an exhaustive claim. A zero-hit search
+  is a report, not the gate: a clean grep proves one spelling is gone,
+  not that the defect is gone.
+  ✅ "literals swept, the shared class rebuilt, every tier rendered
+  through the emitting helper — effect gone on each inventoried surface."
   ❌ "the grep is clean across all 53 files, so the sweep is done."
 - **Output contract** — conclusions + `file:line` refs, each tagged
   `[verified: ran <cmd>]`, `[verified: read <file:line>]`, or
@@ -110,9 +117,10 @@ reviewers that they silently absorb as implementers.
   'none')"). The reviewer re-runs that named search, never takes it on
   trust — then challenges its coverage with one differently-shaped query (a
   broader or structural pattern, or a class-aware check): re-running a
-  narrow pattern reproduces its hits AND its misses. (An every-instance
-  sweep's dispatch scope and acceptance gate are §2's sweep fields —
-  generator inventory and effect-per-surface, never search-zero.)
+  narrow pattern reproduces its hits AND its misses. (A
+  find-and-fix-every-instance sweep's dispatch scope and acceptance gate
+  are §2's sweep fields; there, "a zero-hit search is a report, not the
+  gate.")
 - **Machinery is not the user.** Tool completions, CI events, and agent statuses
   are state changes, not approval or proof. Open the artifact and verify.
 - **Auditing a completion claim** (an agent's or contractor's "done", a
@@ -324,8 +332,8 @@ prescribes only the defensive split. Private evidence, cited as shape per
 the README covenant's second branch; no in-repo probe has run — in-body
 `unprobed` marker.
 The §2 sweep-scope additions (2026-07-21; search-scope/write-scope split,
-definition-surface inventory, effect-per-surface proof gate, and the §3
-pointer) come from a private incident: a
+axis-diverse inventory closed per §3's discovery loop, effect-per-surface
+proof gate, and the §3 pointer) come from a private incident: a
 find-and-fix-every-instance styling sweep (53 files), three review rounds, and
 a merged fix all missed the actual defect — it lived in a shared global
 utility class the token grep pattern never touched, and each follow-up round's
