@@ -192,6 +192,22 @@ artifact-producing step.
   promote the rule into the standing instructions; the entry remains as the
   record of why. Retrieval re-derives the answer every session; compilation
   pays once.
+- **Flipping a current-state order does not retire the old one on its
+  own — sweep the whole file.** Updating the top summary or the newest
+  paragraph is not enough: an older evidence block can still carry its
+  own bold imperative verdict ("KEEP X AS DEFAULT") lower in the same
+  file, and a future reader — or a weaker model executing the file
+  top-to-bottom — can hit that older verdict first and follow the
+  superseded order. After any default/order flip: grep the file for the
+  superseded term(s) and tag every stale verdict block explicitly
+  ("⤷ SUPERSEDED `<date>` — see `<new order's anchor>`; this block is
+  provenance, its verdict is no longer the order") rather than deleting
+  it — history stays legible, but only one verdict reads as current.
+  ✅ "promoted the new default at the top, then grepped the file for the
+  old model's name — found two older 'KEEP AS DEFAULT' blocks, tagged
+  both SUPERSEDED with the date and a pointer to the new order."
+  ❌ "updated the current-state summary; the old benchmark write-up down
+  below is just history, nobody reads that far" (a weaker executor does).
 - **Two-strike promotion trigger:** the second time a lesson's trigger
   fires, that event promotes it — into a standing rule, or a hook where
   machine-checkable — and the entry gets a `promoted-to:` line. One
