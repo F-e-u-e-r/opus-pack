@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: How to write skills, CLAUDE.md/AGENTS.md, fix logs, and handoff documents that a weaker or zero-context model can actually execute. Load when authoring or updating any instruction file, SKILL.md, project memory, or institutional-knowledge document — including when converting lessons from a session into durable files. Not for writing user-facing docs or code comments.
+description: How to write skills, CLAUDE.md/AGENTS.md, fix logs, and handoff documents that a weaker or zero-context model can actually execute. Load when authoring or updating any instruction file, SKILL.md, project memory, or institutional-knowledge document — including when converting lessons from a session into durable files — and when about to act on a recorded capability-negative ("no such flag", "the API can't do X") found in one. Not for writing user-facing docs or code comments.
 ---
 
 # Skill Authoring for Weaker Models
@@ -99,7 +99,8 @@ artifact-producing step.
   interactively", "the API can't do X" into an instruction file — or
   about to act on one already there: these are version-scoped
   observations that read as timeless
-  rules. A stale positive claim fails loud the first time someone follows
+  rules. A stale positive claim is far likelier to be exercised and
+  exposed the first time someone follows
   it; a stale negative fails silent — it steers every later session away
   from a capability that now exists, and nothing ever exercises it to
   expose the rot. One playbook's "model switching only works in the
@@ -112,21 +113,44 @@ artifact-producing step.
   session acting on it — routing decision or not — re-probes at
   decision time before repeating or relying on the negative, the
   re-probe satisfied only under the pinned-string rule's own
-  attribution and unknown-property-fallback clauses (an unattributed
-  answer never satisfies it); on any wording disagreement, the
+  attribution and unknown-property-fallback clauses, carried verbatim:
+  "an unattributed answer measures an unknown model, not the slug's",
+  and probe unavailable or failing → "assume the ADVERSE plausible
+  state for this decision"; on any wording disagreement, the
   pinned-string rule wins.
   Writing a tool-interface negative: pin
-  it to the version and probe it was observed on. Acting on one: read
-  its pin; the tool's version has changed, or the pin is missing →
-  re-verify with one probe (`--help`, or a trial invocation exercising
-  the claimed-absent capability) before
+  it to the version and probe it was observed on — and a capability
+  controlled server-side (an API feature, an account rollout, a
+  remote configuration) additionally pins the instance/account and
+  observation date, because it can flip with no version change.
+  Acting on one: read
+  its pin; the tool's version has changed, the pin is missing, or the
+  capability is server-side and any pinned dimension (instance,
+  account, configuration, or simply time since the dated
+  observation) may have drifted →
+  re-verify with one probe (`--help` for a local interface claim; a
+  server-side capability probes against the CURRENT decision's
+  resolved instance/account — re-probing the former pin is comparison
+  evidence, never the acting gate, and a local help screen proves
+  nothing about an account-controlled
+  feature; an existence claim — a flag listed, a field accepted —
+  settles on `--help` or a schema read, while a FUNCTIONAL claim
+  needs a trial invocation exercising
+  the claimed-absent capability, and a trial whose success would be
+  consequential (a send, a delete, a purchase) runs as a safe
+  synthetic or dry-run form, or under its own authorization
+  (operational-rigor §2) — no safe form and no authorization → the
+  capability stays unknown), recording the newly observed
+  dimensions, before
   obeying it; probe unavailable or inconclusive → the capability is
   unknown, not absent — record that where the claim is used and do not
   repeat the negative as fact. Done: writing — the claim carries its
-  version pin and the probe that observed it; acting — the pin is
-  matched to the current version, or re-probed, or recorded unknown.
+  version pin, the probe that observed it, and (server-side) its
+  instance/account and date; acting — every applicable pinned
+  dimension is matched current, or re-probed, or recorded unknown.
   ✅ "playbook says no flag (pinned v0.2.98); current binary v0.2.101 —
-  ran --help: the flag exists now; corrected the playbook in place."
+  --help lists the flag now (existence), a dry-run invocation
+  accepted it (function); corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."
 - Correct a stale rule in place — never append the correction below the old
   line. A zero-context reader obeys whichever sentence it reads first, not
@@ -208,9 +232,13 @@ artifact-producing step.
   of every file searched; from that real outline — never from memory —
   name the candidate homes (every section with a hit, plus every section
   the fact would live in if it existed) and read each in full before any
-  verdict. A headingless file is read in full. When every search came
-  back empty, read every searched file in full before concluding
-  anything — the incidents' catch was the read, not the grep. Duplicate
+  verdict. A headingless file is read in full. When the candidate
+  reads end with no duplicate found — and always when every search
+  came back empty — read every searched file in full before any
+  absence verdict: the trigger for the full read is failing to find
+  the duplicate, never grep emptiness (one irrelevant hit must not
+  disable the fallback), and the incidents' catch was the read, not
+  the grep. Duplicate
   found → no second home, wherever it lives: in the target, no addition;
   in a sibling, cross-reference it — the "A cross-reference is not a
   load" rule below still applies as written. Otherwise the change record
@@ -220,11 +248,20 @@ artifact-producing step.
   or "read in full"), and "not found under the searches and sections
   listed". For a landing addition, the fresh-context reviewer (§6)
   re-runs those searches against the pre-addition text (the file at the
-  revision the change branches from — never the edited working copy) and
-  reads at least one candidate of their own choosing — on empty
-  searches, one searched file in full; a batch landing multiple
+  revision the change branches from AND at the landing target's
+  current pre-merge state — the base can gain an equivalent rule
+  after the branch point; never the edited working copy) and
+  reads at least one candidate of their own choosing — and before
+  CONFIRMING an absence verdict, runs the author's own fallback:
+  every searched file read in full when the duplicate was not found
+  (a one-file sample confirms nothing — short of the full read, the
+  verdict stays provisional and says so); a batch landing multiple
   additions — to one file or across files in the search set (targets,
-  siblings, routers/entry files) — also searches the merged result
+  siblings, routers/entry files) — also READS each added rule body
+  against the other additions in the batch, searches alone never
+  discharging it (two additions can express one doctrine with
+  disjoint vocabulary, exactly the empty-grep blind spot this rule
+  opens with), plus searches the merged result
   across all added hunks (two additions can duplicate each other
   while neither exists in any base); a standalone not-covered verdict
   with no reviewer stays provisional in the report until a fresh-context

@@ -266,9 +266,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   it through to its pass/fail oracle —
   the assertions (or, for a linter or build job, its rule set and
   inputs) inspected at the revision the cited run actually used —
-  which must itself contain the change under review: a green run on a
-  revision without the change is evidence about that revision, never
-  the change — the
+  and the run attributable to the change under review: the tested
+  artifact built from a revision containing it (a commit id, an image
+  digest — or, for a run against uncommitted work, an exact recorded
+  working-tree capture identity such as the settled-tree baseline),
+  while the oracle itself may live at its own stable
+  revision; a green run on an artifact without the change is evidence
+  about that artifact, never the change — the
   invocation path and setup that feed them, whether that path executed
   in the cited run, and whether its assertions PASSED there with their
   failure controlling the check's final status (a run is not a pass —
@@ -279,8 +283,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   the other a pre-filter. A trace you cannot inspect leaves that
   coverage unverified — say so. "There is a check called X" is a claim
   about naming, not behavior.
-  ✅ "traced check X at run 1234's revision: it asserts A and B against
-  the real adapter; the run's log shows that path executed and A, B
+  ✅ "traced check X at run 1234: its oracle (at the run's own harness
+  revision) asserts A and B against
+  the real adapter; the run tested the image digest built from the
+  change's commit; the log shows that path executed and A, B
   passed with failures propagating to the job status; nothing in its
   path drives C — C is unverified."
   ❌ "the change is safe, check X covers it" (named, never read).

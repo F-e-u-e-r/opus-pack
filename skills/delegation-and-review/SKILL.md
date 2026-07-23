@@ -59,10 +59,13 @@ treat every returned result as a claim until verified.
   then observe exact equality with that recorded value THROUGH every
   relied session-local consumer path (the API proxy included, not
   just the top page); a listener check (`lsof`-style) is port
-  discovery, never identity evidence. Marker cleanup is the one
+  discovery, never identity evidence — and the marker is state
+  installed only in THIS session's tree (a static file it serves, a
+  server-held value), never a caller-supplied echo: a
+  request-reflecting endpoint returns your nonce from the wrong
+  sibling too. Marker cleanup is the one
   mutation that follows the check — use a marker whose removal
-  restarts or reloads nothing (a static file, a debug endpoint's
-  echo), remove it, and verify the removal against the
+  restarts or reloads nothing (a static file), remove it, and verify the removal against the
   pre-instrumentation state (tracked, untracked, and ignored files —
   the declared persistent port configuration stays); a marker that
   cannot be removed without a restart or reload is the wrong marker —
@@ -100,19 +103,24 @@ treat every returned result as a claim until verified.
   every such measurement where it is recorded; at decision time, re-run
   the probe — its battery responses route-attributed per the labels
   rule below, not just a preceding trivial check (an
-  unattributed answer measures an unknown model, not the slug's) —
+  unattributed answer measures an unknown model, not the slug's), and
+  produced by this invocation, not replayed from a cache (the labels
+  rule's freshness clause) —
   and cite the fresh result's timestamp and configuration —
   the fresh result informs the routing, it never replaces §2's edge
   specification and proof gate for the work itself, and no measurement
   pins the endpoint's behavior on the next request. Probe unavailable
-  or failing → the property is unknown: route as if the property were
-  absent (no edge guard, no latency class, no failure signature) and spec
+  or failing → the property is unknown: assume the ADVERSE plausible
+  state for this decision — a protective property (an edge guard, a
+  latency class you rely on) treated as absent, a hazardous one (a
+  known failure signature) treated as present — and spec
   the edge per §2. Done when the decision record cites the fresh probe
   (timestamp + configuration, its route attributed per the labels
   rule below) or the unknown-property fallback — an
   undated behavioral claim about a hosted endpoint is expired on
   arrival, and an unattributed probe never satisfies the citation.
-  ✅ "re-ran the edge battery this session — the wrapper's route line
+  ✅ "re-ran the edge battery this session, cache-bypassed — the
+  wrapper's route line
   named the slug as what answered each response — cited its timestamp
   in the
   routing note, and specced the edge in the packet anyway."
@@ -129,13 +137,22 @@ treat every returned result as a claim until verified.
   and execution context the work will use; the pass is two observations
   — a model ANSWER to that prompt, AND the wrapper's own route report
   naming this route as what ANSWERED (a banner echoing the requested
-  slug is configuration, not attribution) — wrapper banners,
+  slug is configuration, not attribution) — both produced by THIS
+  invocation: a cached or replayed response (wrapper cache, proxy
+  layer) is not a pass — run cache-bypassed or carry a
+  per-invocation element a replay cannot contain. Wrapper banners,
   usage text, diagnostics, or error pages are not answers. Channel
   presence is established, never assumed: the wrapper's docs or config
   declaring a what-answered report, or a prior same-wrapper invocation
   that emitted one, establishes the channel; NO-channel-by-design is
   established only by that same evidence positively showing none
-  exists. Channel established but this invocation's report missing,
+  exists — and that conclusion is itself a capability-negative claim
+  under skill-authoring §3's protocol (pinned to the version and
+  probe it was observed on — and, attribution being wrapper- and
+  account-controlled, to the instance/account and date; re-verified
+  when any pinned dimension may have drifted);
+  where its evidence is unknown or stale, treat the invocation as
+  channel-present-unattributed and block. Channel established but this invocation's report missing,
   ambiguous, or naming a silent fallback → the route is unverified —
   like an error or a non-answer, do not dispatch dependent work on it
   (§4's retry/escalation ladder governs); channel presence UNKNOWN →
@@ -143,9 +160,16 @@ treat every returned result as a claim until verified.
   never emitting attribution yields the
   reachability-only pass: the route stays unattributed — record that
   limit wherever the pass is cited, and dependent dispatch on it
-  carries the recorded limitation, never a verified-route claim.
+  carries the recorded limitation, never a verified-route claim. And
+  a callability pass clears the ROUTE, not the work: where the
+  channel exists, each dependent response's own route report is
+  checked on receipt — the preflight is answer-plus-route for that
+  trivial probe alone, and a capacity-pressured or long-context work
+  request can fall back where the probe did not.
   ✅ "wrapper docs define no route field and no invocation has ever
-  emitted one — recorded 'reachability-only, route unattributed' in
+  emitted one (no-channel pin: version, this account, today's date);
+  this invocation's model answer arrived — recorded
+  'reachability-only, route unattributed' in
   the dispatch note and proceeded on that recorded limit."
   ❌ "no route line this time — must not have a channel; dispatched"
   (unknown channel presence is a block, not a downgrade). A
@@ -161,8 +185,9 @@ treat every returned result as a claim until verified.
   wrapper's OWN config, docs, or request trace, then validate that
   resulting ID with the provider; mapping unresolved → the namespace
   crossing stays blocked.
-  ✅ "sent 'reply OK' through the wrapper we dispatch with — the model
-  answered and the wrapper's route line named it; for the quota check,
+  ✅ "sent 'reply OK <fresh nonce>' through the wrapper we dispatch
+  with — the answer carried the nonce (no replay) and the wrapper's
+  route line named it; for the quota check,
   read the wrapper config's alias map to get the provider ID, then
   confirmed that ID in the provider's model list."
   ❌ "the CLI lists it, so it's available — route tomorrow's batch to
@@ -274,9 +299,11 @@ Every packet names:
 - **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
-- **Recurring dispatches carry ledgers** (`unprobed` — private incident as shape;
-  see Provenance). A field for RECURRING dispatches only — it never
-  blocks a one-off. Fresh-context reviewers re-litigate a campaign's
+- **Recurring review campaigns carry ledgers** (`unprobed` — private incident as shape;
+  see Provenance). A field for the rounds of a RECURRING review or
+  audit campaign only — it never
+  blocks a one-off, and a recurring non-review dispatch
+  (implementation, operations) is outside its scope. Fresh-context reviewers re-litigate a campaign's
   history: one re-raised a finding class an earlier round had refuted
   against the dependency's own source; another flagged as a defect the
   exact code a prior round had shipped as a fix. So a recurring packet

@@ -1,6 +1,7 @@
 # delegation-and-review · references: recurring-sweep ledgers
 
-The lifecycle behind §2's "Recurring dispatches carry ledgers" field
+The lifecycle behind §2's "Recurring review campaigns carry ledgers"
+field
 (`unprobed` — see the
 skill's Provenance; protocol body placed here per the pack's split
 precedent). Load when dispatching or reviewing a round of a named,
@@ -48,17 +49,22 @@ nothing. §3's canonical set still governs the audit loop itself ("Dedup
 new findings against everything ever surfaced, including ones already
 rejected: dedup against confirmed-only never converges").
 
-Write-back moves entries across categories: an OPEN finding whose fix
-landed this round moves to PRIOR FIXES carrying the fix's correctness
-evidence; an UNRESOLVED item confirmed this round moves to OPEN
-FINDINGS (confirmed and fixed in the same round, straight to PRIOR
-FIXES with the fix's evidence); an OPEN or UNRESOLVED item refuted
-this round moves to
-REFUTED FINDING-CLASSES carrying the counterexample; a PRIOR-FIXES
-entry re-flagged this round with evidence the fix failed, regressed,
-or left a residual spawns a NEW OPEN finding carrying that evidence,
-the historical entry staying put with a pointer to it; everything else
-stays where it is. Write-backs of one campaign serialize: a round's
+Write-back is one mapping, not a transition list: place every finding
+this round touched in the category matching its CURRENT evidence
+state — confirmed and unfixed → OPEN FINDINGS; fixed, with the fix's
+correctness evidence → PRIOR FIXES; refuted, with the counterexample →
+REFUTED FINDING-CLASSES; surfaced but neither confirmed nor refuted →
+UNRESOLVED. Insert a new entry where none exists; move the existing
+entry where one does; a same-round sequence lands at its end state
+(confirmed then fixed → PRIOR FIXES directly, re-flagged then re-fixed
+→ PRIOR FIXES with the new fix's evidence). Where the placement
+reverses a recorded verdict — a re-flagged prior fix, a refutation
+overturned by current evidence (which, per the non-authority rule
+above, always wins) — the superseded entry stays only as a
+pointer-annotated historical line under the new one. A round closes
+only when the ledger reflects every touched finding's current state —
+a round that surfaced anything never closes on an unchanged ledger.
+Write-backs of one campaign serialize: a round's
 write-back completes before the next round dispatches; concurrent
 writers over one ledger follow §4's edit-conflict rule (re-read,
 re-anchor — never last-writer-wins).
@@ -69,8 +75,9 @@ ledger has been reconciled against an ENUMERATED source of prior-round
 records — the list of prior round reports or record IDs, compared item
 by item with the comparison's result written down (an artifact that
 merely exists can silently omit an entry; reconciliation is the check).
-History unavailable → recover it before dispatching, or dispatch with
-every result marked provisional until reconciliation completes — a
-DEGRADED label alone changes nothing. Post-round (the campaign's
+History unavailable → recovering it is its own non-review task first;
+the round dispatches only after reconciliation completes (this keeps
+the §2 field's readiness rule intact — an unfillable field means the
+dispatch is not ready, and no provisional label changes that). Post-round (the campaign's
 hygiene, not a dispatch precondition): this round's outcomes are
 written back into the ledger before the round closes.
