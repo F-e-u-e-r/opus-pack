@@ -474,6 +474,17 @@ default; an AI rewrite does not launder a derivative).
   demoting incident detail to the fix log, and deleting rules that never
   fire. Record what was removed and why, so a rule that turns out to have
   been load-bearing can be restored.
+- **A line-count budget is relative to what earns its place, not a fixed
+  number to shrink back to.** After extracting everything that compacts
+  cleanly, a file can still sit above an old baseline because a genuinely
+  new trigger was added since that baseline was set — that gap is not
+  unpaid debt to keep chasing on the next pass; it is the new baseline.
+  Confusing the two produces a maintenance log that carries the same
+  "still owes an extraction pass" line for months on content that already
+  extracted everything extractable. After a compaction pass: if every
+  remaining line still traces to a live trigger, record the new line count
+  as the floor: only future wording or detail growth against *that* number
+  counts as debt.
 - **A compaction or extraction pass needs a word-diff, not a structure check**
   (verification-time counterpart to §3's don't-paraphrase rule above, which
   guards the writing, not the later edit). Grepping that anchors, pointers,
