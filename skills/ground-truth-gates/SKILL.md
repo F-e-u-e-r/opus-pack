@@ -153,6 +153,35 @@ A generic green test is not proof. A gate is real only if:
    discipline. Fixture-design corollary: hang the trap on a breadcrumb
    the task itself forces (the failing check's output names the doc), or
    read-narrow evidence discipline will disarm the fixture.
+   The two-sided proof above validates a grader for ONE invocation shape at
+   ONE time — reusing it later (a new run, a different candidate pool, hours
+   later in the same session) is a fresh claim, not an inherited one. Before
+   reuse: re-run the two-sided proof — the known-good references (both
+   structurally distinct valid solutions, per the bar above) and the
+   known-bad — diffing each outcome against the record of the prior
+   validation (per-CASE outcomes, not an aggregate score — the same 2/6
+   with different cases passing is drift; the invocation shape —
+   command, arguments, configuration, with ephemeral values like
+   run-scoped paths and timestamps normalized — and the
+   reference-corpus identity, so drift in any is visible; a deliberate
+   invocation change re-baselines only through a fresh two-sided proof
+   and a new record; no record on hand → reuse stops, the two-sided
+   proof runs fresh and its record is written before any scoring) —
+   any drift is stop-the-line, never "still mostly failing, close enough."
+   A wrong invocation shape (a file path fed where the grader expects a
+   directory, a stale flag) can make the harness fail to load the candidate
+   at all while the grader still emits a normal-looking scorecard — the
+   candidate never ran, but the grader can't tell "candidate legitimately
+   failed" from "candidate never executed." Watch for the inverted
+   signature this produces: edge cases PASS while happy-path cases FAIL,
+   because an edge case's own error-tolerant branch (a try/catch that treats
+   a thrown exception as valid defensive behavior) silently absorbed the
+   harness's load failure and got credited for it. (Incident: a
+   directory-vs-file argument mismatch made every candidate throw
+   `MODULE_NOT_FOUND` before its code ever ran; the known-bad reference
+   scored 2/6 against a recorded 0/6, and the 2 passes were exactly the two
+   capacity-edge cases whose accepted-throw branch swallowed the harness's
+   own error.) (`unprobed` — private incident as shape; see Provenance.)
 3. The **easy fake pass is named** and closed — hardcoded expected value,
    weakened assertion, testing the mock, a test that compiled but was never
    registered/run, a permanently `#[ignore]`/`.skip`ped backlog test that reads
@@ -325,5 +354,18 @@ shell dialect with nullglob, and the guard "passed" while scanning zero
 files, including the one its outage check existed for. Private evidence,
 cited as shape per the README covenant's second branch; no in-repo probe
 has run, so the shape carries an in-body `unprobed` marker.
+The rule-2 reuse-time re-validation clause (2026-07-23) comes from a
+contributor incident: before a new batch, a grader re-validation fed a
+directory to a grader that takes a file path; the harness threw a
+module-load error for every case before any candidate code ran, the
+known-bad reference scored 2/6 against a recorded 0/6, and the two
+spurious passes were exactly the two capacity-edge cases whose
+accepted-throw branch absorbed the harness's own load failure
+(contributor-reported; the private harness is verifiable by the
+contributor, not linkable here). Ships `unprobed` per the README
+covenant's second branch; the executable probe — seed an
+invocation-shape mismatch against a two-sided-proven grader and observe
+whether reuse-time re-validation catches it before scoring — has not
+run; the in-body marker records that debt.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.

@@ -133,6 +133,75 @@ treat every returned result as a claim until verified.
   edge-risky work to it" — any prior measurement reused for a routing
   or safety decision without a decision-time re-run, last week's or
   this morning's.
+- **Empty or dead-looking output from a live probe needs a differential
+  diagnosis before it becomes a routing decision** (`unprobed` — private
+  incidents as shape; see Provenance) — one observation (the
+  decision-time re-probe the rule above demands can itself come back
+  empty) cannot distinguish an intermittent transport flake from a
+  genuine capability gap, and the reads route differently (demote to
+  supervised use, drop from the pool, or fix your own side first). Two
+  situations, two ladders:
+  - **A single endpoint returns empty/no bytes.** Before declaring it
+    dead: (1) re-probe raw, ruling out your own parsing (a grep pattern
+    against the wrong response shape reads as "empty" too); (2) verify
+    the key/gateway itself with a cheap call (e.g. a models-list
+    endpoint returning 200); (3) call a *different* model on the same
+    key, transport, and request shape (same canary prompt and
+    parameters, the answer route-attributed per the labels rule
+    below), seconds apart. Only a controlled differential — the
+    alternate answers, the target still doesn't, everything else held
+    equal — isolates the failure to the target's route, away from
+    shared auth/gateway and your own parsing; the target ATTEMPT
+    itself must be evidenced (a status or error attributed to the
+    target's route, not silence alone — a wrapper that silently
+    rerouted or dropped the call leaves the target UNKNOWN, not
+    dead). Route-isolated is not yet "model down": a per-model block
+    on your side (entitlement, quota, unsupported parameters) silences
+    one target the same way — the attributed status decides which,
+    and the remedies differ (fix your account vs. wait out an
+    outage). Any other pattern
+    yields no target verdict — a failed gateway check is your side or
+    the shared path, fixed first (unless the work-path differential
+    completed anyway: evidence from the path the work actually takes
+    outranks the auxiliary screen); a silent alternate leaves the
+    differential incomplete (the alternate can carry its own block);
+    either way an incomplete diagnosis, no-usable-alternate included,
+    is recorded UNRESOLVED, never dead.
+  - **A model returns empty on some tasks in a batch.** Re-run the
+    battery before concluding anything, then classify each TASK
+    separately, never the run as a whole — one battery can carry both
+    kinds ({A,B} empty then {A,C} empty is a stable failure on A plus
+    intermittent noise on B and C). A task empty in some runs but not
+    others is intermittent — transport, serving, or another
+    nondeterministic cause, not a stable gap: the model is usable but
+    unreliable there — unfit for an unattended single-shot chain with
+    no retry; demote it to supervised or retry-wrapped use rather
+    than dropping it from the pool outright (for any work relying on
+    a probed property, the binding sentence below still holds it). A
+    task empty in EVERY run is a stable per-task failure — rule out
+    your own side for that task first: parsing (the raw re-probe
+    above, per task), a per-task limit (a token cap that empties the
+    same long task every run), collection loss — before recording it
+    as a capability gap. Two runs are the floor, not proof; extend
+    the re-runs when the decision is load-bearing. A single run
+    cannot tell these apart, and routing on the wrong read either
+    burns budget on a broken transport or drops a usable model from
+    the pool.
+  Either way, for a routing or safety decision the ladders refine the
+  DIAGNOSIS, never the binding above: an empty, flaky, or unresolved
+  probe of a property leaves that property UNKNOWN, and work relying
+  on it still does not route to that model — the differential decides
+  transport-vs-model and what to fix, not whether unverified work may
+  route.
+  ✅ "re-probed raw (ruled out my own parser), confirmed the key with a
+  200 on /models, then sent the same canary to a different model on
+  the same key — it answered, the target's evidenced attempt still got
+  no response: route-isolated; the attributed status was a server-side
+  failure, not an account or request block (quota, entitlement,
+  parameters), so recorded as an outage — a nondiagnostic status would
+  have stayed UNRESOLVED."
+  ❌ "the output file was empty, so the model is dead" (one observation,
+  no differential, no re-run).
 - **Labels are routes, listings are claims** (`unprobed` — private incidents
   as shape; see Provenance). Two separate boundaries, each with its own
   check. About to route work through a listed model: a lineup listing is
@@ -412,6 +481,36 @@ reviewers that they silently absorb as implementers.
   Immaterial discrepancies go in the findings, never into the verdict.
   The delivered tree stays untouched — no edits, no new files; findings
   go in the reply, not the tree.
+- **A reported FAILURE is a claim too, exactly like a reported success —
+  reproduce it before acting on it** (`unprobed` — private incident as
+  shape; see Provenance). A subordinate's own execution
+  environment can fabricate a RED gate as easily as a model fabricates a
+  green one: a sandbox restriction masquerading as a code defect. Acting
+  on an unreproduced RED either reverts working code (the failure was the
+  sandbox, not the change) or — worse — teaches the next session to treat
+  RED gates as noise. Re-run the claimed failing check yourself, outside
+  the subordinate's environment (in your own, per the isolated-copy
+  discipline above — and in the environment the gate's contract actually
+  targets: green in a non-target environment dismisses nothing, and an
+  unexplained environment split is a finding that leaves the gate
+  UNKNOWN), before reverting or
+  otherwise treating the verdict as established — and one green re-run
+  refutes a deterministic RED, not an intermittent one: RED-then-green
+  with no identified cause is a flake finding to record, never noise
+  to ship over — escalation needs no
+  prior re-run; it is the outlet for the unresolved case below; a RED
+  you cannot re-run yourself stays an unverified
+  claim: record the gap and treat the gate's state as UNKNOWN — it
+  neither licenses a revert (not a proven failure) nor a clean ship
+  (unknown is never green; the caveated-verdict path above applies) —
+  escalate the unresolved gate rather than assuming it away in either
+  direction. (Incident: a subordinate CLI's
+  sandboxed run reported a verbatim "GATES RED — do not ship" with a
+  specific failure reason — its test runner could not create IPC pipes
+  under that sandbox's restrictions; the same gate re-run on the host was
+  green both times the subordinate reported RED. The subordinate had
+  disclosed the sandbox limitation honestly in its own report — the risk
+  was a reader trusting the RED verdict without reading that far.)
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
@@ -685,6 +784,32 @@ half), and seed an alias-collision fixture and observe whether the
 mapping is resolved before a namespace crossing (the provider-ID half);
 neither has run in-repo, and the in-body `unprobed` marker stands until
 both have.
+The §1 empty-output differential rule (2026-07-23) comes from two
+contributor incidents in one day's sessions: a probe's empty output
+file was traced through a raw re-probe (no response at the transport),
+a gateway check (a models-list call answering 200), and a successful
+call to a different model on the same key before the failure was
+isolated to the target's route; and a batch bench where one model's
+empty slot MOVED between two runs (intermittent) while another model's
+same-task failure reproduced identically (a stable per-task failure)
+(contributor-reported; the private repos are verifiable by the
+contributor, not linkable here). Ships `unprobed` per the README
+covenant's second branch; the executable probe — fixture a dead
+endpoint beside a healthy sibling on one key, plus a moving-slot
+battery, and observe whether a weak-tier agent runs the ladders before
+routing — has not run; the in-body marker records that debt.
+The §3 reported-failure rule (2026-07-23) comes from a contributor
+incident: a sandboxed subordinate CLI reported a verbatim "GATES RED —
+do not ship" because its test runner could not create IPC pipes under
+the sandbox's restrictions; the same gate re-run on the host was green
+both times, and the subordinate's own report had disclosed the sandbox
+limitation honestly — the risk was a reader trusting the RED verdict
+without reading that far (contributor-reported; the private repo is
+verifiable by the contributor, not linkable here). Ships `unprobed`
+per the README covenant's second branch; the executable probe — a
+fixture whose subordinate report carries a sandbox-caused RED over
+green code, observing whether the orchestrator re-runs the gate before
+reverting — has not run; the in-body marker records that debt.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.

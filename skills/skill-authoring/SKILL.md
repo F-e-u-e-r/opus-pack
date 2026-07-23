@@ -192,6 +192,36 @@ artifact-producing step.
   promote the rule into the standing instructions; the entry remains as the
   record of why. Retrieval re-derives the answer every session; compilation
   pays once.
+- **Flipping a current-state order does not retire the old one on its
+  own — sweep the whole file** (`unprobed` — private incident as shape;
+  see Provenance). The instruction-file analog of operational-rigor §3's
+  call-site sweep: a flipped default is an interface change whose call
+  sites are every older verdict block in the same file. Updating the top
+  summary or the newest
+  paragraph is not enough: an older evidence block can still carry its
+  own bold imperative verdict ("KEEP X AS DEFAULT") lower in the same
+  file, and a future reader — or a weaker model that greps by the old
+  term, lands mid-file on a retrieved chunk, or reads a bottom-appended
+  log in order — can meet that older verdict first and follow the
+  superseded order. After any default/order flip: grep the file for the
+  superseded term(s) and their aliases — an empty grep is not a clean
+  sweep (§5's keyword-grep-absence rule: a stale verdict can phrase the
+  incumbent without the term), so read every verdict-bearing block —
+  and neutralize each stale verdict IN PLACE: rewrite the verdict line
+  itself, never a note appended below it (§3's correct-in-place rule —
+  a zero-context reader, or a retrieved chunk that starts at the old
+  bold line, obeys whichever sentence it reads first). The old
+  imperative stops being one: "KEEP X AS DEFAULT" becomes "SUPERSEDED
+  `<date>` — was: keep X as default — see `<new order's anchor>`; this
+  block is provenance, its verdict is no longer the order". Rewrite
+  rather than delete — history stays legible, but only one verdict
+  reads as current.
+  ✅ "promoted the new default at the top, then grepped the file for the
+  old model's name — found two older 'KEEP AS DEFAULT' blocks, rewrote
+  both verdict lines in place as SUPERSEDED-with-date pointing at the
+  new order."
+  ❌ "updated the current-state summary; the old benchmark write-up down
+  below is just history, nobody reads that far" (a weaker executor does).
 - **Two-strike promotion trigger:** the second time a lesson's trigger
   fires, that event promotes it — into a standing rule, or a hook where
   machine-checkable — and the entry gets a `promoted-to:` line. One
@@ -619,4 +649,16 @@ shape per the README covenant's second branch; the executable probe —
 re-running recorded capability-negatives against the current binary on
 each version change and counting flips — has not been run as a standing
 check; the in-body `unprobed` marker records that debt.
+The §4 superseded-verdict sweep (2026-07-23) comes from a contributor
+incident: after promoting a new default in a playbook, a whole-file
+grep found two older evidence blocks still carrying bold
+keep-the-old-default verdicts from earlier benchmark rounds — each
+would read as current to a reader (or a weaker executor) reaching it
+before the new summary; both were tagged superseded-with-date rather
+than deleted (contributor-reported; the private repo is verifiable by
+the contributor, not linkable here). Ships `unprobed` per the README
+covenant's second branch; the executable probe — seed a flipped
+default above an untagged stale verdict block and observe whether a
+weak-tier executor follows the stale order — has not run; the in-body
+marker records that debt.
 Stable method; no environment facts to re-verify.
