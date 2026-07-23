@@ -1,6 +1,6 @@
 ---
 name: skill-authoring
-description: How to write skills, CLAUDE.md/AGENTS.md, fix logs, and handoff documents that a weaker or zero-context model can actually execute. Load when authoring or updating any instruction file, SKILL.md, project memory, or institutional-knowledge document — including when converting lessons from a session into durable files. Not for writing user-facing docs or code comments.
+description: How to write skills, CLAUDE.md/AGENTS.md, fix logs, and handoff documents that a weaker or zero-context model can actually execute. Load when authoring or updating any instruction file, SKILL.md, project memory, or institutional-knowledge document — including when converting lessons from a session into durable files — and when about to act on a recorded capability-negative ("no such flag", "the API can't do X") found in one. Not for writing user-facing docs or code comments.
 ---
 
 # Skill Authoring for Weaker Models
@@ -113,8 +113,10 @@ artifact-producing step.
   session acting on it — routing decision or not — re-probes at
   decision time before repeating or relying on the negative, the
   re-probe satisfied only under the pinned-string rule's own
-  attribution and unknown-property-fallback clauses (an unattributed
-  answer never satisfies it); on any wording disagreement, the
+  attribution and unknown-property-fallback clauses, carried verbatim:
+  "an unattributed answer measures an unknown model, not the slug's",
+  and probe unavailable or failing → "assume the ADVERSE plausible
+  state for this decision"; on any wording disagreement, the
   pinned-string rule wins.
   Writing a tool-interface negative: pin
   it to the version and probe it was observed on — and a capability
@@ -131,8 +133,14 @@ artifact-producing step.
   resolved instance/account — re-probing the former pin is comparison
   evidence, never the acting gate, and a local help screen proves
   nothing about an account-controlled
-  feature; either way a trial invocation exercising
-  the claimed-absent capability), recording the newly observed
+  feature; an existence claim — a flag listed, a field accepted —
+  settles on `--help` or a schema read, while a FUNCTIONAL claim
+  needs a trial invocation exercising
+  the claimed-absent capability, and a trial whose success would be
+  consequential (a send, a delete, a purchase) runs as a safe
+  synthetic or dry-run form, or under its own authorization
+  (operational-rigor §2) — no safe form and no authorization → the
+  capability stays unknown), recording the newly observed
   dimensions, before
   obeying it; probe unavailable or inconclusive → the capability is
   unknown, not absent — record that where the claim is used and do not
@@ -141,7 +149,8 @@ artifact-producing step.
   instance/account and date; acting — every applicable pinned
   dimension is matched current, or re-probed, or recorded unknown.
   ✅ "playbook says no flag (pinned v0.2.98); current binary v0.2.101 —
-  ran --help: the flag exists now; corrected the playbook in place."
+  --help lists the flag now (existence), a dry-run invocation
+  accepted it (function); corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."
 - Correct a stale rule in place — never append the correction below the old
   line. A zero-context reader obeys whichever sentence it reads first, not
@@ -242,8 +251,11 @@ artifact-producing step.
   revision the change branches from AND at the landing target's
   current pre-merge state — the base can gain an equivalent rule
   after the branch point; never the edited working copy) and
-  reads at least one candidate of their own choosing — on empty
-  searches, one searched file in full; a batch landing multiple
+  reads at least one candidate of their own choosing — and before
+  CONFIRMING an absence verdict, runs the author's own fallback:
+  every searched file read in full when the duplicate was not found
+  (a one-file sample confirms nothing — short of the full read, the
+  verdict stays provisional and says so); a batch landing multiple
   additions — to one file or across files in the search set (targets,
   siblings, routers/entry files) — also READS each added rule body
   against the other additions in the batch, searches alone never

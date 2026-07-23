@@ -119,7 +119,8 @@ treat every returned result as a claim until verified.
   rule below) or the unknown-property fallback — an
   undated behavioral claim about a hosted endpoint is expired on
   arrival, and an unattributed probe never satisfies the citation.
-  ✅ "re-ran the edge battery this session — the wrapper's route line
+  ✅ "re-ran the edge battery this session, cache-bypassed — the
+  wrapper's route line
   named the slug as what answered each response — cited its timestamp
   in the
   routing note, and specced the edge in the packet anyway."
@@ -146,8 +147,10 @@ treat every returned result as a claim until verified.
   that emitted one, establishes the channel; NO-channel-by-design is
   established only by that same evidence positively showing none
   exists — and that conclusion is itself a capability-negative claim
-  under skill-authoring §3's protocol (pinned to version, instance,
-  and date; re-verified when any pinned dimension may have drifted);
+  under skill-authoring §3's protocol (pinned to the version and
+  probe it was observed on — and, attribution being wrapper- and
+  account-controlled, to the instance/account and date; re-verified
+  when any pinned dimension may have drifted);
   where its evidence is unknown or stale, treat the invocation as
   channel-present-unattributed and block. Channel established but this invocation's report missing,
   ambiguous, or naming a silent fallback → the route is unverified —
@@ -164,7 +167,9 @@ treat every returned result as a claim until verified.
   trivial probe alone, and a capacity-pressured or long-context work
   request can fall back where the probe did not.
   ✅ "wrapper docs define no route field and no invocation has ever
-  emitted one — recorded 'reachability-only, route unattributed' in
+  emitted one (no-channel pin: version, this account, today's date);
+  this invocation's model answer arrived — recorded
+  'reachability-only, route unattributed' in
   the dispatch note and proceeded on that recorded limit."
   ❌ "no route line this time — must not have a channel; dispatched"
   (unknown channel presence is a block, not a downgrade). A
@@ -180,8 +185,9 @@ treat every returned result as a claim until verified.
   wrapper's OWN config, docs, or request trace, then validate that
   resulting ID with the provider; mapping unresolved → the namespace
   crossing stays blocked.
-  ✅ "sent 'reply OK' through the wrapper we dispatch with — the model
-  answered and the wrapper's route line named it; for the quota check,
+  ✅ "sent 'reply OK <fresh nonce>' through the wrapper we dispatch
+  with — the answer carried the nonce (no replay) and the wrapper's
+  route line named it; for the quota check,
   read the wrapper config's alias map to get the provider ID, then
   confirmed that ID in the provider's model list."
   ❌ "the CLI lists it, so it's available — route tomorrow's batch to

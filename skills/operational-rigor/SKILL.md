@@ -283,8 +283,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   the other a pre-filter. A trace you cannot inspect leaves that
   coverage unverified — say so. "There is a check called X" is a claim
   about naming, not behavior.
-  ✅ "traced check X at run 1234's revision: it asserts A and B against
-  the real adapter; the run's log shows that path executed and A, B
+  ✅ "traced check X at run 1234: its oracle (at the run's own harness
+  revision) asserts A and B against
+  the real adapter; the run tested the image digest built from the
+  change's commit; the log shows that path executed and A, B
   passed with failures propagating to the job status; nothing in its
   path drives C — C is unverified."
   ❌ "the change is safe, check X covers it" (named, never read).

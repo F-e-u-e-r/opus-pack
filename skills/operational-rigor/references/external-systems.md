@@ -119,8 +119,13 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   while its write step silently never executed; a second output channel
   on the same task was separately dead on a stale hardcoded credential —
   contributor-reported shape.) Gates first — and two branches exit here before any fire: reviewing
-  without authorization to run it goes straight to the inspection-only
-  arm at the end of this entry, and a schedule with no authorizable
+  without authorization to run it still performs every read-only step
+  — the configured-entry read and the full channel inventory below
+  included (the incident's second dead channel lived in task config
+  an inventory-skipping reviewer never opens) — then takes the
+  inspection-only
+  arm at the end of this entry, skipping only fires, enabling,
+  suppression, and every other mutation; and a schedule with no authorizable
   alert path cannot complete arming — record that gap and stop before
   any test fire. Otherwise every consequential supervised or test
   invocation — the repeat run below included — carries its own
