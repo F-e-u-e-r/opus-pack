@@ -153,6 +153,26 @@ A generic green test is not proof. A gate is real only if:
    discipline. Fixture-design corollary: hang the trap on a breadcrumb
    the task itself forces (the failing check's output names the doc), or
    read-narrow evidence discipline will disarm the fixture.
+   The two-sided proof above validates a grader for ONE invocation shape at
+   ONE time — reusing it later (a new run, a different candidate pool, hours
+   on in the same session) is a fresh claim, not an inherited one. Before
+   reuse: re-run against both the known-good and known-bad references again,
+   diffing the score against the value ON RECORD from the prior validation —
+   any drift is stop-the-line, never "still mostly failing, close enough."
+   A wrong invocation shape (a file path fed where the grader expects a
+   directory, a stale flag) can make the harness fail to load the candidate
+   at all while the grader still emits a normal-looking scorecard — the
+   candidate never ran, but the grader can't tell "candidate legitimately
+   failed" from "candidate never executed." Watch for the inverted
+   signature this produces: edge cases PASS while happy-path cases FAIL,
+   because an edge case's own error-tolerant branch (a try/catch that treats
+   a thrown exception as valid defensive behavior) silently absorbed the
+   harness's load failure and got credited for it. (Incident: a
+   directory-vs-file argument mismatch made every candidate throw
+   `MODULE_NOT_FOUND` before its code ever ran; the known-bad reference
+   scored 2/6 against a recorded 0/6, and the 2 passes were exactly the two
+   capacity-edge cases whose accepted-throw branch swallowed the harness's
+   own error.)
 3. The **easy fake pass is named** and closed — hardcoded expected value,
    weakened assertion, testing the mock, a test that compiled but was never
    registered/run, a permanently `#[ignore]`/`.skip`ped backlog test that reads
