@@ -412,6 +412,21 @@ reviewers that they silently absorb as implementers.
   Immaterial discrepancies go in the findings, never into the verdict.
   The delivered tree stays untouched — no edits, no new files; findings
   go in the reply, not the tree.
+- **A reported FAILURE is a claim too, exactly like a reported success —
+  reproduce it before acting on it.** A subordinate's own execution
+  environment can fabricate a RED gate as easily as a model fabricates a
+  green one: a sandbox restriction masquerading as a code defect. Acting
+  on an unreproduced RED either reverts working code (the failure was the
+  sandbox, not the change) or — worse — teaches the next session to treat
+  RED gates as noise. Re-run the claimed failing check yourself, outside
+  the subordinate's environment, before reverting, escalating, or
+  otherwise trusting the verdict. (Incident: a subordinate CLI's
+  sandboxed run reported a verbatim "GATES RED — do not ship" with a
+  specific failure reason — its test runner could not create IPC pipes
+  under that sandbox's restrictions; the same gate re-run on the host was
+  green both times the subordinate reported RED. The subordinate had
+  disclosed the sandbox limitation honestly in its own report — the risk
+  was a reader trusting the RED verdict without reading that far.)
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
