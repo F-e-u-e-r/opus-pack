@@ -46,7 +46,7 @@ applicability before deduplicating (Verify critics too; in-file
 evidence overrides history, and an entry with no evidence binds
 nothing. §3's canonical set still governs the audit loop itself ("Dedup
 new findings against everything ever surfaced, including ones already
-rejected").
+rejected: dedup against confirmed-only never converges").
 
 Write-back moves entries across categories: an OPEN finding whose fix
 landed this round moves to PRIOR FIXES carrying the fix's correctness

@@ -110,7 +110,11 @@ artifact-producing step.
   follows delegation-and-review §1's pinned-string rule, not this
   protocol: date-stamp the recorded claim where written, and any
   session acting on it — routing decision or not — re-probes at
-  decision time before repeating or relying on the negative.
+  decision time before repeating or relying on the negative, the
+  re-probe satisfied only under the pinned-string rule's own
+  attribution and unknown-property-fallback clauses (an unattributed
+  answer never satisfies it); on any wording disagreement, the
+  pinned-string rule wins.
   Writing a tool-interface negative: pin
   it to the version and probe it was observed on. Acting on one: read
   its pin; the tool's version has changed, or the pin is missing →
