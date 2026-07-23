@@ -1,6 +1,7 @@
 # delegation-and-review · references: recurring-sweep ledgers
 
-The lifecycle behind §2's "Recurring dispatches carry ledgers" field
+The lifecycle behind §2's "Recurring review campaigns carry ledgers"
+field
 (`unprobed` — see the
 skill's Provenance; protocol body placed here per the pack's split
 precedent). Load when dispatching or reviewing a round of a named,

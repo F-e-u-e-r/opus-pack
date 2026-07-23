@@ -26,7 +26,12 @@ When the requested end-state permits a commit, commit the content under
 review on the reviewed branch and note the revision — staging exactly
 the content under review; unrelated dirty or untracked material is
 attributed first (operational-rigor's baseline rule), never swept into
-the settle commit; an end-state
+the settle commit — and every noncommitted path remaining in the
+protected read set is STILL captured and materialized into the copy:
+the commit settles the reviewed content's history, not the rest of
+the read set's state (a dirty config the reviewed code depends on is
+otherwise replaced by its clean committed form in the copy, and the
+copy-equality check passes against the wrong baseline); an end-state
 requiring unchanged history or uncommitted work takes the restorable
 capture — working content, index state, and untracked files across the
 protected read set, plus the baseline refs — verified to hold everything

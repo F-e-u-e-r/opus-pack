@@ -178,8 +178,11 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   is unarmed and that gap is the report; no automated outward action
   invents itself). Anything short stays unarmed — and enabling is not
   the end: scheduler binding stays an open claim until the first
-  scheduler-originated fire lands its attributed effects by its deadline
-  (the alarm's first cycle checks exactly that). Ongoing: a dead task
+  scheduler-originated fire whose emission conditions were due lands
+  its attributed effects by its deadline
+  (the alarm's first cycle checks exactly that; a first fire with no
+  channel due leaves binding open — its absence proves only the
+  suppression branch, never the binding). Ongoing: a dead task
   cannot report its own death, and a watcher that can die silently moves
   the problem one layer down — terminate the chain in a mechanism whose
   alarm fires on ABSENCE by construction (an externally enforced

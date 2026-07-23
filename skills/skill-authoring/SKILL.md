@@ -99,7 +99,8 @@ artifact-producing step.
   interactively", "the API can't do X" into an instruction file — or
   about to act on one already there: these are version-scoped
   observations that read as timeless
-  rules. A stale positive claim fails loud the first time someone follows
+  rules. A stale positive claim is far likelier to be exercised and
+  exposed the first time someone follows
   it; a stale negative fails silent — it steers every later session away
   from a capability that now exists, and nothing ever exercises it to
   expose the rot. One playbook's "model switching only works in the
@@ -126,10 +127,13 @@ artifact-producing step.
   account, configuration, or simply time since the dated
   observation) may have drifted →
   re-verify with one probe (`--help` for a local interface claim; a
-  server-side capability probes against the pinned instance/account —
-  a local help screen proves nothing about an account-controlled
+  server-side capability probes against the CURRENT decision's
+  resolved instance/account — re-probing the former pin is comparison
+  evidence, never the acting gate, and a local help screen proves
+  nothing about an account-controlled
   feature; either way a trial invocation exercising
-  the claimed-absent capability) before
+  the claimed-absent capability), recording the newly observed
+  dimensions, before
   obeying it; probe unavailable or inconclusive → the capability is
   unknown, not absent — record that where the claim is used and do not
   repeat the negative as fact. Done: writing — the claim carries its
@@ -219,9 +223,13 @@ artifact-producing step.
   of every file searched; from that real outline — never from memory —
   name the candidate homes (every section with a hit, plus every section
   the fact would live in if it existed) and read each in full before any
-  verdict. A headingless file is read in full. When every search came
-  back empty, read every searched file in full before concluding
-  anything — the incidents' catch was the read, not the grep. Duplicate
+  verdict. A headingless file is read in full. When the candidate
+  reads end with no duplicate found — and always when every search
+  came back empty — read every searched file in full before any
+  absence verdict: the trigger for the full read is failing to find
+  the duplicate, never grep emptiness (one irrelevant hit must not
+  disable the fallback), and the incidents' catch was the read, not
+  the grep. Duplicate
   found → no second home, wherever it lives: in the target, no addition;
   in a sibling, cross-reference it — the "A cross-reference is not a
   load" rule below still applies as written. Otherwise the change record

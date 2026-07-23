@@ -103,7 +103,9 @@ treat every returned result as a claim until verified.
   every such measurement where it is recorded; at decision time, re-run
   the probe — its battery responses route-attributed per the labels
   rule below, not just a preceding trivial check (an
-  unattributed answer measures an unknown model, not the slug's) —
+  unattributed answer measures an unknown model, not the slug's), and
+  produced by this invocation, not replayed from a cache (the labels
+  rule's freshness clause) —
   and cite the fresh result's timestamp and configuration —
   the fresh result informs the routing, it never replaces §2's edge
   specification and proof gate for the work itself, and no measurement
@@ -134,13 +136,20 @@ treat every returned result as a claim until verified.
   and execution context the work will use; the pass is two observations
   — a model ANSWER to that prompt, AND the wrapper's own route report
   naming this route as what ANSWERED (a banner echoing the requested
-  slug is configuration, not attribution) — wrapper banners,
+  slug is configuration, not attribution) — both produced by THIS
+  invocation: a cached or replayed response (wrapper cache, proxy
+  layer) is not a pass — run cache-bypassed or carry a
+  per-invocation element a replay cannot contain. Wrapper banners,
   usage text, diagnostics, or error pages are not answers. Channel
   presence is established, never assumed: the wrapper's docs or config
   declaring a what-answered report, or a prior same-wrapper invocation
   that emitted one, establishes the channel; NO-channel-by-design is
   established only by that same evidence positively showing none
-  exists. Channel established but this invocation's report missing,
+  exists — and that conclusion is itself a capability-negative claim
+  under skill-authoring §3's protocol (pinned to version, instance,
+  and date; re-verified when any pinned dimension may have drifted);
+  where its evidence is unknown or stale, treat the invocation as
+  channel-present-unattributed and block. Channel established but this invocation's report missing,
   ambiguous, or naming a silent fallback → the route is unverified —
   like an error or a non-answer, do not dispatch dependent work on it
   (§4's retry/escalation ladder governs); channel presence UNKNOWN →
@@ -284,9 +293,11 @@ Every packet names:
 - **Cost asymmetry** — for reviewers/verifiers, name which failure direction is
   expensive (e.g. a missed unverified claim vs. a false alarm) so scrutiny is
   weighted toward it, not split evenly.
-- **Recurring dispatches carry ledgers** (`unprobed` — private incident as shape;
-  see Provenance). A field for RECURRING dispatches only — it never
-  blocks a one-off. Fresh-context reviewers re-litigate a campaign's
+- **Recurring review campaigns carry ledgers** (`unprobed` — private incident as shape;
+  see Provenance). A field for the rounds of a RECURRING review or
+  audit campaign only — it never
+  blocks a one-off, and a recurring non-review dispatch
+  (implementation, operations) is outside its scope. Fresh-context reviewers re-litigate a campaign's
   history: one re-raised a finding class an earlier round had refuted
   against the dependency's own source; another flagged as a defect the
   exact code a prior round had shipped as a fix. So a recurring packet
