@@ -19,7 +19,7 @@ signature scanning is not a security boundary and has been removed; the
 Two files:
 
 - `hooks/skill_snapshot.py` — the **observation and persistence primitive**:
-  root enumeration (`list_candidates`), tree snapshot, canonical digest,
+  root enumeration (`scan_root`), tree snapshot, canonical digest,
   baseline load/store, and a small CLI (`digest` / `record` / `status`).
   Library-shaped and unit-testable; its library core decides no verdicts (the
   CLI adds a thin verdict-recording convenience so the skill's §3 binding is

@@ -2,7 +2,7 @@
 """Observation/persistence primitive for the skill-vetting advisory hook.
 
 This module owns everything that touches the filesystem for
-`hooks/skill-vetting-advisory.py`: root enumeration (`list_candidates`), the
+`hooks/skill-vetting-advisory.py`: root enumeration (`scan_root`), the
 whole-tree snapshot, the canonical digest encoding, and the hardened baseline
 load/store. Its LIBRARY core is policy-free (it decides no verdicts); the CLI
 adds a thin verdict-recording convenience (`record`/`status`) so the
@@ -69,6 +69,7 @@ MAX_FILE_BYTES = 8 << 20    # per-file content cap; larger is an anomaly, never 
 MAX_TOTAL_BYTES = 64 << 20  # per-candidate content budget
 MAX_DEPTH = 24              # per-candidate directory depth
 MAX_CANDIDATES = 256        # top-level entries enumerated per root
+MAX_OPEN_DIRS = 128         # peak concurrently-open directory fds in one walk (bounds fd use)
 MAX_BASELINE_BYTES = 4 << 20
 
 _DIR_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -220,11 +221,18 @@ def snapshot_tree(root, budget=None):
 
     Directory descent goes ONLY through O_NOFOLLOW-verified directory fds, so a
     directory swapped for a symlink mid-scan is never traversed as the original
-    tree (it becomes an anomaly). `budget` may be a shared dict to bound work
-    across many candidates in one run; when omitted, a per-candidate budget is
-    used. A caller-supplied budget already exhausted short-circuits to a budget
-    anomaly."""
-    root = os.fsencode(root)
+    tree (it becomes an anomaly). Peak concurrently-open dir fds are bounded by
+    MAX_OPEN_DIRS (fail-closed past it), so a very wide/bushy tree cannot
+    exhaust the fd table. `budget` may be a shared dict to bound work across many
+    candidates in one run; when omitted, a per-candidate budget is used. A
+    caller-supplied budget already exhausted short-circuits to a budget
+    anomaly. A trailing slash / "/." on `root` is normalized away first, so a
+    symlinked candidate root cannot be laundered by path spelling (SV5-01)."""
+    # Normalize away a trailing slash / "/." BEFORE lstat: `link/` or `link/.`
+    # makes the OS resolve a candidate-root symlink to its target, laundering a
+    # symlinked dir past the symlink check (round-5 SV5-01). normpath strips
+    # both while leaving the final component un-resolved for lstat.
+    root = os.path.normpath(os.fsencode(root))
     entries = []      # (rel_bytes, kind_byte, payload_bytes)
     anomalies = []    # (reason_str, rel_bytes)
     if budget is None:
@@ -242,13 +250,14 @@ def snapshot_tree(root, budget=None):
         return _finish(entries, anomalies)
 
     if stat.S_ISLNK(lst.st_mode):
+        # Route through the SAME encoder scan_root uses for a symlink candidate,
+        # so the CLI and the hook agree on a symlinked root's digest (sol nit:
+        # otherwise the two disagree and churn status).
         try:
             target = os.readlink(root)
         except OSError:
             target = b""
-        anomalies.append(("symlink", b""))
-        _entry(entries, anomalies, budget, b"", b"S", target)
-        return _finish(entries, anomalies)
+        return _anomaly_snap("symlink", target)
 
     if stat.S_ISREG(lst.st_mode):
         rootdir = os.path.dirname(root) or b"."
@@ -346,6 +355,17 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                             anomalies.append(("symlink", childrel))
                             _entry(entries, anomalies, budget, childrel, b"S", target)
                         elif stat.S_ISDIR(dst.st_mode):
+                            # Bound PEAK open dir fds (round-5 SV5-02): the stack
+                            # holds one open fd per pending subdir, so a very wide
+                            # or bushy tree could accumulate O(width) fds. Cap the
+                            # live stack and fail CLOSED (budget anomaly -> advise)
+                            # rather than open unboundedly. A real skill is small;
+                            # this only trips a pathological tree.
+                            if len(stack) >= MAX_OPEN_DIRS:
+                                anomalies.append(("budget", childrel))
+                                _entry(entries, anomalies, budget, childrel, b"A", b"fanout")
+                                budget["stop"] = True
+                                break
                             sub_fd = _opendir_nofollow(name, dir_fd, anomalies, childrel)
                             if sub_fd is None:
                                 _entry(entries, anomalies, budget, childrel, b"A",
@@ -387,9 +407,12 @@ def _anomaly_snap(kind, target=b""):
 
 
 def scan_root(root, budget=None):
-    """Stream one skills ROOT and snapshot each top-level entry, holding only
-    O(depth) directory fds at a time (round-4 SV4-02: no eager materialization,
-    no all-fds-up-front). Returns {"candidates", "anomalies", "complete"}:
+    """Stream one skills ROOT and snapshot each top-level entry (round-4 SV4-02:
+    no eager materialization, no all-candidate-fds-up-front - candidates are
+    processed one at a time). The in-tree walker holds one open fd per PENDING
+    subdirectory, hard-capped at MAX_OPEN_DIRS and failing closed past it
+    (round-5 SV5-02), so peak fd use is bounded by a constant, not O(width).
+    Returns {"candidates", "anomalies", "complete"}:
     candidates = [(name_bytes, snap)] for EVERY top-level entry - a real
     subdirectory (walked), a symlink or special file or open-failure (an
     anomaly snap), so none is silently skipped (SV4-01). A top-level regular
@@ -486,7 +509,10 @@ def _snapshot_from_fd(dir_fd, budget):
 def _finish(entries, anomalies):
     h = hashlib.sha256()
     h.update(_HEADER)
-    h.update(struct.pack(">I", SCHEMA_VERSION))
+    # Bind BOTH versions into the digest (round-5 SV5-03): otherwise two tool
+    # copies differing only in POLICY_VERSION produce the same digest, and a
+    # verdict reviewed under an old policy could be reused under a new one.
+    h.update(struct.pack(">II", SCHEMA_VERSION, POLICY_VERSION))
     for path, kind, payload in sorted(entries):
         h.update(struct.pack(">I", len(path)))
         h.update(path)
@@ -708,9 +734,13 @@ def _cli_record(argv):
     # badname refusal below (round-4 SV4-08).
     dir_base = os.path.basename(os.path.normpath(os.fsencode(args["dir"])))
     if os.fsencode(args["name"]) != dir_base:
-        print("REFUSED: --name must equal the directory's basename (%r), not %r"
-              % (dir_base.decode("utf-8", "backslashreplace"), args["name"]),
-              file=sys.stderr)
+        # Echo only display-safe forms - a hostile basename (or --name) must not
+        # ride out through this stderr, which §3 feeds to the model (round-5
+        # SV5-04).
+        db_disp, _ = display_name(dir_base)
+        nm_disp, _ = display_name(os.fsencode(args["name"]))
+        print("REFUSED: --name (%s) must equal the directory's basename (%s)"
+              % (nm_disp, db_disp), file=sys.stderr)
         return 2
     # SAFE-TO-PROPOSE MUST bind to the digest the reviewer examined - the verdict
     # is otherwise a claim about unread bytes (round-4 SV4-07).
