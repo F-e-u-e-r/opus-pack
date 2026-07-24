@@ -158,6 +158,15 @@ artifact-producing step.
 - End each skill with a short provenance note and a one-line re-verification
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
+- **A merged upstream integration is not necessarily the end of the
+  campaign.** Before diff-verifying a local file against "upstream final"
+  and closing the sync, check for PRs merged AFTER the integration PR in
+  hand — a maintainer's review round can continue in follow-up PRs rather
+  than concluding in the one that first merged. Treating an intermediate
+  merge as terminal ports a state that is already stale and owes a
+  follow-up fold once the later rounds land. List merged PRs newer than
+  the one being synced against; only an empty list makes "upstream final"
+  a safe anchor.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
