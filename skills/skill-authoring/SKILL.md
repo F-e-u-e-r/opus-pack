@@ -158,6 +158,69 @@ artifact-producing step.
 - End each skill with a short provenance note and a one-line re-verification
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
+- **A merged upstream integration is not necessarily the end of the
+  campaign** (`unprobed` — the upstream half of the incident is
+  verifiable in this repo's PR history, the sync half
+  contributor-reported; see Provenance). Before diff-verifying a local
+  file against "upstream final" and closing the sync, check for
+  continuation on the synced surfaces — a maintainer's review can
+  continue in follow-up PRs rather than concluding in the one that
+  first merged, and at sync time those rounds may not have merged YET.
+  The synced surfaces are every file the sync contract couples (the
+  change-X-update-Y pairs), not only the file in hand. Check BOTH
+  lists, each with its own invocation, on the SAME upstream repo and
+  target branch lineage (a backport into another release branch is not
+  a hit) — OPEN first, then MERGED, so a PR that merges between the
+  two queries leaves the first set only by entering the second: ALL
+  currently-open PRs (no creation-time bound — a follow-up opened
+  BEFORE the anchor merged still counts; e.g. `gh pr list --repo
+  <upstream> --base <branch> --state open`), then PRs merged after
+  the anchor by MERGE TIME, not PR number (e.g. `gh pr list --repo
+  <upstream> --base <branch> --state merged --json
+  number,mergedAt` — the repo/base flags and the mergedAt field are
+  load-bearing: an unflagged query can read the wrong fork or
+  default branch, and PR numbers do not order by merge time). Each list is enumerated
+  to EXHAUSTION — the tool's default page size (gh's is 30) silently
+  truncates, and a date bound does not lift the cap: paginate until
+  the last page is short, and record the total counted. "Touching" is
+  decided from each candidate's CHANGED FILES read mechanically, with
+  the per-PR query ALSO repo-scoped — PR numbers are repository-local,
+  so an unflagged view from a fork checkout reads the wrong PR (e.g.
+  `gh pr view <n> --repo <upstream> --json files` or
+  `gh pr diff <n> --repo <upstream> --name-only`),
+  never from titles or bodies — a continuation PR's title may carry
+  no path token while it edits the synced file. File enumeration has
+  its own caps (gh's files query returns the first 100; hosted diffs
+  truncate around 300): verify the retrieved file count equals the
+  PR's changedFiles total, and when completeness cannot be proven,
+  treat that PR as TOUCHING (conservative) or keep the sync
+  provisional. One OPEN+MERGED pass is a snapshot with
+  blind windows at its edges — a PR can change state between any two
+  queries — so REPEAT the pass until a full OPEN+MERGED pass adds NO new
+  TOUCHING-OR-UNCLASSIFIED candidate versus the previous pass — every
+  newcomer gets its changed-files classification, AND every still-open
+  candidate is reclassified each pass — an open PR's files mutate with
+  new commits (track head OIDs to skip provably-unchanged ones); a
+  transition to touching-or-unclassified destabilizes, while
+  non-touching classifications never do (else a busy repo livelocks
+  into provisional despite zero synced-surface hits);
+  each pass's merged query re-covers whatever the prior open query
+  lost to a merge. Still unstable after three passes → record the
+  sync provisional, no further queries owed. A rename touches when EITHER path side
+  matches a synced surface — path-oriented file listings can hide the
+  old path, so where the tool does not expose both sides, treat
+  renames conservatively as touching. Any touching hit → do not close
+  the sync as final: re-anchor to the newest touching merged state,
+  RE-DIFF the local files against that new state, and re-run the
+  checks, or — when touching rounds are still open — record the sync
+  as provisional with the follow-up fold owed. The re-diff is a GATE,
+  not a citation: final closure requires zero unexplained
+  sync-contract differences (differences → fold them and re-run;
+  unresolved → provisional). Done when the sync record cites the
+  stable-pass checks (commands + date + totals) with ZERO TOUCHING
+  HITS — the candidate lists may be nonempty — and a clean local
+  diff against the anchor state; that makes the anchor safe AS OF the
+  check, never forever; otherwise it carries the provisional label.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
@@ -481,6 +544,33 @@ default; an AI rewrite does not launder a derivative).
   demoting incident detail to the fix log, and deleting rules that never
   fire. Record what was removed and why, so a rule that turns out to have
   been load-bearing can be restored.
+- **A line-count budget is relative to what earns its place, not a fixed
+  number to shrink back to** (`unprobed` — private incident as shape;
+  see Provenance). The ~150 trigger above starts a pass; this rule
+  closes the pass's accounting. After extracting everything that
+  compacts cleanly, a file can still sit above an old baseline because
+  a genuinely new trigger was added since that baseline was set — that
+  gap is not unpaid debt to keep chasing on the next pass; it is the
+  new baseline. Confusing the two produces a maintenance log that
+  carries the same "still owes an extraction pass" line for months on
+  content that already extracted everything extractable. After a
+  compaction pass, in order: (1) produce the pass's word-diff
+  artifact (the bullet below) — no artifact, no accounting; (2) test
+  every remaining line against a live trigger; (3) any line traces to
+  NO live trigger → the debt STANDS: the owes-line stays, or on a
+  first pass one is CREATED in the maintenance/fix-log entry
+  recording the pass — never a baseline; (4) only when the artifact
+  exists AND every remaining line is live, record the new line count
+  as the new baseline in the entry that carried the debt (retiring
+  its owes-line), or on a first pass in the entry recording the pass.
+  A baseline without steps 1-2 is the phantom-debt inversion —
+  declaring extraction complete on self-judgment. Thereafter the
+  LINE-COUNT arm of the compaction trigger above reads against the
+  recorded baseline — re-firing on growth beyond that number, not on
+  the old one; the trigger's other arms (description mismatch, index
+  scannability) are untouched by any baseline. Only
+  future wording or detail growth against the recorded baseline counts
+  as debt.
 - **A compaction or extraction pass needs a word-diff, not a structure check**
   (verification-time counterpart to §3's don't-paraphrase rule above, which
   guards the writing, not the later edit). Grepping that anchors, pointers,
@@ -681,4 +771,33 @@ covenant's second branch; the executable probe — seed a flipped
 default above an untagged stale verdict block and observe whether a
 weak-tier executor follows the stale order — has not run; the in-body
 marker records that debt.
-Stable method; no environment facts to re-verify.
+The §7 relative-budget rule (2026-07-23) comes from a contributor
+incident: a maintenance log carried a "still owes an extraction pass"
+line across sessions for a file that had already extracted everything
+extractable — every remaining line traced to a live trigger, including
+one added after the old baseline was set; the size gap was that new
+rule's cost, and honoring the stale number would have meant gutting a
+live trigger or carrying phantom debt indefinitely
+(contributor-reported; the private log is verifiable by the
+contributor, not linkable here). Ships `unprobed` per the README
+covenant's second branch; the executable probe — seed a maintenance
+log whose owes-line predates a legitimate post-baseline addition and
+observe whether an executor re-baselines or keeps chasing the old
+number — has not run; the in-body marker records that debt.
+The §3 campaign-continuation rule (2026-07-23) comes from an incident
+whose upstream half is verifiable in THIS repo's public history: the
+#59 combined integration merged mid-campaign, and the review continued
+through #60 and #61 (a 12-round, 3-PR campaign); a contributor's
+reverse-port had diff-verified local caches against #59 as "upstream
+final" and owed a follow-up fold when the later rounds landed (the
+local-cache half is contributor-reported). Ships `unprobed` per the
+README covenant's second branch — the in-repo history evidences the
+incident, not a probe; the executable probe — fixture a repo whose
+sync target has newer merged PRs touching the synced files and observe
+whether a weak-tier executor checks before declaring the sync final —
+has not run; the in-body marker records that debt.
+Re-verify against current tooling: `gh pr list --help | grep -i
+"default 30"` (exits nonzero when the documented default page size
+drifts — re-read the §3 campaign-continuation check's pagination
+language then), and re-check the hosted diff/file-listing caps in the
+forge's current limits docs; everything else is stable method.
