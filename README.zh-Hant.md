@@ -17,15 +17,15 @@
 ---
 
 **Opus Pack 是一個 Claude Code plugin marketplace** —— 一個 repo、兩個可各自
-安裝的 plugin、共 12 個 skill,為 Fable 5 退場後的日常模型
+安裝的 plugin、共 13 個 skill,為 Fable 5 退場後的日常模型
 (Opus 4.8 / Sonnet 5 / Haiku)而做:
 
 | Plugin | 領域 | 安裝內容 |
 |---|---|---|
-| **`opus-pack`** | Agent 紀律——工作如何完成:rigor、委派、驗證、證據 | 9 個 skill |
+| **`opus-pack`** | Agent 紀律——工作如何完成:rigor、委派、驗證、證據 | 10 個 skill |
 | **`design-pack`** | 設計工藝——同一風格的視覺/UI 判斷:版面、動效、審查 | 3 個 skill |
 
-另有**三個選配 hook**——repo 層級、手動安裝;兩個 plugin 都不註冊它們
+另有**四個選配 hook**——repo 層級、手動安裝;兩個 plugin 都不註冊它們
 (見[強制層:hooks](#強制層hooks-設定方法))。全部押注一件事:強模型本就具備的
 判斷力,靠**更多散文**得到的提升,遠不如靠**在工作出錯時大聲失敗的閘門**。
 兩個 plugin 可擇一或兩者都裝——`design-pack` 與 `opus-pack` 共用這個
@@ -57,7 +57,7 @@ opus-pack 在場時解析得到;見 [`design-pack`](#design-pack設計-skill))�
 /plugin install design-pack@opus-pack
 ```
 
-`opus-pack@opus-pack` 裝紀律 plugin(9 個 skill);`design-pack@opus-pack`
+`opus-pack@opus-pack` 裝紀律 plugin(10 個 skill);`design-pack@opus-pack`
 裝設計 plugin(3 個 skill)。擇一或兩者都裝。Skills 會以 namespace 形式載入
 (`opus-pack:operational-rigor`、`design-pack:ui-design-craft`……),用
 `/plugin marketplace update` 更新。兩個 plugin 都不註冊 hooks——它們改變
@@ -89,6 +89,7 @@ mkdir -p ~/.claude/skills && cp -R design-pack/skills/* ~/.claude/skills/
 | `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | 使用者提供的 roadmap 參考稿,砍儀式、補判斷 |
 | `personal-goal-planning` | 教練式五步驟:最少提問建檔、三層目標(2–4週/2–3月/6–12月)單一主線、可執行任務與可觀察完成標準、務實週節奏、含卡關規則的每週檢討 | @pro_ai.news 目標教練 protocol(Threads)+ 本包 house rules |
 | `domain-evidence-discipline` | 非程式交付物的證據紀律(行銷/研究/資料/營運):各領域的最低證據集、權威順序、「以觀察驗證」的定義、給審查者獵捕的 fraud table;red-line 專業判斷一律拒絕並轉介合格人類 | Sahir619/fable-method 的 domain-adapter schema(MIT、只採意念)濃縮為單一 pattern skill;實例為本包自行壓縮 |
+| `skill-vetting` | 在第三方 skill / plugin / hook / 指令檔執行前先掃 trojan:把 operational-rigor §2 的 install gate 變成可執行流程,附 trojan-shape checklist 與 fail-closed 判決(乾淨掃描絕不等於「safe」);另附一個 opt-in 的 advisory session-start 絆線(`hooks/skill-vetting-advisory.py`) | operational-rigor §2(canonical)+ 2026-07 的 12-source 社群 security-skill 稽查、以及 2026-07-24 starred-repo 挖礦掃描抓到的第 4 個活躍 trojan——見致謝 |
 | `cross-model-review` | load-bearing merge 前找**不同模型家族**做對抗審查:session 時偵測審查者(不寫死陣容)、自足 packet、findings 視為主張、有界的審查-修正迴圈(每位審查者都給出確認過的 verdict——各自為 PROCEED,或其每個剩餘 FIX 項皆為記錄在案且有正當理由的 gap,才 merge;timeout/空回應不算 verdict)、exit code≠通過。只放 doctrine——具體 CLI 不進 pack | 由 owner 私有 cross-model-review CLI 筆記提升;doctrine 一般化,機器 recipe 保留在個人端 |
 
 `ground-truth-gates/template/` 已實跑驗證(Node v23,2026-07-06):
@@ -192,6 +193,7 @@ Hook 是 Claude Code harness 本身在特定事件上執行的 shell 指令—�
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
+cp hooks/skill-vetting-advisory.py .claude/hooks/
 ```
 
 維護者可用下列指令回歸測試每一個 hook(每套測試都涵蓋放行與擋下兩條路):
@@ -200,6 +202,7 @@ cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hook
 bash hooks/test-gate-before-commit.sh
 bash hooks/test-verify-before-stop.sh
 bash hooks/test-gate-credential-destruction.sh
+bash hooks/test-skill-vetting-advisory.sh
 ```
 
 然後在 `.claude/settings.json` 加入:
@@ -252,7 +255,16 @@ bash hooks/test-gate-credential-destruction.sh
   "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-credential-destruction.py" }
 ```
 
-三個 hook 都會把稽核事件寫入 `~/.claude/hooks/hooks.log`——「閘門多常觸發、被擋之後發生什麼」變成可稽核,而不是看不見。
+**第四個(可選)hook——未審或變動的第三方 skill 的 advisory 絆線。** `hooks/skill-vetting-advisory.py`(Python 3 標準庫,已測試)是一個**純 advisory** 的 `SessionStart` hook,是 `skill-vetting` skill 的搭檔。**簽章掃描不是安全邊界,已移除**:它對每個 installed skill 目錄(`~/.claude/skills` 與專案的 `.claude/skills`)裡的**每個檔案**做 hash——所以任何地方(不只 `SKILL.md`)的新增/修改/刪除/改名/symlink 變動都算變動——對新/變動的 skill 注入一行導向 `skill-vetting` skill。它**絕不擋、也絕不輸出「safe」**——`SessionStart` hook 無法 deny,而會放行的掃描器正是 `skill-vetting` 要避開的虛假保證陷阱;乾淨、未變動或 first-run baseline 一律靜默,讀取錯誤或 cache 損毀則 **fail closed**(提示,絕不靜默 baseline)。攻擊者控制的 skill 名字在進入 model context 前會被消毒。它是導向完整 vetting 閱讀的絆線,絕非替代品——文字 regex 對 skill 要抓的散文式/跨檔案/拆分式 payload recall 太低,只會加上虛假保證與注入面。設定方式:
+
+```json
+"SessionStart": [
+  { "matcher": "", "hooks": [ { "type": "command",
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/skill-vetting-advisory.py" } ] }
+]
+```
+
+三個 gating hook 把稽核事件寫入 `~/.claude/hooks/hooks.log`,advisory vetting hook 寫入 `~/.claude/skill-vetting-advisory.log`——閘門活動與 vetting hook 的提示都變成可稽核,而不是看不見。
 
 **兩個注意事項。** Hook 以你的權限執行任意 shell:啟用前先讀過腳本,且建議把 hook commit 進 repo、像程式碼一樣被審查。另外 Claude Code 在啟動時快照 hook 設定:改完後要用 `/hooks` 選單確認或重啟 session 才生效。
 

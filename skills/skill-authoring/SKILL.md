@@ -879,4 +879,4 @@ trigger-degradation note with
 its scope-install / invoke-by-name / prune mitigation ladder (MathWorks
 field-of-use license — ideas only, no text). Both ship `unprobed` per the
 covenant; their probes join the private round-5 queue — the catalog-collision
-rule's is directly runnable against this pack's own 12 skills.
+rule's is directly runnable against this pack's own 13 skills.
