@@ -183,8 +183,11 @@ artifact-producing step.
   to EXHAUSTION — the tool's default page size (gh's is 30) silently
   truncates, and a date bound does not lift the cap: paginate until
   the last page is short, and record the total counted. "Touching" is
-  decided from each candidate's CHANGED FILES read mechanically (e.g.
-  `gh pr view <n> --json files` or `gh pr diff <n> --name-only`),
+  decided from each candidate's CHANGED FILES read mechanically, with
+  the per-PR query ALSO repo-scoped — PR numbers are repository-local,
+  so an unflagged view from a fork checkout reads the wrong PR (e.g.
+  `gh pr view <n> --repo <upstream> --json files` or
+  `gh pr diff <n> --repo <upstream> --name-only`),
   never from titles or bodies — a continuation PR's title may carry
   no path token while it edits the synced file. File enumeration has
   its own caps (gh's files query returns the first 100; hosted diffs
@@ -195,9 +198,12 @@ artifact-producing step.
   blind windows at its edges — a PR can change state between any two
   queries — so REPEAT the pass until a full OPEN+MERGED pass adds NO new
   TOUCHING-OR-UNCLASSIFIED candidate versus the previous pass — every
-  newcomer gets its changed-files classification, but a newcomer
-  classified non-touching does not destabilize the loop (else a busy
-  repo livelocks into provisional despite zero synced-surface hits);
+  newcomer gets its changed-files classification, AND every still-open
+  candidate is reclassified each pass — an open PR's files mutate with
+  new commits (track head OIDs to skip provably-unchanged ones); a
+  transition to touching-or-unclassified destabilizes, while
+  non-touching classifications never do (else a busy repo livelocks
+  into provisional despite zero synced-surface hits);
   each pass's merged query re-covers whatever the prior open query
   lost to a merge. Still unstable after three passes → record the
   sync provisional, no further queries owed. A rename touches when EITHER path side
