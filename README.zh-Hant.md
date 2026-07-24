@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.15" src="https://img.shields.io/badge/version-alpha--0.1.15-orange.svg">
+  <img alt="Version alpha-0.1.16" src="https://img.shields.io/badge/version-alpha--0.1.16-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -33,7 +33,7 @@ marketplace,而非硬相依(它的審查 skill 對 opus-pack 的 cross-reference
 opus-pack 在場時解析得到;見 [`design-pack`](#design-pack設計-skill))。
 
 > [!NOTE]
-> **早期 alpha(`alpha-0.1.15`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
+> **早期 alpha(`alpha-0.1.16`)。** 規則會隨真實 session 暴露的缺口調整,而且本包
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
@@ -193,16 +193,17 @@ Hook 是 Claude Code harness 本身在特定事件上執行的 shell 指令—�
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
-cp hooks/skill-vetting-advisory.py .claude/hooks/
+cp hooks/skill-vetting-advisory.py hooks/skill_snapshot.py .claude/hooks/
 ```
 
-維護者可用下列指令回歸測試每一個 hook(每套測試都涵蓋放行與擋下兩條路):
+維護者可用下列指令回歸測試每一個 hook(每套測試都涵蓋該 hook 行為的兩面——gating hook 是放行與擋下,advisory hook 是靜默與提示):
 
 ```bash
 bash hooks/test-gate-before-commit.sh
 bash hooks/test-verify-before-stop.sh
 bash hooks/test-gate-credential-destruction.sh
 bash hooks/test-skill-vetting-advisory.sh
+bash hooks/test-skill_snapshot.sh
 ```
 
 然後在 `.claude/settings.json` 加入:
@@ -255,7 +256,7 @@ bash hooks/test-skill-vetting-advisory.sh
   "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-credential-destruction.py" }
 ```
 
-**第四個(可選)hook——未審或變動的第三方 skill 的 advisory 絆線。** `hooks/skill-vetting-advisory.py`(Python 3 標準庫,已測試)是一個**純 advisory** 的 `SessionStart` hook,是 `skill-vetting` skill 的搭檔。**簽章掃描不是安全邊界,已移除**:它對每個 installed skill 目錄(`~/.claude/skills` 與專案的 `.claude/skills`)裡的**每個檔案**做 hash——所以任何地方(不只 `SKILL.md`)的新增/修改/刪除/改名/symlink 變動都算變動——對新/變動的 skill 注入一行導向 `skill-vetting` skill。它**絕不擋、也絕不輸出「safe」**——`SessionStart` hook 無法 deny,而會放行的掃描器正是 `skill-vetting` 要避開的虛假保證陷阱;乾淨、未變動或 first-run baseline 一律靜默,讀取錯誤或 cache 損毀則 **fail closed**(提示,絕不靜默 baseline)。攻擊者控制的 skill 名字在進入 model context 前會被消毒。它是導向完整 vetting 閱讀的絆線,絕非替代品——文字 regex 對 skill 要抓的散文式/跨檔案/拆分式 payload recall 太低,只會加上虛假保證與注入面。設定方式:
+**第四個(可選)hook——未審或變動的第三方 skill 的 advisory 絆線。** `hooks/skill-vetting-advisory.py`(Python 3 標準庫,已測試)是一個**純 advisory** 的 `SessionStart` hook,是 `skill-vetting` skill 的搭檔;它的整個觀測層放在同目錄的 `hooks/skill_snapshot.py` 模組——兩個檔案要一起安裝到同一個目錄(設計紀錄:`reviews/2026-07-25-skill-vetting-snapshot-threat-model.md`)。**簽章掃描不是安全邊界,已移除**:primitive 對受監看 skills 根目錄(`$CLAUDE_CONFIG_DIR/skills`,預設 `~/.claude/skills`,加上專案經由 `$CLAUDE_PROJECT_DIR` 的 `.claude/skills`)之下每個項目的**每個檔案**做快照——所以任何地方(不只 `SKILL.md`)的新增/修改/刪除/改名/symlink/檔案型別變動都算——而任何無法完整觀測的東西(讀取錯誤、超大檔案、任何 symlink、特殊檔案、敵意名稱、損毀或版本過期的 baseline)都是**異常:一律提示,絕不可能被認證為「未變動」**。對新增/變動/移除/異常的 skill,它注入一行導向 `skill-vetting` skill。它**絕不擋、也絕不輸出「safe」**——`SessionStart` hook 無法 deny,而會放行的掃描器正是 `skill-vetting` 要避開的虛假保證陷阱;乾淨、未變動或 first-run baseline 一律靜默;advisory **先印出**、baseline(`<config>/skill-vetting/baseline.json`)才前進——投遞失敗下次 session 會重新提示——skill 名字只透過嚴格 ASCII allowlist 或不透明 id 進入 model context。baseline 不具防竄改性(它與 skills 本身同一信任層級);這個限制是誠實記載、不是被防禦。它是導向完整 vetting 閱讀的絆線,絕非替代品。設定方式:
 
 ```json
 "SessionStart": [
@@ -264,7 +265,7 @@ bash hooks/test-skill-vetting-advisory.sh
 ]
 ```
 
-三個 gating hook 把稽核事件寫入 `~/.claude/hooks/hooks.log`,advisory vetting hook 寫入 `~/.claude/skill-vetting-advisory.log`——閘門活動與 vetting hook 的提示都變成可稽核,而不是看不見。
+三個 gating hook 把稽核事件寫入 `~/.claude/hooks/hooks.log`,advisory vetting hook 寫入 `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`(預設 `~/.claude/skill-vetting/advisory.log`)——閘門活動與 vetting hook 的提示都變成可稽核,而不是看不見。
 
 **兩個注意事項。** Hook 以你的權限執行任意 shell:啟用前先讀過腳本,且建議把 hook commit 進 repo、像程式碼一樣被審查。另外 Claude Code 在啟動時快照 hook 設定:改完後要用 `/hooks` 選單確認或重啟 session 才生效。
 

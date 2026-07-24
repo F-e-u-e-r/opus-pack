@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.15" src="https://img.shields.io/badge/version-alpha--0.1.15-orange.svg">
+  <img alt="Version alpha-0.1.16" src="https://img.shields.io/badge/version-alpha--0.1.16-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -35,7 +35,7 @@ opus-pack simply resolve when opus-pack is present; see
 [`design-pack`](#design-pack-the-design-skills)).
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.15`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.16`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -286,17 +286,19 @@ silently allowing one):
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
-cp hooks/skill-vetting-advisory.py .claude/hooks/
+cp hooks/skill-vetting-advisory.py hooks/skill_snapshot.py .claude/hooks/
 ```
 
-Maintainers can regression-test every hook (each suite covers both the
-allow path and the block path):
+Maintainers can regression-test every hook (each suite covers both sides of
+its hook's behavior — allow and block for the gating hooks, silent and
+advisory for the advisory hook):
 
 ```bash
 bash hooks/test-gate-before-commit.sh
 bash hooks/test-verify-before-stop.sh
 bash hooks/test-gate-credential-destruction.sh
 bash hooks/test-skill-vetting-advisory.sh
+bash hooks/test-skill_snapshot.sh
 ```
 
 Then add to `.claude/settings.json`:
@@ -379,20 +381,28 @@ second command under the same `PreToolUse`/`Bash` matcher:
 **Fourth (optional) hook — an advisory tripwire for unvetted or changed
 third-party skills.** `hooks/skill-vetting-advisory.py` (Python 3 stdlib, tested)
 is a **pure-advisory** `SessionStart` hook, the companion to the `skill-vetting`
-skill. **Signature scanning is not a security boundary and has been removed**: it
-hashes every file in each installed skill's directory (`~/.claude/skills` and the
-project's `.claude/skills`), so an add / modify / delete / rename / symlink change
-anywhere — not just in `SKILL.md` — counts as a change, and for a new or changed
-skill it injects one line routing to the `skill-vetting` skill. It **never blocks
-and never emits a "safe" line** — a `SessionStart` hook cannot deny, and a
-green-lighting scanner is the false-assurance trap `skill-vetting` exists to
-avoid; a clean, unchanged, or first-run-baseline run is silent, and a read error
-or corrupt cache fails **closed** (advises, never silently baselines).
-Attacker-controlled skill names are sanitized before they reach the model. It is
-a tripwire that routes to the full vetting read, never a substitute for it — a
-regex over skill text has low recall on the prose / cross-file / split payloads
-the skill hunts, and would only add false assurance and an injection surface.
-Wire it with:
+skill; its whole observation layer lives in the sibling module
+`hooks/skill_snapshot.py` — install both files into the same directory (design
+record: `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md`).
+**Signature scanning is not a security boundary and has been removed**: the
+primitive snapshots every file under each entry of the watched skills roots
+(`$CLAUDE_CONFIG_DIR/skills`, default `~/.claude/skills`, plus the project's
+`.claude/skills` via `$CLAUDE_PROJECT_DIR`), so an add / modify / delete /
+rename / symlink / filetype change anywhere — not just in `SKILL.md` — counts,
+and whatever cannot be fully observed (a read error, an oversize file, any
+symlink, a special file, a hostile name, a corrupt or version-stale baseline)
+is an **anomaly that always advises and can never be certified unchanged**. For
+a new, changed, removed, or anomalous skill it injects one line routing to the
+`skill-vetting` skill. It **never blocks and never emits a "safe" line** — a
+`SessionStart` hook cannot deny, and a green-lighting scanner is the
+false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged, or
+first-run-baseline run is silent, the advisory prints **before** the baseline
+(`<config>/skill-vetting/baseline.json`) advances — a failed delivery
+re-advises next session — and skill names reach the model only through a strict
+ASCII allowlist or an opaque id. The baseline is not tamper-evident (it shares
+a trust level with the skills themselves); that limit is documented, not
+defended. It is a tripwire that routes to the full vetting read, never a
+substitute for it. Wire it with:
 
 ```json
 "SessionStart": [
@@ -402,8 +412,9 @@ Wire it with:
 ```
 
 The three gating hooks append audit events to `~/.claude/hooks/hooks.log` and the
-advisory vetting hook to `~/.claude/skill-vetting-advisory.log`, so gate activity —
-and the vetting hook's advisories — is auditable instead of invisible.
+advisory vetting hook to `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`
+(default `~/.claude/skill-vetting/advisory.log`), so gate activity — and the
+vetting hook's advisories — is auditable instead of invisible.
 
 **Two cautions.** Hooks run arbitrary shell with your permissions: read any
 hook script before enabling it, and prefer committing hooks so they are
