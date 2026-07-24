@@ -678,10 +678,6 @@ def store_baseline(data, path=None):
                 pass
 
 
-def _fmt_path(rel_bytes):
-    return rel_bytes.decode("utf-8", "backslashreplace")
-
-
 def _redacted_path(rel_bytes):
     """An anomaly's location as reason-only + an opaque id of the path bytes -
     NEVER the raw path text. §3 feeds `digest` output to the model, so a nested
