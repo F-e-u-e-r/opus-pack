@@ -167,16 +167,22 @@ artifact-producing step.
   continue in follow-up PRs rather than concluding in the one that
   first merged, and at sync time those rounds may not have merged YET.
   The synced surfaces are every file the sync contract couples (the
-  change-X-update-Y pairs), not only the file in hand. Check BOTH: PRs
-  merged after the one in hand (by MERGE TIME, not PR number — e.g.
-  `gh pr list --state merged` with merge dates) and OPEN PRs, filtered
-  to those touching the synced surfaces. Any hit → do not close the
-  sync as final: re-anchor to the newest touching merged state and
-  re-run the check, or — when touching rounds are still open — record
-  the sync as provisional with the follow-up fold owed. Done when the
-  sync record cites the check (command + date) with an empty touching
-  list — which makes the anchor safe AS OF that check, never forever —
-  or carries the provisional label.
+  change-X-update-Y pairs), not only the file in hand. Check BOTH
+  lists, each with its own invocation, on the SAME upstream repo and
+  target branch lineage (a backport into another release branch is not
+  a hit): PRs merged after the one in hand (by MERGE TIME, not PR
+  number — e.g. `gh pr list --state merged`) AND open PRs (e.g.
+  `gh pr list --state open`), each enumerated COMPLETELY over the
+  interval (the tool's default page size — gh's is 30 — silently
+  truncates; raise the limit or date-bound the query and record the
+  bound), both filtered to those touching the synced surfaces. Any
+  hit → do not close the sync as final: re-anchor to the newest
+  touching merged state and re-run the check, or — when touching
+  rounds are still open — record the sync as provisional with the
+  follow-up fold owed. Done when the sync record cites BOTH checks
+  (commands + date + enumeration bound) with empty touching lists —
+  which makes the anchor safe AS OF that check, never forever — or
+  carries the provisional label.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
@@ -516,9 +522,13 @@ default; an AI rewrite does not launder a derivative).
   ALONGSIDE that pass's word-diff artifact (the bullet below): a
   re-baseline without the pass artifact is the phantom-debt inversion,
   declaring extraction complete on self-judgment. Any remaining line
-  that traces to NO live trigger → the owes-line stays. Thereafter the
-  compaction trigger above reads against the recorded baseline: it
-  re-fires on growth beyond that number, not on the old one. Only
+  that traces to NO live trigger → the owes-line stays. No
+  carried-debt entry exists (a first pass) → create the baseline line
+  in the maintenance/fix-log entry recording that pass. Thereafter the
+  LINE-COUNT arm of the compaction trigger above reads against the
+  recorded baseline — re-firing on growth beyond that number, not on
+  the old one; the trigger's other arms (description mismatch, index
+  scannability) are untouched by any baseline. Only
   future wording or detail growth against the recorded baseline counts
   as debt.
 - **A compaction or extraction pass needs a word-diff, not a structure check**
@@ -746,4 +756,6 @@ incident, not a probe; the executable probe — fixture a repo whose
 sync target has newer merged PRs touching the synced files and observe
 whether a weak-tier executor checks before declaring the sync final —
 has not run; the in-body marker records that debt.
-Stable method; no environment facts to re-verify.
+Re-verify against current tooling: the §3 campaign-continuation
+check's CLI examples (`gh pr list` flags and its default page size)
+drift with the tool; everything else is stable method.
