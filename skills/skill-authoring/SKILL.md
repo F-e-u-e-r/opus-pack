@@ -255,6 +255,16 @@ artifact-producing step.
   promote the rule into the standing instructions; the entry remains as the
   record of why. Retrieval re-derives the answer every session; compilation
   pays once.
+- **Sort a durable note by its future reach, not its topic** (`unprobed` — see
+  Provenance). Three tiers, one admission test each: useful only for the current
+  task → that task's own working file; a record of what happened this session, of
+  no standing use later → a session journal; something to be followed *every*
+  future time this kind of work is done → the standing spec/rules. The tier is
+  set by how far forward the note applies — not by how long it stays literally
+  true (a session event stays true forever yet still belongs in the journal, not
+  the standing rules), and not by what it is about. A "fix" that is really a
+  permanent convention belongs in the spec (compile-don't-retrieve above), not
+  left in a task file the next task never opens.
 - **Flipping a current-state order does not retire the old one on its
   own — sweep the whole file** (`unprobed` — private incident as shape;
   see Provenance). The instruction-file analog of operational-rigor §3's
@@ -391,6 +401,18 @@ artifact-producing step.
   A skill that never fires is dead weight; a skill that always fires is a tax.
 - Prefer few dense skills over many fragments. A 20-file library of
   near-duplicates dilutes triggers and splits facts across homes.
+- **Catalog size itself degrades triggering — measure collision, don't just
+  avoid duplicates** (`unprobed` — see Provenance). Beyond the near-duplicate
+  case above, a second failure appears at scale: with many skills installed,
+  context pressure trims some from view, so the right one may not fire even with
+  a clean trigger. Two defenses — (1) make description collision a *measured*
+  gate, not a manual eyeball: a deterministic pairwise-similarity check across
+  every skill's trigger description, failing when pairwise similarity exceeds a
+  ceiling, and only lowering that ceiling over time, never raising it to pass a
+  regression; (2) when triggering degrades, walk a mitigation ladder — install
+  only the groups the work needs, then invoke by explicit name, then prune the
+  unused — before blaming a single skill's wording. A multi-skill install like
+  this project's own is the setting this addresses.
 - Discover before writing: read the repo like an incoming engineer (history,
   reverted attempts, CI, docs), then ask the user only what the repo cannot
   tell you — a small, bounded list.
@@ -843,3 +865,18 @@ this pack's evidence) and their verbatim-move rule + row-by-row move map
 for eval-tuned prose. Both ship `unprobed`; the pressure-probe rule's own
 probe is exactly the shape it prescribes and joins the private round-5
 queue with the move-map rule's.
+The §4 memory-lifespan-tiers rule and §5 catalog-collision rule (2026-07-24)
+come from a starred-repo mining pass (ideas only; see README acknowledgements).
+The lifespan-tiers rule adapts mindfold-ai/Trellis's three-tier memory model —
+task directory / session journal / durable spec, each with an explicit admission
+test (AGPLv3 source, strictly ideas only, no text). The catalog-collision rule
+is a two-source convergence — addyosmani/agent-skills's deterministic pairwise
+trigger-description similarity check (a fixed similarity ceiling in the source,
+whose separate ratchet-only CI floor governs rank-1 routing accuracy; this pack
+applies that ratchet-only discipline to the collision ceiling as its own
+strengthening — MIT), and matlab/matlab-agentic-toolkit's crowded-catalog
+trigger-degradation note with
+its scope-install / invoke-by-name / prune mitigation ladder (MathWorks
+field-of-use license — ideas only, no text). Both ship `unprobed` per the
+covenant; their probes join the private round-5 queue — the catalog-collision
+rule's is directly runnable against this pack's own 12 skills.

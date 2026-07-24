@@ -606,6 +606,58 @@ This pack distills and adapts ideas from:
   rule (`delegation-and-review` §1).
 - `security-architect` and `product-roadmap` were built from reference drafts
   supplied directly by the pack's owner.
+- **2026-07-24 starred-repo mining pass** — a sweep of the owner's starred
+  agent-skill repositories; ideas only, no text adopted (each source's license
+  noted; a no-license or field-of-use source is ideas-only by necessity as well
+  as policy). One surveyed source was judged a **live trojan** (self-propagation
+  into the reading agent's global config, an authorization-default flip, and an
+  agent-obedience-engineering manual) and **nothing was taken from it** — the
+  finding reinforced the "self-described security tools earn stricter scrutiny"
+  rule (`operational-rigor` §2). Adopted, on merit, from the rest:
+  - [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail)
+    (MIT) — external-ground-truth version anchoring (a mutual-consistency check
+    passes while all artifacts are stale together) and deterministic-instrument
+    gate framing (`ground-truth-gates`).
+  - [`cloudflare/security-audit-skill`](https://github.com/cloudflare/security-audit-skill)
+    (MIT) — mechanical-check-separate-from-model-judgment gate framing
+    (`ground-truth-gates`) and the guardrail-prompts-are-not-controls /
+    denial-of-wallet bar (`security-architect`).
+  - [`s0912758806p/agentic-sop-to-work`](https://github.com/s0912758806p/agentic-sop-to-work)
+    (MIT) — hermetic LLM-free hard gates with advisory-capped self-eval, and the
+    globally-installed-hook silent-no-op opt-in (`ground-truth-gates`); a
+    co-source of the labelled-degraded-fallback rule (`operational-rigor`).
+  - [`openai/codex-plugin-cc`](https://github.com/openai/codex-plugin-cc)
+    (Apache-2.0) — fix-the-contract-before-escalating-compute and
+    no-silent-backfill-of-a-failed-delegate (`delegation-and-review`).
+  - [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills)
+    (MIT) — deterministic trigger-description collision checking
+    (`skill-authoring`); co-source of fix-the-contract (`delegation-and-review`).
+  - [`mindfold-ai/Trellis`](https://github.com/mindfold-ai/Trellis)
+    (AGPL-3.0 — strictly ideas only, no text) — the subagent
+    no-commit/push/merge boundary (`delegation-and-review`) and the three-tier
+    memory-by-lifespan taxonomy (`skill-authoring`).
+  - [`NYCU-Chung/my-claude-devteam`](https://github.com/NYCU-Chung/my-claude-devteam)
+    (MIT) — reviewer role-purity via tool-grant denial
+    (`delegation-and-review`), corroborating the hook opt-in rule.
+  - [`matlab/matlab-agentic-toolkit`](https://github.com/matlab/matlab-agentic-toolkit)
+    (MathWorks field-of-use license — ideas only, no text) — the
+    self-severing-command one-way-door (`operational-rigor`) and the
+    crowded-catalog trigger-degradation ladder (`skill-authoring`).
+  - [`gsd-build/get-shit-done`](https://github.com/gsd-build/get-shit-done)
+    (MIT) — the Unicode Tag Block gap it surfaced in the hidden-directive sweep,
+    fixed in `operational-rigor` §2 and in this repo's own `.github/checks.py`.
+  - [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)
+    (MIT declared in its README, no LICENSE file — ideas only) — co-source of the
+    mechanical-gate-separate-from-model-judgment framing (`ground-truth-gates`).
+  - [`oso95/scroll-world`](https://github.com/oso95/scroll-world),
+    [`vinhhien112/Three.js-Object-Sculptor-Codex-Plugin`](https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin),
+    and [`GiMi-Xiaomi/gimi-illustration-skill`](https://github.com/GiMi-Xiaomi/gimi-illustration-skill)
+    (all MIT) — co-sources of the never-silently-degrade / labelled-degraded-fallback
+    rule (`operational-rigor`).
+  - [`Nutlope/hallmark`](https://github.com/Nutlope/hallmark) (MIT) — its
+    URL-fetch checklist surfaced the metadata-endpoint sharpening of the
+    `security-architect` SSRF clause. Design-side ideas from all four of these
+    land in the design-pack.
 
 All adopted sources were read and checked; no embedded instructions were
 executed, and nothing was taken from the sources the 2026-07 audit judged

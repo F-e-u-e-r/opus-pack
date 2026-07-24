@@ -246,6 +246,29 @@ A generic green test is not proof. A gate is real only if:
    agreement separately (two models agreeing is one lens, not two). A metric
    clearing a threshold is *evidence*, never *authorization*: keep the go/no-go a
    separate recorded decision.
+6. If it is an **automated gate, its block-on-fail decision is deterministic, not
+   an LLM's judgment** (`unprobed` — see Provenance). An executable hard gate that
+   denies or blocks runs on code, not a model verdict; where an LLM contributes to
+   it, the LLM is **advisory and capped** by the gate contract's declared limits —
+   a maximum advisory-pass count, a confidence ceiling, findings dropped unless
+   sourced — never the pass/fail authority. And where a claim hands you a count,
+   sum, or sourced value, **re-derive it independently** (recompute the aggregate;
+   trace each value back to its source) rather than trusting the number given. (A
+   review/adjudication gate — where a human or a cross-family model verdict IS the
+   gate, as in cross-model-review or design-review-gate — is a different
+   instrument: there the verdict is the authority, disciplined by lens diversity
+   and reproduction, not replaced by code.)
+7. If it uses **mutual agreement to assert correctness, freshness, or an
+   authoritative value, it anchors that to an external ground truth** (`unprobed`
+   — see Provenance). A check that infers currentness from N artifacts agreeing
+   with each *other* passes while all N are stale **together** (every manifest
+   frozen at an old version, so they "agree"); such an inference anchors to an
+   independent source of truth — a release tag, the upstream record, a recomputed
+   value — read at the moment it matters. (A check whose contract is only
+   *consistency* — do these N agree with each other, with freshness asserted
+   elsewhere — is legitimate as-is and needs no anchor, as does an intrinsic gate
+   like a syntax or forbidden-character scan. The rule bites only when agreement
+   is made to stand in for an external fact.)
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -320,6 +343,20 @@ enforces one at runtime — and has its own failure design:
   inherent bypasses into the parser. (At a trust boundary, prefer structural
   prevention over a content classifier — see security-architect's "Secure
   ingestion"; don't re-derive it here.)
+- **A globally-installed *optional-feature* guard defaults to a silent no-op
+  unless the current project opted in** (`unprobed` — see Provenance). A
+  convenience hook shipped to every project (a global Stop / PreToolUse hook for
+  a feature) checks a project-local opt-in marker — a file, a config key — and
+  does nothing, silently, where it is absent, so a broad install never disturbs
+  work that never adopted the feature. This pack's own plugin ships its hooks
+  **unregistered** for exactly this reason (checks.py asserts "plugin registers
+  no hooks"). The carve-out is a control the owner or admin *authorized* to be
+  universal — a secret scanner, a policy or destructive-command guard: those are
+  meant to cover every project, and gating them behind a project opt-in would
+  silently disable protection. So an optional feature is opt-in; an authorized
+  global policy control fires everywhere by design. (Distinct from the
+  fail-direction choice above, which governs a guard a project is already subject
+  to.)
 
 ## When NOT to build a gate
 
@@ -389,5 +426,25 @@ and the change-detector trap — failure shapes the two-sided protocol alone
 cannot screen, since a source-echo test genuinely fails the old arm and
 passes the new one. Ships `unprobed` per the covenant; its probe joins the
 private round-5 queue.
+Numbered items 6 (deterministic block-on-fail + independent recompute) and 7
+(external-anchor over mutual agreement) under "What makes a gate real"
+(2026-07-24) come from a starred-repo mining pass (ideas only; see README
+acknowledgements). Item 6 is a four-source convergence —
+s0912758806p/agentic-sop-to-work (hard gates hermetic and LLM-free, self-eval
+advisory-and-capped), cloudflare/security-audit-skill and
+vercel-labs/agent-skills (a mechanical structural check kept separate from model
+judgment), and DietrichGebert/ponytail (self-verified good/bad instruments) —
+its independent-recompute clause adapting agentic-sop's `recompute_gate` and
+per-value trace gate (all MIT — vercel's MIT is declared in its README with no
+LICENSE file; ideas only, no text). Item 7 adapts ponytail's `check-versions.js`,
+whose comment records the real incident (every manifest shipped stale at one
+version together while a mutual-consistency test passed — its #260/#262),
+generalized from version manifests to any mutual-agreement check. The guard
+opt-in rule under "Designing the guard itself" (2026-07-24) adapts
+s0912758806p/agentic-sop-to-work's globally-installed hook that silent-no-ops
+unless the project opted in (MIT, ideas only), corroborated by
+NYCU-Chung/my-claude-devteam's bypassPermissions-hook framing (MIT) — it
+matches this pack's own no-auto-registered-hooks invariant. All three ship
+`unprobed` per the covenant; their probes join the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.

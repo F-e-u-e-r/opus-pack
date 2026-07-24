@@ -349,6 +349,19 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
 - **fable-agent-orchestration** @ `935e4a3`(git.wearein.space/elias,Apache-2.0)
 - **agent-standard-oss** @ `3786c4c`(github.com/anmoln7,MIT);2026-07-24 對其 anchor 之後的 commits 做 delta 掃描,採納 capability triangle(`security-architect`)並共同溯源 quota/effort 派工規則(`delegation-and-review` §1)。
 - `security-architect` 與 `product-roadmap` 依本包擁有者直接提供的參考稿建構。
+- **2026-07-24 starred-repo 挖礦掃描** — 對擁有者 starred 的 agent-skill repos 做一輪掃描;只採意念、不採文字(各來源 license 已註明;無 license 或 field-of-use 的來源在必要性與政策上都只能採意念)。其中一個被掃描的來源被判為**活躍 trojan**(自我繁殖寫入 reading agent 的全域設定、翻轉授權預設、附一份 agent 服從工程手冊),**未從其採納任何內容**——此發現強化了「自稱 security 工具要受更嚴審查」規則(`operational-rigor` §2)。從其餘來源依價值採納:
+  - [`DietrichGebert/ponytail`](https://github.com/DietrichGebert/ponytail)(MIT)— 版本一致性錨定外部真值(只互相比對的檢查在所有 artifact 一起過期時仍會通過)與 deterministic-instrument gate 框架(`ground-truth-gates`)。
+  - [`cloudflare/security-audit-skill`](https://github.com/cloudflare/security-audit-skill)(MIT)— 機械檢查與模型判斷分離的 gate 框架(`ground-truth-gates`),以及 guardrail-prompt 不是 control / denial-of-wallet 的判準(`security-architect`)。
+  - [`s0912758806p/agentic-sop-to-work`](https://github.com/s0912758806p/agentic-sop-to-work)(MIT)— hermetic、LLM-free 的 hard gate 搭配 advisory-capped 自評,以及全域安裝 hook 預設靜默 no-op 的 opt-in(`ground-truth-gates`);labelled-degraded-fallback 規則的共同來源(`operational-rigor`)。
+  - [`openai/codex-plugin-cc`](https://github.com/openai/codex-plugin-cc)(Apache-2.0)— 升 compute 前先修 contract、以及失敗 delegate 絕不靜默補位(`delegation-and-review`)。
+  - [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills)(MIT)— 決定性的 trigger-description collision 檢查(`skill-authoring`);修 contract 的共同來源(`delegation-and-review`)。
+  - [`mindfold-ai/Trellis`](https://github.com/mindfold-ai/Trellis)(AGPL-3.0 — 嚴格只採意念、不採文字)— subagent no-commit/push/merge 邊界(`delegation-and-review`)與依 lifespan 分層的三層記憶分類(`skill-authoring`)。
+  - [`NYCU-Chung/my-claude-devteam`](https://github.com/NYCU-Chung/my-claude-devteam)(MIT)— 以 tool-grant 拒絕落實 reviewer 角色純度(`delegation-and-review`),並佐證 hook opt-in 規則。
+  - [`matlab/matlab-agentic-toolkit`](https://github.com/matlab/matlab-agentic-toolkit)(MathWorks field-of-use license — 只採意念、不採文字)— 切斷自身控制通道指令的 one-way-door(`operational-rigor`)與擁擠 catalog 觸發退化的 mitigation ladder(`skill-authoring`)。
+  - [`gsd-build/get-shit-done`](https://github.com/gsd-build/get-shit-done)(MIT)— 它揭出 hidden-directive sweep 漏掉的 Unicode Tag Block,已在 `operational-rigor` §2 與本 repo 自己的 `.github/checks.py` 補上。
+  - [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)(MIT 於 README 宣告、無 LICENSE 檔 — 只採意念)— 機械 gate 與模型判斷分離框架的共同來源(`ground-truth-gates`)。
+  - [`oso95/scroll-world`](https://github.com/oso95/scroll-world)、[`vinhhien112/Three.js-Object-Sculptor-Codex-Plugin`](https://github.com/vinhhien112/Three.js-Object-Sculptor-Codex-Plugin)、以及 [`GiMi-Xiaomi/gimi-illustration-skill`](https://github.com/GiMi-Xiaomi/gimi-illustration-skill)(皆 MIT)— never-silently-degrade / labelled-degraded-fallback 規則的共同來源(`operational-rigor`)。
+  - [`Nutlope/hallmark`](https://github.com/Nutlope/hallmark)(MIT)— 其 URL-fetch checklist 揭出 `security-architect` SSRF 條款要補的 metadata endpoint。這四個來源的設計面意念落在 design-pack。
 
 所有被採用的來源皆已通讀檢查;未執行任何內嵌指令,2026-07 稽查判為惡意的來源亦未被採用任何內容。萃取只採意念。每個連結都附作者+平台,連結失效後 attribution 仍可考。
 

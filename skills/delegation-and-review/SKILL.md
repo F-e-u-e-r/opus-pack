@@ -416,7 +416,11 @@ Every packet names:
   reconciled item-by-item against rounds 1-2's reports."
   ❌ "the reviewer gets fresh context each round, so the packet doesn't
   need the sweep's history."
-- **Rules** — do not merge, weaken gates, or revert unrelated work; report
+- **Rules** — do not commit, push, or merge (writes to shared history stay with
+  the dispatching session, so a human-facing checkpoint survives between agent
+  work and the persisted record — a write-capable worker still self-fixes and
+  reports, it does not persist to shared history), nor weaken gates or revert
+  unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure.
   For an implementation task, after bounded discovery (interfaces read, ambiguity
   resolved), require a concrete artifact by an early checkpoint — a reproduced
@@ -437,6 +441,15 @@ reviewers that they silently absorb as implementers.
   1. *Gate critic:* is the proof real, old-bug-failing, production-path, not weakened?
   2. *Change critic:* does the diff close the invariant without ownership,
      durability, security, or compatibility regressions?
+- **Prefer** a genuinely read-only critic so the reviewer-is-not-the-author
+  separation is structural, not merely instructed — but "read-only" means no
+  file-mutating tool at all: dropping only Edit/Write leaves Bash, which mutates
+  through redirection, `sed`, or a script, so a real read-only sandbox (or an
+  agent type carrying no mutation-capable tool) is what actually prevents
+  fix-while-reviewing. A critic that can still mutate the tree biases its own
+  verdict and moves the tree it is judging (the settled-tree rule below). Where a
+  write-capable critic is genuinely needed, it does not review the live tree — it
+  gets the independent copy §3 requires. (`unprobed` — see Provenance.)
 - Dispatcher and critics write expected results before actuals (operational-rigor
   §4). Prefer lens diversity over redundant same-lens votes.
 - Pick framing deliberately: "verify this contract" is precise/low-noise; "try
@@ -590,6 +603,21 @@ reviewers that they silently absorb as implementers.
 5. Pattern solved → downgrade batch application to cheaper model with example;
    spot-check random ~20% (minimum 2) plus flagged items. One miss → verify all.
 
+- **When a delegate underperforms because the contract has slack, tighten the
+  contract before you buy more compute.** If the prompt or the output/proof
+  contract is ambiguous or was not followed, sharpen it before raising reasoning
+  effort or escalating to a costlier tier — escalating first just spends tokens on
+  the same ambiguity. This does NOT apply when the failure is capability, context
+  window, or reasoning depth: a precise contract cannot fix those, and there the
+  compute/tier lever (or a different model) is the right one. Diagnose which it is
+  before spending. (`unprobed` — see Provenance.)
+- **A failed or never-invoked delegate is reported, never silently backfilled.**
+  Manual finish after a delegate fails is sanctioned (§1), but it is *disclosed* —
+  quietly doing the delegate's job yourself masks the failure and changes the
+  quality bar without the user knowing. A delegate that never actually ran
+  produced nothing to relay: report the failure; do not fabricate a
+  stand-in and pass it off as the delegate's work. (`unprobed` — see
+  Provenance.)
 - **At the ceiling, the ladder inverts** (`unprobed` — adapted external
   design; see Provenance). The advice-mode rung above assumes a tier exists
   above the executor. When the ORCHESTRATOR is observably the ceiling
@@ -928,6 +956,25 @@ mechanism (ladder inverts when the commander IS the ceiling model),
 model-agnostic with a bounded no-viable-delegate exception added at this
 pack's gate review. Both ship `unprobed` per the covenant; their probes
 join the private round-5 queue.
+The §3 read-only-critic rule, §4 fix-the-contract-before-compute rule, and §4
+no-silent-backfill rule (2026-07-24) come from a starred-repo mining pass (ideas
+only, no text; see README acknowledgements). The read-only-critic rule adapts
+NYCU-Chung/my-claude-devteam's per-role tool scoping — its reviewer/planner
+agents are granted no Edit/Write (MIT); this pack's rule strengthens that (since
+Bash mutates too) into "no file-mutating tool at all" and reconciles it with the
+write-capable-critic path (§1 and §3's settled-tree independent copy). The
+fix-the-contract rule is a two-source convergence — openai/codex-plugin-cc's
+guidance to sharpen the prompt and its checks before dialing up reasoning
+effort (Apache-2.0) and addyosmani/agent-skills (MIT) — bounded here to the
+contract-has-slack case, not capability/context failures. The no-silent-backfill
+rule adapts openai/codex-plugin-cc's rule that a failed or never-invoked delegate
+run is reported rather than quietly finished on your own side, reconciled with
+§1's sanctioned manual-finish trigger by requiring disclosure. All three ship
+`unprobed` per the covenant; their probes join the private round-5 queue. The §2
+Rules bullet was also extended from "do not merge" to "do not commit, push, or
+merge" (generalizing mindfold-ai/Trellis's check-agent forbidden-operations
+list, AGPLv3 — strictly ideas only) — a widening of an existing prohibition, not
+a new standalone rule, so it owes no separate probe.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
