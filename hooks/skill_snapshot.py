@@ -2,9 +2,12 @@
 """Observation/persistence primitive for the skill-vetting advisory hook.
 
 This module owns everything that touches the filesystem for
-`hooks/skill-vetting-advisory.py`: the whole-tree snapshot, the canonical
-digest encoding, and the hardened baseline load/store. The hook itself is a
-thin dispatcher and contains no observation logic. Design record:
+`hooks/skill-vetting-advisory.py`: root enumeration (`list_candidates`), the
+whole-tree snapshot, the canonical digest encoding, and the hardened baseline
+load/store. Its LIBRARY core is policy-free (it decides no verdicts); the CLI
+adds a thin verdict-recording convenience (`record`/`status`) so the
+skill-vetting skill's §3 binding is executable. The hook itself is a thin
+dispatcher and contains no filesystem-walking logic of its own. Design record:
 `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md` (threat model,
 goals G1-G6, invariants I1-I7). A deliberate naming deviation: this file uses
 an underscore (not the hooks/ hyphen convention) because the hook imports it
@@ -58,14 +61,21 @@ import struct
 import sys
 import tempfile
 
-SCHEMA_VERSION = 1   # versions the manifest encoding + digest; change -> visible re-baseline
-POLICY_VERSION = 1   # versions the advisory/verdict policy; change -> visible re-baseline
+SCHEMA_VERSION = 2   # versions the manifest encoding + digest; change -> visible re-baseline
+POLICY_VERSION = 2   # versions the advisory/verdict/enumeration policy; change -> visible re-baseline
 
 MAX_ENTRIES = 4096          # per-candidate manifest entries
 MAX_FILE_BYTES = 8 << 20    # per-file content cap; larger is an anomaly, never a partial hash
 MAX_TOTAL_BYTES = 64 << 20  # per-candidate content budget
 MAX_DEPTH = 24              # per-candidate directory depth
+MAX_CANDIDATES = 256        # top-level entries enumerated per root
 MAX_BASELINE_BYTES = 4 << 20
+
+_DIR_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
+if hasattr(os, "O_DIRECTORY"):
+    _DIR_FLAGS |= os.O_DIRECTORY
+if hasattr(os, "O_NONBLOCK"):
+    _DIR_FLAGS |= os.O_NONBLOCK
 
 _HEADER = b"opus-pack-skill-snapshot\x00"
 _STATUSES = ("baseline", "seen", "vetted")
@@ -74,7 +84,12 @@ _VERDICTS = ("SAFE-TO-PROPOSE", "SUSPECT", "BLOCK")
 # alphanumeric. Anything else is shown as an opaque id and flagged "badname".
 _DISPLAY_OK = re.compile(rb"[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z")
 _HEX64 = re.compile(r"[0-9a-f]{64}\Z")
-_SCOPE_OK = re.compile(r"(?:global|proj:[0-9a-f]{16})\Z")
+_SCOPE_OK = re.compile(r"(?:global|proj:[0-9a-f]{64})\Z")
+# A stored display name is EITHER an allowlisted live name or the opaque id
+# form display_name() emits — nothing else, so a planted baseline cannot carry
+# injection prose that a removal line would later echo (a printable-ASCII name
+# is not enough; that admits "IGNORE ALL PREVIOUS INSTRUCTIONS").
+_STORED_NAME_OK = re.compile(r"(?:[A-Za-z0-9][A-Za-z0-9._-]{0,63}|id-[0-9a-f]{8})\Z")
 
 
 def config_root():
@@ -90,8 +105,11 @@ def baseline_path(cfg_root=None):
 
 
 def name_key(name_bytes):
-    """JSON-safe, collision-resistant key segment for an untrusted dir name."""
-    return hashlib.sha256(name_bytes).hexdigest()[:16]
+    """JSON-safe, collision-resistant key segment for an untrusted dir name.
+    Full 256-bit digest (no truncation) so a birthday collision is infeasible
+    — a collision plus a full tree-digest match is the only way to alias two
+    baseline slots, and both are 256-bit."""
+    return hashlib.sha256(name_bytes).hexdigest()
 
 
 def scope_id(project_root_bytes=None):
@@ -99,7 +117,7 @@ def scope_id(project_root_bytes=None):
     if project_root_bytes is None:
         return "global"
     real = os.path.realpath(project_root_bytes)
-    return "proj:" + hashlib.sha256(real).hexdigest()[:16]
+    return "proj:" + hashlib.sha256(real).hexdigest()
 
 
 def display_name(name_bytes):
@@ -113,18 +131,26 @@ def display_name(name_bytes):
 
 def _entry(entries, anomalies, budget, rel, kind, payload):
     entries.append((rel, kind, payload))
-    if len(entries) > MAX_ENTRIES:
+    budget["entries"] = budget.get("entries", 0) + 1
+    if budget["entries"] > MAX_ENTRIES:      # global when the caller shares one budget
         anomalies.append(("budget", rel))
         budget["stop"] = True
 
 
-def _read_regular(full, lst, anomalies, rel, budget):
-    """Hash a regular file from an O_NOFOLLOW|O_NONBLOCK fd; None on anomaly.
-    fstat on the opened fd is authoritative for type and size - a path swapped
-    to a symlink/FIFO between lstat and open fails the open or the S_ISREG
-    check and lands as an anomaly, and O_NONBLOCK keeps a FIFO from hanging."""
+def _read_regular(name, dir_fd, anomalies, rel, budget):
+    """Hash a regular file from an O_NOFOLLOW|O_NONBLOCK fd opened RELATIVE to
+    its parent's dir fd; None on anomaly. fstat on the opened fd is
+    authoritative for type, size, AND mode - a path swapped to a symlink/FIFO
+    between the scandir stat and open fails the open or the S_ISREG check and
+    lands as an anomaly, O_NONBLOCK keeps a FIFO from hanging, and the mode
+    comes from the fd (not a pre-open stat a race could have staled). The full
+    permission word is bound (>H), so a 0644->0666 or 0744->0755 change moves
+    the digest. dir_fd-relative opens make the whole descent race-safe: an
+    attacker cannot redirect a component by swapping a parent after we hold its
+    fd."""
     try:
-        fd = os.open(full, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC)
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK | os.O_CLOEXEC,
+                     dir_fd=dir_fd)
     except OSError:
         anomalies.append(("unreadable", rel))
         return None
@@ -151,8 +177,7 @@ def _read_regular(full, lst, anomalies, rel, budget):
         if budget["bytes"] > MAX_TOTAL_BYTES:
             anomalies.append(("budget", rel))
             budget["stop"] = True
-        execbit = b"x" if (lst.st_mode & 0o111) else b"-"
-        return struct.pack(">Q", total) + h.digest() + execbit
+        return struct.pack(">QH", total, st.st_mode & 0o7777) + h.digest()
     except OSError:
         anomalies.append(("unreadable", rel))
         return None
@@ -160,7 +185,31 @@ def _read_regular(full, lst, anomalies, rel, budget):
         os.close(fd)
 
 
-def snapshot_tree(root):
+def _opendir_nofollow(name, dir_fd, anomalies, rel):
+    """Open a directory via an O_NOFOLLOW fd (relative to dir_fd when given, so
+    a swapped parent cannot redirect it) and fstat-verify it is really a
+    directory. Returns an fd, or None + an anomaly. This closes the
+    directory->symlink descent race: even if a prior stat said 'directory', if
+    the path is a symlink by open time the O_NOFOLLOW open fails (ELOOP), so a
+    swapped-in symlink is never traversed as the original tree."""
+    try:
+        fd = os.open(name, _DIR_FLAGS, dir_fd=dir_fd)
+    except OSError:
+        anomalies.append(("unreadable", rel))
+        return None
+    try:
+        if not stat.S_ISDIR(os.fstat(fd).st_mode):
+            os.close(fd)
+            anomalies.append(("special", rel))
+            return None
+    except OSError:
+        os.close(fd)
+        anomalies.append(("unreadable", rel))
+        return None
+    return fd
+
+
+def snapshot_tree(root, budget=None):
     """Snapshot one top-level skill candidate (dir, file, or symlink) at
     bytes-path `root`. Returns {"digest", "entries", "anomalies"} where
     anomalies is a list of (reason, rel_path_bytes) with stable reason codes:
@@ -168,11 +217,22 @@ def snapshot_tree(root):
     Anomalies are also manifest entries where they REPLACE an observation, so
     an anomaly appearing or healing changes the digest; comparison callers
     must treat ANY anomaly as "anomalous" regardless of digest equality (I5).
-    """
+
+    Directory descent goes ONLY through O_NOFOLLOW-verified directory fds, so a
+    directory swapped for a symlink mid-scan is never traversed as the original
+    tree (it becomes an anomaly). `budget` may be a shared dict to bound work
+    across many candidates in one run; when omitted, a per-candidate budget is
+    used. A caller-supplied budget already exhausted short-circuits to a budget
+    anomaly."""
     root = os.fsencode(root)
     entries = []      # (rel_bytes, kind_byte, payload_bytes)
     anomalies = []    # (reason_str, rel_bytes)
-    budget = {"bytes": 0, "stop": False}
+    if budget is None:
+        budget = {"bytes": 0, "entries": 0, "stop": False}
+    if budget.get("stop"):
+        anomalies.append(("budget", b""))
+        _entry(entries, anomalies, budget, b"", b"A", b"budget")
+        return _finish(entries, anomalies)
 
     try:
         lst = os.lstat(root)
@@ -191,7 +251,18 @@ def snapshot_tree(root):
         return _finish(entries, anomalies)
 
     if stat.S_ISREG(lst.st_mode):
-        payload = _read_regular(root, lst, anomalies, b"", budget)
+        rootdir = os.path.dirname(root) or b"."
+        base = os.path.basename(root)
+        try:
+            dfd = os.open(rootdir, _DIR_FLAGS)
+        except OSError:
+            anomalies.append(("unreadable", b""))
+            _entry(entries, anomalies, budget, b"", b"A", b"unreadable")
+            return _finish(entries, anomalies)
+        try:
+            payload = _read_regular(base, dfd, anomalies, b"", budget)
+        finally:
+            os.close(dfd)
         if payload is None:
             _entry(entries, anomalies, budget, b"", b"A", anomalies[-1][0].encode())
         else:
@@ -203,57 +274,182 @@ def snapshot_tree(root):
         _entry(entries, anomalies, budget, b"", b"A", b"special")
         return _finish(entries, anomalies)
 
-    stack = [(root, b"", 0)]
-    while stack and not budget["stop"]:
-        dirpath, rel, depth = stack.pop()
-        if depth > MAX_DEPTH:
-            anomalies.append(("budget", rel))
-            _entry(entries, anomalies, budget, rel, b"A", b"depth")
-            budget["stop"] = True
-            continue
-        try:
-            with os.scandir(dirpath) as it:
-                dirents = sorted(it, key=lambda d: d.name)
-        except OSError:
-            anomalies.append(("unreadable", rel))
-            _entry(entries, anomalies, budget, rel, b"A", b"unreadable")
-            continue
-        for de in dirents:
-            if budget["stop"]:
-                break
-            name = de.name
-            childrel = rel + b"/" + name if rel else name
-            if not _DISPLAY_OK.match(name):
-                anomalies.append(("badname", childrel))
-            try:
-                dst = de.stat(follow_symlinks=False)
-            except OSError:
-                anomalies.append(("unreadable", childrel))
-                _entry(entries, anomalies, budget, childrel, b"A", b"unreadable")
-                continue
-            if stat.S_ISLNK(dst.st_mode):
-                try:
-                    target = os.readlink(de.path)
-                except OSError:
-                    target = b""
-                anomalies.append(("symlink", childrel))
-                _entry(entries, anomalies, budget, childrel, b"S", target)
-            elif stat.S_ISDIR(dst.st_mode):
-                _entry(entries, anomalies, budget, childrel, b"D", b"")
-                stack.append((de.path, childrel, depth + 1))
-            elif stat.S_ISREG(dst.st_mode):
-                payload = _read_regular(de.path, dst, anomalies, childrel, budget)
-                if payload is None:
-                    _entry(entries, anomalies, budget, childrel, b"A",
-                           anomalies[-1][0].encode())
-                else:
-                    _entry(entries, anomalies, budget, childrel, b"F", payload)
-            else:
-                anomalies.append(("special", childrel))
-                _entry(entries, anomalies, budget, childrel, b"A", b"special")
+    # Open the root dir directly (its path is caller-supplied, not a child of a
+    # fd we hold); every descent below is dir_fd-relative and race-safe.
+    try:
+        root_fd = os.open(root, _DIR_FLAGS)
+        if not stat.S_ISDIR(os.fstat(root_fd).st_mode):
+            os.close(root_fd)
+            raise OSError("root is not a directory")
+    except OSError:
+        anomalies.append(("special", b""))
+        _entry(entries, anomalies, budget, b"", b"A", b"special")
+        return _finish(entries, anomalies)
+    _walk_dir(root_fd, entries, anomalies, budget)
     if budget["stop"]:
         _entry(entries, anomalies, budget, b"", b"A", b"budget")
+    return _finish(entries, anomalies)
 
+
+def _walk_dir(root_fd, entries, anomalies, budget):
+    """Iterative, dir_fd-relative, O_NOFOLLOW tree walk from an open dir fd.
+    CONSUMES (closes) root_fd and every fd it opens. All child access is
+    relative to a held dir fd, so a swapped parent cannot redirect a
+    component; a subdirectory swapped for a symlink mid-walk fails its
+    O_NOFOLLOW open and becomes an anomaly rather than being traversed."""
+    stack = [(root_fd, b"", 0)]
+    try:
+        while stack and not budget["stop"]:
+            dir_fd, rel, depth = stack.pop()
+            try:
+                if depth > MAX_DEPTH:
+                    anomalies.append(("budget", rel))
+                    _entry(entries, anomalies, budget, rel, b"A", b"depth")
+                    budget["stop"] = True
+                    continue
+                try:
+                    dmode = os.fstat(dir_fd).st_mode & 0o7777
+                    # os.listdir(fd) yields str with surrogateescape; os.fsencode
+                    # round-trips to the exact original bytes (I3 byte-faithful).
+                    names = sorted(os.listdir(dir_fd))
+                except OSError:
+                    anomalies.append(("unreadable", rel))
+                    _entry(entries, anomalies, budget, rel, b"A", b"unreadable")
+                    continue
+                if rel:
+                    _entry(entries, anomalies, budget, rel, b"D",
+                           struct.pack(">H", dmode))
+                for name in names:
+                    if budget["stop"]:
+                        break
+                    nameb = os.fsencode(name)
+                    childrel = rel + b"/" + nameb if rel else nameb
+                    if not _DISPLAY_OK.match(nameb):
+                        anomalies.append(("badname", childrel))
+                    try:
+                        dst = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+                    except OSError:
+                        anomalies.append(("unreadable", childrel))
+                        _entry(entries, anomalies, budget, childrel, b"A", b"unreadable")
+                        continue
+                    if stat.S_ISLNK(dst.st_mode):
+                        try:
+                            target = os.fsencode(os.readlink(name, dir_fd=dir_fd))
+                        except OSError:
+                            target = b""
+                        anomalies.append(("symlink", childrel))
+                        _entry(entries, anomalies, budget, childrel, b"S", target)
+                    elif stat.S_ISDIR(dst.st_mode):
+                        sub_fd = _opendir_nofollow(name, dir_fd, anomalies, childrel)
+                        if sub_fd is None:
+                            _entry(entries, anomalies, budget, childrel, b"A",
+                                   anomalies[-1][0].encode())
+                        else:
+                            stack.append((sub_fd, childrel, depth + 1))
+                    elif stat.S_ISREG(dst.st_mode):
+                        payload = _read_regular(name, dir_fd, anomalies, childrel, budget)
+                        if payload is None:
+                            _entry(entries, anomalies, budget, childrel, b"A",
+                                   anomalies[-1][0].encode())
+                        else:
+                            _entry(entries, anomalies, budget, childrel, b"F", payload)
+                    else:
+                        anomalies.append(("special", childrel))
+                        _entry(entries, anomalies, budget, childrel, b"A", b"special")
+            finally:
+                os.close(dir_fd)
+    finally:
+        for dir_fd, _rel, _depth in stack:      # stopped with fds still queued
+            try:
+                os.close(dir_fd)
+            except OSError:
+                pass
+
+
+def list_candidates(root):
+    """Hardened enumeration of one skills ROOT (moved out of the hook so the
+    hook owns no filesystem logic). Returns {"candidates", "anomalies",
+    "complete"}: candidates = [(name_bytes, dir_fd)] for each immediate
+    subdirectory, each opened through an O_NOFOLLOW fd the caller must close;
+    anomalies carries stable reasons (root-missing is NOT an anomaly - it is a
+    complete empty view); complete=False when enumeration failed or was capped
+    (the caller must then NOT prune baseline entries for this scope, since a
+    removal cannot be told from not-scanned).
+
+    A symlinked or non-directory root, or an unreadable one, is an anomaly with
+    an EMPTY candidate list and complete=False. A top-level entry whose NAME
+    fails the display allowlist is still returned (so its content is snapshotted)
+    but flagged as a `badname` anomaly, so a hostile top-level skill name can
+    never settle into silence."""
+    rootb = os.fsencode(root)
+    out = {"candidates": [], "anomalies": [], "complete": True}
+    try:
+        lst = os.lstat(rootb)
+    except FileNotFoundError:
+        return out                                  # no such root: complete empty
+    except OSError:
+        out["anomalies"].append(("root-unreadable", b""))
+        out["complete"] = False
+        return out
+    if stat.S_ISLNK(lst.st_mode) or not stat.S_ISDIR(lst.st_mode):
+        out["anomalies"].append(("root-symlink" if stat.S_ISLNK(lst.st_mode)
+                                 else "root-notdir", b""))
+        out["complete"] = False
+        return out
+    try:
+        root_fd = os.open(rootb, _DIR_FLAGS)
+    except OSError:
+        out["anomalies"].append(("root-unreadable", b""))
+        out["complete"] = False
+        return out
+    try:
+        if not stat.S_ISDIR(os.fstat(root_fd).st_mode):
+            out["anomalies"].append(("root-notdir", b""))
+            out["complete"] = False
+            return out
+        names = sorted(os.listdir(root_fd))
+        if len(names) > MAX_CANDIDATES:
+            out["anomalies"].append(("root-overfull", b""))
+            out["complete"] = False
+            names = names[:MAX_CANDIDATES]
+        for name in names:
+            nameb = os.fsencode(name)
+            try:
+                dst = os.stat(name, dir_fd=root_fd, follow_symlinks=False)
+            except OSError:
+                out["anomalies"].append(("unreadable", nameb))
+                continue
+            if not stat.S_ISDIR(dst.st_mode):
+                continue                            # only skill DIRECTORIES are candidates
+            fd = _opendir_nofollow(name, root_fd, out["anomalies"], nameb)
+            if fd is None:
+                continue
+            if not _DISPLAY_OK.match(nameb):
+                out["anomalies"].append(("badname", nameb))
+            out["candidates"].append((nameb, fd))
+    except OSError:
+        out["anomalies"].append(("root-unreadable", b""))
+        out["complete"] = False
+    finally:
+        os.close(root_fd)
+    return out
+
+
+def snapshot_fd(dir_fd, budget=None):
+    """Snapshot an already-opened, O_NOFOLLOW-verified directory fd (the shape
+    list_candidates hands back). Same return as snapshot_tree. The fd is NOT
+    closed here."""
+    entries, anomalies = [], []
+    if budget is None:
+        budget = {"bytes": 0, "entries": 0, "stop": False}
+    if budget.get("stop"):
+        anomalies.append(("budget", b""))
+        _entry(entries, anomalies, budget, b"", b"A", b"budget")
+        return _finish(entries, anomalies)
+    dup = os.dup(dir_fd)                             # _walk_dir closes what it is given
+    _walk_dir(dup, entries, anomalies, budget)
+    if budget["stop"]:
+        _entry(entries, anomalies, budget, b"", b"A", b"budget")
     return _finish(entries, anomalies)
 
 
@@ -274,24 +470,58 @@ def _valid_entry(v):
     if not isinstance(v, dict):
         return False
     required = {"digest", "status", "name", "scope"}
-    allowed = required | {"verdict"}
+    allowed = required | {"verdict", "provenance"}
     if not required.issubset(v) or not set(v).issubset(allowed):
         return False
-    return (isinstance(v["digest"], str) and _HEX64.match(v["digest"])
+    if not (isinstance(v["digest"], str) and _HEX64.match(v["digest"])
             and v["status"] in _STATUSES
-            and isinstance(v["name"], str) and len(v["name"]) <= 80
-            and re.match(r"[\x20-\x7e]{1,80}\Z", v["name"])
-            and isinstance(v["scope"], str) and _SCOPE_OK.match(v["scope"])
-            and ("verdict" not in v or v["verdict"] in _VERDICTS))
+            # name must be an allowlisted display name or an opaque id - NOT
+            # arbitrary printable prose, which would let a planted baseline
+            # smuggle injection text a removal line later echoes.
+            and isinstance(v["name"], str) and _STORED_NAME_OK.match(v["name"])
+            and isinstance(v["scope"], str) and _SCOPE_OK.match(v["scope"])):
+        return False
+    if v["status"] == "vetted" and v.get("verdict") not in _VERDICTS:
+        return False   # a "vetted" entry without a real verdict is invalid state
+    if "verdict" in v and v["verdict"] not in _VERDICTS:
+        return False
+    if "provenance" in v and not (isinstance(v["provenance"], str)
+                                  and re.match(r"[\x20-\x7e]{0,200}\Z", v["provenance"])):
+        return False
+    return True
+
+
+def _dir_trusted(dirp):
+    """(ok, reason): the directory exists as a real (non-symlink) directory,
+    owned by us, and is not group/world-writable. The SAME check gates both
+    the baseline READ and WRITE - a symlinked or world-writable baseline
+    directory is refused on load, not only on store (else an attacker plants a
+    valid baseline in a dir store_baseline would never have written to)."""
+    try:
+        dst = os.lstat(dirp)
+    except OSError:
+        return False, "io"
+    if stat.S_ISLNK(dst.st_mode) or not stat.S_ISDIR(dst.st_mode):
+        return False, "dir-untrusted"
+    if dst.st_uid != os.geteuid() or (dst.st_mode & 0o022):
+        return False, "dir-untrusted"
+    return True, ""
 
 
 def load_baseline(path=None):
     """-> (state, data): ("ok", dict) | ("absent", None) | ("stale", reason)
     | ("corrupt", reason). "stale" = readable but written under a different
     schema/policy version (visible re-baseline); "corrupt" = anything else
-    wrong, including a symlinked baseline path - never silently treated as a
-    first run (that distinction is load-bearing: round-1 B4/SV-4)."""
+    wrong, including a symlinked baseline path OR an untrusted parent directory
+    - never silently treated as a first run (that distinction is load-bearing:
+    round-1 B4/SV-4). The parent-dir trust check matches store_baseline so a
+    planted baseline in a symlinked/world-writable dir cannot be trusted."""
     path = path or baseline_path()
+    dirp = os.path.dirname(path)
+    if os.path.lexists(dirp):
+        ok, _r = _dir_trusted(dirp)
+        if not ok:
+            return "corrupt", "dir-untrusted"
     try:
         lst = os.lstat(path)
     except FileNotFoundError:
@@ -334,7 +564,8 @@ def load_baseline(path=None):
     if not isinstance(ent, dict):
         return "corrupt", "shape"
     for k, v in ent.items():
-        if not isinstance(k, str) or len(k) > 120 or not _valid_entry(v):
+        # key = "<scope>|<name_key>" = up to "proj:"+64 + "|" + 64 = 134 chars.
+        if not isinstance(k, str) or len(k) > 160 or not _valid_entry(v):
             return "corrupt", "shape"
     return "ok", data
 
@@ -349,35 +580,37 @@ def store_baseline(data, path=None):
     deltas simply re-advise next session)."""
     path = path or baseline_path()
     dirp = os.path.dirname(path)
+    tmp = None
     try:
         if not os.path.lexists(dirp):
             os.makedirs(dirp, mode=0o700, exist_ok=True)
-        dst = os.lstat(dirp)
-        if stat.S_ISLNK(dst.st_mode) or not stat.S_ISDIR(dst.st_mode):
-            return False, "dir-untrusted"
-        if dst.st_uid != os.geteuid() or (dst.st_mode & 0o022):
-            return False, "dir-untrusted"
+        ok, reason = _dir_trusted(dirp)
+        if not ok:
+            return False, reason
         if os.path.lexists(path) and os.path.islink(path):
             return False, "symlink"
+        blob = json.dumps(data, sort_keys=True).encode("utf-8")
         fd, tmp = tempfile.mkstemp(dir=dirp, prefix=".baseline-", suffix=".tmp")
         try:
-            os.write(fd, json.dumps(data, sort_keys=True).encode("utf-8"))
+            off = 0
+            while off < len(blob):          # loop: os.write may short-write
+                off += os.write(fd, blob[off:])
             os.fsync(fd)
         finally:
             os.close(fd)
-        try:
-            os.replace(tmp, path)
-        except OSError:
-            try:
-                os.unlink(tmp)
-            except OSError:
-                pass
-            return False, "replace"
+        os.replace(tmp, path)               # atomic; consumes tmp on success
+        tmp = None
         return True, ""
     except OSError:
         return False, "io"
     except Exception:
         return False, "internal"
+    finally:
+        if tmp is not None:                 # any failure before replace: no litter
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
 
 
 def _fmt_path(rel_bytes):
@@ -400,18 +633,20 @@ def _cli_digest(argv):
 
 
 def _cli_record(argv):
-    args = {}
+    args = {"expect-digest": None, "reviewer": None}
     it = iter(argv)
     for a in it:
-        if a in ("--scope", "--name", "--dir", "--verdict"):
+        if a in ("--scope", "--name", "--dir", "--verdict", "--expect-digest",
+                 "--reviewer"):
             args[a[2:]] = next(it, None)
         else:
             print("unknown argument: " + a, file=sys.stderr)
             return 2
-    if None in args.values() or set(args) != {"scope", "name", "dir", "verdict"}:
+    need = {"scope", "name", "dir", "verdict"}
+    if any(args.get(k) is None for k in need):
         print("usage: skill_snapshot.py record --scope <global|proj:PATH> "
-              "--name <name> --dir <dir> --verdict <" + "|".join(_VERDICTS) + ">",
-              file=sys.stderr)
+              "--name <name> --dir <dir> --verdict <" + "|".join(_VERDICTS) + "> "
+              "[--expect-digest <hex>] [--reviewer <text>]", file=sys.stderr)
         return 2
     if args["verdict"] not in _VERDICTS:
         print("verdict must be one of: " + ", ".join(_VERDICTS), file=sys.stderr)
@@ -423,23 +658,38 @@ def _cli_record(argv):
             return 2
         scope = scope_id(os.fsencode(scope[len("proj:"):]))
     snap = snapshot_tree(args["dir"])
-    if snap["anomalies"] and args["verdict"] == "SAFE-TO-PROPOSE":
-        print("REFUSED: the tree is anomalous (" +
-              ", ".join(sorted({r for r, _ in snap["anomalies"]})) +
-              ") - an anomalous tree cannot be recorded SAFE-TO-PROPOSE "
-              "(fail closed); resolve the anomalies or record SUSPECT/BLOCK.",
+    # Bind the verdict to the bytes the reviewer ACTUALLY examined: if they pass
+    # the digest they reviewed and the tree has since changed, refuse - the
+    # verdict would otherwise certify content that was never read (luna F5).
+    if args["expect-digest"] and args["expect-digest"] != snap["digest"]:
+        print("REFUSED: --expect-digest %s does not match the current tree "
+              "digest %s - the skill changed since you reviewed it; re-vet the "
+              "current bytes." % (args["expect-digest"], snap["digest"]),
               file=sys.stderr)
         return 3
     nb = os.fsencode(args["name"])
-    disp, _ = display_name(nb)
+    disp, disp_ok = display_name(nb)
+    # A hostile top-level name is itself an anomaly; refuse to bless it SAFE.
+    if args["verdict"] == "SAFE-TO-PROPOSE" and (snap["anomalies"] or not disp_ok):
+        reasons = sorted({r for r, _ in snap["anomalies"]})
+        if not disp_ok:
+            reasons.append("badname")
+        print("REFUSED: cannot record SAFE-TO-PROPOSE (" + ", ".join(reasons) +
+              ") - an anomalous tree or a hostile skill name fails closed; "
+              "resolve it or record SUSPECT/BLOCK.", file=sys.stderr)
+        return 3
     state, data = load_baseline()
     if state != "ok":
         print("note: baseline state was '%s' - rebuilding it fresh" % state,
               file=sys.stderr)
         data = fresh_baseline()
     key = "%s|%s" % (scope, name_key(nb))
-    data["entries"][key] = {"digest": snap["digest"], "status": "vetted",
-                            "verdict": args["verdict"], "name": disp, "scope": scope}
+    entry = {"digest": snap["digest"], "status": "vetted",
+             "verdict": args["verdict"], "name": disp, "scope": scope}
+    if args["reviewer"]:
+        prov = re.sub(r"[^\x20-\x7e]", "?", args["reviewer"])[:200]
+        entry["provenance"] = prov
+    data["entries"][key] = entry
     ok, reason = store_baseline(data)
     if not ok:
         print("baseline write FAILED (%s) - verdict not recorded" % reason,

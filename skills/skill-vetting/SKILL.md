@@ -119,23 +119,32 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
 - A SAFE-TO-PROPOSE verdict is input to the user's install decision (§0).
 - **A verdict binds to the exact content, not a name or a path - and the binding
   is executable, not prose.** Compute the snapshot with the pack's canonical
-  tool and record its output with the verdict:
+  tool and record its output with the verdict. **Run the tool from its TRUSTED
+  installed location, never a relative `hooks/skill_snapshot.py` path** - when
+  you are vetting an untrusted repository, a relative path resolves to that
+  repo's OWN planted copy and would execute attacker code before you vet it.
+  Use the copy the README's hooks section installs (or the plugin-bundled copy
+  via `${CLAUDE_PLUGIN_ROOT}`), and point it at the candidate directory:
 
   ```bash
-  python3 hooks/skill_snapshot.py digest <skill-dir>
+  # $TOOL = your installed, trusted copy, e.g.
+  #   "$CLAUDE_PROJECT_DIR"/.claude/hooks/skill_snapshot.py  (README install)
+  #   "$CLAUDE_PLUGIN_ROOT"/hooks/skill_snapshot.py          (plugin-bundled)
+  python3 "$TOOL" digest <candidate-skill-dir>
   ```
 
   That prints the tree digest (every file, sorted, length-prefixed binary
   encoding - not just the entry file), the snapshot `schema` version, the
   vetting `policy` version, and any observation anomalies; it exits non-zero
   on an anomalous tree, and an anomalous tree can never be SAFE-TO-PROPOSE
-  (fail closed). A verdict record carries: digest, schema, policy, the
-  reviewing model/tool identities, the date, and the verdict word. To bind the
-  verdict into the advisory hook's baseline (so `status` audits show it):
+  (fail closed). Record the verdict against the digest you actually reviewed
+  (the `--reviewer` note carries the reviewing model/tool identities and date;
+  `--expect-digest` refuses if the tree changed since you read it):
 
   ```bash
-  python3 hooks/skill_snapshot.py record --scope <global|proj:PATH> \
-      --name <dir-name> --dir <skill-dir> --verdict <SAFE-TO-PROPOSE|SUSPECT|BLOCK>
+  python3 "$TOOL" record --scope <global|proj:PATH> --name <dir-name> \
+      --dir <candidate-skill-dir> --verdict <SAFE-TO-PROPOSE|SUSPECT|BLOCK> \
+      --expect-digest <the digest you reviewed> --reviewer "<models, date>"
   ```
 
   A cached verdict may be reused ONLY if the digest AND schema AND policy all

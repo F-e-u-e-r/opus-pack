@@ -79,21 +79,31 @@ except Exception:
     _IMPORT_ERROR = traceback.format_exc()
 
 MAX_LISTED = 8        # display cap only; the full count is always surfaced
-MAX_CANDIDATES = 256  # top-level entries scanned per root; more is a root anomaly
 
 _PREFIX = ("skill-vetting advisory (tripwire only, NOT a safety verdict — the "
            "skill-vetting skill's full read is the actual check): ")
 
 
 def _log(msg):
-    """Best-effort audit line; never raises (preserves robustness fail-open)."""
+    """Best-effort audit line; never raises AND never blocks. Opens the log
+    O_NOFOLLOW|O_NONBLOCK|O_APPEND via a raw fd, so a planted symlink or a FIFO
+    at the log path cannot redirect the write or hang SessionStart (a blocking
+    open on a reader-less FIFO would otherwise wedge the whole session)."""
     try:
         cfg = snapmod.config_root() if snapmod else os.path.join(
             os.path.expanduser("~"), ".claude")
-        path = os.path.join(cfg, "skill-vetting", "advisory.log")
-        os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
-        with open(path, "a") as fh:
-            fh.write(msg + "\n")
+        d = os.path.join(cfg, "skill-vetting")
+        os.makedirs(d, mode=0o700, exist_ok=True)
+        flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_CLOEXEC
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        if hasattr(os, "O_NONBLOCK"):
+            flags |= os.O_NONBLOCK
+        fd = os.open(os.path.join(d, "advisory.log"), flags, 0o600)
+        try:
+            os.write(fd, (msg + "\n").encode("utf-8", "replace"))
+        finally:
+            os.close(fd)
     except Exception:
         pass
 
@@ -117,6 +127,16 @@ def _emit(lines):
         return False
 
 
+def _same_dir(a, b):
+    """True only when a and b are the SAME directory inode, by lstat identity
+    (no symlink following) - so a symlinked root never dedups away a scope."""
+    try:
+        sa, sb = os.lstat(a), os.lstat(b)
+        return (sa.st_dev, sa.st_ino) == (sb.st_dev, sb.st_ino)
+    except OSError:
+        return False
+
+
 def _resolve_project_root(payload):
     env = os.environ.get("CLAUDE_PROJECT_DIR", "")
     if env and os.path.isabs(env):
@@ -127,43 +147,60 @@ def _resolve_project_root(payload):
     return os.getcwd()
 
 
-def _scan_root(scope, label, root):
-    """Enumerate one skills root. Returns (candidates, root_lines, complete):
-    candidates = [(key, name_bytes, display, snap)]; complete=False means the
-    enumeration itself failed or was truncated (baseline pruning for this
-    scope must then be skipped — a removal cannot be distinguished from
-    not-scanned)."""
-    rootb = os.fsencode(root)
-    try:
-        with os.scandir(rootb) as it:
-            dirents = sorted(it, key=lambda d: d.name)
-    except FileNotFoundError:
-        return [], [], True          # no such root: a complete, empty view
-    except NotADirectoryError:
-        return [], ["the %s skills path is not a directory — treat its skills "
-                    "as changed; run the skill-vetting skill before trusting "
-                    "them" % label], False
-    except OSError:
-        return [], ["the %s skills directory could not be read — treat its "
-                    "skills as changed; run the skill-vetting skill before "
-                    "trusting them" % label], False
-    lines = []
-    complete = True
-    if len(dirents) > MAX_CANDIDATES:
-        lines.append("the %s skills directory holds %d entries (limit %d) — "
-                     "entries beyond the limit were NOT scanned; run the "
-                     "skill-vetting skill on them manually"
-                     % (label, len(dirents), MAX_CANDIDATES))
-        dirents = dirents[:MAX_CANDIDATES]
-        complete = False
+_ROOT_ANOMALY_LINE = {
+    "root-symlink": "the %s skills directory is a symlink (not a real directory) "
+                    "— its skills cannot be trusted; run the skill-vetting skill",
+    "root-notdir": "the %s skills path is not a directory — run the "
+                   "skill-vetting skill before trusting anything there",
+    "root-unreadable": "the %s skills directory could not be read — treat its "
+                       "skills as changed; run the skill-vetting skill",
+    "root-overfull": "the %s skills directory holds more entries than the scan "
+                     "limit — entries beyond it were NOT scanned; run the "
+                     "skill-vetting skill on them manually",
+}
+
+
+def _scan_root(scope, label, root, budget):
+    """Enumerate one skills root via the hardened primitive (the hook owns no
+    filesystem walking of its own). Returns (candidates, root_lines, complete):
+    candidates = [(key, display, snap)]; complete=False means enumeration
+    failed/was truncated, so baseline pruning for this scope must be skipped
+    (a removal cannot be told from not-scanned). A symlinked or unreadable
+    root, or a hostile top-level skill NAME, becomes a root/anomaly line here —
+    never a silent pass."""
+    listing = snapmod.list_candidates(root)
+    lines, badnames = [], set()
+    for reason, name in listing["anomalies"]:
+        if reason in _ROOT_ANOMALY_LINE:
+            lines.append(_ROOT_ANOMALY_LINE[reason] % label)
+        elif reason == "badname":
+            badnames.add(name)
+    candidates = listing["candidates"]
     out = []
-    for de in dirents:
-        name = de.name
-        disp, _ = snapmod.display_name(name)
-        key = "%s|%s" % (scope, snapmod.name_key(name))
-        out.append((key, name, "%s:%s" % (label, disp),
-                    snapmod.snapshot_tree(de.path)))
-    return out, lines, complete
+    try:
+        for i, (nameb, dir_fd) in enumerate(candidates):
+            try:
+                snap = snapmod.snapshot_fd(dir_fd, budget)
+            finally:
+                os.close(dir_fd)                 # consumed: closed exactly once
+                candidates[i] = (nameb, -1)      # mark closed so the sweep skips it
+            disp, disp_ok = snapmod.display_name(nameb)
+            key = "%s|%s" % (scope, snapmod.name_key(nameb))
+            # a hostile top-level name is an anomaly the snapshot cannot carry
+            # (it is about the name, not the tree) — force it onto the snap so
+            # the candidate can never settle into silence.
+            if not disp_ok or nameb in badnames:
+                snap = dict(snap)
+                snap["anomalies"] = list(snap["anomalies"]) + [("badname", nameb)]
+            out.append((key, "%s:%s" % (label, disp), snap))
+    finally:
+        for _nameb, dir_fd in candidates:        # any fd not yet consumed
+            if dir_fd is not None and dir_fd >= 0:
+                try:
+                    os.close(dir_fd)
+                except OSError:
+                    pass
+    return out, lines, listing["complete"]
 
 
 def main():
@@ -181,9 +218,16 @@ def main():
 
         cfg = snapmod.config_root()
         proj = os.path.realpath(_resolve_project_root(payload))
-        roots = [("global", "global", os.path.join(cfg, "skills"))]
+        global_skills = os.path.join(cfg, "skills")
+        roots = [("global", "global", global_skills)]
         proj_skills = os.path.join(proj, ".claude", "skills")
-        if os.path.realpath(proj_skills) != os.path.realpath(roots[0][2]):
+        # Dedup by lstat IDENTITY, not realpath: a realpath compare follows a
+        # symlink, so a project skills dir replaced by a symlink to the global
+        # root would compare-equal and be silently skipped (sol#3). lstat
+        # identity only matches when the two paths are literally the same
+        # directory inode - a symlinked project root then differs, is NOT
+        # deduped, gets scanned, and its symlink surfaces as an anomaly.
+        if not _same_dir(proj_skills, global_skills):
             roots.append((snapmod.scope_id(os.fsencode(proj)), "project",
                           proj_skills))
 
@@ -207,12 +251,13 @@ def main():
         anomaly_lines, new_lines, changed_lines, removed_lines = [], [], [], []
         new_entries = {}
         scanned_scopes = {}   # scope -> enumeration complete?
+        budget = {"bytes": 0, "entries": 0, "stop": False}  # shared across ALL candidates
         for scope, label, root in roots:
-            candidates, root_lines, complete = _scan_root(scope, label, root)
+            candidates, root_lines, complete = _scan_root(scope, label, root, budget)
             head_lines.extend(root_lines)
             prev = scanned_scopes.get(scope, True)
             scanned_scopes[scope] = prev and complete
-            for key, _name, disp, snap in candidates:
+            for key, disp, snap in candidates:
                 old = old_entries.get(key)
                 is_new = old is None
                 is_changed = (old is not None) and old["digest"] != snap["digest"]
@@ -259,6 +304,8 @@ def main():
                 elif scope not in scanned_scopes:
                     new_entries[key] = old       # other project: preserve
 
+        # Deliver BEFORE advancing the baseline (G5/R2-08): a failed delivery
+        # must leave the old baseline so the same deltas re-advise next run.
         lines = (head_lines + anomaly_lines + new_lines + changed_lines
                  + removed_lines)
         if lines:
@@ -274,13 +321,24 @@ def main():
             printed = True
             _log("ADVISED %d item(s)" % len(lines))
 
+        # Now advance the baseline. A store that cannot persist is a DETECTION
+        # failure for next session — so when this was a SILENT run (nothing
+        # delivered, e.g. a first-run bootstrap), a store failure fails CLOSED
+        # with its own advisory rather than repeating a silent bootstrap that
+        # would swallow any change made before the next run (sol#2 / luna F4).
         merged = snapmod.fresh_baseline()
         merged["entries"] = new_entries
         if state != "ok" or merged["entries"] != data["entries"]:
-            ok, reason = snapmod.store_baseline(merged, bpath)
-            if not ok:
-                _log("WARN baseline write refused/failed (%s) — deltas will "
-                     "re-advise next run" % reason)
+            store_ok, reason = snapmod.store_baseline(merged, bpath)
+            if not store_ok:
+                _log("WARN baseline write refused/failed (%s)" % reason)
+                if not printed:
+                    _emit(["the vetting baseline could not be saved (%s) — a "
+                           "skill change before the next session may go "
+                           "UNOBSERVED; fix the <config>/skill-vetting "
+                           "directory, and vet currently installed skills with "
+                           "the skill-vetting skill" % reason])
+                    printed = True
         return 0
     except Exception:
         _log("ERROR " + traceback.format_exc().replace("\n", " | "))
