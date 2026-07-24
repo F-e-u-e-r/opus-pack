@@ -300,6 +300,44 @@ class HookE2E(unittest.TestCase):
         rc, ctx, _ = self.run_hook()             # and again next session
         self.assertIsNotNone(ctx, "a hostile name is an anomaly -> re-advises")
 
+    def test_top_level_symlink_skill_never_silently_dropped(self):
+        # round-4 SV4-01: the fold regression — a top-level symlinked skill dir
+        # must advise (and keep advising), not vanish from enumeration.
+        self.run_hook()                            # empty bootstrap
+        outside = os.path.join(self.tmp, "evil-real")
+        os.makedirs(outside)
+        with open(os.path.join(outside, "SKILL.md"), "w") as fh:
+            fh.write("# trojan\n")
+        os.symlink(outside, os.path.join(self.G, "trojan"))
+        rc, ctx, _ = self.run_hook()
+        self.assertIsNotNone(ctx, "a top-level symlink skill must not be silent")
+        self.assertIn("trojan", ctx)
+        self.assertIn("symlink", ctx)
+        rc, ctx, _ = self.run_hook()               # and it re-advises (anomaly, I5)
+        self.assertIn("symlink", ctx)
+
+    def test_new_unreadable_skill_dir_advises(self):
+        # round-4 grok MF-2: a new unreadable top-level dir must not settle silent.
+        if os.geteuid() == 0:
+            self.skipTest("root ignores permissions")
+        self.run_hook()
+        d = self.mkskill(self.G, "locked")
+        os.chmod(d, 0)
+        try:
+            rc, ctx, _ = self.run_hook()
+            self.assertIsNotNone(ctx)
+            self.assertIn("locked", ctx)
+        finally:
+            os.chmod(d, 0o755)
+
+    def test_root_dir_mode_change_advises(self):
+        # round-4 SV4-03: chmod on the skill root itself must be observed.
+        self.mkskill(self.G, "alpha")
+        self.run_hook()
+        os.chmod(os.path.join(self.G, "alpha"), 0o700)
+        rc, ctx, _ = self.run_hook()
+        self.assertIn("changed skill global:alpha", ctx)
+
     def test_symlinked_skills_root_advises(self):
         # round-3 sol#3/luna#2: a watched root that is a symlink is not followed
         # silently — it is an anomaly.
@@ -414,9 +452,15 @@ class HookE2E(unittest.TestCase):
         self.run_hook()
         env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
                "HOME": self.home, "CLAUDE_CONFIG_DIR": self.cfg}
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("ss", SNAP)
+        ssmod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ssmod)
+        dg = ssmod.snapshot_tree(d)["digest"]
         res = subprocess.run([PY, SNAP, "record", "--scope", "global",
                               "--name", "alpha", "--dir", d,
-                              "--verdict", "SAFE-TO-PROPOSE"],
+                              "--verdict", "SAFE-TO-PROPOSE", "--expect-digest", dg,
+                              "--reviewer", "test, 2026-07-25"],
                              capture_output=True, env=env, timeout=60)
         self.assertEqual(res.returncode, 0, res.stderr)
         entry = list(self.read_baseline()["entries"].values())[0]
@@ -426,6 +470,8 @@ class HookE2E(unittest.TestCase):
         self.assertIsNone(ctx)
         entry = list(self.read_baseline()["entries"].values())[0]
         self.assertEqual(entry["status"], "vetted", "unchanged content keeps its verdict")
+        self.assertEqual(entry["provenance"], "test, 2026-07-25",
+                         "SV4-09: provenance preserved across an unchanged run")
         self.mkskill(self.G, "alpha", body="# changed\n")
         rc, ctx, _ = self.run_hook()
         self.assertIn("changed skill global:alpha", ctx)

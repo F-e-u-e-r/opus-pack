@@ -119,6 +119,16 @@ observable, advisable event, never a silent state.
   delta on this run or the next. The residual failure direction is an extra
   advisory, not a miss; non-regular-file swap tricks are excluded by G2
   (fd-verified type, anomaly otherwise).
+- **N7 — intermediate path-component symlinks on the watched-root PATH.**
+  `O_NOFOLLOW` guards the final root component and every in-tree descent, but
+  the ancestor path of a watched root (`$CLAUDE_CONFIG_DIR`, or
+  `$CLAUDE_PROJECT_DIR/.claude`) is resolved normally. An attacker who can
+  replace `.claude` itself (or the config dir) with a symlink already controls
+  the agent's entire configuration — settings, hooks, every skill — which is
+  ADV-2 (out of scope): defeating this tripwire is moot once that directory is
+  theirs. We harden the final `skills` component and each skill dir; we do not
+  build a component-by-component openat walk to defend a boundary whose breach
+  is already full compromise.
 
 ## Snapshot invariants (the primitive's contract)
 

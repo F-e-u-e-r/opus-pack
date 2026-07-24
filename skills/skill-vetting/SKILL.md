@@ -119,17 +119,20 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
 - A SAFE-TO-PROPOSE verdict is input to the user's install decision (§0).
 - **A verdict binds to the exact content, not a name or a path - and the binding
   is executable, not prose.** Compute the snapshot with the pack's canonical
-  tool and record its output with the verdict. **Run the tool from its TRUSTED
-  installed location, never a relative `hooks/skill_snapshot.py` path** - when
-  you are vetting an untrusted repository, a relative path resolves to that
-  repo's OWN planted copy and would execute attacker code before you vet it.
-  Use the copy the README's hooks section installs (or the plugin-bundled copy
-  via `${CLAUDE_PLUGIN_ROOT}`), and point it at the candidate directory:
+  tool and record its output with the verdict. **Run the tool ONLY from a
+  trusted copy OUTSIDE the tree you are vetting, never a path inside the
+  candidate.** A relative `hooks/skill_snapshot.py`, or
+  `"$CLAUDE_PROJECT_DIR"/.claude/hooks/skill_snapshot.py` when the project you
+  are vetting IS that repository, resolves to the candidate's OWN planted copy
+  and would execute attacker code before you vet it. Use the plugin-bundled
+  copy via `${CLAUDE_PLUGIN_ROOT}`, or a separate user-level install you
+  control (e.g. under `~/.local/`) that is not the vetted checkout:
 
   ```bash
-  # $TOOL = your installed, trusted copy, e.g.
-  #   "$CLAUDE_PROJECT_DIR"/.claude/hooks/skill_snapshot.py  (README install)
-  #   "$CLAUDE_PLUGIN_ROOT"/hooks/skill_snapshot.py          (plugin-bundled)
+  # $TOOL = a trusted copy OUTSIDE the candidate, e.g.
+  #   "$CLAUDE_PLUGIN_ROOT"/hooks/skill_snapshot.py   (plugin-bundled)
+  #   ~/.local/share/opus-pack/skill_snapshot.py      (your own separate install)
+  # NEVER "$CLAUDE_PROJECT_DIR"/.claude/... when the project is what you're vetting.
   python3 "$TOOL" digest <candidate-skill-dir>
   ```
 

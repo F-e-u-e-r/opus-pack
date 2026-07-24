@@ -161,46 +161,27 @@ _ROOT_ANOMALY_LINE = {
 
 
 def _scan_root(scope, label, root, budget):
-    """Enumerate one skills root via the hardened primitive (the hook owns no
-    filesystem walking of its own). Returns (candidates, root_lines, complete):
-    candidates = [(key, display, snap)]; complete=False means enumeration
-    failed/was truncated, so baseline pruning for this scope must be skipped
-    (a removal cannot be told from not-scanned). A symlinked or unreadable
-    root, or a hostile top-level skill NAME, becomes a root/anomaly line here —
-    never a silent pass."""
-    listing = snapmod.list_candidates(root)
-    lines, badnames = [], set()
-    for reason, name in listing["anomalies"]:
-        if reason in _ROOT_ANOMALY_LINE:
-            lines.append(_ROOT_ANOMALY_LINE[reason] % label)
-        elif reason == "badname":
-            badnames.add(name)
-    candidates = listing["candidates"]
+    """Enumerate + snapshot one skills root via the primitive's streaming
+    `scan_root` (the hook owns no filesystem walking of its own; the primitive
+    holds the fds and returns finished snaps). Returns (candidates, root_lines,
+    complete): candidates = [(key, display, snap)] for EVERY top-level entry -
+    a directory, a symlink, a special file, or an open-failure - so none is
+    silently dropped (round-4 SV4-01); complete=False means enumeration
+    failed/was truncated, so baseline pruning for this scope must be skipped."""
+    scanned = snapmod.scan_root(root, budget)
+    lines = [_ROOT_ANOMALY_LINE[r] % label
+             for r, _n in scanned["anomalies"] if r in _ROOT_ANOMALY_LINE]
     out = []
-    try:
-        for i, (nameb, dir_fd) in enumerate(candidates):
-            try:
-                snap = snapmod.snapshot_fd(dir_fd, budget)
-            finally:
-                os.close(dir_fd)                 # consumed: closed exactly once
-                candidates[i] = (nameb, -1)      # mark closed so the sweep skips it
-            disp, disp_ok = snapmod.display_name(nameb)
-            key = "%s|%s" % (scope, snapmod.name_key(nameb))
-            # a hostile top-level name is an anomaly the snapshot cannot carry
-            # (it is about the name, not the tree) — force it onto the snap so
-            # the candidate can never settle into silence.
-            if not disp_ok or nameb in badnames:
-                snap = dict(snap)
-                snap["anomalies"] = list(snap["anomalies"]) + [("badname", nameb)]
-            out.append((key, "%s:%s" % (label, disp), snap))
-    finally:
-        for _nameb, dir_fd in candidates:        # any fd not yet consumed
-            if dir_fd is not None and dir_fd >= 0:
-                try:
-                    os.close(dir_fd)
-                except OSError:
-                    pass
-    return out, lines, listing["complete"]
+    for nameb, snap in scanned["candidates"]:
+        disp, disp_ok = snapmod.display_name(nameb)
+        key = "%s|%s" % (scope, snapmod.name_key(nameb))
+        # a hostile top-level NAME is an anomaly about the name, not the tree -
+        # force it onto the snap so the candidate can never settle into silence.
+        if not disp_ok:
+            snap = dict(snap)
+            snap["anomalies"] = list(snap["anomalies"]) + [("badname", nameb)]
+        out.append((key, "%s:%s" % (label, disp), snap))
+    return out, lines, scanned["complete"]
 
 
 def main():
@@ -261,8 +242,11 @@ def main():
                 old = old_entries.get(key)
                 is_new = old is None
                 is_changed = (old is not None) and old["digest"] != snap["digest"]
-                if state == "absent":
+                anomalous = bool(snap["anomalies"])
+                if state == "absent" and not anomalous:
                     status = "baseline"          # first-run bootstrap: silent
+                elif state == "absent":
+                    status = "seen"              # anomalous first-run: advised, so seen (SV4-N1)
                 elif state != "ok":
                     status = "seen"              # advised untrusted collectively
                 elif is_new or is_changed:
@@ -271,8 +255,10 @@ def main():
                     status = old["status"]       # unchanged: keep status+verdict
                 entry = {"digest": snap["digest"], "status": status,
                          "name": disp.split(":", 1)[1], "scope": scope}
-                if status == "vetted" and old and "verdict" in old:
-                    entry["verdict"] = old["verdict"]
+                if status == "vetted" and old:   # preserve the full verdict record
+                    for f in ("verdict", "provenance"):   # SV4-09: keep provenance too
+                        if f in old:
+                            entry[f] = old[f]
                 new_entries[key] = entry
                 if snap["anomalies"]:
                     reasons = ",".join(sorted({r for r, _ in snap["anomalies"]}))
