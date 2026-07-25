@@ -396,7 +396,9 @@ a new, changed, removed, or anomalous skill it injects one line routing to the
 `skill-vetting` skill. It **never blocks and never emits a "safe" line** — a
 `SessionStart` hook cannot deny, and a green-lighting scanner is the
 false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged, or
-first-run-baseline run is silent, the advisory prints **before** the baseline
+first run emits one labelled line naming how many installed
+skills it recorded as the baseline without reviewing them, the advisory prints
+**before** the baseline
 (`<config>/skill-vetting/baseline.json`) advances — a failed delivery
 re-advises next session — and skill names reach the model only through a strict
 ASCII allowlist or an opaque id. The baseline is not tamper-evident (it shares

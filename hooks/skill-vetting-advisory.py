@@ -18,7 +18,9 @@ real defense is the `skill-vetting` skill: a full, human-grade read. This hook
 only routes to it.
 
 What fires an advisory (each covers EVERY file in the tree, not just SKILL.md):
-a new, changed, or removed top-level entry under a watched skills root; any
+a new, changed, or removed top-level DIRECTORY, symlink or special file under a
+watched skills root — a top-level regular FILE is deliberately not a candidate,
+because a loose `.md` beside the skill directories is not loadable as a skill; any
 observation anomaly — an unreadable file or directory, an oversize file, a
 budget breach, ANY symlink, a special file (FIFO/socket/device), a hostile or
 undecodable name (shown only as an opaque id); an unreadable/corrupt/stale
@@ -280,11 +282,18 @@ def main():
             pass
         lock_fd, lock_state = _acquire(lockpath)
         if lock_state == "contended":
-            # A live peer holds it and is doing exactly this work; it will
-            # advise. Say so rather than looking clean, and touch nothing.
-            _emit(["another session is scanning the skills directories right "
-                   "now, so this session did not — if it reported new or "
-                   "changed skills, they apply here too"])
+            # The lock is HELD by someone. We deliberately do not claim the
+            # holder is alive or that it will advise: the lock file carries no
+            # pid and liveness is never checked, so a lock left by a process
+            # that died under LOCK_STALE_S reaches here too. Say only what is
+            # known — this session did not scan — which is the fail-closed
+            # statement either way. (Replacing this with fcntl.flock, which the
+            # kernel releases on death, is design item D2.)
+            _emit(["the skills directories were not scanned this session "
+                   "because another run holds the vetting lock — treat "
+                   "installed skills as unverified for this session and run "
+                   "the skill-vetting skill on anything you did not install "
+                   "yourself"])
             return 0
         # "unavailable" (the lock file cannot be created at all) is a degraded
         # run, not contention: proceed unlocked. The store will fail for the

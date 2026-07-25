@@ -9,7 +9,7 @@ adds a thin verdict-recording convenience (`record`/`status`) so the
 skill-vetting skill's §3 binding is executable. The hook itself is a thin
 dispatcher and contains no filesystem-walking logic of its own. Design record:
 `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md` (threat model,
-goals G1-G6, invariants I1-I7). A deliberate naming deviation: this file uses
+goals G1-G6, invariants I1-I11). A deliberate naming deviation: this file uses
 an underscore (not the hooks/ hyphen convention) because the hook imports it
 as a Python module; install it NEXT TO the hook (same directory).
 
@@ -30,9 +30,11 @@ Contract highlights (the tests in hooks/test-skill_snapshot.py hold each):
   change outside the tree, so they can never be certified unchanged.
   Directories are entries too (empty-dir adds/removes change the digest).
 - FAIL CLOSED (G2/I5): anything not fully observable - unreadable file/dir,
-  oversize file, entry/byte/depth budget breach, symlink, special file
-  (FIFO/socket/device), hostile or undecodable name - is an ANOMALY with a
-  stable reason code. An anomalous snapshot never counts as "unchanged".
+  oversize file, entry/byte budget breach, structural depth/fanout refusal,
+  symlink, special file (FIFO/socket/device) - is an ANOMALY with a stable
+  reason code. A hostile or undecodable name is an anomaly only for a TOP-LEVEL
+  candidate (the name that gets displayed); nested names are not gated, because
+  they are never echoed and their bytes are already bound into the digest. An anomalous snapshot never counts as "unchanged".
 - HARDENED BASELINE I/O (I6): read via O_NOFOLLOW with a size cap and strict
   schema/shape validation (any deviation -> "corrupt", a visible state, never
   a silent re-baseline); write via same-directory mkstemp(0600) + os.replace
@@ -271,8 +273,11 @@ def snapshot_tree(root, budget=None):
     """Snapshot one top-level skill candidate (dir, file, or symlink) at
     bytes-path `root`. Returns {"digest", "entries", "anomalies"} where
     anomalies is a list of (reason, rel_path_bytes) with stable reason codes:
-    unreadable / oversize / budget / depth / fanout / symlink / special /
-    badname / root.
+    unreadable / oversize / budget / depth / fanout / symlink / special / root.
+    NOT `badname`: since round 6 a NESTED name is never display-gated (its bytes
+    are already bound into the digest and it is never echoed), so this function
+    cannot produce that reason. A TOP-LEVEL candidate name is still gated, by
+    the CLI and hook wrappers, not here.
     Anomalies are also manifest entries where they REPLACE an observation, so
     an anomaly appearing or healing changes the digest; comparison callers
     must treat ANY anomaly as "anomalous" regardless of digest equality (I5).

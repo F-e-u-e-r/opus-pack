@@ -348,17 +348,28 @@ class TreeObservation(Base):
         self.assertFalse(ss.display_name("危險".encode("utf-8"))[1],
                          "\\w-style unicode names must not pass the allowlist (R2-11)")
 
-    def test_non_utf8_name_is_handled_bytes_faithfully(self):
-        os.makedirs(os.path.join(self.tmp, "s"))
+    def test_non_utf8_name_is_bytes_faithful_not_badname(self):
+        # REWRITTEN (round 8 screen). The old body asserted that a nested
+        # non-UTF-8 name produces a `badname` anomaly. _walk_dir cannot produce
+        # `badname` at all since round 6 removed the nested-name gate - and the
+        # test was skipped on this filesystem, so it would never have gone red.
+        # What must hold is the byte-faithfulness (I3), which is testable.
         raw = os.path.join(os.fsencode(self.tmp), b"s", b"\xff\xfe.bin")
+        os.makedirs(os.path.dirname(raw), exist_ok=True)
         try:
             with open(raw, "wb") as fh:
                 fh.write(b"x")
         except (OSError, ValueError):
             self.skipTest("filesystem rejects non-UTF-8 names")
-        a = self.snap("s")
-        self.assertIn("badname", {r for r, _ in a["anomalies"]})
-        self.assertEqual(a["digest"], self.snap("s")["digest"])
+        snap = self.snap("s")
+        self.assertEqual([], [r for r, _ in snap["anomalies"]],
+                         "a nested name is not display-gated (round 6)")
+        before = snap["digest"]
+        with open(raw, "wb") as fh:
+            fh.write(b"y")
+        self.assertNotEqual(before, self.snap("s")["digest"],
+                            "its bytes are still bound into the digest (I3)")
+
 
     def test_missing_root_is_root_anomaly(self):
         snap = ss.snapshot_tree(os.path.join(self.tmp, "nope"))
@@ -513,12 +524,29 @@ class TreeObservation(Base):
         scanned = dict(ss.scan_root(self.tmp)["candidates"])[b"link"]["digest"]
         self.assertEqual(cli, scanned)
 
-    def test_loose_file_candidate_is_watched(self):
+    def test_snapshot_tree_can_digest_a_single_regular_file(self):
+        # RENAMED (round 8 screen). The old name claimed a loose top-level file
+        # is a WATCHED candidate. It is not: scan_root skips top-level regular
+        # files by design, so this test never covered the watched set - it only
+        # covers the CLI's ability to digest a file path an operator typed.
+        # The watched-set behaviour is asserted in
+        # test_top_level_regular_file_is_not_a_candidate below.
         p = self.mk("loose.md", content=b"v1")
         a = ss.snapshot_tree(p)
         self.assertEqual(a["anomalies"], [])
         self.mk("loose.md", content=b"v2")
         self.assertNotEqual(ss.snapshot_tree(p)["digest"], a["digest"])
+
+    def test_top_level_regular_file_is_not_a_candidate(self):
+        # The property the previous test's NAME wrongly claimed. Stated
+        # explicitly so the skip is a recorded decision, not an accident: a
+        # loose `.md` beside the skill directories is not loadable as a skill.
+        root = os.path.join(self.tmp, "root")
+        os.makedirs(root)
+        self.mk("root", "loose.md")
+        self.mk("root", "realskill", "SKILL.md")
+        names = {n for n, _ in ss.scan_root(root)["candidates"]}
+        self.assertEqual({b"realskill"}, names)
 
     def test_mutation_between_scans_is_visible(self):
         # TOCTOU stance (N6): each scan hashes the exact bytes it read; a

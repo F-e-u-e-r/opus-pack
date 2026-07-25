@@ -12,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import unittest
 
 HOOKS = os.path.dirname(os.path.realpath(__file__))
@@ -571,6 +572,40 @@ class HookE2E(unittest.TestCase):
             % sorted({"n%02d" % i for i in range(20)} - named))
         self.assertIsNone(self.run_hook()[1], "and then it settles")
 
+    def test_lock_stale_takeover_is_KNOWN_BROKEN(self):
+        # NOT a passing security property. This PINS A KNOWN DEFECT so the suite
+        # stops reading as if I11 held, and so the day D2 lands this test goes
+        # red and has to be rewritten deliberately.
+        #
+        # The defect: on the stale path `_acquire` UNLINKS and then re-creates.
+        # Two racers that both lstat the stale lock before either unlinks are
+        # therefore both granted it (round 7 measured 40/40), and `_release`
+        # unlinks whatever file is at the path rather than the one it created,
+        # so a finishing holder deletes a live successor's lock. Reproducing the
+        # race needs forked children on a common deadline; that is inherently
+        # timing-dependent, so what is asserted here is the CODE SHAPE that
+        # causes it, which is deterministic and equally protective.
+        src = open(HOOK).read()
+        acquire = src[src.index("def _acquire("):src.index("def _release(")]
+        self.assertIn("os.unlink(lockpath)", acquire,
+                      "the stale path still unlinks-then-recreates")
+        self.assertNotIn("import fcntl", src,
+                         "no kernel-arbitrated lock yet (design item D2)")
+        release = src[src.index("def _release("):]
+        release = release[:release.index("\ndef ")]
+        self.assertIn("os.unlink(lockpath)", release,
+                      "_release still unlinks by path, not by the fd it opened")
+        # ...and the other writer of the same file takes no lock at all.
+        snap = open(SNAP).read()
+        record = snap[snap.index("def _cli_record("):]
+        record = record[:record.index("\ndef ")]
+        for token in ("flock(", "_acquire(", "lockf("):
+            self.assertNotIn(
+                token, record,
+                "if this FAILS, record now takes a lock - D2 landed, so "
+                "rewrite this test to assert the property instead of the defect")
+
+
     def test_a_partial_snap_is_not_baselined_on_first_observation(self):
         # ROUND-7: the round-6 fix only protected a candidate that already had a
         # real record. On FIRST observation `old is None`, so the constant
@@ -656,7 +691,14 @@ class HookE2E(unittest.TestCase):
                 "%s lost its verdict to a transient budget breach" % n)
             self.assertEqual("SAFE-TO-PROPOSE", after[n].get("verdict"))
 
-    def test_concurrent_hooks_do_not_lose_an_update(self):
+    def test_concurrent_hooks_under_an_uncontended_lock_do_not_lose_an_update(self):
+        # RENAMED AND NARROWED (round 8 screen). The old name asserted a
+        # property the artifact DOES NOT HAVE: on the stale-takeover path both
+        # racers are granted the lock (40/40 trials) and `_cli_record` takes no
+        # lock at all, so updates ARE losable. This test only ever exercised
+        # the uncontended path, so it was a green light for a false claim.
+        # The real property is design item D2; the gap is pinned by
+        # test_stale_lock_takeover_admits_two_holders_KNOWN_BROKEN below.
         # round-6 (sol): load/store are a read-modify-write with no lock, so a
         # slower hook wrote its STALE merge over a faster one's and the delta the
         # faster one advised was un-recorded and never re-advised.

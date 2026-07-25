@@ -187,10 +187,14 @@ observable, advisable event, never a silent state.
   (`os.fsencode`); undecodable names still hash exactly and are displayed only
   as opaque ids.
 - **I4 — hard budgets.** `MAX_ENTRIES`, `MAX_FILE_BYTES`, `MAX_TOTAL_BYTES`,
-  `MAX_DEPTH`. A breach stops that skill's scan (bounded work) and is an
-  anomaly — never a silently-truncated hash (the round-2 oversize repro: a
-  byte flipped beyond the old read window changed nothing; here oversize means
-  anomaly, so it always advises).
+  `MAX_DEPTH`, `MAX_CANDIDATES`, `MAX_OPEN_DIRS`. A RESOURCE breach
+  (`MAX_ENTRIES`, `MAX_TOTAL_BYTES`) stops the run; a STRUCTURAL breach
+  (`MAX_DEPTH`, `MAX_OPEN_DIRS`) stops only that branch and leaves the shared
+  budget alone — see I8, which supersedes the earlier "a breach stops that
+  skill's scan" reading. Either way it is an anomaly, never a
+  silently-truncated hash (the round-2 oversize repro: a byte flipped beyond
+  the old read window changed nothing; here oversize means anomaly, so it
+  always advises).
 - **I5 — anomaly dominates comparison.** Comparison yields
   `unchanged`/`changed`/`anomalous`; a snapshot containing any anomaly is
   `anomalous` regardless of digest equality, and always advises. Anomalies are
@@ -222,12 +226,17 @@ observable, advisable event, never a silent state.
   silently swallowed. A pruned removal entry can never re-fire, which made a
   lost removal line the one unrecoverable case (round 6).
 
-- **I11 — the load/store cycle is serialized.** `load_baseline` ->
-  scan -> deliver -> `store_baseline` is a read-modify-write with no inherent
-  concurrency control, so two hooks racing lose an update: the slower writes its
-  stale merge over the faster one's and the delta the faster one advised is
-  un-recorded. Atomic replace prevents a torn file, not a lost update. The hook
-  takes a bounded, stale-recoverable lock around the whole cycle (round 6).
+- **I11 — the load/store cycle is serialized. NOT MET (round 7, open).**
+  `load_baseline` -> scan -> deliver -> `store_baseline` is a read-modify-write
+  with no inherent concurrency control, so two hooks racing lose an update: the
+  slower writes its stale merge over the faster one's and the delta the faster
+  one advised is un-recorded. Atomic replace prevents a torn file, not a lost
+  update. Round 6 added a hand-rolled lock intended to establish this; round 7
+  measured it and it does NOT: on the stale-takeover path BOTH racers are
+  granted the lock (each lstats the stale file, each unlinks it, each then
+  succeeds at the `O_EXCL` create — 40/40 trials), `_release` unlinks whatever
+  file is at the path rather than the one it created, and `_cli_record`, the
+  other writer of the same file, takes no lock at all. Replacement: design D2.
 - **I6 — hardened baseline I/O.** Read: `O_NOFOLLOW`, size-capped, strict JSON
   parse plus shape/enum/schema validation — any deviation is `corrupt`, which
   advises and rebuilds visibly. Write: same-directory `mkstemp` (0600) +
@@ -235,8 +244,8 @@ observable, advisable event, never a silent state.
   caller-owned, non-group/world-writable directory; a symlinked baseline path
   or untrusted directory is an anomaly and the write is refused. A refused or
   failed write is logged and leaves the previous state (G5 makes that safe).
-- **I7 — status lifecycle.** `baseline` (first-run bootstrap, silent by
-  documented design), `seen` (delta observed and delivered), `vetted` (recorded
+- **I7 — status lifecycle.** `baseline` (first-run bootstrap; it announces
+  itself with one line naming the count — see N-CORRECTION), `seen` (delta observed and delivered), `vetted` (recorded
   only via the CLI `record` subcommand with a verdict). Statuses never affect
   delta detection — only reporting and the `status` listing.
 
@@ -274,7 +283,12 @@ was the problem.
 
 ## Verification obligations
 
-Every goal and invariant above maps to a named executable test in
+**G3-SHELL has NO test in either suite** — nothing composes the procedure's
+shipped command templates and runs them against a hostile directory name, which
+is why the round-6 remedy for it could ship broken and be "verified" with the
+one metacharacter it happened to stop. Closing G3-SHELL (design D1) must land
+with that test. With that exception stated, every goal and invariant above maps
+to a named executable test in
 `hooks/test-skill_snapshot.sh` (primitive matrix) or
 `hooks/test-skill-vetting-advisory.sh` (hook contract), covering at minimum:
 add / modify / delete / rename / symlink / broken symlink / special filenames
@@ -283,7 +297,7 @@ pairs / oversize and budget breach / permission denied (file, subdir, root) /
 mid-scan mutation / FIFO (no hang) / cache corruption, dangling-symlink cache,
 symlinked tmp path / wrong or unset project-root env / delivery failure
 (closed stdout ⇒ baseline not advanced) / version-change invalidation /
-first-run bootstrap silence / multi-project baseline stability / display cap
+first-run bootstrap announces its count / multi-project baseline stability / display cap
 with anomalies listed first and full count surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
 (checks.py). Anomaly ⇒ advise is asserted per class, not in aggregate.

