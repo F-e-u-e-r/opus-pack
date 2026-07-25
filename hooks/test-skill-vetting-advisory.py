@@ -645,22 +645,6 @@ class HookE2E(unittest.TestCase):
             % sorted({"n%02d" % i for i in range(20)} - named))
         self.assertIsNone(self.run_hook()[1], "and then it settles")
 
-    def test_a_failed_store_is_not_announced_as_a_completed_one(self):
-        # ROUND-8 SCREEN pass 12. The first-run / corrupt / stale head lines are
-        # composed and emitted BEFORE store_baseline runs, and G5's single-JSON
-        # emit means no correction can follow a successful print. So a store
-        # that then fails left the session told something was "recorded",
-        # "rebuilt" or "reset" when nothing was. The wording is now
-        # non-perfective, which is the only honest option under G5.
-        self.mkskill(self.G, "alpha")
-        rc, ctx, _ = self.run_hook()
-        self.assertEqual(0, rc)
-        self.assertIsNotNone(ctx)
-        for perfective in ("recorded as the baseline", "has been rebuilt",
-                           "baselines reset"):
-            self.assertNotIn(perfective, ctx,
-                             "a pre-store line must not claim a completed write")
-        self.assertIn("are being baselined", ctx)
 
     def test_a_contended_run_is_recorded_in_the_audit_log(self):
         # ROUND-8 SCREEN, third family. The READMEs point at advisory.log and say

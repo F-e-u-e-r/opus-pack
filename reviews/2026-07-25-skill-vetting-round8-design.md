@@ -423,7 +423,13 @@ under-specified transitions.
   so the destination is explicit rather than inferred from the environment. (The
   maintainer wrote a stray entry into the real `~/.claude` during round-6
   verification precisely because it was inferred.)
-- **`status` keeps a non-zero exit for adverse**, and gains `--porcelain` for
+- **`status` reports an adverse verdict ON RECORD, not a live presence check.**
+  It reads the BASELINE and never lstats, so a skill deleted after its BLOCK
+  still appears; the shipped field is named `adverse_verdicts_in_baseline` for
+  exactly that reason. "Still installed" is this decision's INTENT, and making
+  it true would need `status` to stat the watched roots — a separate decision,
+  not something the current name should imply. It keeps a non-zero exit for
+  adverse, and gains `--porcelain` for
   callers that read any non-zero as tool failure.
 
 ### Rejected alternatives

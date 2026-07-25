@@ -426,4 +426,18 @@ print()
 if failures:
     print(f"{len(failures)} check(s) failed")
     sys.exit(1)
+# 5. No test function is defined twice in a suite. Python keeps only the last
+#    definition, so a duplicate silently shadows an earlier one - the earlier
+#    body stops running while the suite still reports it as present. Found live
+#    at the round-8 screen: one hook test had been added twice by two folds of
+#    the same finding, and the shadowed copy was dead for several commits.
+import collections as _collections
+for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisory.py"):
+    _names = re.findall(r"^    def (test_\w+)\(", open(_suite).read(), re.M)
+    _dupes = sorted(n for n, c in _collections.Counter(_names).items() if c > 1)
+    if _dupes:
+        fail("%s defines these tests more than once (the earlier copy is dead "
+             "code Python never runs): %s" % (_suite, ", ".join(_dupes)))
+    ok("%s has %d tests, no shadowed duplicates" % (_suite, len(_names)))
+
 print("all checks passed")
