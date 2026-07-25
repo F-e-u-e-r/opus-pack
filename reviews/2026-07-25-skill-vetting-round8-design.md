@@ -324,9 +324,16 @@ content in place, before any decision exists.
    candidate whose behaviour depends on what the export excludes (symlinks,
    special files, anything oversize) is BLOCK or SUSPECT on those grounds, not
    "export incomplete, skip the check".
-3. The verdict binds to the export's digest. `--expect-digest` then means what
-   §3 has always claimed it means, because the reviewed bytes and the digested
-   bytes are the same bytes by construction.
+3. The reviewer reads the EXPORT; the verdict binds `--expect-digest` to
+   `snapshot_digest`, the LIVE digest, exactly as step 1 decided.
+   `export_digest` attests only that the review artifact was not altered after
+   it was written. An earlier draft of this step said the verdict binds "the
+   export's digest" and that reviewed and digested bytes are "the same bytes by
+   construction" — both contradict step 1, which had already rejected binding to
+   an export payload a live encoder can never reproduce. What export buys is
+   that the reviewer's bytes cannot change UNDER them mid-read; a live mutation
+   between the export and the `record` still refuses, which is the fail-closed
+   behaviour, not a gap.
 4. §2's Unicode sweep becomes a tool subcommand over the export rather than a
    grep the agent is told to write but never given. Its ranges are defined in
    one place and include the variation-selector planes the current prose omits.
@@ -349,7 +356,10 @@ content in place, before any decision exists.
 ### Invariants claimed (attack these)
 
 **I15** — after `export` succeeds, nothing the reviewer reads can be changed by
-ADV-1, and the verdict binds to exactly those bytes.
+ADV-1. The verdict binds the LIVE digest taken at export
+time (`snapshot_digest`), not the export payload — `export_digest` attests the
+artifact separately — so a live mutation between export and record refuses
+rather than certifying unread bytes.
 **I16** — no step of the procedure opens a non-regular file or follows a symlink
 out of the candidate tree.
 

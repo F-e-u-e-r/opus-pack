@@ -215,8 +215,12 @@ one line routing to THIS skill; names are shown only when they pass a strict
 ASCII allowlist, otherwise as an opaque id, and content is never echoed. It
 **never blocks and never emits a "safe" line**; a clean, unchanged run is silent, while a
 first run that recorded something emits one labelled line naming how many
-installed skills it OBSERVED and recorded as the baseline without review (a
-first run over empty roots records nothing and is silent) — a candidate the scan could not
+installed
+skills it RECORDED as the baseline without review — a count that includes
+candidates whose observation was COMPLETE but adverse (a symlink, an unreadable
+directory, a special file, a hostile name), and excludes only those lost to a
+resource-budget short-circuit, whose digest would be a placeholder; a first run
+over empty roots records nothing and is silent — a candidate the scan could not
 observe is not recorded and not in that count, and advises through its own
 anomaly line instead; a corrupt or
 version-stale baseline advises and resets VISIBLY, never silently; the advisory

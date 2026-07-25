@@ -79,7 +79,8 @@ MAX_FILE_BYTES = 8 << 20    # per-file content cap; larger is an anomaly, never 
 MAX_TOTAL_BYTES = 64 << 20  # content budget; SHARED like MAX_ENTRIES above
 MAX_DEPTH = 24              # per-candidate directory depth
 MAX_CANDIDATES = 256        # top-level entries enumerated per root
-MAX_OPEN_DIRS = 128         # peak concurrently-open directory fds in one walk (bounds fd use)
+MAX_OPEN_DIRS = 128         # cap on PENDING subdir fds; peak is this + the dir
+                            # being scanned (+ scan_root's own root fd)
 MAX_BASELINE_BYTES = 4 << 20
 
 _DIR_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -512,8 +513,10 @@ def scan_root(root, budget=None):
     """Stream one skills ROOT and snapshot each top-level entry (round-4 SV4-02:
     no eager materialization, no all-candidate-fds-up-front - candidates are
     processed one at a time). The in-tree walker holds one open fd per PENDING
-    subdirectory, hard-capped at MAX_OPEN_DIRS and failing closed past it
-    (round-5 SV5-02), so peak fd use is bounded by a constant, not O(width).
+    subdirectory, with the PENDING count hard-capped at MAX_OPEN_DIRS and
+    failing closed past it (round-5 SV5-02), so peak fd use is bounded by a
+    constant - MAX_OPEN_DIRS + the directory being scanned + this root fd -
+    rather than O(width).
     Returns {"candidates", "anomalies", "complete"}:
     candidates = [(name_bytes, snap)] for EVERY top-level entry - a real
     subdirectory (walked), a symlink or special file or open-failure (an

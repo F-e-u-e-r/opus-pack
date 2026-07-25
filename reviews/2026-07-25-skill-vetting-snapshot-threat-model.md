@@ -263,8 +263,13 @@ observable, advisable event, never a silent state.
   calls it "changed", and drops the recorded verdict.
 
 - **I10 — a delivered advisory covers exactly what the baseline advance
-  consumes.** Transient deltas (new/changed/removed) fire once and are then
-  consumed; steady-state anomaly lines recur until fixed. Deltas therefore
+  consumes.** A line is TRANSIENT when this run's baseline advance
+  will consume it, and STEADY-STATE otherwise. That is narrower than
+  new/changed/removed: a candidate whose baseline write is skipped (an
+  unobservable `partial` one) is "new" again on every run, so it is
+  steady-state however new it looks — classifying it as transient let it
+  re-claim the front slots forever and starve a real delta. Steady-state
+  anomaly lines recur until the condition is fixed. Deltas therefore
   outrank anomalies for display slots, and any delta line that is NOT delivered
   has its baseline entry restored, so it is genuinely pending rather than
   silently swallowed. A pruned removal entry can never re-fire, which made a

@@ -403,9 +403,11 @@ a new, changed, removed, or anomalous skill it injects one line routing to the
 false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
 silent — as is a first run that found nothing to record — while a first run
 that DID record something emits one labelled line naming how many installed
-skills it OBSERVED and recorded as the baseline without reviewing them (a
-candidate the scan could not observe is not recorded and not in that count — it
-advises through its own anomaly line); the advisory prints
+skills it RECORDED as the baseline without reviewing them — a count that
+includes candidates whose observation was COMPLETE but adverse (a symlink, an
+unreadable directory, a special file, a hostile name), and excludes only those
+lost to a resource-budget short-circuit, whose digest would be a placeholder;
+each excluded one still advises through its own anomaly line; the advisory prints
 **before** the baseline
 (`<config>/skill-vetting/baseline.json`) advances — a failed delivery
 re-advises next session — and skill names reach the model only through a strict

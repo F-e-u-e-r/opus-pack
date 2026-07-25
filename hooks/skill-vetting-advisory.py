@@ -380,8 +380,11 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 "currently installed skills with the skill-vetting skill"
                 % (snapmod.SCHEMA_VERSION, snapmod.POLICY_VERSION))
 
-        # delta_lines holds TRANSIENT events (new / changed / removed): each
-        # fires once and is then consumed by the baseline advance. Every item is
+        # delta_lines holds TRANSIENT events: those THIS RUN'S BASELINE ADVANCE
+        # WILL CONSUME. That is narrower than new/changed/removed - a `partial`
+        # candidate is "new" on every run precisely because it is never
+        # baselined, so it belongs on the steady-state path (see the
+        # classification below; getting this wrong livelocked the queue). Every item is
         # (line, key, prior_entry_or_None) so a line that does not fit the
         # display cap can have its baseline entry put back, leaving the delta
         # undelivered and therefore still pending (G5, round 6).
