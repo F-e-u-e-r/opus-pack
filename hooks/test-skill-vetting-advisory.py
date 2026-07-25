@@ -612,6 +612,29 @@ class HookE2E(unittest.TestCase):
             % sorted({"n%02d" % i for i in range(20)} - named))
         self.assertIsNone(self.run_hook()[1], "and then it settles")
 
+    def test_a_contended_run_is_recorded_in_the_audit_log(self):
+        # ROUND-8 SCREEN, third family. The READMEs point at advisory.log and say
+        # the vetting hook's advisories are "auditable instead of invisible".
+        # The lock-contended advisory - a full advisory delivered into session
+        # context - wrote nothing there and did not even create the file, so one
+        # advisory class was exactly invisible to the log the claim names. Fixed
+        # in the code rather than the claim, since the claim is the right
+        # behaviour.
+        self.mkskill(self.G, "alpha")
+        self.run_hook()
+        lock = self.bpath + ".lock"
+        os.makedirs(os.path.dirname(lock), exist_ok=True)
+        with open(lock, "w"):
+            pass
+        self.addCleanup(lambda: os.path.exists(lock) and os.unlink(lock))
+        rc, ctx, _ = self.run_hook()
+        self.assertEqual(0, rc)
+        self.assertIn("vetting lock", ctx or "")
+        log = os.path.join(os.path.dirname(self.bpath), "advisory.log")
+        self.assertTrue(os.path.exists(log), "the contended advisory must be logged")
+        with open(log) as fh:
+            self.assertIn("SKIPPED scan", fh.read())
+
     def test_lock_stale_takeover_is_KNOWN_BROKEN(self):
         # NOT a passing security property. This PINS A KNOWN DEFECT so the suite
         # stops reading as if I11 held, and so the day D2 lands this test goes

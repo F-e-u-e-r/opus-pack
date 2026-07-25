@@ -29,8 +29,9 @@ undecodable TOP-LEVEL candidate name (shown only as an opaque id; NESTED names
 are deliberately not gated, since they are never echoed and their bytes are
 already bound into the digest); an unreadable/corrupt/stale baseline. An anomalous tree can never be certified unchanged, so it re-advises
 EVERY session until the anomaly is resolved — deliberate for a tree that cannot
-be fully observed. A clean, unchanged tree is SILENT; a first run emits one
-labelled bootstrap line. The hook NEVER blocks and NEVER emits a "safe" line.
+be fully observed. A clean, unchanged tree is SILENT, and so is a first run
+that found nothing to record; a first run that DID record something emits one
+labelled bootstrap line naming that count. The hook NEVER blocks and NEVER emits a "safe" line.
 
 Watched roots: `$CLAUDE_CONFIG_DIR/skills` (default `~/.claude/skills`) and
 `$CLAUDE_PROJECT_DIR/.claude/skills` (falling back to the hook payload's `cwd`,
@@ -57,8 +58,10 @@ Known limits (documented, not hidden):
   count. A candidate the scan could not observe (a resource-budget breach, say)
   is deliberately NOT recorded - baselining a placeholder digest would make a
   later real observation compare equal to it - so it is not in that count; it
-  advises through its own anomaly line instead. A first run in which NOTHING was
-  observable therefore emits anomaly lines and no count line.
+  advises through its own anomaly line instead. So a first run over EMPTY or
+  missing skills roots is fully silent - there is nothing recorded without
+  review, hence nothing to announce - and a first run in which candidates
+  existed but none was observable emits their anomaly lines and no count line.
   It is not silent (round 6: a silent bootstrap was reachable a second time
   after a failed first write, which then swallowed a change). Run the
   `skill-vetting` skill on anything present but not yet reviewed;
@@ -308,6 +311,7 @@ def main():
             # known — this session did not scan — which is the fail-closed
             # statement either way. (Replacing this with fcntl.flock, which the
             # kernel releases on death, is design item D2.)
+            _log("SKIPPED scan — vetting lock held")
             _emit(["the skills directories were not scanned this session "
                    "because the vetting lock was held — treat "
                    "installed skills as unverified for this session and run "

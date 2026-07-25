@@ -73,7 +73,15 @@ observable, advisable event, never a silent state.
 - **G1 — change visibility.** Any observable difference between the current
   watched trees and the last *delivered* baseline produces an advisory this
   session: add, modify, delete, rename, type change, symlink change — any file,
-  not just `SKILL.md`. The safe failure direction is over-advising.
+  not just `SKILL.md`. **ONE STATED CARVE-OUT:** a top-level REGULAR FILE
+  directly under a watched skills root is deliberately not a candidate, because
+  a loose `.md` beside the skill directories is not loadable as a skill — so
+  adding, modifying or deleting one never advises. (That exclusion was
+  implemented and tested from the start, and documented in the hook and in
+  `scan_root`; it was never stated HERE, in the document that DEFINES G1 and
+  against which the implementation is held — found by the third screening family
+  at round 8.) A type change involving such a file still advises, as a removal
+  or an add. The safe failure direction is over-advising.
 - **G2 — observation honesty (fail closed).** Anything the scanner cannot
   fully and unambiguously observe is an **anomaly** and always advises:
   unreadable file or directory, oversize file, an entry/byte RESOURCE budget
@@ -159,8 +167,10 @@ observable, advisable event, never a silent state.
   watched; vet those manually.
 - **N4 — same-session installs.** SessionStart-only; content landing after the
   scan is seen next session.
-- **N-CORRECTION (round 6).** First-run bootstrap is no longer fully silent: it
-  emits one line naming the count of skills baselined without review. The old
+- **N-CORRECTION (round 6).** First-run bootstrap is no longer silent WHEN IT RECORDS
+  ANYTHING: it emits one line naming the count of skills baselined without
+  review. A first run over empty or missing roots records nothing and stays
+  silent, which is not a gap - nothing was trusted without review. The old
   silence was reachable a SECOND time — a transient failure of the very first
   baseline write left no durable trace, so the next session saw "absent" again
   and silently baselined whatever the content had become in between.
@@ -278,8 +288,9 @@ observable, advisable event, never a silent state.
   caller-owned, non-group/world-writable directory; a symlinked baseline path
   or untrusted directory is an anomaly and the write is refused. A refused or
   failed write is logged and leaves the previous state (G5 makes that safe).
-- **I7 — status lifecycle.** `baseline` (first-run bootstrap; it announces
-  itself with one line naming the count — see N-CORRECTION), `seen` (delta observed and delivered), `vetted` (recorded
+- **I7 — status lifecycle.** `baseline` (first-run bootstrap; when it records
+  anything it announces itself with one line naming the count — see
+  N-CORRECTION), `seen` (delta observed and delivered), `vetted` (recorded
   only via the CLI `record` subcommand with a verdict). Statuses never affect
   delta detection — only reporting and the `status` listing.
 

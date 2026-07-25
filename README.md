@@ -398,7 +398,8 @@ a new, changed, removed, or anomalous skill it injects one line routing to the
 `skill-vetting` skill. It **never blocks and never emits a "safe" line** — a
 `SessionStart` hook cannot deny, and a green-lighting scanner is the
 false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
-silent, while a first run emits one labelled line naming how many installed
+silent — as is a first run that found nothing to record — while a first run
+that DID record something emits one labelled line naming how many installed
 skills it OBSERVED and recorded as the baseline without reviewing them (a
 candidate the scan could not observe is not recorded and not in that count — it
 advises through its own anomaly line); the advisory prints
