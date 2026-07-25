@@ -141,7 +141,13 @@ class TreeObservation(Base):
         build("t10", lambda d: os.symlink("x|S|y", os.path.join(d, "a")))
 
         self.assertEqual(len(digests), cases,
-                         "distinct trees must never share a digest (I1)")
+                         "distinct MANIFESTS must never share a digest (I1). "
+                         "Note the careful form: I1 is injectivity over the "
+                         "ENCODER, not over the world - two trees the scanner "
+                         "refuses to observe in detail share a manifest and so "
+                         "share a digest, and are both anomalies. These "
+                         "fixtures are all fully observed, so their manifests "
+                         "differ and their digests must too.")
 
     def test_symlink_is_anomaly_and_target_change_is_visible(self):
         self.mk("s", "SKILL.md")
