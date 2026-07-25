@@ -379,6 +379,22 @@ class HookE2E(unittest.TestCase):
         rc, ctx, _ = self.run_hook()
         self.assertIn("changed skill global:alpha", ctx)
 
+    def test_notdir_skills_root_advises(self):
+        # ROUND-8 SCREEN pass 14. The suite docstring asserts per-class coverage
+        # of the root anomalies; root-symlink, root-unreadable and root-overfull
+        # each had a test and `root-notdir` had none — grepping both suites for
+        # "notdir" returned only the comment claiming it was covered.
+        self.mkskill(self.G, "alpha")
+        self.run_hook()
+        import shutil as _sh
+        _sh.rmtree(self.G)
+        with open(self.G, "w") as fh:      # a regular FILE where the root was
+            fh.write("not a directory\n")
+        rc, ctx, _ = self.run_hook()
+        self.assertEqual(0, rc)
+        self.assertIsNotNone(ctx, "a non-directory skills root must advise")
+        self.assertIn("not a directory", ctx)
+
     def test_symlinked_skills_root_advises(self):
         # round-3 sol#3/luna#2: a watched root that is a symlink is not followed
         # silently — it is an anomaly.

@@ -841,6 +841,49 @@ def _redacted_path(rel_bytes):
     return "depth%d/id-%s" % (depth, hashlib.sha256(rel_bytes).hexdigest()[:8])
 
 
+_REFUSE = object()
+
+
+def _resolve_dot_base(raw):
+    """For a `.`/`..` spelling: the real last component, or _REFUSE when the
+    process reached this directory THROUGH a symlink.
+
+    Three things this has to get right, each of which an earlier version got
+    wrong (round-8 screen, passes 13 and 14):
+
+    - It must test the property the message claims. Comparing the BASENAME of
+      $PWD against the basename of realpath(".") does not: a planted skill
+      `skills/helper -> elsewhere/helper` shares its target's basename, so the
+      comparison found nothing and the symlink anomaly was silently dropped.
+      `os.path.islink` on the logical path tests arrival directly.
+    - It must key on the NORMALISED spelling. A raw `argv[0] in (".", "./")`
+      test let `./.`, `././` and `.//` past the refusal while the enclosing
+      branch had already accepted them - normalised at one use, raw at another,
+      inside one function, which is the same defect the record-side fix had just
+      removed.
+    - It must not fire on an ANCESTOR symlink. On macOS /tmp -> /private/tmp and
+      /var -> /private/var make ancestor-symlink working directories completely
+      ordinary; refusing those would be a false-BLOCK factory. Only the FINAL
+      component is the candidate.
+
+    $PWD remains the only available evidence: once the process is inside the
+    directory, `.` IS the resolved target and no syscall says which name reached
+    it. A shell maintains PWD across `cd`, which is how an agent invokes this; a
+    bare subprocess that does not export PWD gets no protection here and must
+    address the candidate by name. That limit is stated in SKILL.md §3, and D1's
+    --root/--select addressing is what removes the dot spelling entirely."""
+    logical = os.environ.get("PWD", "")
+    try:
+        real = os.path.realpath(raw)
+        base = os.path.basename(os.fsencode(real))
+    except OSError:
+        return b""
+    if (logical and os.path.realpath(logical) == os.path.realpath(raw)
+            and os.path.islink(logical)):
+        return _REFUSE
+    return base
+
+
 def _cli_digest(argv):
     if len(argv) != 1:
         print("usage: skill_snapshot.py digest <dir>", file=sys.stderr)
@@ -861,44 +904,13 @@ def _cli_digest(argv):
     # to put a hostile name in a shell command (round-8 screen, pass 10).
     # Resolve to the real last component and gate THAT instead.
     if base in (b".", b".."):
-        # Resolve to the real last component so `digest .` cannot launder a
-        # hostile basename (pass 10). The DOT SPELLING is the problem, not just
-        # the name: after `cd <hostile-symlink>`, `.` is already the resolved
-        # target as far as this process is concerned - lstat(".") sees a plain
-        # directory, so BOTH the badname and the symlink anomaly vanished and
-        # the tree could be recorded SAFE-TO-PROPOSE under the target's key.
-        # That is pass 10's own defect reopened one spelling over, on the
-        # spelling SKILL.md §3 blesses (round-8 screen, pass 13).
-        #
-        # A dot path cannot express which of several names reached this inode,
-        # and that name is exactly what has to be gated. So resolve it, gate the
-        # resolved name - and additionally refuse when the process arrived here
-        # through a symlink, which $PWD preserves and getcwd() does not.
-        try:
-            resolved = os.path.realpath(argv[0])
-            base = os.path.basename(os.fsencode(resolved))
-        except OSError:
-            base = b""
-        # $PWD is the ONLY evidence available. Once the process is inside the
-        # directory, `.` IS the resolved target - there is no syscall that says
-        # which name reached this inode. A shell maintains PWD across `cd`, so
-        # this catches the agent path (SKILL.md §3 tells an agent to `cd` and
-        # digest `.`); a bare subprocess that does not export PWD gets no
-        # protection here and must address the candidate by name. That
-        # limitation is real and is stated in §3 rather than papered over - the
-        # durable answer is D1's --root/--select addressing, which removes the
-        # dot spelling from the procedure entirely.
-        logical = os.environ.get("PWD", "")
-        if base in (b"", b".", b"..") or (
-                argv[0] in (".", "./") and logical
-                and os.path.realpath(logical) == os.path.realpath(".")
-                and os.path.basename(logical) != os.path.basename(
-                    os.path.realpath("."))):
-            print("REFUSED: a dot-relative path cannot say which name reached "
-                  "this directory, and this one arrived through a symlink - a "
-                  "digest taken here would describe the TARGET and silently "
-                  "drop the symlink anomaly. Address the candidate by a path "
-                  "whose last component is its own name.", file=sys.stderr)
+        base = _resolve_dot_base(argv[0])
+        if base is _REFUSE:
+            print("REFUSED: this directory was entered through a SYMLINK, and a "
+                  "dot-relative path cannot express that - a digest taken here "
+                  "would describe the target and silently drop the symlink "
+                  "anomaly. Address the candidate by a path whose last "
+                  "component is its own name.", file=sys.stderr)
             return 2
     if base and not display_name(base)[1]:
         anomalies.append(("badname", b""))
@@ -969,10 +981,19 @@ def _cli_record(argv):
     # against the actual directory - which then REFUSES `--name .`, because `.`
     # is not that directory's name.
     if dir_base in (b".", b".."):
-        try:
-            dir_base = os.path.basename(os.fsencode(os.path.realpath(args["dir"])))
-        except OSError:
-            dir_base = b""
+        # SAME helper as the digest side. `record` had no arrival-path guard at
+        # all, so `cd <symlinked-candidate> && record --dir .` bound a verdict
+        # to the target while the hook keeps the link as a permanent anomaly -
+        # the two halves of one interface disagreeing about one input, for the
+        # third time (round-8 screen, pass 14).
+        dir_base = _resolve_dot_base(args["dir"])
+        if dir_base is _REFUSE:
+            print("REFUSED: --dir was entered through a SYMLINK and given as a "
+                  "dot path, which cannot express that - the verdict would bind "
+                  "the target and drop the symlink anomaly. Address the "
+                  "candidate by a path whose last component is its own name.",
+                  file=sys.stderr)
+            return 2
     # An EMPTY basename was exempted rather than resolved - `--dir ""`, `--dir
     # "/"` and `--dir "//"` all produce it, and `--name ""` then satisfied the
     # equality below vacuously, exactly the way `.` == `.` did before pass 11.

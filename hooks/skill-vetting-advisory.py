@@ -123,8 +123,17 @@ def _log(msg):
     at the log path cannot redirect the write or hang SessionStart (a blocking
     open on a reader-less FIFO would otherwise wedge the whole session)."""
     try:
-        cfg = snapmod.config_root() if snapmod else os.path.join(
-            os.path.expanduser("~"), ".claude")
+        # The fallback runs exactly when the companion module failed to
+        # import - the degraded path - and it must still honour
+        # CLAUDE_CONFIG_DIR, or the one run that most needs its log written
+        # writes it to the wrong place (round-8 screen, pass 14). Inline rather
+        # than shared, because snapmod is what is unavailable here.
+        if snapmod:
+            cfg = snapmod.config_root()
+        else:
+            _env = os.environ.get("CLAUDE_CONFIG_DIR", "")
+            cfg = _env if (_env and os.path.isabs(_env)) else os.path.join(
+                os.path.expanduser("~"), ".claude")
         d = os.path.join(cfg, "skill-vetting")
         os.makedirs(d, mode=0o700, exist_ok=True)
         flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND | os.O_CLOEXEC
