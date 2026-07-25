@@ -77,10 +77,11 @@ observable, advisable event, never a silent state.
 - **G2 — observation honesty (fail closed).** Anything the scanner cannot
   fully and unambiguously observe is an **anomaly** and always advises:
   unreadable file or directory, oversize file, an entry/byte RESOURCE budget
-  breach (which also makes every candidate enumerated after it `partial`, and
-  each of those advises too — the hook skips only their BASELINE WRITE, never
-  their advisory line; getting that distinction wrong was the round-7
-  regression), a STRUCTURAL depth/fanout refusal (see I8 — structural refusals
+  breach (every candidate enumerated after it then advises
+  too — never suppressed, which getting wrong was the round-7 regression; among
+  those, a walkable DIRECTORY comes back `partial` and has its baseline write
+  skipped, while a symlink or special file is a complete observation and IS
+  baselined), a STRUCTURAL depth/fanout refusal (see I8 — structural refusals
   are per-candidate and must not set the shared stop),
   any symlink, any non-regular file (FIFO/socket/device), an undecodable or
   hostile TOP-LEVEL candidate name (a NESTED name is deliberately not gated

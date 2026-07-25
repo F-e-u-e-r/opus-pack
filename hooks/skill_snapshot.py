@@ -72,9 +72,11 @@ import tempfile
 SCHEMA_VERSION = 3   # versions the manifest encoding + digest; change -> visible re-baseline
 POLICY_VERSION = 3   # versions the advisory/verdict/enumeration policy; change -> visible re-baseline
 
-MAX_ENTRIES = 4096          # per-candidate manifest entries
+MAX_ENTRIES = 4096          # manifest entries; SHARED across all candidates and
+                            # both watched roots in the hook (per-candidate only
+                            # for a CLI `digest` call, which passes no budget)
 MAX_FILE_BYTES = 8 << 20    # per-file content cap; larger is an anomaly, never a partial hash
-MAX_TOTAL_BYTES = 64 << 20  # per-candidate content budget
+MAX_TOTAL_BYTES = 64 << 20  # content budget; SHARED like MAX_ENTRIES above
 MAX_DEPTH = 24              # per-candidate directory depth
 MAX_CANDIDATES = 256        # top-level entries enumerated per root
 MAX_OPEN_DIRS = 128         # peak concurrently-open directory fds in one walk (bounds fd use)

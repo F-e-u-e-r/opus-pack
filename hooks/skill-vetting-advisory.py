@@ -22,8 +22,9 @@ a new, changed, or removed top-level DIRECTORY, symlink or special file under a
 watched skills root — a top-level regular FILE is deliberately not a candidate,
 because a loose `.md` beside the skill directories is not loadable as a skill; any
 observation anomaly — an unreadable file or directory, an oversize file, a
-budget breach (which also makes every candidate enumerated after it partial —
-each of those advises too; only their baseline WRITE is skipped), ANY symlink, a special file (FIFO/socket/device), a hostile or
+budget breach (every candidate enumerated after it then advises too; a walkable
+DIRECTORY among them is `partial` and its baseline write is skipped, while a
+symlink or special file is a complete observation and IS baselined), ANY symlink, a special file (FIFO/socket/device), a hostile or
 undecodable TOP-LEVEL candidate name (shown only as an opaque id; NESTED names
 are deliberately not gated, since they are never echoed and their bytes are
 already bound into the digest); an unreadable/corrupt/stale baseline. An anomalous tree can never be certified unchanged, so it re-advises
@@ -436,10 +437,33 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                     reasons = ",".join(sorted({r for r, _ in snap["anomalies"]}))
                     kind = "new " if (state == "ok" and is_new) else (
                         "changed " if (state == "ok" and is_changed) else "")
-                    anomaly_lines.append(
-                        "%sskill %s cannot be certified unchanged (%s) — run "
-                        "the skill-vetting skill on it before trusting it"
-                        % (kind, disp, reasons))
+                    line = ("%sskill %s cannot be certified unchanged (%s) — run "
+                            "the skill-vetting skill on it before trusting it"
+                            % (kind, disp, reasons))
+                    # ROUND-8 SCREEN. The split that matters for G5 is TRANSIENT
+                    # vs STEADY-STATE, not anomalous vs clean. An anomalous
+                    # candidate that is ALSO new or changed fires that news ONCE
+                    # and the baseline then consumes it, exactly like a clean
+                    # delta - so it needs the same slot priority and the same
+                    # revert-if-undelivered protection. Sending it to
+                    # anomaly_lines gave it neither: with nine or more anomalous
+                    # candidates the overflow branch replaces named lines with a
+                    # count, os.scandir order is stable so the SAME trailing
+                    # candidates are never named, and a change to one of those
+                    # advanced its stored digest with a byte-identical advisory
+                    # and could never re-fire. That is the round-6 budget
+                    # poisoner, residual: round 6 protected clean deltas from
+                    # eviction and left changes riding on anomaly lines exposed.
+                    if state == "ok" and (is_new or is_changed):
+                        # ...and it goes to the FRONT of the transient queue:
+                        # among lines that fire once, one that also cannot be
+                        # certified is the higher signal, which is the round-2/3
+                        # "the highest-signal line must not be capped away"
+                        # intent. Both kinds are revert-protected, so ordering
+                        # here decides which is seen FIRST, never which is lost.
+                        delta_lines.insert(0, (line, key, old))
+                    else:
+                        anomaly_lines.append(line)
                 elif state == "ok" and is_new:
                     delta_lines.append((
                         "new skill %s — run the skill-vetting skill on it "

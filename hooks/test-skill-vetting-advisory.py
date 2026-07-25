@@ -476,7 +476,11 @@ class HookE2E(unittest.TestCase):
         os.symlink("x", os.path.join(d, "link"))
         rc, ctx, _ = self.run_hook()
         self.assertIn("cannot be certified unchanged", ctx,
-                      "SV-3 generalized: the highest-signal line must not be capped away")
+                      "SV-3 generalized: the highest-signal line must not be "
+                      "capped away. Since the round-8 screen an anomalous NEW "
+                      "or CHANGED candidate is a transient delta (so it gets "
+                      "revert protection its anomaly-line form never had); it "
+                      "heads the transient queue so this intent still holds.")
 
     # -- vetting-status lifecycle ------------------------------------------
 
@@ -523,6 +527,39 @@ class HookE2E(unittest.TestCase):
         self.assertIn("victim", ctx, "a real change must not be evicted")
         self.assertIn("goner", ctx, "a removal must not be evicted")
 
+    def test_a_change_to_an_anomalous_skill_is_never_consumed_silently(self):
+        # ROUND-8 SCREEN, two-sided. A candidate that is ITSELF anomalous used to
+        # carry its change only as a "changed " prefix on an anomaly line, so it
+        # got neither the reserved delta slot nor the revert-if-undelivered
+        # protection, while its baseline entry advanced to the new digest
+        # anyway. With enough anomalous candidates the overflow branch replaces
+        # named lines with a count, os.scandir order is stable, and the same
+        # trailing candidates are never named - so a change to one of them
+        # produced a BYTE-IDENTICAL advisory and could never re-fire.
+        for i in range(10):
+            d = self.mkskill(self.G, "s%02d" % i, body="v1\n")
+            os.symlink("x", os.path.join(d, "link"))
+        self.run_hook()
+        before = self.run_hook()[1]
+        self.assertIsNotNone(before)
+        # find one the cap does NOT name in steady state
+        hidden = [n for n in ("s%02d" % i for i in range(10)) if n not in before]
+        self.assertTrue(hidden, "premise: the cap must hide at least one")
+        victim = hidden[0]
+        with open(os.path.join(self.G, victim, "SKILL.md"), "w") as fh:
+            fh.write("v2 TROJAN\n")
+        seen = ""
+        for _ in range(8):          # it may be held back, but must arrive
+            ctx = self.run_hook()[1]
+            if ctx is None:
+                break
+            seen += " " + ctx
+            if victim in ctx:
+                break
+        self.assertIn(victim, seen,
+                      "a change to an anomalous skill was consumed with no "
+                      "delivered signal (%s stayed hidden)" % victim)
+
     def test_the_advisory_never_exceeds_the_display_cap(self):
         # ROUND-7 REGRESSION GUARD. The round-6 slot arithmetic could emit nine
         # items (head + deltas + a held-back summary + an anomaly summary), and
@@ -551,8 +588,11 @@ class HookE2E(unittest.TestCase):
                     % (n_delta, n_anom, len(items)))
 
     def test_an_undelivered_delta_is_not_consumed(self):
-        # The general form of G5: whatever the cap holds back must still be
-        # pending, not silently baselined.
+        # G5 for CLEAN new skills. The general form is asserted separately by
+        # test_a_change_to_an_anomalous_skill_is_never_consumed_silently - this
+        # body only exercises non-anomalous adds, and its comment used to claim
+        # the general form, which is how a change riding on an anomaly line went
+        # unprotected through 44 green tests (round-8 screen).
         self.mkskill(self.G, "keeper")
         self.run_hook()
         for i in range(20):
