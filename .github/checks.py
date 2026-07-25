@@ -422,10 +422,6 @@ if isinstance(plugin, dict) and "hooks" in plugin:
 if isinstance(plugin, dict) and "hooks" not in plugin and not os.path.exists(os.path.join(ROOT, "hooks", "hooks.json")):
     ok("plugin registers no hooks (standing invariant holds)")
 
-print()
-if failures:
-    print(f"{len(failures)} check(s) failed")
-    sys.exit(1)
 # 5. No test function is defined twice in a suite. Python keeps only the last
 #    definition, so a duplicate silently shadows an earlier one - the earlier
 #    body stops running while the suite still reports it as present. Found live
@@ -440,4 +436,8 @@ for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisor
              "code Python never runs): %s" % (_suite, ", ".join(_dupes)))
     ok("%s has %d tests, no shadowed duplicates" % (_suite, len(_names)))
 
+print()
+if failures:
+    print(f"{len(failures)} check(s) failed")
+    sys.exit(1)
 print("all checks passed")
