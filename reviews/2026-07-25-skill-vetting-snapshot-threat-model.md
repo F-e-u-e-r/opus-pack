@@ -72,7 +72,9 @@ observable, advisable event, never a silent state.
   not just `SKILL.md`. The safe failure direction is over-advising.
 - **G2 — observation honesty (fail closed).** Anything the scanner cannot
   fully and unambiguously observe is an **anomaly** and always advises:
-  unreadable file or directory, oversize file, entry/byte/depth budget breach,
+  unreadable file or directory, oversize file, an entry/byte RESOURCE budget
+  breach, a STRUCTURAL depth/fanout refusal (see I8 - structural refusals are
+  per-candidate and must not set the shared stop),
   any symlink, any non-regular file (FIFO/socket/device), an undecodable or
   hostile TOP-LEVEL candidate name (a NESTED name is deliberately not gated
   since round 6 — it is never echoed and its bytes are already bound into the

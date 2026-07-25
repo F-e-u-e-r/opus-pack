@@ -16,8 +16,10 @@ as a Python module; install it NEXT TO the hook (same directory).
 Contract highlights (the tests in hooks/test-skill_snapshot.py hold each):
 
 - INJECTIVE ENCODING (I1): the manifest serializes as a length-prefixed binary
-  stream (fixed header + schema AND policy versions + sorted entries, every
-  field length-prefixed). There are no delimiter characters to collide with path
+  stream (fixed header + schema AND policy versions + sorted entries, with the
+  path and the payload length-prefixed and the kind tag written raw as a FIXED
+  ONE-BYTE tag - injectivity holds because the tag is fixed-width, NOT because
+  it is framed). There are no delimiter characters to collide with path
   or symlink-target bytes, so two distinct MANIFESTS cannot share a digest. That
   is a statement about the encoder, not about the world: two trees the scanner
   refuses to observe in detail (say, two different unopenable things) can share
