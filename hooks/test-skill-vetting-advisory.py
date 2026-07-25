@@ -518,8 +518,62 @@ class HookE2E(unittest.TestCase):
         for i in range(11):
             self.mkskill(self.G, "s%02d" % i)
         rc, ctx, _ = self.run_hook()
-        self.assertIn("11 total", ctx, "condition 7: the cap may hide lines, never counts")
+        self.assertIn("11 new/changed/removed in all", ctx,
+                      "condition 7: the cap may hide lines, never counts")
         self.assertIn("ALL", ctx)
+
+    def test_each_overflow_line_counts_its_OWN_category(self):
+        """Round 8, two lenses independently. Both overflow lines printed
+        len(delta_lines) + len(anomaly_lines), so each named one category and
+        reported the size of both.
+
+        The suite could not catch it: the only count assertion was the test
+        above, whose fixture has ZERO anomalies - the one shape where the
+        cross-category sum equals the delta count. It pinned a coincidence, so
+        a mixed tree was never measured at all. This test IS the mixed tree,
+        and it also covers the anomaly overflow line, which had no assertion of
+        any kind (deleting it outright kept the suite green)."""
+        self.run_hook()
+        for i in range(10):                      # 10 deltas, baselined then changed
+            self.mkskill(self.G, "c%02d" % i)
+        self.run_hook()
+
+        # Reaching anomaly_lines takes a STEADY-STATE anomaly, and the axis is
+        # not clean-vs-anomalous but "will this run's baseline advance consume
+        # it". A directory that merely CONTAINS a symlink is fully observed, so
+        # it is baselined - and so is a candidate that IS a symlink, on the run
+        # that first sees it. Only once baselined and unchanged does it become
+        # steady state: it can never be certified, so it re-advises every
+        # session while consuming nothing. That is the shape the two lenses
+        # reproduced, and it takes its own settling run to reach.
+        outside = os.path.join(self.tmp, "outside")
+        for i in range(5):
+            t = os.path.join(outside, "t%02d" % i)
+            os.makedirs(t, exist_ok=True)
+            with open(os.path.join(t, "SKILL.md"), "w") as fh:
+                fh.write("x\n")
+            os.symlink(t, os.path.join(self.G, "a%02d" % i))
+        self.run_hook()                          # settles the 5 as steady state
+
+        for i in range(10):
+            with open(os.path.join(self.G, "c%02d" % i, "SKILL.md"), "w") as fh:
+                fh.write("changed\n")
+        # Exactly one run after the change: an intermediate run would deliver
+        # and baseline some of the deltas, and the fixture would then be
+        # measuring a number it did not set up.
+        rc, ctx, _ = self.run_hook()
+
+        self.assertIn("10 new/changed/removed in all", ctx,
+                      "the delta line must count DELTAS")
+        self.assertIn("5 such in all", ctx,
+                      "the anomaly line must count ANOMALIES")
+        self.assertNotIn("15", ctx,
+                         "no line may report the cross-category sum - it is the "
+                         "size of neither group")
+        # "N more" is only true when some were named; with none named it is a
+        # comparison against nothing.
+        if "further unnamed" not in ctx:
+            self.assertIn("more skill(s) that cannot be certified", ctx)
 
     def test_anomalies_survive_the_display_cap(self):
         self.run_hook()
@@ -925,17 +979,70 @@ class HookE2E(unittest.TestCase):
                 "%s lost its verdict to a transient budget breach" % n)
             self.assertEqual("SAFE-TO-PROPOSE", after[n].get("verdict"))
 
-    def test_concurrent_hooks_do_not_lose_an_update_when_the_lock_is_fresh(self):
-        # RENAMED AND NARROWED (round 8 screen). The old name asserted a
-        # property the artifact DOES NOT HAVE: on the stale-takeover path both
-        # racers are granted the lock (40/40 trials) and `_cli_record` takes no
-        # lock at all, so updates ARE losable. What this test covers is the
-        # FRESH-lock path: the racers contend and wait for each other, which
-        # works. It does not cover the stale-takeover path, which is where the
-        # double grant happens - so on its own it was a green light for a
-        # claim the artifact does not support.
-        # The real property is design item D2; the gap is pinned by
-        # test_lock_stale_takeover_is_KNOWN_BROKEN, above.
+    def test_lock_wait_stays_bounded_when_the_lock_keeps_coming_back_stale(self):
+        """LOCK_WAIT_S and _acquire's docstring both promise a bounded wait, and
+        round 8 found one path that did not honour it: the stale branch used
+        `continue`, jumping straight back to the create and over the deadline
+        check, with no sleep. A lock that keeps reappearing stale span that loop
+        with no bound - and a SessionStart hook that stalls the session is an
+        availability failure whether or not anyone arranged it.
+
+        Reproduced by making the takeover ineffective (os.unlink neutered), so
+        every iteration re-enters the stale branch. Before the fix this never
+        returns, so it runs as a SUBPROCESS under a timeout: a hang has to fail
+        the test rather than wedge the suite."""
+        shim = os.path.join(self.tmp, "lockshim.py")
+        with open(shim, "w") as fh:
+            fh.write(
+                "import importlib.util, os, sys, time\n"
+                "spec = importlib.util.spec_from_file_location('hk', %r)\n"
+                "m = importlib.util.module_from_spec(spec)\n"
+                "spec.loader.exec_module(m)\n"
+                "lp = sys.argv[1]\n"
+                "open(lp, 'w').close()\n"
+                "old = time.time() - (m.LOCK_STALE_S + 60)\n"
+                "os.utime(lp, (old, old))\n"
+                "os.unlink = lambda *a, **k: None   # takeover never works\n"
+                "m.LOCK_WAIT_S = 0.5\n"
+                "t0 = time.time()\n"
+                "fd, state = m._acquire(lp)\n"
+                "print('%%s %%.3f' %% (state, time.time() - t0))\n" % HOOK)
+        lp = os.path.join(self.tmp, "stale.lock")
+        try:
+            res = subprocess.run([PY, shim, lp], capture_output=True, text=True,
+                                 timeout=15)
+        except subprocess.TimeoutExpired:
+            self.fail("_acquire never returned: the stale path is unbounded, "
+                      "which is the defect this test exists for")
+        self.assertEqual(0, res.returncode, res.stderr)
+        state, elapsed = res.stdout.split()
+        self.assertEqual("contended", state)
+        self.assertLess(float(elapsed), 5.0,
+                        "the wait must be bounded by LOCK_WAIT_S, not by luck")
+
+    def test_concurrent_hooks_converge_and_at_least_one_advises_the_change(self):
+        # RENAMED TWICE. Round 8 renamed it to claim the FRESH-lock path -
+        # "the racers contend and wait for each other" - and two lenses of the
+        # round-8 gate independently showed it verifies no such thing:
+        #
+        #  - `advised = [r for r in results if r and "g" in r]` was VACUOUS.
+        #    _PREFIX contains the letter g (in "vetting"), so every non-None
+        #    advisory satisfied it - including a contended-only or degraded-only
+        #    one, i.e. it passed when the change was advised by nobody.
+        #  - the fixture cannot distinguish a working lock from no lock at all.
+        #    All four racers observe the SAME already-changed tree, so each
+        #    computes the same new_entries and the final baseline is correct
+        #    whatever the ordering. Replacing _acquire with a stub that does no
+        #    serialization at all leaves this test passing.
+        #
+        # So the name now claims only what the fixture measures: the racers
+        # converge, and the change is advised by at least one of them, by name.
+        # Mutual exclusion is NOT tested here and cannot be without a forced
+        # interleaving (a racer blocked between load and store while another
+        # completes a DIFFERENT delta). That is deliberately not built: I11 is
+        # recorded NOT MET and pinned by test_lock_stale_takeover_is_KNOWN_BROKEN,
+        # and writing an exclusion assertion that passes without exclusion is
+        # how this test got here twice.
         # round-6 (sol): load/store are a read-modify-write with no lock, so a
         # slower hook wrote its STALE merge over a faster one's and the delta the
         # faster one advised was un-recorded and never re-advised.
@@ -955,11 +1062,56 @@ class HookE2E(unittest.TestCase):
             t.start()
         for t in threads:
             t.join()
-        advised = [r for r in results if r and "g" in r]
-        self.assertTrue(advised, "the change must be advised by someone")
+        # The full line, not a substring that the fixed prefix already contains.
+        advised = [r for r in results if r and "changed skill global:g" in r]
+        self.assertTrue(advised,
+                        "the CHANGE must be advised by name, by at least one "
+                        "racer; %r" % (results,))
         # ...and after the dust settles the baseline must agree with the tree,
         # so a further run is silent rather than re-reporting a lost update.
         self.assertIsNone(self.run_hook()[1])
+
+    def test_a_budget_breach_alone_never_reports_a_skill_as_changed(self):
+        """`is_changed` carries a `not partial` term, and round 8 measured that
+        deleting it kept all 143 tests green. A partial snap's digest describes
+        the SCAN, so without that term a tree NOTHING touched compares unequal
+        to its stored digest and is announced as "changed".
+
+        Two consequences, and the second is the worse one: the advisory states
+        something false about the user's disk, and the candidate is then
+        classified as a transient delta whose baseline write is skipped - the
+        exact unconsumable-front-slot shape I10 warns about, which the existing
+        starvation test cannot reach because its fixture only produces
+        `old is None` partials."""
+        self.mkskill(self.G, "aaa")
+        self.run_hook()                              # baselined, fully observed
+        ctx = self.run_hook()[1]
+        self.assertIsNone(ctx, "precondition: a clean unchanged tree is silent")
+
+        # Nothing on disk changes; only the budget does. Same shrunk-copy
+        # mechanism the other budget tests use, so there is one way to do this.
+        tools = os.path.join(self.tmp, "tools-budget")
+        os.makedirs(tools)
+        for name in ("skill_snapshot.py", "skill-vetting-advisory.py"):
+            src = open(os.path.join(HOOKS, name)).read()
+            if name == "skill_snapshot.py":
+                s2 = src.replace("MAX_ENTRIES = 4096", "MAX_ENTRIES = 1", 1)
+                self.assertNotEqual(src, s2, "MAX_ENTRIES anchor moved")
+                src = s2
+            with open(os.path.join(tools, name), "w") as fh:
+                fh.write(src)
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": self.home,
+               "CLAUDE_CONFIG_DIR": self.cfg, "CLAUDE_PROJECT_DIR": self.projA}
+        res = subprocess.run([PY, os.path.join(tools, "skill-vetting-advisory.py")],
+                             input=b"{}", env=env, cwd=self.neutral,
+                             capture_output=True, timeout=60)
+        ctx = json.loads(res.stdout.decode())["hookSpecificOutput"][
+            "additionalContext"]
+        self.assertIn("cannot be certified unchanged", ctx,
+                      "an unobservable tree must still advise")
+        self.assertNotIn("changed skill", ctx,
+                         "a budget breach is not evidence of a change - nothing "
+                         "on disk moved")
 
     def test_record_then_change_flips_vetted_to_seen(self):
         d = self.mkskill(self.G, "alpha")

@@ -139,6 +139,25 @@ class TreeObservation(Base):
         # joined path|kind|payload with "|"
         build("t9", lambda d: os.symlink("y", os.path.join(d, "a|S|x")))
         build("t10", lambda d: os.symlink("x|S|y", os.path.join(d, "a")))
+        # ...and the KIND TAG. Round 8 measured that deleting `h.update(kind)`
+        # left every one of 143 tests green, because no pair here differed only
+        # by kind. This pair does, and it is reachable on a real filesystem
+        # rather than only as a crafted manifest: an unreadable DIRECTORY named
+        # x gives (b"x", b"A", b"unreadable"), while a SYMLINK named x whose
+        # target is the literal string "unreadable" gives (b"x", b"S",
+        # b"unreadable"). Same path, same payload, different kind - and one is
+        # an `unreadable` anomaly while the other is a `symlink` anomaly, so a
+        # collision here would let two materially different trees certify each
+        # other as unchanged.
+        def _unreadable_dir(d):
+            sub = os.path.join(d, "x")
+            os.makedirs(sub)
+            with open(os.path.join(sub, "hidden"), "w") as fh:
+                fh.write("secret\n")
+            os.chmod(sub, 0o000)
+            self.addCleanup(os.chmod, sub, 0o755)
+        build("t11", _unreadable_dir)
+        build("t12", lambda d: os.symlink("unreadable", os.path.join(d, "x")))
 
         self.assertEqual(len(digests), cases,
                          "distinct MANIFESTS must never share a digest (I1). "
@@ -148,6 +167,47 @@ class TreeObservation(Base):
                          "share a digest, and are both anomalies. These "
                          "fixtures are all fully observed, so their manifests "
                          "differ and their digests must too.")
+
+    def test_encoder_framing_is_injective_on_crafted_manifests(self):
+        """I1 names three framing mechanisms - the header, the length-prefixed
+        path, and the length-prefixed payload - and round 8 measured that each
+        could be deleted with the whole suite green. The filesystem cannot reach
+        these pairs (no real tree produces a path containing another entry's
+        encoding), so they are built as MANIFESTS and passed straight to the
+        encoder, which is a pure function of them.
+
+        The module docstring's careful claim is what is under test: injectivity
+        holds because each field is LENGTH-PREFIXED and the kind tag is
+        fixed-width, not because the fields are delimited."""
+        def dg(entries):
+            return ss._finish(entries, [])["digest"]
+
+        # Without the path length prefix, entry 1's whole encoding can be
+        # absorbed into entry 2's path.
+        a = [(b"a", b"D", b"XY"), (b"b", b"D", b"ZZ")]
+        b = [(b"aD\x00\x00\x00\x02XYb", b"D", b"ZZ")]
+        self.assertNotEqual(dg(a), dg(b),
+                            "the path length prefix is load-bearing (I1)")
+        # Without the payload length prefix, a payload can swallow the next
+        # entry's framing the same way.
+        # The absorbed bytes must be exactly what the UNPREFIXED encoder would
+        # emit for entry 2 - `len(path) | path | kind | payload` with no payload
+        # prefix - or the pair proves nothing about the mechanism under test.
+        c = [(b"p", b"D", b"AA"), (b"q", b"D", b"BB")]
+        d = [(b"p", b"D", b"AA" + b"\x00\x00\x00\x01" + b"q" + b"D" + b"BB")]
+        self.assertNotEqual(dg(c), dg(d),
+                            "the payload length prefix is load-bearing (I1)")
+        # And the version header must reach the digest at all.
+        old_schema = ss.SCHEMA_VERSION
+        try:
+            base = dg(a)
+            ss.SCHEMA_VERSION = old_schema + 1
+            self.assertNotEqual(base, dg(a),
+                                "SCHEMA_VERSION must be bound into the digest, "
+                                "or a verdict reviewed under one policy is "
+                                "reusable under another (I1/G6)")
+        finally:
+            ss.SCHEMA_VERSION = old_schema
 
     def test_symlink_is_anomaly_and_target_change_is_visible(self):
         self.mk("s", "SKILL.md")
@@ -1082,6 +1142,49 @@ class CommandLine(Base):
         body = st.stdout if st.stdout.strip() else "{}"
         self.assertNotIn("id-cdb4ee2a", body,
                          "nothing may be recorded under the key for `.`")
+
+    def test_record_refuses_a_partial_snapshot(self):
+        """snapshot_tree's own contract says a `partial` digest describes the
+        SCAN STATE, not the tree, and "a caller must never store it as that
+        skill's digest, which is what I9 hangs on". The hook honours that via
+        skip_baseline; `record` had no guard at all, so an over-budget tree -
+        a size ADV-1 picks - took a BLOCK bound to a placeholder that stopped
+        matching as soon as the tree became observable, and the hook then called
+        it "changed" and dropped the verdict (round 8). Deleting the guard kept
+        all 143 tests green, which is why this test exists.
+
+        The budget is lowered inside the CHILD, because the CLI runs as a
+        subprocess and an in-process patch_const would not reach it."""
+        d = os.path.dirname(self.mk("bulky", "SKILL.md"))
+        for i in range(12):
+            with open(os.path.join(d, "f%02d" % i), "w") as fh:
+                fh.write("x\n")
+        shim = os.path.join(self.tmp, "shim.py")
+        with open(shim, "w") as fh:
+            fh.write("import sys\n"
+                     "sys.path.insert(0, %r)\n"
+                     "import skill_snapshot as m\n"
+                     "m.MAX_ENTRIES = 4\n"
+                     "sys.exit(m.main(sys.argv[1:]))\n" % HOOKS)
+
+        def run(*args):
+            return subprocess.run([PY, shim] + list(args), capture_output=True,
+                                  text=True, env=self.env, timeout=60)
+
+        dg = run("digest", d)
+        self.assertEqual(3, dg.returncode, dg.stdout + dg.stderr)
+        self.assertTrue(json.loads(dg.stdout)["partial"],
+                        "fixture must actually breach the budget")
+        for verdict in ("BLOCK", "SUSPECT"):
+            with self.subTest(verdict=verdict):
+                r = run("record", "--scope", "global", "--name", "bulky",
+                        "--dir", d, "--verdict", verdict)
+                self.assertEqual(3, r.returncode,
+                                 "a partial digest must not be bound: " + r.stderr)
+                self.assertIn("REFUSED", r.stderr)
+        st = self.run_cli("status")
+        self.assertNotIn("bulky", st.stdout,
+                         "nothing may have reached the baseline")
 
     def test_record_from_inside_an_ordinary_skill_still_works(self):
         # The legitimate cd-then-record path the fix must not break: `--dir .`

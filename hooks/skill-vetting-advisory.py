@@ -150,12 +150,28 @@ def _log(msg):
         pass
 
 
+_ANY_BYTES_WRITTEN = False
+
+
 def _emit(lines):
     """Print the advisory JSON. True only if the whole write succeeded — the
     caller advances the baseline only on True (delivery before advance). Writes
     the raw fd, not sys.stdout: a broken pipe then fails HERE, atomically with
     the delivery decision, instead of lingering in a buffer whose exit-time
-    flush would flip the interpreter's exit code."""
+    flush would flip the interpreter's exit code.
+
+    It also records that stdout is no longer pristine. `main` guards its
+    last-resort advisory on that, and used to guard it on a LOCAL `printed`
+    flag that only `_run`'s same-named local was ever assigned — so the guard
+    read False no matter what had been delivered, and an exception raised after
+    a successful emit put a SECOND JSON object on stdout, which G5 forbids
+    (round 8). The flag lives with the write it describes: a caller cannot set
+    it out of step, and there is only one to keep in step.
+
+    PARTIAL is deliberately truthful rather than optimistic: a write that died
+    mid-payload emitted bytes, so a second object would corrupt what is already
+    there even though nothing complete was delivered."""
+    global _ANY_BYTES_WRITTEN
     payload = (json.dumps({"hookSpecificOutput": {
         "hookEventName": "SessionStart",
         "additionalContext": _PREFIX + " | ".join(lines)}},
@@ -163,7 +179,10 @@ def _emit(lines):
     try:
         off = 0
         while off < len(payload):
-            off += os.write(1, payload[off:])
+            n = os.write(1, payload[off:])
+            off += n
+            if n:
+                _ANY_BYTES_WRITTEN = True
         return True
     except Exception:
         return False
@@ -207,15 +226,24 @@ def _acquire(lockpath):
                            os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_CLOEXEC,
                            0o600), "held"
         except FileExistsError:
+            # The stale branch used to `continue` straight back to the create,
+            # jumping over the deadline check below - so a lock that kept being
+            # recreated stale spun this loop with no sleep and no bound, and the
+            # bounded wait the docstring and LOCK_WAIT_S both promise did not
+            # hold on that path (round 8). Now EVERY failure path passes the
+            # deadline exactly once; takeover only skips the SLEEP, because
+            # having just removed the lock there is nothing to wait for.
+            took_over = False
             try:
                 if time.time() - os.lstat(lockpath).st_mtime > LOCK_STALE_S:
                     os.unlink(lockpath)
-                    continue
+                    took_over = True
             except OSError:
                 pass
             if time.time() >= deadline:
                 return None, "contended"
-            time.sleep(0.05)
+            if not took_over:
+                time.sleep(0.05)
         except OSError:
             return None, "unavailable"
 
@@ -289,7 +317,6 @@ def _scan_root(scope, label, root, budget):
 
 
 def main():
-    printed = False
     try:
         if snapmod is None:
             raise RuntimeError("companion module hooks/skill_snapshot.py "
@@ -359,7 +386,7 @@ def main():
                 _release(lock_fd, lockpath)
     except Exception:
         _log("ERROR " + traceback.format_exc().replace("\n", " | "))
-        if not printed:
+        if not _ANY_BYTES_WRITTEN:
             _emit(["the skill-vetting advisory hook could not complete "
                    "(internal error) — skill changes may be UNOBSERVED this "
                    "session; run the skill-vetting skill manually on anything "
@@ -376,7 +403,6 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
     all - it proceeds here UNLOCKED and says so in the advisory, because a
     degraded run that reports itself beats no run. So this is not a serialized
     critical section unconditionally, and lock_state records which case it is."""
-    printed = False
     try:
         state, data = snapmod.load_baseline(bpath)
         old_entries = data["entries"] if state == "ok" else {}
@@ -593,12 +619,20 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 new_entries[key] = prior
         lines = head_lines + [l for l, _k, _p in shown_deltas]
         held = len(delta_lines) - len(shown_deltas)
-        total = len(delta_lines) + len(anomaly_lines)
         if held:
-            # The cap may hide LINES; it must never hide COUNTS.
+            # The cap may hide LINES; it must never hide COUNTS - and a count is
+            # only a count OF something. Both overflow lines used to print
+            # len(delta_lines) + len(anomaly_lines), so each named one category
+            # and then reported the size of both: 10 changed skills and 5
+            # anomalous ones produced "15 total" TWICE, a number that was the
+            # size of neither group (round 8, reported independently by two
+            # lenses). The suite could not catch it because its only count
+            # assertion used a fixture with zero anomalies - the one shape where
+            # the cross-category sum happens to equal the delta count.
             lines.append("...and %d further new/changed/removed skill(s) held "
-                         "back for the next session — %d total; run the "
-                         "skill-vetting skill on ALL of them" % (held, total))
+                         "back for the next session — %d new/changed/removed in "
+                         "all; run the skill-vetting skill on ALL of them"
+                         % (held, len(delta_lines)))
         left = MAX_LISTED - len(lines)
         if anomaly_lines:
             if len(anomaly_lines) <= left:
@@ -606,25 +640,28 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             else:
                 keep = max(0, left - 1)
                 lines.extend(anomaly_lines[:keep])
-                lines.append("...and %d more skill(s) that cannot be certified "
-                             "unchanged — %d total; run the skill-vetting skill "
-                             "on ALL of them"
-                             % (len(anomaly_lines) - keep, total))
+                # "N more" is a lie when the cap left room for none of them:
+                # there is nothing for them to be more THAN.
+                lines.append("...and %d %s skill(s) that cannot be certified "
+                             "unchanged — %d such in all; run the skill-vetting "
+                             "skill on ALL of them"
+                             % (len(anomaly_lines) - keep,
+                                "more" if keep else "further unnamed",
+                                len(anomaly_lines)))
         if lines:
             shown = lines
             if not _emit(shown):
                 _log("WARN advisory delivery failed — baseline NOT advanced "
                      "(will re-advise)")
                 return 0
-            printed = True
             _log("ADVISED %d item(s)" % len(lines))
 
         # Now advance the baseline. A store that cannot persist is a DETECTION
         # failure for next session. Note exactly which runs reach the fallback
-        # below: it needs `printed` to still be False. On a clean UNCHANGED tree
+        # below: it needs stdout to still be PRISTINE. On a clean UNCHANGED tree
         # store_baseline is never called at all (the guard below), so nothing can
         # fail. A first run WITH skills is NOT one of these either - it emits its
-        # bootstrap line and sets printed - so its failed store is not announced
+        # bootstrap line, which writes bytes - so its failed store is not announced
         # separately, and does not need to be: nothing was written, so the next
         # session sees the same state and says the same thing again. What is
         # left for the fallback is a run that WROTE while printing nothing, e.g.
@@ -650,17 +687,16 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 # screen, pass 13 - five documents had promised a "could not be
                 # saved" line that is unreachable in exactly the case they
                 # described).
-                if not printed:
+                if not _ANY_BYTES_WRITTEN:
                     _emit(["the vetting baseline could not be saved (%s) — a "
                            "skill change before the next session may go "
                            "UNOBSERVED; fix the <config>/skill-vetting "
                            "directory, and vet currently installed skills with "
                            "the skill-vetting skill" % reason])
-                    printed = True
         return 0
     except Exception:
         _log("ERROR " + traceback.format_exc().replace("\n", " | "))
-        if not printed:
+        if not _ANY_BYTES_WRITTEN:
             _emit(["the skill-vetting advisory hook could not complete "
                    "(internal error) — skill changes may be UNOBSERVED this "
                    "session; run the skill-vetting skill manually on anything "

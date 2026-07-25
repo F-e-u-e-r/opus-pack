@@ -1083,6 +1083,24 @@ def _cli_record(argv):
         print("REFUSED: --dir could not be observed at all (no such path) - a "
               "verdict cannot bind a tree that was never read.", file=sys.stderr)
         return 3
+    # snapshot_tree's own contract: "`partial` is True when the digest describes
+    # the SCAN STATE rather than the tree ... a caller must never store it as
+    # that skill's digest, which is what I9 hangs on." This caller stored it
+    # anyway. The hook already honours the rule through skip_baseline; the CLI
+    # had no guard, so a candidate over MAX_ENTRIES - a size ADV-1 chooses -
+    # took a BLOCK bound to a placeholder, and once the tree shrank under the
+    # budget its real digest no longer matched, the hook called it "changed",
+    # and the adverse verdict was dropped exactly when it began to matter
+    # (round 8). SAFE-TO-PROPOSE was already unreachable here because a budget
+    # breach is an anomaly, so this is about the adverse verdicts, which are the
+    # ones worth keeping.
+    if snap.get("partial"):
+        print("REFUSED: --dir could not be fully observed (resource budget), so "
+              "this digest describes the SCAN rather than the tree. Binding a "
+              "verdict to it would record a placeholder that stops matching the "
+              "moment the tree is observable, dropping the verdict. Reduce the "
+              "tree or raise the budget, then re-digest.", file=sys.stderr)
+        return 3
     # Bind the verdict to the digest the caller passes: if the tree has changed
     # since THAT DIGEST WAS TAKEN, refuse. This does not know when a human or an
     # agent read the source - an earlier comment and message claimed it did, and
