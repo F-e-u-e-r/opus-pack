@@ -30,8 +30,11 @@ are deliberately not gated, since they are never echoed and their bytes are
 already bound into the digest); an unreadable/corrupt/stale baseline. An anomalous tree can never be certified unchanged, so it re-advises
 EVERY session until the anomaly is resolved — deliberate for a tree that cannot
 be fully observed. A clean, unchanged tree is SILENT, and so is a first run
-that found nothing to record; a first run that DID record something emits one
-labelled bootstrap line naming that count. The hook NEVER blocks and NEVER emits a "safe" line.
+that found nothing to baseline; a first run that HAS something to baseline
+emits one labelled bootstrap line naming that count. The line is emitted BEFORE
+the store and says so ("are being baselined"): under G5 the advisory is a single
+JSON object, so nothing can correct it afterwards, and a store that then fails
+is reported by its own "could not be saved" class instead. The hook NEVER blocks and NEVER emits a "safe" line.
 
 Watched roots: `$CLAUDE_CONFIG_DIR/skills` (default `~/.claude/skills`) and
 `$CLAUDE_PROJECT_DIR/.claude/skills` (falling back to the hook payload's `cwd`,
@@ -53,9 +56,11 @@ Known limits (documented, not hidden):
   trust level, and same-privilege local code can rewrite any of them. The
   advisory posture is a tripwire against upstream/content changes, not a
   defense against code already running as you.
-- First run (no baseline file) records the installed skills it could snapshot as
-  the baseline WITHOUT reviewing them, and emits ONE line saying so with that
-  count. "Snapshot" is wider than "observe": the count ALSO includes candidates
+- First run (no baseline file) baselines the installed skills it could snapshot
+  WITHOUT reviewing them, and emits ONE line saying so with that count. The line
+  is emitted BEFORE the write and is worded that way on purpose: G5 makes the
+  advisory a single JSON object, so a store that then fails cannot be corrected
+  afterwards, and is reported by its own "could not be saved" class instead. "Snapshot" is wider than "observe": the count ALSO includes candidates
   whose observation was complete but adverse - an unreadable directory, a
   symlink, a special file, a hostile name - because for each of those the scan
   established everything it could about THAT candidate, so recording it is

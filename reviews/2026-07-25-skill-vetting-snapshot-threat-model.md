@@ -168,8 +168,8 @@ observable, advisable event, never a silent state.
   watched; vet those manually.
 - **N4 — same-session installs.** SessionStart-only; content landing after the
   scan is seen next session.
-- **N-CORRECTION (round 6).** First-run bootstrap is no longer silent WHEN IT RECORDS
-  ANYTHING: it emits one line naming the count of skills baselined without
+- **N-CORRECTION (round 6).** First-run bootstrap is no longer silent WHEN IT HAS
+  SOMETHING TO BASELINE: it emits one line naming the count of skills baselined without
   review. A first run over empty or missing roots records nothing and stays
   silent, which is not a gap - nothing was trusted without review. The old
   silence was reachable a SECOND time — a transient failure of the very first
@@ -294,8 +294,9 @@ observable, advisable event, never a silent state.
   caller-owned, non-group/world-writable directory; a symlinked baseline path
   or untrusted directory is an anomaly and the write is refused. A refused or
   failed write is logged and leaves the previous state (G5 makes that safe).
-- **I7 — status lifecycle.** `baseline` (first-run bootstrap; when it records
-  anything it announces itself with one line naming the count — see
+- **I7 — status lifecycle.** `baseline` (first-run bootstrap; when it has anything
+  to baseline it announces itself with one line naming that count, emitted
+  BEFORE the write — see
   N-CORRECTION), `seen` (delta observed and delivered), `vetted` (recorded
   only via the CLI `record` subcommand with a verdict). Statuses never affect
   delta detection — only reporting and the `status` listing.
@@ -352,8 +353,8 @@ pairs / oversize and budget breach / permission denied (file, subdir, root) /
 mid-scan mutation / FIFO (no hang) / cache corruption, dangling-symlink cache,
 symlinked tmp path / wrong or unset project-root env / delivery failure
 (closed stdout ⇒ baseline not advanced) / version-change invalidation /
-first-run bootstrap announces its count when it records anything, and is
-silent over empty roots / multi-project baseline stability / display cap
+first-run bootstrap announces its count when it has anything to baseline, does
+so BEFORE the write, and is silent over empty roots / multi-project baseline stability / display cap
 with transient deltas ahead of steady-state anomalies, the
 total never exceeding the cap, and full counts surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
