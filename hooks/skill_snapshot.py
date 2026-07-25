@@ -490,7 +490,10 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                                 # What is load-bearing is the SHAPE: bounded by
                                 # a constant, never O(width) - which is what
                                 # test_walker_fd_use_is_bounded_by_a_constant
-                                # measures, at two caps, against /dev/fd.
+                                # measures, at three caps, against /dev/fd -
+                                # three so an ordering coincidence cannot
+                                # satisfy a two-point equality, which is how the
+                                # pass-12 version passed while blind.
                                 anomalies.append(("fanout", childrel))
                                 _entry(entries, anomalies, budget, childrel, b"A", b"fanout")
                                 break

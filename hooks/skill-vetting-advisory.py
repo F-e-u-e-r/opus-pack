@@ -336,8 +336,13 @@ def main():
                    "yourself"])
             return 0
         # "unavailable" (the lock file cannot be created at all) is a degraded
-        # run, not contention: proceed unlocked. The store will fail for the
-        # same underlying reason and take its own fail-closed advisory path.
+        # run, not contention: proceed unlocked. _run then puts the "could not
+        # be saved" text into head_lines BEFORE the emit, which is the only
+        # place it can go: the store fails for the same underlying reason, but
+        # by then a line has printed, so the post-store fallback is unreachable
+        # and the failure reaches the session only through that anticipatory
+        # head line (round-8 screen, pass 14). The store failure is still
+        # logged.
         try:
             return _run(snapmod, roots, bpath, cfg, lock_state)
         finally:
@@ -606,12 +611,18 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             _log("ADVISED %d item(s)" % len(lines))
 
         # Now advance the baseline. A store that cannot persist is a DETECTION
-        # failure for next session. Note which silent run this is about: on a
-        # clean UNCHANGED tree the guard below means store_baseline is never
-        # called at all, so there is nothing to fail. The case that matters is a
-        # silent run that still WRITES - a first-run bootstrap, or a scope whose
-        # entries changed without producing a line - where a store failure fails
-        # CLOSED
+        # failure for next session. Note exactly which runs reach the fallback
+        # below: it needs `printed` to still be False. On a clean UNCHANGED tree
+        # store_baseline is never called at all (the guard below), so nothing can
+        # fail. A first run WITH skills is NOT one of these either - it emits its
+        # bootstrap line and sets printed - so its failed store is not announced
+        # separately, and does not need to be: nothing was written, so the next
+        # session sees the same state and says the same thing again. What is
+        # left for the fallback is a run that WROTE while printing nothing, e.g.
+        # a first run over empty roots that still stores an empty baseline
+        # (round-8 screen, pass 14 - this comment previously called a non-empty
+        # first run silent and promised it an advisory it cannot get). There it
+        # fails CLOSED
         # with its own advisory rather than repeating a silent bootstrap that
         # would swallow any change made before the next run (sol#2 / luna F4).
         merged = snapmod.fresh_baseline()
