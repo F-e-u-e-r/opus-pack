@@ -27,11 +27,13 @@ unprotected" are different findings and must never share an exit path.
 
 Usage:  python3 hooks/mutation_matrix.py [--check-only] [--only M52,M60]
 
-An AUTHORITATIVE run - the one a closure report cites - takes no flags: a clean
-tree, every mutation, and the commit it measured printed with the result.
---check-only validates anchors and measures nothing; --allow-dirty-head-only
-measures HEAD while your uncommitted work sits outside the run. Neither belongs
-in a closure claim.
+An AUTHORITATIVE run - the one a closure report may cite - is `--authoritative`,
+which REFUSES to combine with any override and refuses if the runner or the
+mutation definitions on disk differ from HEAD, so subject, runner and
+definitions are one snapshot. --check-only validates anchors and measures
+nothing; --allow-dirty-head-only measures HEAD while your uncommitted work sits
+outside the run. Neither can be part of an authoritative run, and that is
+enforced here rather than asked for in prose.
 """
 import argparse
 import ast
@@ -137,6 +139,10 @@ def run_suite(script, cwd=REPO):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
+    ap.add_argument("--authoritative", action="store_true",
+                    help="the mode a closure report may cite: clean tree, "
+                         "every mutation, no overrides - ENFORCED, not merely "
+                         "documented")
     ap.add_argument("--check-only", action="store_true",
                     help="validate every mutation's shape; run no suites")
     ap.add_argument("--only", default="",
@@ -150,6 +156,36 @@ def main(argv=None):
                     help="proceed with a dirty tree, measuring HEAD ONLY - "
                          "uncommitted changes are EXCLUDED from the run")
     args = ap.parse_args(argv)
+
+    # This used to live in the docstring as "an authoritative run takes no
+    # flags". A convention in prose is not a gate: anyone could pass an
+    # override and still call the result authoritative, which is the same shape
+    # of defect - a claim that does not match the artifact - that this whole
+    # branch exists to remove. So the mode is a real flag and the exclusions
+    # are checked here.
+    if args.authoritative:
+        conflicts = [n for n, v in (("--check-only", args.check_only),
+                                    ("--allow-dirty-head-only",
+                                     args.allow_dirty_head_only),
+                                    ("--only", bool(args.only))) if v]
+        if conflicts:
+            print("REFUSED: --authoritative excludes %s. An authoritative run "
+                  "measures EVERY mutation against a clean committed tree with "
+                  "no overrides; anything less is a partial run and must not be "
+                  "reported as one." % ", ".join(conflicts), file=sys.stderr)
+            return 2
+
+    # Which snapshot is the RUNNER, as distinct from the subject? The subject
+    # is a worktree at a commit; the runner and the mutation definitions are
+    # read from whatever checkout invoked this, which need not be the same one.
+    # Compare the on-disk blobs against HEAD's so the report can state it
+    # rather than assume it.
+    def _blob_matches_head(rel):
+        disk = subprocess.run(["git", "hash-object", rel], cwd=REPO,
+                              capture_output=True, text=True).stdout.strip()
+        committed = subprocess.run(["git", "rev-parse", "HEAD:" + rel], cwd=REPO,
+                                   capture_output=True, text=True).stdout.strip()
+        return bool(disk) and disk == committed
 
     matrix = load_matrix()
     wanted = {x.strip() for x in args.only.split(",") if x.strip()}
@@ -199,6 +235,21 @@ def main(argv=None):
         return 2
 
     # PHASE 2 - execute, inside a throwaway checkout of `head`.
+    runner_ok = _blob_matches_head("hooks/mutation_matrix.py")
+    defs_ok = _blob_matches_head("hooks/mutations.json")
+    if args.authoritative and not (runner_ok and defs_ok):
+        print("REFUSED: the runner or the mutation definitions on disk differ "
+              "from HEAD, so subject, runner and definitions would not be the "
+              "same snapshot.", file=sys.stderr)
+        return 2
+    if args.authoritative:
+        print("MODE                AUTHORITATIVE")
+        print("OVERRIDES           NONE")
+    print("subject commit      %s" % head)
+    print("runner commit       %s%s" % (head, "" if runner_ok
+                                        else "  (ON-DISK COPY DIFFERS)"))
+    print("definitions commit  %s%s" % (head, "" if defs_ok
+                                        else "  (ON-DISK COPY DIFFERS)"))
     print("measuring commit %s in an isolated worktree" % head[:12])
     parent = tempfile.mkdtemp(prefix="mutation-matrix-")
     wt = os.path.join(parent, "wt")

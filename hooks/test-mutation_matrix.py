@@ -124,6 +124,41 @@ class DirtyTreeGate(unittest.TestCase):
         self.assertIn("EXCLUDED", r.stdout)
 
 
+class AuthoritativeMode(unittest.TestCase):
+    """`--authoritative` is the mode a closure report may cite, so the thing
+    that makes it authoritative has to be ENFORCED. It was first written as a
+    docstring sentence saying an authoritative run takes no flags - a
+    convention in prose, which anyone could ignore while still calling the
+    result authoritative. That is the same shape of defect this branch exists
+    to remove: a claim that does not match the artifact."""
+
+    def _run(self, *flags):
+        return subprocess.run([sys.executable,
+                               os.path.join(HOOKS, "mutation_matrix.py")]
+                              + list(flags),
+                              capture_output=True, text=True, timeout=120)
+
+    def test_it_refuses_every_override(self):
+        for flag in ("--check-only", "--allow-dirty-head-only"):
+            with self.subTest(flag=flag):
+                r = self._run("--authoritative", flag)
+                self.assertEqual(2, r.returncode, r.stdout)
+                self.assertIn("REFUSED", r.stderr)
+                self.assertIn(flag, r.stderr, "the refusal must name the flag")
+
+    def test_it_refuses_a_partial_selection(self):
+        r = self._run("--authoritative", "--only", "M18")
+        self.assertEqual(2, r.returncode, r.stdout)
+        self.assertIn("--only", r.stderr)
+        self.assertIn("EVERY mutation", r.stderr)
+
+    def test_the_mode_is_a_flag_and_not_only_a_docstring(self):
+        r = self._run("--help")
+        self.assertIn("--authoritative", r.stdout)
+        self.assertIn("ENFORCED", r.stdout,
+                      "the help must not describe a convention as a gate")
+
+
 class TheRealMatrix(unittest.TestCase):
     """The shipped data file must satisfy the gate it declares."""
 
