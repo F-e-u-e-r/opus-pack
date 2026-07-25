@@ -77,8 +77,11 @@ observable, advisable event, never a silent state.
 - **G2 — observation honesty (fail closed).** Anything the scanner cannot
   fully and unambiguously observe is an **anomaly** and always advises:
   unreadable file or directory, oversize file, an entry/byte RESOURCE budget
-  breach, a STRUCTURAL depth/fanout refusal (see I8 - structural refusals are
-  per-candidate and must not set the shared stop),
+  breach (which also makes every candidate enumerated after it `partial`, and
+  each of those advises too — the hook skips only their BASELINE WRITE, never
+  their advisory line; getting that distinction wrong was the round-7
+  regression), a STRUCTURAL depth/fanout refusal (see I8 — structural refusals
+  are per-candidate and must not set the shared stop),
   any symlink, any non-regular file (FIFO/socket/device), an undecodable or
   hostile TOP-LEVEL candidate name (a NESTED name is deliberately not gated
   since round 6 — it is never echoed and its bytes are already bound into the
@@ -88,9 +91,13 @@ observable, advisable event, never a silent state.
   than papered over.** What holds: advisory text is built from fixed template
   strings and counts; file paths and file content are never echoed; a name that
   fails the ASCII allowlist, or that spells this tool's own `id-xxxxxxxx`
-  namespace, is shown only as an opaque digest-derived id and is itself an
-  anomaly; and no CLI message on stdout or stderr echoes an unvalidated
-  argument.
+  namespace, is shown only as an opaque digest-derived id; and no CLI message on
+  stdout or stderr echoes an unvalidated argument. That name is ALSO an anomaly
+  for `digest` and for the hook — but NOT for `record` when the verdict is BLOCK
+  or SUSPECT, where a not-ok name only refuses SAFE-TO-PROPOSE, so an adverse
+  verdict on a hostile-named but otherwise clean tree reports no anomalies. (The
+  universal form was corrected inside `display_name`'s docstring at screen pass 4
+  and left standing here until pass 7.)
 
   **What does NOT hold (round 7, open):** an ALLOWLISTED name still reaches the
   model verbatim — in the advisory, in the removal line, and in `status` — and
@@ -132,7 +139,8 @@ observable, advisable event, never a silent state.
   advisory covering those deltas has been successfully written to stdout. A
   failed print leaves the baseline untouched, so the same deltas re-advise
   next session. A failed baseline write after a successful print re-advises
-  too (stderr-logged); both failure orders converge on re-advising.
+  too (recorded in `<config>/skill-vetting/advisory.log`, not on stderr — the
+  hook writes nothing to stderr in any commit); both failure orders converge on re-advising.
 - **G6 — versioned binding.** One canonical encoder, binding BOTH the schema
   and the policy version into every digest (a policy-only bump therefore moves
   every digest — see I1), produces
@@ -329,4 +337,13 @@ first-run bootstrap announces its count / multi-project baseline stability / dis
 with transient deltas ahead of steady-state anomalies, the
 total never exceeding the cap, and full counts surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
-(checks.py). Anomaly ⇒ advise is asserted per class, not in aggregate.
+(checks.py). Anomaly ⇒ advise is asserted per class, not in aggregate —
+`test_every_anomaly_class_actually_advises` drives one fixture per class
+(symlink, unreadable, special, oversize, depth, fanout) through the real hook.
+That test did NOT exist until the round-8 screen, and this sentence claimed it
+did: the suite asserted advise only for symlink, unreadable, root-symlink,
+badname and corrupt/stale baseline. The gap is exactly what let a round-7 fix
+(`if partial and old is None: continue`) delete the advisory for the whole
+resource-budget class while 42 tests stayed green — a single 4200-file skill
+made the hook emit ZERO bytes, every session, and took every candidate
+enumerated after it into that silence.

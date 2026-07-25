@@ -22,7 +22,8 @@ a new, changed, or removed top-level DIRECTORY, symlink or special file under a
 watched skills root — a top-level regular FILE is deliberately not a candidate,
 because a loose `.md` beside the skill directories is not loadable as a skill; any
 observation anomaly — an unreadable file or directory, an oversize file, a
-budget breach, ANY symlink, a special file (FIFO/socket/device), a hostile or
+budget breach (which also makes every candidate enumerated after it partial —
+each of those advises too; only their baseline WRITE is skipped), ANY symlink, a special file (FIFO/socket/device), a hostile or
 undecodable TOP-LEVEL candidate name (shown only as an opaque id; NESTED names
 are deliberately not gated, since they are never echoed and their bytes are
 already bound into the digest); an unreadable/corrupt/stale baseline. An anomalous tree can never be certified unchanged, so it re-advises
@@ -387,14 +388,21 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                     status = "seen"
                 else:
                     status = old["status"]       # unchanged: keep status+verdict
-                if partial and old is None:
-                    # Never seen before AND not observed this run: recording the
-                    # content-independent placeholder as this skill's digest
-                    # would make a later real observation compare equal to it.
-                    # Leave it out of the baseline entirely so the next run
-                    # treats it as new (round 7 - the round-6 fix only covered
-                    # the case where a prior real record existed).
-                    continue
+                # Never seen before AND not observed this run: recording the
+                # content-independent placeholder as this skill's digest would
+                # make a later real observation compare equal to it, so it must
+                # stay OUT of the baseline and be treated as new next run.
+                #
+                # ROUND-8 SCREEN: this used to `continue` here, which skipped the
+                # candidate entirely - including the anomaly line composed below.
+                # A single oversized skill (4200 files vs MAX_ENTRIES=4096) then
+                # made the hook emit ZERO bytes, every session: the over-budget
+                # skill was never reported, an ordinary skill enumerated after it
+                # was never reported, and the first-run count line was suppressed
+                # because new_entries ended up empty. A fix for "do not baseline a
+                # placeholder" had become a silent miss, which is the one outcome
+                # this component exists to prevent. Skip the BASELINE WRITE only.
+                skip_baseline = partial and old is None
                 if partial and old is not None:
                     entry = dict(old)           # not observed: keep the real record
                 else:
@@ -404,7 +412,8 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                         for f in ("verdict", "provenance"):   # SV4-09: provenance too
                             if f in old:
                                 entry[f] = old[f]
-                new_entries[key] = entry
+                if not skip_baseline:
+                    new_entries[key] = entry
                 if snap["anomalies"]:
                     reasons = ",".join(sorted({r for r, _ in snap["anomalies"]}))
                     kind = "new " if (state == "ok" and is_new) else (

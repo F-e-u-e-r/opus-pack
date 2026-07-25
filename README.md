@@ -389,7 +389,8 @@ primitive snapshots every file under each entry of the watched skills roots
 (`$CLAUDE_CONFIG_DIR/skills`, default `~/.claude/skills`, plus the project's
 `.claude/skills` via `$CLAUDE_PROJECT_DIR`), so an add / modify / delete /
 rename / symlink / filetype change anywhere — not just in `SKILL.md` — counts,
-and whatever cannot be fully observed (a read error, an oversize file, any
+and whatever cannot be fully observed (a read error, an oversize file, a scan-budget
+breach and everything enumerated after it, any
 symlink, a special file, a hostile TOP-LEVEL skill name — nested names are not
 gated, a corrupt or version-stale baseline)
 is an **anomaly that always advises and can never be certified unchanged**. For

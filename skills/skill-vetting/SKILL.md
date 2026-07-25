@@ -199,7 +199,8 @@ layer is the same `hooks/skill_snapshot.py` primitive §3 binds verdicts with
 (one canonical digest for the hook, the verdict record, and the tests), snapshotting
 EVERY file - so an add / modify / delete / rename / symlink / filetype change
 anywhere, not just in `SKILL.md`, registers - and treating whatever it cannot
-fully observe (read errors, oversize files, budget breaches, any symlink, special
+fully observe (read errors, oversize files, budget breaches — including every
+candidate enumerated after the budget ran out, any symlink, special
 files, a hostile TOP-LEVEL skill name — nested names are not gated, since they
 are never echoed and their bytes are already in the digest) as an **anomaly that
 always advises and can never be

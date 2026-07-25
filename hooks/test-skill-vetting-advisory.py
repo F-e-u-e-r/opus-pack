@@ -638,6 +638,78 @@ class HookE2E(unittest.TestCase):
             self.assertIn(n, ctx or "",
                           "%s was baselined from a placeholder and went silent" % n)
 
+    def test_every_anomaly_class_actually_advises(self):
+        # THE GAP THAT LET THE REGRESSION SHIP. The threat model claims "Anomaly
+        # => advise is asserted per class, not in aggregate", and it was not:
+        # the suite asserted advise for symlink, unreadable, root-symlink,
+        # badname and corrupt/stale baseline, and for NO resource/structural
+        # class. So when a round-7 fix made an over-budget candidate skip the
+        # advisory entirely, 42 green tests kept vouching for "always advises".
+        # One case per class, driven through the real hook.
+        cases = {}
+
+        d = self.mkskill(self.G, "c_symlink")
+        os.symlink("x", os.path.join(d, "link"))
+        cases["symlink"] = "c_symlink"
+
+        d = self.mkskill(self.G, "c_unreadable")
+        sub = os.path.join(d, "sub")
+        os.makedirs(sub)
+        os.chmod(sub, 0)
+        self.addCleanup(os.chmod, sub, 0o755)
+        cases["unreadable"] = "c_unreadable"
+
+        d = self.mkskill(self.G, "c_special")
+        os.mkfifo(os.path.join(d, "pipe"))
+        cases["special"] = "c_special"
+
+        d = self.mkskill(self.G, "c_oversize")
+        big = os.path.join(d, "big.bin")
+        with open(big, "wb") as fh:
+            fh.truncate(9 << 20)          # > MAX_FILE_BYTES (8 MiB), unpatched
+        cases["oversize"] = "c_oversize"
+
+        d = self.mkskill(self.G, "c_depth")
+        os.makedirs(os.path.join(d, *["n%d" % i for i in range(30)]))
+        cases["depth"] = "c_depth"
+
+        d = self.mkskill(self.G, "c_fanout")
+        for i in range(200):              # > MAX_OPEN_DIRS (128), unpatched
+            os.makedirs(os.path.join(d, "w%03d" % i))
+        cases["fanout"] = "c_fanout"
+
+        ctx = self.run_hook()[1]          # first run: all of them are new
+        self.assertIsNotNone(ctx, "a tree full of anomalies must never be silent")
+        seen = ctx
+        for _ in range(6):                # drain anything held back by the cap
+            more = self.run_hook()[1]
+            if more is None:
+                break
+            seen += " " + more
+        for reason, name in sorted(cases.items()):
+            self.assertIn(name, seen,
+                          "the %s class never advised for %s" % (reason, name))
+
+    def test_an_over_budget_candidate_advises_and_is_not_baselined(self):
+        # ROUND-8 SCREEN, the regression itself, two-sided. `if partial and old
+        # is None: continue` skipped the candidate before its anomaly line was
+        # composed, so an oversized skill made the hook emit ZERO bytes forever -
+        # and took every candidate enumerated after it into that silence.
+        d = self.mkskill(self.G, "aaa_bulky")
+        for i in range(4200):             # > MAX_ENTRIES (4096), unpatched
+            with open(os.path.join(d, "f%04d" % i), "w") as fh:
+                fh.write("x")
+        self.mkskill(self.G, "zzz_ordinary")
+        for _ in range(3):
+            ctx = self.run_hook()[1]
+            self.assertIsNotNone(
+                ctx, "an over-budget tree must never produce a silent session")
+            self.assertIn("aaa_bulky", ctx)
+        # ...and the placeholder digest must never be stored as its real one.
+        stored = {e["name"] for e in self.read_baseline()["entries"].values()}
+        self.assertNotIn("aaa_bulky", stored,
+                         "a partial observation must not be baselined")
+
     def test_a_partial_scan_does_not_destroy_a_recorded_verdict(self):
         # round-6: a RESOURCE-budget exhaustion gives every remaining candidate
         # one constant content-independent placeholder digest. Storing it as the
