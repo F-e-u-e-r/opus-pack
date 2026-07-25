@@ -134,7 +134,9 @@ raw name through a shell.
 
 **I12** — every path the procedure instructs an agent to put on a command line
 is drawn from a tool-minted alphabet: `[0-9a-f]` for selectors, `[a-z0-9./]` for
-exported paths, plus operator-typed `<ROOT>` and `<DEST>`. No ADV-1 byte appears
+exported paths, plus the operator-typed `<ROOT>`. (An earlier draft also listed
+`<DEST>`; D4 made the export destination tool-chosen precisely so it is not a
+caller-supplied path, and this line was not updated with it.) No ADV-1 byte appears
 on any of them. Raw names exist only inside `MANIFEST.json`, as escaped JSON
 data that the procedure explicitly forbids passing to a shell.
 

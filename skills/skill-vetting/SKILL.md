@@ -208,8 +208,10 @@ certified unchanged**. For a new, changed, removed, or anomalous skill it inject
 one line routing to THIS skill; names are shown only when they pass a strict
 ASCII allowlist, otherwise as an opaque id, and content is never echoed. It
 **never blocks and never emits a "safe" line**; a clean, unchanged run is silent, while a
-first run emits one labelled line naming how many installed skills it recorded
-as the baseline without review; a corrupt or
+first run emits one labelled line naming how many installed skills it OBSERVED
+and recorded as the baseline without review — a candidate the scan could not
+observe is not recorded and not in that count, and advises through its own
+anomaly line instead; a corrupt or
 version-stale baseline advises and resets VISIBLY, never silently; the advisory
 prints before the baseline advances, so a failed delivery re-advises next
 session. The baseline is NOT tamper-evident - it shares a trust level with the

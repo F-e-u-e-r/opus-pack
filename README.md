@@ -399,7 +399,9 @@ a new, changed, removed, or anomalous skill it injects one line routing to the
 `SessionStart` hook cannot deny, and a green-lighting scanner is the
 false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
 silent, while a first run emits one labelled line naming how many installed
-skills it recorded as the baseline without reviewing them; the advisory prints
+skills it OBSERVED and recorded as the baseline without reviewing them (a
+candidate the scan could not observe is not recorded and not in that count — it
+advises through its own anomaly line); the advisory prints
 **before** the baseline
 (`<config>/skill-vetting/baseline.json`) advances — a failed delivery
 re-advises next session — and skill names reach the model only through a strict

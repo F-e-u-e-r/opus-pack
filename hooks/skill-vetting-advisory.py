@@ -51,8 +51,13 @@ Known limits (documented, not hidden):
   trust level, and same-privilege local code can rewrite any of them. The
   advisory posture is a tripwire against upstream/content changes, not a
   defense against code already running as you.
-- First run (no baseline file) records what is already installed as the
-  baseline WITHOUT reviewing it, and emits ONE line saying so with the count.
+- First run (no baseline file) records the installed skills it could OBSERVE as
+  the baseline WITHOUT reviewing them, and emits ONE line saying so with that
+  count. A candidate the scan could not observe (a resource-budget breach, say)
+  is deliberately NOT recorded - baselining a placeholder digest would make a
+  later real observation compare equal to it - so it is not in that count; it
+  advises through its own anomaly line instead. A first run in which NOTHING was
+  observable therefore emits anomaly lines and no count line.
   It is not silent (round 6: a silent bootstrap was reachable a second time
   after a failed first write, which then swallowed a change). Run the
   `skill-vetting` skill on anything present but not yet reviewed;
@@ -139,7 +144,14 @@ LOCK_STALE_S = 60.0   # a lock older than this belonged to a run that died
 
 
 def _acquire(lockpath):
-    """Serialize load -> scan -> deliver -> store across concurrent hooks.
+    """ATTEMPT to serialize load -> scan -> deliver -> store across concurrent
+    hooks. It does not achieve it, and the threat model records I11 as NOT MET:
+    on the stale-takeover path both racers are granted the lock (40/40 measured),
+    `_release` unlinks by path rather than the file it created, and `_cli_record`
+    - the other writer of the same baseline - takes no lock at all. Replacing
+    this with fcntl.flock is design item D2;
+    `test_lock_stale_takeover_is_KNOWN_BROKEN` pins the broken shape so that
+    landing D2 forces this docstring to change with it.
 
     load_baseline/store_baseline are a read-modify-write with no lock,
     generation or compare-and-swap, so two SessionStart hooks racing (two
@@ -321,7 +333,13 @@ def main():
 
 def _run(snapmod, roots, bpath, cfg, lock_state="held"):
     """The critical section: load the baseline, scan every watched root,
-    deliver the advisory, then advance the baseline. Called with the lock held."""
+    deliver the advisory, then advance the baseline.
+
+    Called with the lock held WHEN ONE COULD BE TAKEN. `main()` returns early
+    only on "contended"; on "unavailable" - the lock file cannot be created at
+    all - it proceeds here UNLOCKED and says so in the advisory, because a
+    degraded run that reports itself beats no run. So this is not a serialized
+    critical section unconditionally, and lock_state records which case it is."""
     printed = False
     try:
         state, data = snapmod.load_baseline(bpath)
