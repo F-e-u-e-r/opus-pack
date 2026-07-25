@@ -299,6 +299,35 @@ class HookE2E(unittest.TestCase):
         rc, ctx, _ = self.run_hook()
         self.assertIn("new skill global:fresh", ctx, "the delta re-advises once deliverable")
 
+    def test_degraded_log_goes_to_CLAUDE_CONFIG_DIR_not_the_home_default(self):
+        """The fallback in `_log` runs exactly when the companion module could
+        not be imported - the run whose log matters most. Pass 14 made it read
+        CLAUDE_CONFIG_DIR instead of hardcoding ~/.claude, but shipped no test,
+        so the mutation that reverted it survived the whole suite (M55). HOME
+        and CLAUDE_CONFIG_DIR are pointed at DIFFERENT scratch roots here, so
+        the two destinations are distinguishable rather than coincident."""
+        iso = os.path.join(self.tmp, "iso")
+        os.makedirs(iso)
+        shutil.copy2(HOOK, os.path.join(iso, "skill-vetting-advisory.py"))
+        stray = os.path.join(self.tmp, "stray-home")
+        os.makedirs(stray)
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+               "HOME": stray, "CLAUDE_CONFIG_DIR": self.cfg,
+               "CLAUDE_PROJECT_DIR": self.projA}
+        res = subprocess.run([PY, os.path.join(iso, "skill-vetting-advisory.py")],
+                             input=b"{}", stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, env=env, cwd=self.neutral,
+                             timeout=60)
+        self.assertEqual(res.returncode, 0)
+        wanted = os.path.join(self.cfg, "skill-vetting", "advisory.log")
+        unwanted = os.path.join(stray, ".claude", "skill-vetting", "advisory.log")
+        self.assertTrue(os.path.exists(wanted),
+                        "the degraded run must log under CLAUDE_CONFIG_DIR")
+        self.assertFalse(os.path.exists(unwanted),
+                         "the degraded run must NOT fall back to ~/.claude when "
+                         "CLAUDE_CONFIG_DIR is set - that writes into a config "
+                         "root the operator did not select")
+
     def test_missing_companion_module_degrades_visibly(self):
         iso = os.path.join(self.tmp, "iso")
         os.makedirs(iso)
