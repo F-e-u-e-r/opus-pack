@@ -276,8 +276,10 @@ def main():
         bpath = snapmod.baseline_path(cfg)
         # Everything from here to the store is one critical section: see
         # _acquire. A hook that cannot take the lock does NOT scan and does NOT
-        # touch the baseline — the holder is doing exactly this work and will
-        # advise — but it says so rather than looking clean.
+        # touch the baseline. It does NOT claim the holder is alive or that it
+        # will advise: `contended` means only that the lock path still existed
+        # after the bounded wait, and an abandoned lock younger than
+        # LOCK_STALE_S lands there too.
         lockpath = bpath + ".lock"
         try:
             os.makedirs(os.path.dirname(bpath), mode=0o700, exist_ok=True)
@@ -293,7 +295,7 @@ def main():
             # statement either way. (Replacing this with fcntl.flock, which the
             # kernel releases on death, is design item D2.)
             _emit(["the skills directories were not scanned this session "
-                   "because another run holds the vetting lock — treat "
+                   "because the vetting lock was held — treat "
                    "installed skills as unverified for this session and run "
                    "the skill-vetting skill on anything you did not install "
                    "yourself"])

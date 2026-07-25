@@ -436,7 +436,7 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                             # Bound PEAK open dir fds (round-5 SV5-02): the stack
                             # holds one open fd per pending subdir, so a very wide
                             # or bushy tree could accumulate O(width) fds. Cap the
-                            # live stack and fail CLOSED (budget anomaly -> advise)
+                            # live stack and fail CLOSED (`fanout` anomaly -> advise)
                             # rather than open unboundedly. A real skill is small;
                             # this only trips a pathological tree.
                             if len(stack) >= MAX_OPEN_DIRS:

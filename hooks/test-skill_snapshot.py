@@ -426,7 +426,8 @@ class TreeObservation(Base):
 
     def test_wide_tree_fd_fanout_fails_closed(self):
         # round-5 SV5-02: a tree wider than MAX_OPEN_DIRS at one level stops with
-        # a budget anomaly (bounded fds), never an unbounded open or a silent pass.
+        # a `fanout` anomaly (bounded fds; the reason was `budget` until round 7),
+        # never an unbounded open or a silent pass.
         self.patch_const("MAX_OPEN_DIRS", 8)
         for i in range(20):
             self.mk("s", "d%02d" % i, "x.md")

@@ -120,7 +120,10 @@ observable, advisable event, never a silent state.
   acquires one from a review that never read it. Quoting rules are the wrong
   abstraction for this; shell-safe candidate addressing is a design item.
 - **G4 — bounded work, visible degradation.** Entry-count, per-file-byte,
-  total-byte, and depth caps bound the scan; opens use `O_NOFOLLOW|O_NONBLOCK`
+  and total-byte RESOURCE caps bound the run, while depth and open-directory
+  caps are per-candidate STRUCTURAL refusals that do not stop it (I8 — peering
+  the two here is the conflation that enabled the round-6 poisoner); opens use
+  `O_NOFOLLOW|O_NONBLOCK`
   so a planted FIFO cannot hang SessionStart; the walk is iterative. An
   unexpected internal error exits 0 (never breaks session start) but emits a
   generic "hook could not complete — changes may be unobserved" advisory when
@@ -130,7 +133,9 @@ observable, advisable event, never a silent state.
   failed print leaves the baseline untouched, so the same deltas re-advise
   next session. A failed baseline write after a successful print re-advises
   too (stderr-logged); both failure orders converge on re-advising.
-- **G6 — versioned binding.** One canonical, schema-versioned encoder produces
+- **G6 — versioned binding.** One canonical encoder, binding BOTH the schema
+  and the policy version into every digest (a policy-only bump therefore moves
+  every digest — see I1), produces
   every digest, shared by the hook and by the `skill-vetting` skill's verdict
   procedure through the same CLI. The baseline records the schema and policy
   versions; a version change invalidates it visibly (advisory + re-baseline),
