@@ -372,13 +372,13 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 "and vet currently installed skills with the skill-vetting skill")
         if state == "corrupt":
             head_lines.append(
-                "the vetting baseline was unreadable and has been rebuilt — "
+                "the vetting baseline was unreadable and is being rebuilt — "
                 "prior baselines are untrusted; re-vet currently installed "
                 "skills with the skill-vetting skill")
         elif state == "stale":
             head_lines.append(
                 "the vetting baseline predates the current snapshot "
-                "schema/policy (now v%d/v%d) — baselines reset; re-vet "
+                "schema/policy (now v%d/v%d) — baselines are being reset; re-vet "
                 "currently installed skills with the skill-vetting skill"
                 % (snapmod.SCHEMA_VERSION, snapmod.POLICY_VERSION))
 
@@ -525,10 +525,15 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             # baselined whatever the content had become in between (round 6).
             # One honest line makes the bootstrap auditable and closes that
             # sequence without needing durable failure state.
+            # PERFECTIVE WORDING IS WRONG HERE: this line is composed and
+            # emitted BEFORE store_baseline runs, and G5's single-JSON emit
+            # means no correction can follow a successful print. A store that
+            # then fails leaves the session told something was "recorded" when
+            # nothing was (round-8 screen, pass 12).
             head_lines.append(
-                "first run — %d installed skill(s) recorded as the baseline "
-                "WITHOUT review; run the skill-vetting skill on any you have "
-                "not vetted (`skill_snapshot.py status` lists them)"
+                "first run — %d installed skill(s) are being baselined WITHOUT "
+                "review; run the skill-vetting skill on any you have not vetted "
+                "(`skill_snapshot.py status` lists what was actually stored)"
                 % len(new_entries))
 
         # Deliver BEFORE advancing the baseline (G5/R2-08): a failed delivery

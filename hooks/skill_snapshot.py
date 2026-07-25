@@ -83,8 +83,9 @@ MAX_FILE_BYTES = 8 << 20    # per-file content cap; larger is an anomaly, never 
 MAX_TOTAL_BYTES = 64 << 20  # content budget; SHARED like MAX_ENTRIES above
 MAX_DEPTH = 24              # per-candidate directory depth
 MAX_CANDIDATES = 256        # top-level entries enumerated per root
-MAX_OPEN_DIRS = 128         # cap on PENDING subdir fds; peak is this + the dir
-                            # being scanned (+ scan_root's own root fd)
+MAX_OPEN_DIRS = 128         # cap on PENDING subdir fds. Total descriptors held
+                            # is this plus a small constant - see _walk_dir; the
+                            # cap is not the peak
 MAX_BASELINE_BYTES = 4 << 20
 
 _DIR_FLAGS = os.O_RDONLY | os.O_NOFOLLOW | os.O_CLOEXEC
@@ -299,9 +300,12 @@ def snapshot_tree(root, budget=None):
     directory swapped for a symlink mid-scan is never traversed as the original
     tree (it becomes an anomaly). Peak concurrently-open dir fds are bounded by
     MAX_OPEN_DIRS pending fds plus the one currently being scanned - so the
-    true peak is MAX_OPEN_DIRS + 1, and `scan_root` holds its enumeration-root
-    fd on top of that. Bounded by a constant either way, which is the property
-    that matters, but the cap is not literally the peak. `budget` may be a shared dict to bound work across many
+    peak DESCRIPTOR count is MAX_OPEN_DIRS plus a small constant (the directory
+    being scanned, the fd os.scandir dups for its iterator, and at most one
+    regular-file fd), and `scan_root` adds its own root fd and that fd's dup.
+    Bounded by a constant, never O(width) - which is the property that matters;
+    the cap is not the peak, and no exact total is claimed here because it
+    depends on CPython dup'ing for fdopendir. `budget` may be a shared dict to bound work across many
     candidates in one run; when omitted, a per-candidate budget is used. A
     caller-supplied budget already exhausted short-circuits to a budget
     anomaly. A trailing slash / "/." on `root` is normalized away first, so a
@@ -457,18 +461,29 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                                 # shared stop that would blind every other
                                 # candidate (round 6).
                                 #
-                                # Walker-held peak is MAX_OPEN_DIRS + 1: at most
-                                # MAX_OPEN_DIRS pending on the stack, plus the
-                                # one being scanned. Not +2 - this guard runs
-                                # BEFORE _opendir_nofollow, so at the instant a
-                                # child fd is opened the stack holds at most
-                                # MAX_OPEN_DIRS - 1. Measured: with the cap at
-                                # 4, peak concurrently-open fds is 5. (An
-                                # earlier wording here said "+ the one being
-                                # opened", contradicting the +1 in
-                                # snapshot_tree's docstring 150 lines above -
-                                # round-8 screen, pass 11.) scan_root holds its
-                                # enumeration-root fd on top of that.
+                                # Peak DESCRIPTORS held during a walk is
+                                # MAX_OPEN_DIRS + a small constant, not
+                                # MAX_OPEN_DIRS itself: the pending stack, plus
+                                # the directory being scanned, plus the fd
+                                # os.scandir(dir_fd) DUPS for its iterator, plus
+                                # at most one regular-file fd inside
+                                # _read_regular. scan_root adds its own root fd
+                                # and that fd's scandir dup.
+                                #
+                                # No exact figure is stated on purpose. Two
+                                # earlier attempts here were both wrong: "+ the
+                                # one being opened" (pass 11) and "+ 1,
+                                # measured" (pass 11's fix), the latter because
+                                # its instrument wrapped os.open and the scandir
+                                # dup never goes through os.open, and because
+                                # its fixture put every file one level BELOW the
+                                # wide directory so a file fd and a full stack
+                                # were never live together. The exact total also
+                                # depends on CPython using fdopendir on a dup.
+                                # What is load-bearing is the SHAPE: bounded by
+                                # a constant, never O(width) - which is what
+                                # test_walker_fd_use_is_bounded_by_a_constant
+                                # measures, at two caps, against /dev/fd.
                                 anomalies.append(("fanout", childrel))
                                 _entry(entries, anomalies, budget, childrel, b"A", b"fanout")
                                 break
@@ -529,8 +544,8 @@ def scan_root(root, budget=None):
     processed one at a time). The in-tree walker holds one open fd per PENDING
     subdirectory, with the PENDING count hard-capped at MAX_OPEN_DIRS and
     failing closed past it (round-5 SV5-02), so peak fd use is bounded by a
-    constant - MAX_OPEN_DIRS + the directory being scanned + this root fd -
-    rather than O(width).
+    constant - MAX_OPEN_DIRS plus a small fixed number of descriptors, see
+    _walk_dir - rather than O(width).
     Returns {"candidates", "anomalies", "complete"}:
     candidates = [(name_bytes, snap)] for EVERY top-level entry - a real
     subdirectory (walked), a symlink or special file or open-failure (an
@@ -949,6 +964,18 @@ def _cli_record(argv):
     # its true digest differs from the placeholder, so the hook calls it
     # "changed" and DROPS the verdict: the adverse record degrades to noise
     # exactly when it starts mattering (round-8 screen, pass 11).
+    # A loose regular FILE is not a candidate (G1's stated carve-out: it is not
+    # loadable as a skill), so the hook never enumerates one. Recording a verdict
+    # against it put a key in the baseline that no scan can ever match, and the
+    # next SessionStart pruned it with the line "skill X was removed" - while X
+    # sat on disk - wiping the adverse verdict (round-8 screen, pass 12). Refuse
+    # here so the CLI and the hook agree on what a candidate is.
+    if os.path.isfile(args["dir"]) and not os.path.islink(args["dir"]):
+        print("REFUSED: --dir is a regular file, not a skill directory. A loose "
+              "file under a skills root is not loadable as a skill and is never "
+              "a candidate, so a verdict recorded against it would be pruned as "
+              "a removal on the next session.", file=sys.stderr)
+        return 2
     if any(r == "root" for r, _ in snap["anomalies"]):
         print("REFUSED: --dir could not be observed at all (no such path) - a "
               "verdict cannot bind a tree that was never read.", file=sys.stderr)
@@ -1011,8 +1038,12 @@ def _cli_status(_argv):
     # from the only list this command prints, and the audit output became
     # byte-identical to an all-clear. The reporting direction was inverted: the
     # more damning the verdict, the cleaner the report. A recorded BLOCK or
-    # SUSPECT means a skill was JUDGED unsafe and is STILL INSTALLED, which is
-    # the single most important thing this command can say.
+    # SUSPECT means a skill was JUDGED unsafe, and surfacing that is still the
+    # most important thing this command does. What it CANNOT say is that the
+    # skill is still present: this reads the BASELINE and never lstats, so the
+    # old field name `adverse_verdict_still_installed` reported a deleted skill
+    # unchanged (round-8 screen, pass 12). The field now says what is true -
+    # an adverse verdict recorded in the baseline and not since superseded.
     unvetted, adverse, safe = [], [], []
     for v in data["entries"].values():
         line = "%s %s (%s%s)" % (v["scope"], v["name"], v["status"],
@@ -1024,7 +1055,7 @@ def _cli_status(_argv):
         else:
             safe.append(line)
     print(json.dumps({"baseline": "ok", "entries": len(data["entries"]),
-                      "adverse_verdict_still_installed": sorted(adverse),
+                      "adverse_verdicts_in_baseline": sorted(adverse),
                       "unvetted": sorted(unvetted),
                       "vetted_safe": sorted(safe)},
                      ensure_ascii=True, indent=2))

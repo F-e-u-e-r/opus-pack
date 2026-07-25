@@ -245,7 +245,9 @@ class HookE2E(unittest.TestCase):
         with open(self.bpath, "w") as fh:
             fh.write("{ not json")
         rc, ctx, _ = self.run_hook()
-        self.assertIn("baseline was unreadable and has been rebuilt", ctx)
+        self.assertIn("baseline was unreadable and is being rebuilt", ctx,
+                      "non-perfective: the line is emitted BEFORE the store, "
+                      "and G5 allows no correcting second emit (pass 12)")
         self.assertIn("re-vet", ctx)
         rc, ctx, _ = self.run_hook()
         self.assertIsNone(ctx, "after the visible rebuild, steady state is silent")
@@ -263,7 +265,9 @@ class HookE2E(unittest.TestCase):
         with open(self.bpath, "w") as fh:
             json.dump({"schema": 999999, "policy": 1, "entries": {}}, fh)
         rc, ctx, _ = self.run_hook()
-        self.assertIn("baselines reset", ctx, "version change must re-baseline VISIBLY (C7)")
+        self.assertIn("baselines are being reset", ctx,
+                      "version change must re-baseline VISIBLY (C7), and the "
+                      "line must not claim a store that has not run yet (pass 12)")
 
     def test_unreadable_skills_root_advises_and_preserves_baseline(self):
         if os.geteuid() == 0:
@@ -641,6 +645,23 @@ class HookE2E(unittest.TestCase):
             % sorted({"n%02d" % i for i in range(20)} - named))
         self.assertIsNone(self.run_hook()[1], "and then it settles")
 
+    def test_a_failed_store_is_not_announced_as_a_completed_one(self):
+        # ROUND-8 SCREEN pass 12. The first-run / corrupt / stale head lines are
+        # composed and emitted BEFORE store_baseline runs, and G5's single-JSON
+        # emit means no correction can follow a successful print. So a store
+        # that then fails left the session told something was "recorded",
+        # "rebuilt" or "reset" when nothing was. The wording is now
+        # non-perfective, which is the only honest option under G5.
+        self.mkskill(self.G, "alpha")
+        rc, ctx, _ = self.run_hook()
+        self.assertEqual(0, rc)
+        self.assertIsNotNone(ctx)
+        for perfective in ("recorded as the baseline", "has been rebuilt",
+                           "baselines reset"):
+            self.assertNotIn(perfective, ctx,
+                             "a pre-store line must not claim a completed write")
+        self.assertIn("are being baselined", ctx)
+
     def test_a_contended_run_is_recorded_in_the_audit_log(self):
         # ROUND-8 SCREEN, third family. The READMEs point at advisory.log and say
         # the vetting hook's advisories are "auditable instead of invisible".
@@ -663,6 +684,23 @@ class HookE2E(unittest.TestCase):
         self.assertTrue(os.path.exists(log), "the contended advisory must be logged")
         with open(log) as fh:
             self.assertIn("SKIPPED scan", fh.read())
+
+    def test_a_failed_store_is_not_announced_as_a_completed_one(self):
+        # ROUND-8 SCREEN pass 12. The first-run / corrupt / stale head lines are
+        # composed and emitted BEFORE store_baseline runs, and G5's single-JSON
+        # emit means no correction can follow a successful print. So a store
+        # that then failed left the session told something was "recorded",
+        # "rebuilt" or "reset" when nothing was. Non-perfective wording is the
+        # only honest option under G5's one-emit rule.
+        self.mkskill(self.G, "alpha")
+        rc, ctx, _ = self.run_hook()
+        self.assertEqual(0, rc)
+        self.assertIsNotNone(ctx)
+        for perfective in ("recorded as the baseline", "has been rebuilt",
+                           "baselines reset"):
+            self.assertNotIn(perfective, ctx,
+                             "a pre-store line must not claim a completed write")
+        self.assertIn("are being baselined", ctx)
 
     def test_lock_stale_takeover_is_KNOWN_BROKEN(self):
         # NOT a passing security property. This PINS A KNOWN DEFECT so the suite

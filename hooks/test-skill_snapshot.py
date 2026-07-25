@@ -430,36 +430,55 @@ class TreeObservation(Base):
         d2 = self.snap("s")["digest"]
         self.assertNotEqual(d1, d2, "the digest must bind POLICY_VERSION")
 
-    def test_walker_peak_open_fds_is_the_cap_plus_one(self):
-        # ROUND-8 SCREEN pass 11 (Fable). The fanout comment carried TWO peak
-        # counts that disagreed: MAX_OPEN_DIRS + 1 in snapshot_tree's docstring,
-        # and "+ the one being scanned + the one being opened" here. The guard
-        # runs BEFORE _opendir_nofollow, so when a child fd is opened the stack
-        # holds at most MAX_OPEN_DIRS - 1 and the true peak is the cap + 1.
-        # Pinned so the number in the comment is measured, not asserted.
-        self.patch_const("MAX_OPEN_DIRS", 4)
-        for i in range(20):
-            self.mk("s", "d%02d" % i, "x.md")
-        live, peak = [0], [0]
-        real_open, real_close = os.open, os.close
+    def test_walker_fd_use_is_bounded_by_a_constant(self):
+        # ROUND-8 SCREEN pass 12. The pass-11 version of this test asserted an
+        # exact peak of MAX_OPEN_DIRS + 1, and was wrong twice over: it wrapped
+        # os.open, which cannot see the descriptor os.scandir(dir_fd) DUPS for
+        # its iterator, and its fixture put every file one level BELOW the wide
+        # directory so a regular-file fd and a full pending stack were never
+        # live at once. Both raise the real count.
+        #
+        # So this measures the property that is actually load-bearing - fd use
+        # is bounded by a CONSTANT, not O(width) - by counting real descriptors
+        # at two caps and requiring the overhead above the cap to be identical.
+        # No exact total is pinned: it depends on CPython using fdopendir on a
+        # dup, which is an implementation detail this suite should not freeze.
+        if not os.path.isdir("/dev/fd"):
+            self.skipTest("no /dev/fd on this platform")
 
-        def counting_open(*a, **k):
-            fd = real_open(*a, **k)
-            live[0] += 1
-            peak[0] = max(peak[0], live[0])
-            return fd
+        def peak_for(cap):
+            self.patch_const("MAX_OPEN_DIRS", cap)
+            root = os.path.join(self.tmp, "c%d" % cap)
+            os.makedirs(root, exist_ok=True)
+            for i in range(cap * 3):            # far wider than the cap
+                os.makedirs(os.path.join(root, "d%02d" % i), exist_ok=True)
+            for i in range(6):                  # ...and files in the SAME dir
+                with open(os.path.join(root, "f%02d.md" % i), "w") as fh:
+                    fh.write("x")
+            seen, real_read = [0], os.read
 
-        def counting_close(fd):
-            live[0] -= 1
-            return real_close(fd)
+            def counting_read(fd, n):
+                try:
+                    seen[0] = max(seen[0], len(os.listdir("/dev/fd")))
+                except OSError:
+                    pass
+                return real_read(fd, n)
 
-        os.open, os.close = counting_open, counting_close
-        try:
-            ss.snapshot_tree(os.path.join(self.tmp, "s"))
-        finally:
-            os.open, os.close = real_open, real_close
-        self.assertEqual(5, peak[0],
-                         "walker peak must be MAX_OPEN_DIRS + 1, not + 2")
+            base = len(os.listdir("/dev/fd"))
+            os.read = counting_read
+            try:
+                ss.snapshot_tree(root)
+            finally:
+                os.read = real_read
+            return seen[0] - base
+
+        small, large = peak_for(4), peak_for(16)
+        self.assertEqual(
+            small - 4, large - 16,
+            "fd overhead above the cap must be a constant, not grow with it "
+            "(got %d over 4 and %d over 16)" % (small, large))
+        self.assertLess(small - 4, 8, "and a small one")
+
 
     def test_wide_tree_fd_fanout_fails_closed(self):
         # round-5 SV5-02: a tree wider than MAX_OPEN_DIRS at one level stops with
@@ -926,6 +945,37 @@ class CommandLine(Base):
         self.assertEqual(2, shared["entries"],
                          "both terminal candidates must charge the shared budget")
 
+    def test_record_refuses_a_loose_regular_file(self):
+        # ROUND-8 SCREEN pass 12. G1 carves loose regular files out of
+        # candidacy, so the hook never enumerates one — but `record` accepted a
+        # verdict against one, planting a baseline key no scan can match. The
+        # next SessionStart then pruned it with "skill X was removed" WHILE X
+        # sat on disk, wiping the adverse verdict. The CLI and the hook must
+        # agree on what a candidate is.
+        p = self.mk("loose-note.md", content=b"not a skill")
+        r = self.run_cli("record", "--scope", "global", "--name", "loose-note.md",
+                         "--dir", p, "--verdict", "BLOCK")
+        self.assertNotEqual(0, r.returncode)
+        self.assertIn("not a skill directory", r.stderr)
+        state, _ = ss.load_baseline(ss.baseline_path(self.cfg))
+        self.assertEqual("absent", state)
+
+    def test_status_does_not_claim_a_deleted_skill_is_installed(self):
+        # ROUND-8 SCREEN pass 12. `status` reads the baseline and never lstats,
+        # so the field could not honestly be called adverse_verdict_STILL_
+        # INSTALLED: a skill deleted after its BLOCK was reported unchanged.
+        d = os.path.dirname(self.mk("trojan", "SKILL.md"))
+        self.assertEqual(0, self.run_cli("record", "--scope", "global",
+                                         "--name", "trojan", "--dir", d,
+                                         "--verdict", "BLOCK").returncode)
+        shutil.rmtree(d)
+        out = json.loads(self.run_cli("status").stdout)
+        self.assertIn("adverse_verdicts_in_baseline", out)
+        self.assertNotIn("adverse_verdict_still_installed", out,
+                         "the field must not claim a presence check it never does")
+        self.assertTrue(out["adverse_verdicts_in_baseline"],
+                        "the verdict itself must still surface")
+
     def test_record_refuses_an_unnameable_dir(self):
         # ROUND-8 SCREEN pass 11b. The pass-11 fix RESOLVED `.`/`..` but
         # EXEMPTED an empty basename, which `--dir ""`, `--dir "/"` and
@@ -1029,8 +1079,8 @@ class CommandLine(Base):
         s = self.run_cli("status")
         out = json.loads(s.stdout)
         self.assertIn("malware BLOCK".split()[0],
-                      " ".join(out["adverse_verdict_still_installed"]))
-        self.assertIn("BLOCK", " ".join(out["adverse_verdict_still_installed"]))
+                      " ".join(out["adverse_verdicts_in_baseline"]))
+        self.assertIn("BLOCK", " ".join(out["adverse_verdicts_in_baseline"]))
         self.assertEqual([], out["unvetted"])
         self.assertEqual(3, s.returncode,
                          "an installed skill judged unsafe must fail closed")
