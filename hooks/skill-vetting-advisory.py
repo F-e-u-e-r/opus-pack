@@ -24,8 +24,8 @@ budget breach, ANY symlink, a special file (FIFO/socket/device), a hostile or
 undecodable name (shown only as an opaque id); an unreadable/corrupt/stale
 baseline. An anomalous tree can never be certified unchanged, so it re-advises
 EVERY session until the anomaly is resolved — deliberate for a tree that cannot
-be fully observed. A clean, unchanged, or (documented limit) first-run
-bootstrap is SILENT; the hook NEVER blocks and NEVER emits a "safe" line.
+be fully observed. A clean, unchanged tree is SILENT; a first run emits one
+labelled bootstrap line. The hook NEVER blocks and NEVER emits a "safe" line.
 
 Watched roots: `$CLAUDE_CONFIG_DIR/skills` (default `~/.claude/skills`) and
 `$CLAUDE_PROJECT_DIR/.claude/skills` (falling back to the hook payload's `cwd`,
@@ -47,10 +47,12 @@ Known limits (documented, not hidden):
   trust level, and same-privilege local code can rewrite any of them. The
   advisory posture is a tripwire against upstream/content changes, not a
   defense against code already running as you.
-- First run (no baseline file) bootstraps SILENTLY — a skill already present
-  at install time is baselined, not flagged. Run the `skill-vetting` skill on
-  anything present but not yet reviewed; `skill_snapshot.py status` lists
-  entries never recorded as vetted.
+- First run (no baseline file) records what is already installed as the
+  baseline WITHOUT reviewing it, and emits ONE line saying so with the count.
+  It is not silent (round 6: a silent bootstrap was reachable a second time
+  after a failed first write, which then swallowed a change). Run the
+  `skill-vetting` skill on anything present but not yet reviewed;
+  `skill_snapshot.py status` lists entries never recorded as vetted.
 - A delivered advisory is not re-raised once baselined (advisory posture): the
   skill's §3 verdict binding, not this hook, carries the re-vet duty. The
   baseline records per-skill status (baseline/seen/vetted; `record` flips to
@@ -371,6 +373,14 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                     status = "seen"
                 else:
                     status = old["status"]       # unchanged: keep status+verdict
+                if partial and old is None:
+                    # Never seen before AND not observed this run: recording the
+                    # content-independent placeholder as this skill's digest
+                    # would make a later real observation compare equal to it.
+                    # Leave it out of the baseline entirely so the next run
+                    # treats it as new (round 7 - the round-6 fix only covered
+                    # the case where a prior real record existed).
+                    continue
                 if partial and old is not None:
                     entry = dict(old)           # not observed: keep the real record
                 else:
@@ -440,21 +450,35 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
         # while the baseline advanced anyway (round 6). Any delta that still
         # does not fit is REVERTED in the baseline, so it is genuinely pending
         # rather than silently consumed — this is what makes G5 literal.
+        # Budget the slots UP FRONT so the total can never exceed MAX_LISTED.
+        # Round 7: truncating the composed list afterwards was wrong twice over
+        # - it discarded the summary lines that carry the counts, and it dropped
+        # delta lines whose baseline entries had already been advanced, which is
+        # exactly the G5 hole round 6 closed. Reserve a slot for each summary
+        # that will actually be needed, then allocate.
         room = max(1, MAX_LISTED - len(head_lines))
-        shown_deltas = delta_lines[:max(0, room - (1 if anomaly_lines else 0))]
+        anom_reserve = 1 if anomaly_lines else 0
+        delta_room = max(0, room - anom_reserve)
+        if len(delta_lines) > delta_room:
+            shown_deltas = delta_lines[:max(0, delta_room - 1)]   # 1 slot: summary
+        else:
+            shown_deltas = delta_lines
+        # Whatever did not fit is PUT BACK, so it is pending rather than
+        # consumed - an undelivered add stays new, an undelivered change or
+        # removal keeps its prior entry and re-advises next session.
         for _l, key, prior in delta_lines[len(shown_deltas):]:
             if prior is None:
-                new_entries.pop(key, None)       # undelivered add: stays new
+                new_entries.pop(key, None)
             else:
-                new_entries[key] = prior         # undelivered change/removal
+                new_entries[key] = prior
         lines = head_lines + [l for l, _k, _p in shown_deltas]
         held = len(delta_lines) - len(shown_deltas)
+        total = len(delta_lines) + len(anomaly_lines)
         if held:
             # The cap may hide LINES; it must never hide COUNTS.
             lines.append("...and %d further new/changed/removed skill(s) held "
                          "back for the next session — %d total; run the "
-                         "skill-vetting skill on ALL of them"
-                         % (held, len(delta_lines) + len(anomaly_lines)))
+                         "skill-vetting skill on ALL of them" % (held, total))
         left = MAX_LISTED - len(lines)
         if anomaly_lines:
             if len(anomaly_lines) <= left:
@@ -465,7 +489,7 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 lines.append("...and %d more skill(s) that cannot be certified "
                              "unchanged — %d total; run the skill-vetting skill "
                              "on ALL of them"
-                             % (len(anomaly_lines) - keep, len(anomaly_lines)))
+                             % (len(anomaly_lines) - keep, total))
         if lines:
             shown = lines
             if not _emit(shown):

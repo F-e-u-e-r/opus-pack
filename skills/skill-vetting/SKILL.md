@@ -189,8 +189,9 @@ files, hostile names) as an **anomaly that always advises and can never be
 certified unchanged**. For a new, changed, removed, or anomalous skill it injects
 one line routing to THIS skill; names are shown only when they pass a strict
 ASCII allowlist, otherwise as an opaque id, and content is never echoed. It
-**never blocks and never emits a "safe" line**; a clean, unchanged, or
-(documented limit) first-run-baseline run is silent; a corrupt or
+**never blocks and never emits a "safe" line**; a clean, unchanged run is silent, while a
+first run emits one labelled line naming how many installed skills it recorded
+as the baseline without review; a corrupt or
 version-stale baseline advises and resets VISIBLY, never silently; the advisory
 prints before the baseline advances, so a failed delivery re-advises next
 session. The baseline is NOT tamper-evident - it shares a trust level with the

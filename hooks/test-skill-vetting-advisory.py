@@ -522,6 +522,33 @@ class HookE2E(unittest.TestCase):
         self.assertIn("victim", ctx, "a real change must not be evicted")
         self.assertIn("goner", ctx, "a removal must not be evicted")
 
+    def test_the_advisory_never_exceeds_the_display_cap(self):
+        # ROUND-7 REGRESSION GUARD. The round-6 slot arithmetic could emit nine
+        # items (head + deltas + a held-back summary + an anomaly summary), and
+        # the first attempt to cap it truncated the COMPOSED list - which
+        # discarded the count-carrying summaries AND dropped delta lines whose
+        # baseline entries had already advanced, reopening the G5 hole. The cap
+        # must be enforced by the allocation, with nothing consumed unnamed.
+        import itertools
+        for n_delta, n_anom in itertools.product((0, 1, 7, 8, 20), (0, 1, 9)):
+            with self.subTest(deltas=n_delta, anomalies=n_anom):
+                self.setUp()
+                self.run_hook()
+                for i in range(n_anom):
+                    d = self.mkskill(self.G, "a%02d" % i)
+                    os.symlink("x", os.path.join(d, "link"))
+                self.run_hook()          # anomalies become steady state
+                for i in range(n_delta):
+                    self.mkskill(self.G, "d%02d" % i)
+                ctx = self.run_hook()[1]
+                if ctx is None:
+                    continue
+                items = ctx.split("): ", 1)[1].split(" | ")
+                self.assertLessEqual(
+                    len(items), 8,
+                    "%d deltas + %d anomalies emitted %d items"
+                    % (n_delta, n_anom, len(items)))
+
     def test_an_undelivered_delta_is_not_consumed(self):
         # The general form of G5: whatever the cap holds back must still be
         # pending, not silently baselined.
@@ -543,6 +570,38 @@ class HookE2E(unittest.TestCase):
             "these were consumed without ever being named: %s"
             % sorted({"n%02d" % i for i in range(20)} - named))
         self.assertIsNone(self.run_hook()[1], "and then it settles")
+
+    def test_a_partial_snap_is_not_baselined_on_first_observation(self):
+        # ROUND-7: the round-6 fix only protected a candidate that already had a
+        # real record. On FIRST observation `old is None`, so the constant
+        # content-independent placeholder was stored as that skill's digest and
+        # a later real observation compared equal to it.
+        tools = os.path.join(self.tmp, "tools")
+        os.makedirs(tools)
+        for name in ("skill_snapshot.py", "skill-vetting-advisory.py"):
+            src = open(os.path.join(HOOKS, name)).read()
+            if name == "skill_snapshot.py":
+                s2 = src.replace("MAX_ENTRIES = 4096", "MAX_ENTRIES = 1", 1)
+                self.assertNotEqual(src, s2, "MAX_ENTRIES anchor moved")
+                src = s2
+            with open(os.path.join(tools, name), "w") as fh:
+                fh.write(src)
+        for n in ("one", "two"):
+            self.mkskill(self.G, n)
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": self.home,
+               "CLAUDE_CONFIG_DIR": self.cfg, "CLAUDE_PROJECT_DIR": self.projA}
+        subprocess.run([PY, os.path.join(tools, "skill-vetting-advisory.py")],
+                       input=b"{}", env=env, cwd=self.neutral,
+                       capture_output=True, timeout=60)
+        stored = {e["name"] for e in self.read_baseline()["entries"].values()}
+        self.assertLess(len(stored), 2,
+                        "premise: the tiny budget left at least one unobserved")
+        # A healthy run must still see the unobserved one as NEW.
+        ctx = self.run_hook()[1]
+        missing = {"one", "two"} - stored
+        for n in missing:
+            self.assertIn(n, ctx or "",
+                          "%s was baselined from a placeholder and went silent" % n)
 
     def test_a_partial_scan_does_not_destroy_a_recorded_verdict(self):
         # round-6: a RESOURCE-budget exhaustion gives every remaining candidate
