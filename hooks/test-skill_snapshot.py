@@ -430,6 +430,37 @@ class TreeObservation(Base):
         d2 = self.snap("s")["digest"]
         self.assertNotEqual(d1, d2, "the digest must bind POLICY_VERSION")
 
+    def test_walker_peak_open_fds_is_the_cap_plus_one(self):
+        # ROUND-8 SCREEN pass 11 (Fable). The fanout comment carried TWO peak
+        # counts that disagreed: MAX_OPEN_DIRS + 1 in snapshot_tree's docstring,
+        # and "+ the one being scanned + the one being opened" here. The guard
+        # runs BEFORE _opendir_nofollow, so when a child fd is opened the stack
+        # holds at most MAX_OPEN_DIRS - 1 and the true peak is the cap + 1.
+        # Pinned so the number in the comment is measured, not asserted.
+        self.patch_const("MAX_OPEN_DIRS", 4)
+        for i in range(20):
+            self.mk("s", "d%02d" % i, "x.md")
+        live, peak = [0], [0]
+        real_open, real_close = os.open, os.close
+
+        def counting_open(*a, **k):
+            fd = real_open(*a, **k)
+            live[0] += 1
+            peak[0] = max(peak[0], live[0])
+            return fd
+
+        def counting_close(fd):
+            live[0] -= 1
+            return real_close(fd)
+
+        os.open, os.close = counting_open, counting_close
+        try:
+            ss.snapshot_tree(os.path.join(self.tmp, "s"))
+        finally:
+            os.open, os.close = real_open, real_close
+        self.assertEqual(5, peak[0],
+                         "walker peak must be MAX_OPEN_DIRS + 1, not + 2")
+
     def test_wide_tree_fd_fanout_fails_closed(self):
         # round-5 SV5-02: a tree wider than MAX_OPEN_DIRS at one level stops with
         # a `fanout` anomaly (bounded fds; the reason was `budget` until round 7),

@@ -450,18 +450,25 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                             # this only trips a pathological tree.
                             if len(stack) >= MAX_OPEN_DIRS:
                                 # STRUCTURAL refusal like the depth cap above:
-                                # stop widening THIS directory (which is what
-                                # bounds the fds: peak is MAX_OPEN_DIRS pending
-                                # + the one being scanned) and mark it anomalous with its
-                                # own `fanout` reason (round 7 - it used to be
-                                # reported as `budget`), without
-                                # setting the shared stop that would blind every
-                                # other candidate (round 6). Peak walker-held
-                                # dir fds stay bounded at MAX_OPEN_DIRS pending
-                                # + the one being scanned + the one being
-                                # opened - a constant, as measured, though not
-                                # literally MAX_OPEN_DIRS as the round-5 comment
-                                # claimed.
+                                # stop widening THIS directory - which is what
+                                # bounds the fds - and mark it anomalous with
+                                # its own `fanout` reason (round 7; it used to
+                                # be reported as `budget`), WITHOUT setting the
+                                # shared stop that would blind every other
+                                # candidate (round 6).
+                                #
+                                # Walker-held peak is MAX_OPEN_DIRS + 1: at most
+                                # MAX_OPEN_DIRS pending on the stack, plus the
+                                # one being scanned. Not +2 - this guard runs
+                                # BEFORE _opendir_nofollow, so at the instant a
+                                # child fd is opened the stack holds at most
+                                # MAX_OPEN_DIRS - 1. Measured: with the cap at
+                                # 4, peak concurrently-open fds is 5. (An
+                                # earlier wording here said "+ the one being
+                                # opened", contradicting the +1 in
+                                # snapshot_tree's docstring 150 lines above -
+                                # round-8 screen, pass 11.) scan_root holds its
+                                # enumeration-root fd on top of that.
                                 anomalies.append(("fanout", childrel))
                                 _entry(entries, anomalies, budget, childrel, b"A", b"fanout")
                                 break
