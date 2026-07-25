@@ -730,14 +730,17 @@ class HookE2E(unittest.TestCase):
             self.assertIn(n, ctx or "",
                           "%s was baselined from a placeholder and went silent" % n)
 
-    def test_every_anomaly_class_actually_advises(self):
+    def test_six_anomaly_classes_advise_through_the_real_hook(self):
         # THE GAP THAT LET THE REGRESSION SHIP. The threat model claims "Anomaly
         # => advise is asserted per class, not in aggregate", and it was not:
         # the suite asserted advise for symlink, unreadable, root-symlink,
         # badname and corrupt/stale baseline, and for NO resource/structural
         # class. So when a round-7 fix made an over-budget candidate skip the
         # advisory entirely, 42 green tests kept vouching for "always advises".
-        # One case per class, driven through the real hook.
+        # One fixture per class. SIX classes, not every one the hook can
+        # produce: `budget` has its own test below, and the root-level classes
+        # (root-symlink / root-notdir / root-unreadable / root-overfull) have
+        # theirs.
         cases = {}
 
         d = self.mkskill(self.G, "c_symlink")

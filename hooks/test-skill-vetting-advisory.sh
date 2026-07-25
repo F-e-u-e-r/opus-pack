@@ -2,7 +2,9 @@
 # Regression suite for hooks/skill-vetting-advisory.py — a PURE-ADVISORY
 # SessionStart delta-detector (signature scanning removed: not a security
 # boundary). Covers both sides of the advisory contract (silent and advisory)
-# and every fail-closed path: whole-tree deltas (add/modify/delete/rename,
+# and the fail-closed paths the threat model promises, with the two exceptions
+# it records as open (G3-SHELL has no test in either suite; I11 is NOT MET, so
+# the lock carries a known-broken pin rather than an assertion): whole-tree deltas (add/modify/delete/rename,
 # not just SKILL.md), anomalies (symlink/special/unreadable/oversize/hostile
 # names) always advising, corrupt/stale baseline surfacing visibly,
 # delivery-before-baseline-advance, env-based root resolution

@@ -9,7 +9,7 @@ that are themselves defective:
 | round | what the fold did | what the next round found |
 |---|---|---|
 | 5 | fixed a trailing-slash symlink laundering with `os.path.normpath` | `normpath("") == "."`, turning a fail-closed empty path into a clean digest of the CWD with exit 0 |
-| 6 | fixed an arbitrary-code-execution finding by double-quoting the placeholders | double quotes do not stop `$(...)`; the RCE was never fixed, and the verification used the one metacharacter double quotes DO stop |
+| 6 | fixed an arbitrary-code-execution finding by double-quoting the placeholders | double quotes do not stop `$(...)`; the RCE was never fixed, and the verification used `;` — one of the many metacharacters double quotes DO neutralise, unlike the `$`, backtick, backslash and closing `"` that carry the attack |
 | 6 | added a display shape cap, a lock, and nine other fixes | the cap rejected ordinary names while admitting instruction-shaped ones; the lock granted the critical section to both racers; six fixes were incomplete |
 
 Of round 6's twelve fixes, **three were defective and six more were incomplete**;
@@ -279,8 +279,10 @@ content in place, before any decision exists.
   step-5 verdict exists, so the payload executes during the procedure meant to
   decide whether it may run.
 - §3 USED TO claim that `--expect-digest` "refuses if the tree changed since
-  you read it" (corrected in `f83925c`; the CLI's own message was corrected in
-  the round-8 screen). The MECHANISM limitation it described remains, which is
+  you read it" (corrected in `f83925c`, which also gave §3 an interim remedy: run
+  `digest` BEFORE the full read as well as after, so two matching digests
+  bracket the read window; the CLI's own message was corrected in the round-8
+  screen). The MECHANISM limitation it described remains, which is
   why D4 exists: it refuses only if the tree changed since the `digest` RUN, and
   §1 orders that run at step 5, AFTER the step-2 read. A mutation inside the
   read window is invisible.

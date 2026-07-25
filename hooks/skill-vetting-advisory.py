@@ -55,14 +55,16 @@ Known limits (documented, not hidden):
   defense against code already running as you.
 - First run (no baseline file) records the installed skills it could snapshot as
   the baseline WITHOUT reviewing them, and emits ONE line saying so with that
-  count. "Snapshot" is wider than "observe": the count also includes candidates
-  that produced a COMPLETE observation of something unobservable - an unreadable
-  directory, a symlink, a special file, a hostile name - because those have a
-  real content-dependent digest and are baselined. Each of them also advises
-  through its own anomaly line, so nothing in the count is trusted silently. A candidate the scan could not observe (a resource-budget breach, say)
-  is deliberately NOT recorded - baselining a placeholder digest would make a
-  later real observation compare equal to it - so it is not in that count; it
-  advises through its own anomaly line instead. So a first run over EMPTY or
+  count. "Snapshot" is wider than "observe": the count ALSO includes candidates
+  whose observation was complete but adverse - an unreadable directory, a
+  symlink, a special file, a hostile name - because for each of those the scan
+  established everything it could about THAT candidate, so recording it is
+  meaningful. What it EXCLUDES is a candidate lost to a resource-budget
+  short-circuit, whose digest would describe the state of the RUN rather than
+  the tree; recording that would make a later real observation compare equal to
+  a placeholder. Every excluded candidate still advises through its own anomaly
+  line, so nothing in the count, and nothing left out of it, is trusted
+  silently. So a first run over EMPTY or
   missing skills roots is fully silent - there is nothing recorded without
   review, hence nothing to announce - and a first run in which candidates
   existed but none was observable emits their anomaly lines and no count line.
@@ -401,7 +403,8 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                 old = old_entries.get(key)
                 is_new = old is None
                 # A `partial` snap's digest describes the SCAN STATE, not the
-                # tree: a resource-budget short-circuit yields one constant,
+                # tree: the candidate the stop lands inside is incomplete, and
+                # every candidate enumerated after it shares ONE constant,
                 # content-independent digest. Never let it decide "changed", and
                 # never let it overwrite a real recorded digest - otherwise a
                 # later genuine change compares equal to the placeholder and is

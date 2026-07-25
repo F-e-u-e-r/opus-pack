@@ -335,8 +335,9 @@ was the problem.
 
 **G3-SHELL has NO test in either suite** — nothing composes the procedure's
 shipped command templates and runs them against a hostile directory name, which
-is why the round-6 remedy for it could ship broken and be "verified" with the
-one metacharacter it happened to stop. Closing G3-SHELL (design D1) must land
+is why the round-6 remedy for it could ship broken and be "verified" with `;` —
+one of the many metacharacters double quotes DO neutralise, unlike the four
+that carry the attack. Closing G3-SHELL (design D1) must land
 with that test. With that exception stated, every goal and invariant above maps
 to a named executable test in
 `hooks/test-skill_snapshot.sh` (primitive matrix) or

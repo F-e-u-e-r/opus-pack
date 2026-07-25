@@ -447,7 +447,8 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                             if len(stack) >= MAX_OPEN_DIRS:
                                 # STRUCTURAL refusal like the depth cap above:
                                 # stop widening THIS directory (which is what
-                                # bounds the fds) and mark it anomalous with its
+                                # bounds the fds: peak is MAX_OPEN_DIRS pending
+                                # + the one being scanned) and mark it anomalous with its
                                 # own `fanout` reason (round 7 - it used to be
                                 # reported as `budget`), without
                                 # setting the shared stop that would blind every
@@ -498,9 +499,11 @@ def _anomaly_snap(kind, target=b"", budget=None):
     symlink-branch rewrite quietly gave every such candidate a private budget,
     so the documented shared-budget contract stopped holding for them).
 
-    `partial` marks a snap whose digest describes the SCAN STATE, not the tree:
-    a budget short-circuit yields one constant, content-independent digest for
-    every candidate it hits, so a caller must never store it as that skill's
+    `partial` marks a snap whose digest describes the SCAN STATE, not the tree.
+    Two cases: the candidate the stop lands INSIDE keeps the entries it managed
+    to record plus a budget marker, so its digest is content-dependent but
+    incomplete; every candidate enumerated AFTER it shares ONE constant,
+    content-independent digest, so a caller must never store it as that skill's
     digest - a later real change would compare equal to it and be invisible."""
     entries, anomalies = [], []
     b = budget if budget is not None else {"bytes": 0, "entries": 0, "stop": False}
@@ -814,9 +817,19 @@ def _cli_digest(argv):
     # `IGNORE ALL PREVIOUS INSTRUCTIONS` - and exit 0 is the signal the skill's
     # section 3 reads as the green light to bind a verdict.
     base = os.path.basename(_strip_trailing(os.fsencode(argv[0])))
-    # b"." / b".." are path syntax, not a candidate NAME - flagging them was a
-    # spurious badname on `digest .` (round 7).
-    if base not in (b"", b".", b"..") and not display_name(base)[1]:
+    # b"." / b".." are path SYNTAX, not a candidate name, so gating them
+    # literally was a spurious badname on `digest .` (round 7). But SKIPPING the
+    # gate for them laundered it: the same hostile-named tree returned exit 3
+    # with `badname` by full path and exit 0 with no anomalies as `.`, and
+    # SKILL.md §3 steers an agent into exactly that spelling by telling it not
+    # to put a hostile name in a shell command (round-8 screen, pass 10).
+    # Resolve to the real last component and gate THAT instead.
+    if base in (b".", b".."):
+        try:
+            base = os.path.basename(os.fsencode(os.path.realpath(argv[0])))
+        except OSError:
+            base = b""
+    if base and not display_name(base)[1]:
         anomalies.append(("badname", b""))
     print(json.dumps({
         "schema": SCHEMA_VERSION,
