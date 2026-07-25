@@ -564,6 +564,31 @@ class HookE2E(unittest.TestCase):
                       "a change to an anomalous skill was consumed with no "
                       "delivered signal (%s stayed hidden)" % victim)
 
+    def test_unconsumable_candidates_cannot_starve_a_real_delta(self):
+        # ROUND-8 SCREEN pass 9, two-sided. The pass-8 fix put anomalous
+        # new/changed candidates at the FRONT of the transient queue. But a
+        # resource-budget `partial` candidate is never consumed (its baseline
+        # write is skipped), so it re-appears as "new" every session and
+        # re-claimed those same front slots forever: with enough of them a
+        # genuinely new, cleanly observed skill was reverted every run and NEVER
+        # named, while the advisory kept saying it was held back for next time.
+        # The axis is not anomalous vs clean, nor new vs unchanged - it is
+        # whether THIS run's baseline advance will consume it.
+        for i in range(25):
+            d = self.mkskill(self.G, "b%02d" % i)
+            for j in range(400):        # unpatched MAX_ENTRIES = 4096
+                with open(os.path.join(d, "f%03d" % j), "w") as fh:
+                    fh.write("x")
+        self.run_hook()
+        self.run_hook()
+        self.mkskill(self.G, "zz-newskill")
+        for attempt in range(4):
+            ctx = self.run_hook()[1]
+            if ctx and "zz-newskill" in ctx:
+                return
+        self.fail("a cleanly observed new skill was starved by candidates that "
+                  "can never be consumed")
+
     def test_the_advisory_never_exceeds_the_display_cap(self):
         # ROUND-7 REGRESSION GUARD. The round-6 slot arithmetic could emit nine
         # items (head + deltas + a held-back summary + an anomaly summary), and

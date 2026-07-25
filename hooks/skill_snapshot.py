@@ -293,8 +293,10 @@ def snapshot_tree(root, budget=None):
     Directory descent goes ONLY through O_NOFOLLOW-verified directory fds, so a
     directory swapped for a symlink mid-scan is never traversed as the original
     tree (it becomes an anomaly). Peak concurrently-open dir fds are bounded by
-    MAX_OPEN_DIRS (fail-closed past it), so a very wide/bushy tree cannot
-    exhaust the fd table. `budget` may be a shared dict to bound work across many
+    MAX_OPEN_DIRS pending fds plus the one currently being scanned - so the
+    true peak is MAX_OPEN_DIRS + 1, and `scan_root` holds its enumeration-root
+    fd on top of that. Bounded by a constant either way, which is the property
+    that matters, but the cap is not literally the peak. `budget` may be a shared dict to bound work across many
     candidates in one run; when omitted, a per-candidate budget is used. A
     caller-supplied budget already exhausted short-circuits to a budget
     anomaly. A trailing slash / "/." on `root` is normalized away first, so a

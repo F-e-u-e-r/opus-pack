@@ -388,7 +388,10 @@ record: `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md`).
 primitive snapshots every file under each entry of the watched skills roots
 (`$CLAUDE_CONFIG_DIR/skills`, default `~/.claude/skills`, plus the project's
 `.claude/skills` via `$CLAUDE_PROJECT_DIR`), so an add / modify / delete /
-rename / symlink / filetype change anywhere — not just in `SKILL.md` — counts,
+rename / symlink / filetype change anywhere inside a skill — not just in its
+`SKILL.md` — counts (one carve-out, stated under G1 in the threat model: a loose
+regular file sitting directly in the skills root is not a candidate at all,
+because it is not loadable as a skill),
 and whatever cannot be fully observed (a read error, an oversize file, a scan-budget
 breach and everything enumerated after it, any
 symlink, a special file, a hostile TOP-LEVEL skill name — nested names are not

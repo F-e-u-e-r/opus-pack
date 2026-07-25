@@ -40,7 +40,11 @@ tracked = [
 
 # 1. Every skill has a CLOSED frontmatter block (byte-exact fences) whose
 #    interior carries exactly one name: (== directory) and exactly one
-#    single-line description: long enough to be a load trigger. A trailing
+#    description: long enough to be a load trigger. NOTE what this does NOT
+#    establish: it collects lines matching ^description:(\s|$) and measures the
+#    remainder of THAT line, so a YAML continuation on the following lines is
+#    neither seen nor rejected - "single-line" describes what is measured, not
+#    a property that is enforced (round-8 screen). A trailing
 #    " #" comment is stripped before judging the value (YAML semantics);
 #    a bare "name:" counts as a duplicate entry, not nothing. Single-line
 #    description is a deliberate house-style tripwire (skill-authoring:

@@ -53,9 +53,13 @@ Known limits (documented, not hidden):
   trust level, and same-privilege local code can rewrite any of them. The
   advisory posture is a tripwire against upstream/content changes, not a
   defense against code already running as you.
-- First run (no baseline file) records the installed skills it could OBSERVE as
+- First run (no baseline file) records the installed skills it could snapshot as
   the baseline WITHOUT reviewing them, and emits ONE line saying so with that
-  count. A candidate the scan could not observe (a resource-budget breach, say)
+  count. "Snapshot" is wider than "observe": the count also includes candidates
+  that produced a COMPLETE observation of something unobservable - an unreadable
+  directory, a symlink, a special file, a hostile name - because those have a
+  real content-dependent digest and are baselined. Each of them also advises
+  through its own anomaly line, so nothing in the count is trusted silently. A candidate the scan could not observe (a resource-budget breach, say)
   is deliberately NOT recorded - baselining a placeholder digest would make a
   later real observation compare equal to it - so it is not in that count; it
   advises through its own anomaly line instead. So a first run over EMPTY or
@@ -460,7 +464,18 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                     # and could never re-fire. That is the round-6 budget
                     # poisoner, residual: round 6 protected clean deltas from
                     # eviction and left changes riding on anomaly lines exposed.
-                    if state == "ok" and (is_new or is_changed):
+                    # ...but ONLY if this run will actually consume it. A
+                    # candidate whose baseline write is skipped (an unobservable
+                    # `partial` one) is never consumed, so it re-appears as
+                    # "new" every session: putting it in the transient queue
+                    # made it re-claim the same front slots forever, and with
+                    # enough of them a genuinely new, cleanly observed skill was
+                    # reverted every run and NEVER named — while the advisory
+                    # kept saying it was "held back for the next session".
+                    # Round-8 screen, pass 9: the axis is not anomalous vs
+                    # clean, and not even new vs unchanged — it is WILL THIS
+                    # RUN'S BASELINE ADVANCE CONSUME IT.
+                    if state == "ok" and (is_new or is_changed) and not skip_baseline:
                         # ...and it goes to the FRONT of the transient queue:
                         # among lines that fire once, one that also cannot be
                         # certified is the higher signal, which is the round-2/3
