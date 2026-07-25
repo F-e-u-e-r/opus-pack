@@ -8,7 +8,10 @@ load/store. Its LIBRARY core is policy-free (it decides no verdicts); the CLI
 adds a thin verdict-recording convenience (`record`/`status`) so the
 skill-vetting skill's §3 binding is executable - for a candidate whose own name
 passes the display gate. For a hostile-named one it is NOT: `digest` reports
-`badname` however it is addressed, and `record` would need that name on a
+`badname` for every addressing form the procedure sanctions (one limit, in §3:
+a candidate that is ITSELF a symlink and entered with `cd` cannot be recovered
+by name from inside the process - `.` is already the resolved target - so that
+spelling is refused rather than digested), and `record` would need that name on a
 command line, which §3 forbids. Such a candidate gets a prose BLOCK and no
 digest binding; closing that is design item D1. The hook itself is a thin
 dispatcher and contains no filesystem-walking logic of its own. Design record:
@@ -285,7 +288,11 @@ def _opendir_nofollow(name, dir_fd, anomalies, rel):
 
 def snapshot_tree(root, budget=None):
     """Snapshot one top-level skill candidate (dir, file, or symlink) at
-    bytes-path `root`. Returns {"digest", "entries", "anomalies"} where
+    bytes-path `root`. Returns {"digest", "entries", "anomalies", "partial"}.
+    `partial` is True when the digest describes the SCAN STATE rather than the
+    tree (a resource-budget short-circuit): a caller must never store it as that
+    skill's digest, which is what I9 hangs on. The other keys are as follows,
+    where
     anomalies is a list of (reason, rel_path_bytes) with stable reason codes:
     unreadable / oversize / budget / depth / fanout / symlink / special / root.
     NOT `badname`: since round 6 a NESTED name is never display-gated (its bytes
@@ -942,7 +949,14 @@ def _cli_record(argv):
     # label past the badname refusal below (round-4 SV4-08), and not a path
     # syntax token, which would bind the verdict to a slot no skill occupies
     # (round-8 screen pass 11).
-    dir_base = os.path.basename(_strip_trailing(os.fsencode(args["dir"])))
+    # Normalise ONCE, here, and use `dirb` for every later decision. The
+    # loose-file guard used to classify the RAW string with os.path.isfile while
+    # dir_base and snapshot_tree both stripped first, so a single trailing slash
+    # made isfile() false (ENOTDIR) while everything else still resolved to the
+    # file - and the guard was bypassed (round-8 screen, pass 13; found by two
+    # families independently). One normalisation, one meaning.
+    dirb = _strip_trailing(os.fsencode(args["dir"]))
+    dir_base = os.path.basename(dirb)
     # `.` / `..` are path SYNTAX, not a name. Pass 10 taught this lesson on
     # `digest` and the same fix was owed here: taking them literally let
     # `record --name . --dir .` bind a verdict under name_key(b"."), a slot no
@@ -989,7 +1003,7 @@ def _cli_record(argv):
             print("scope must be 'global' or 'proj:<project-root-path>'", file=sys.stderr)
             return 2
         scope = scope_id(os.fsencode(scope[len("proj:"):]))
-    snap = snapshot_tree(args["dir"])
+    snap = snapshot_tree(dirb)
     # A path that could not even be lstat-ed comes back with the single `root`
     # anomaly and ONE constant digest shared by every missing path. That refused
     # SAFE-TO-PROPOSE but not BLOCK/SUSPECT, so a mistyped or since-deleted
@@ -1005,7 +1019,12 @@ def _cli_record(argv):
     # next SessionStart pruned it with the line "skill X was removed" - while X
     # sat on disk - wiping the adverse verdict (round-8 screen, pass 12). Refuse
     # here so the CLI and the hook agree on what a candidate is.
-    if os.path.isfile(args["dir"]) and not os.path.islink(args["dir"]):
+    try:
+        _lst = os.lstat(dirb)
+        _is_loose_file = stat.S_ISREG(_lst.st_mode)
+    except OSError:
+        _is_loose_file = False
+    if _is_loose_file:
         print("REFUSED: --dir is a regular file, not a skill directory. A loose "
               "file under a skills root is not loadable as a skill and is never "
               "a candidate, so a verdict recorded against it would be pruned as "

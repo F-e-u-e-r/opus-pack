@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Repo consistency checks. Run locally or in CI: python3 .github/checks.py
 
-Scope: what the published repo carries, enumerated via `git ls-files` (the
+Scope: what the published repo carries. NOTE which checks actually use that
+enumeration: only the plugin-reachability check and the hidden-directive sweep
+read the `tracked` list. Skill discovery and hook-entry discovery walk the
+WORKING TREE with os.listdir, so an untracked directory under a skills root, or
+an untracked script under hooks/, is seen by those and invisible to these
+(round-8 screen, pass 13). Tracked-file enumeration is via `git ls-files` (the
 .claude/ live-install copy and the private evals are gitignored - keeping
 those in sync is a local concern, not a repo one). Fail direction: every
 check fails CLOSED on what it claims to cover - a tracked file the sweep
@@ -429,8 +434,16 @@ if isinstance(plugin, dict) and "hooks" not in plugin and not os.path.exists(os.
 #    the same finding, and the shadowed copy was dead for several commits.
 import collections as _collections
 for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisory.py"):
-    _names = re.findall(r"^    def (test_\w+)\(", open(_suite).read(), re.M)
+    _src = open(_suite).read()
+    _names = re.findall(r"^    def (test_\w+)\(", _src, re.M)
+    # A duplicate CLASS name shadows exactly as silently as a duplicate method:
+    # Python keeps the last, and every test method on the earlier class stops
+    # running while the file still shows them. Same failure, same invisibility
+    # (round-8 screen, pass 13).
+    _classes = re.findall(r"^class (\w+)\(", _src, re.M)
     _dupes = sorted(n for n, c in _collections.Counter(_names).items() if c > 1)
+    _dupes += sorted("class " + n for n, c in _collections.Counter(_classes).items()
+                     if c > 1)
     if _dupes:
         fail("%s defines these tests more than once, so the earlier copy is "
              "dead code Python never runs: %s" % (_suite, ", ".join(_dupes)))

@@ -404,8 +404,9 @@ false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
 silent — as is a first run that found nothing to record — while a first run
 that HAS something to baseline emits one labelled line naming how many
 installed skills it is BASELINING without reviewing them (the line is emitted
-before the write and says so; a write that then fails gets its own "could not be
-saved" line) — a count that
+before the write and says so; a write that then fails is not announced
+separately - it cannot be, under the one-message rule - and does not need to be,
+because nothing was written and the next session says the same thing again) — a count that
 includes candidates whose observation was COMPLETE but adverse (a symlink, an
 unreadable directory, a special file, a hostile name), and excludes only those
 lost to a resource-budget short-circuit, whose digest would be a placeholder;

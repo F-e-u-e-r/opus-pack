@@ -231,8 +231,9 @@ one line routing to THIS skill; names are shown only when they pass a strict
 ASCII allowlist, otherwise as an opaque id, and content is never echoed. It
 **never blocks and never emits a "safe" line**; a clean, unchanged run is silent, while a
 first run with something to baseline emits one labelled line naming how many
-installed skills it is BASELINING without review — emitted before the write, so
-a write that then fails is reported by its own "could not be saved" line — a count that includes
+installed skills it is BASELINING without review — emitted before the write; a write that
+then fails is not announced separately, and does not need to be, because nothing
+was written and the next session says the same thing again — a count that includes
 candidates whose observation was COMPLETE but adverse (a symlink, an unreadable
 directory, a special file, a hostile name), and excludes only those lost to a
 resource-budget short-circuit, whose digest would be a placeholder; each excluded one still advises

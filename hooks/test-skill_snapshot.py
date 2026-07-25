@@ -1000,6 +1000,30 @@ class CommandLine(Base):
         self.assertTrue(out["adverse_verdicts_in_baseline"],
                         "the verdict itself must still surface")
 
+    def test_record_refuses_a_loose_file_under_every_spelling(self):
+        # ROUND-8 SCREEN pass 13, found by two families independently. The
+        # pass-12 loose-file guard classified the RAW --dir string with
+        # os.path.isfile, while dir_base and snapshot_tree both stripped
+        # trailing separators first. One trailing slash made isfile() false
+        # (ENOTDIR) while every other step still resolved to the file, so the
+        # guard was bypassed and the verdict landed in the baseline anyway.
+        # The path is now normalised ONCE and every decision uses that.
+        p = self.mk("notafile", content=b"loose")
+        for spelling in (p, p + "/", p + "//", p + "/."):
+            with self.subTest(spelling=spelling):
+                r = self.run_cli("record", "--scope", "global",
+                                 "--name", "notafile", "--dir", spelling,
+                                 "--verdict", "BLOCK")
+                self.assertNotEqual(0, r.returncode)
+                self.assertIn("not a skill directory", r.stderr)
+        state, _ = ss.load_baseline(ss.baseline_path(self.cfg))
+        self.assertEqual("absent", state, "nothing may have been written")
+        # ...and a real skill addressed with a trailing slash still records.
+        d = os.path.dirname(self.mk("realskill", "SKILL.md"))
+        self.assertEqual(0, self.run_cli("record", "--scope", "global",
+                                         "--name", "realskill", "--dir", d + "/",
+                                         "--verdict", "BLOCK").returncode)
+
     def test_record_refuses_an_unnameable_dir(self):
         # ROUND-8 SCREEN pass 11b. The pass-11 fix RESOLVED `.`/`..` but
         # EXEMPTED an empty basename, which `--dir ""`, `--dir "/"` and

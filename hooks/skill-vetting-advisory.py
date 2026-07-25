@@ -33,8 +33,10 @@ be fully observed. A clean, unchanged tree is SILENT, and so is a first run
 that found nothing to baseline; a first run that HAS something to baseline
 emits one labelled bootstrap line naming that count. The line is emitted BEFORE
 the store and says so ("are being baselined"): under G5 the advisory is a single
-JSON object, so nothing can correct it afterwards, and a store that then fails
-is reported by its own "could not be saved" class instead. The hook NEVER blocks and NEVER emits a "safe" line.
+JSON object, so nothing can correct it afterwards. A store that then fails is
+NOT announced separately - it cannot be, once a line has been printed - and does
+not need to be: nothing was written, so the next session sees the same state and
+says the same thing again. The hook NEVER blocks and NEVER emits a "safe" line.
 
 Watched roots: `$CLAUDE_CONFIG_DIR/skills` (default `~/.claude/skills`) and
 `$CLAUDE_PROJECT_DIR/.claude/skills` (falling back to the hook payload's `cwd`,
@@ -60,7 +62,9 @@ Known limits (documented, not hidden):
   WITHOUT reviewing them, and emits ONE line saying so with that count. The line
   is emitted BEFORE the write and is worded that way on purpose: G5 makes the
   advisory a single JSON object, so a store that then fails cannot be corrected
-  afterwards, and is reported by its own "could not be saved" class instead. "Snapshot" is wider than "observe": the count ALSO includes candidates
+  afterwards and is not announced separately. It does not need to be - nothing
+  was written, so the next session sees the same state and says the same thing
+  again. "Snapshot" is wider than "observe": the count ALSO includes candidates
   whose observation was complete but adverse - an unreadable directory, a
   symlink, a special file, a hostile name - because for each of those the scan
   established everything it could about THAT candidate, so recording it is
@@ -616,6 +620,16 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             store_ok, reason = snapmod.store_baseline(merged, bpath)
             if not store_ok:
                 _log("WARN baseline write refused/failed (%s)" % reason)
+                # This fallback can ONLY fire on a run that printed nothing.
+                # G5 allows one JSON object, so once any line was emitted -
+                # including the first-run bootstrap line - a failed store cannot
+                # be announced afterwards. That is why the pre-store lines are
+                # worded in-progress: the safety property is not a correcting
+                # message, it is that NOTHING WAS WRITTEN, so the next session
+                # sees the same state and says the same thing again (round-8
+                # screen, pass 13 - five documents had promised a "could not be
+                # saved" line that is unreachable in exactly the case they
+                # described).
                 if not printed:
                     _emit(["the vetting baseline could not be saved (%s) — a "
                            "skill change before the next session may go "
