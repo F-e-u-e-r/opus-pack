@@ -23,7 +23,8 @@ Two files:
   baseline load/store, and a small CLI (`digest` / `record` / `status`).
   Library-shaped and unit-testable; its library core decides no verdicts (the
   CLI adds a thin verdict-recording convenience so the skill's §3 binding is
-  executable).
+  executable — for a candidate whose own name passes the display gate; for a
+  hostile-named one it is NOT, and SKILL.md §3 states that exception).
 - `hooks/skill-vetting-advisory.py` — the **thin hook**: resolves watch roots
   from the harness environment, orchestrates snapshot-vs-baseline comparison,
   composes and delivers the advisory, then advances the baseline. Contains no
@@ -357,7 +358,7 @@ with transient deltas ahead of steady-state anomalies, the
 total never exceeding the cap, and full counts surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
 (checks.py). Anomaly ⇒ advise is asserted per class, not in aggregate —
-`test_every_anomaly_class_actually_advises` drives one fixture per class
+`test_six_anomaly_classes_advise_through_the_real_hook` drives one fixture per class
 (symlink, unreadable, special, oversize, depth, fanout) through the real hook.
 That test did NOT exist until the round-8 screen, and this sentence claimed it
 did: the suite asserted advise only for symlink, unreadable, root-symlink,

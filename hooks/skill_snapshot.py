@@ -6,7 +6,11 @@ This module owns everything that touches the filesystem for
 whole-tree snapshot, the canonical digest encoding, and the hardened baseline
 load/store. Its LIBRARY core is policy-free (it decides no verdicts); the CLI
 adds a thin verdict-recording convenience (`record`/`status`) so the
-skill-vetting skill's §3 binding is executable. The hook itself is a thin
+skill-vetting skill's §3 binding is executable - for a candidate whose own name
+passes the display gate. For a hostile-named one it is NOT: `digest` reports
+`badname` however it is addressed, and `record` would need that name on a
+command line, which §3 forbids. Such a candidate gets a prose BLOCK and no
+digest binding; closing that is design item D1. The hook itself is a thin
 dispatcher and contains no filesystem-walking logic of its own. Design record:
 `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md` (threat model,
 goals G1-G6, invariants I1-I11). A deliberate naming deviation: this file uses
@@ -876,10 +880,25 @@ def _cli_record(argv):
         print("REFUSED: --expect-digest must be 64 lowercase hex characters "
               "(the value given is not echoed).", file=sys.stderr)
         return 2
-    # The recorded name must be the dir's ACTUAL basename - not an operator-chosen
-    # alias that could launder a hostile-named dir under a benign label past the
-    # badname refusal below (round-4 SV4-08).
+    # The recorded name must be the dir's ACTUAL basename, resolved: not an
+    # operator-chosen alias that could launder a hostile-named dir under a benign
+    # label past the badname refusal below (round-4 SV4-08), and not a path
+    # syntax token, which would bind the verdict to a slot no skill occupies
+    # (round-8 screen pass 11).
     dir_base = os.path.basename(_strip_trailing(os.fsencode(args["dir"])))
+    # `.` / `..` are path SYNTAX, not a name. Pass 10 taught this lesson on
+    # `digest` and the same fix was owed here: taking them literally let
+    # `record --name . --dir .` bind a verdict under name_key(b"."), a slot no
+    # skill can ever occupy, so one tree acquired TWO baseline entries and
+    # `status` reported an adverse verdict for a phantom id (round-8 screen,
+    # pass 11). Resolve to the real last component so the name check compares
+    # against the actual directory - which then REFUSES `--name .`, because `.`
+    # is not that directory's name.
+    if dir_base in (b".", b".."):
+        try:
+            dir_base = os.path.basename(os.fsencode(os.path.realpath(args["dir"])))
+        except OSError:
+            dir_base = b""
     if os.fsencode(args["name"]) != dir_base:
         # Echo only display-safe forms - a hostile basename (or --name) must not
         # ride out through this stderr, which §3 feeds to the model (round-5
