@@ -895,6 +895,43 @@ class CommandLine(Base):
         self.assertEqual(2, shared["entries"],
                          "both terminal candidates must charge the shared budget")
 
+    def test_record_refuses_an_unnameable_dir(self):
+        # ROUND-8 SCREEN pass 11b. The pass-11 fix RESOLVED `.`/`..` but
+        # EXEMPTED an empty basename, which `--dir ""`, `--dir "/"` and
+        # `--dir "//"` all produce — and `--name ""` then satisfied the equality
+        # vacuously, exactly as `.` == `.` had. The reachability is §3's own
+        # template: it mandates quoting every placeholder, and quoting is what
+        # turns an unset shell variable into a literal empty argument instead of
+        # dropping it.
+        for name, d in (("", ""), ("x", "/"), ("x", "//")):
+            with self.subTest(dir=d):
+                r = self.run_cli("record", "--scope", "global", "--name", name,
+                                 "--dir", d, "--verdict", "BLOCK")
+                self.assertNotEqual(0, r.returncode)
+                # Assert WHICH guard refused. Without this the later
+                # never-observable guard also catches `--dir ""` (defence in
+                # depth), so a mutation removing THIS one survived.
+                self.assertIn("does not name a candidate directory", r.stderr)
+        state, _ = ss.load_baseline(ss.baseline_path(self.cfg))
+        self.assertEqual("absent", state, "nothing may have been written")
+
+    def test_record_refuses_a_dir_that_was_never_observable(self):
+        # ROUND-8 SCREEN pass 11b. A path that cannot be lstat-ed returns the
+        # single `root` anomaly and ONE constant digest shared by every missing
+        # path. That refused SAFE-TO-PROPOSE but not BLOCK, so a mistyped or
+        # since-deleted --dir planted vetted/BLOCK under the key a REAL skill of
+        # that name would use, and `status` called it "still installed". When
+        # the real skill then arrives its digest differs, so the hook calls it
+        # "changed" and drops the verdict — the adverse record degrades to noise
+        # exactly when it starts mattering.
+        missing = os.path.join(self.tmp, "nope", "typo-skill")
+        r = self.run_cli("record", "--scope", "global", "--name", "typo-skill",
+                         "--dir", missing, "--verdict", "BLOCK")
+        self.assertNotEqual(0, r.returncode)
+        self.assertIn("never read", r.stderr)
+        state, _ = ss.load_baseline(ss.baseline_path(self.cfg))
+        self.assertEqual("absent", state)
+
     def test_record_dot_does_not_bind_under_the_path_syntax_key(self):
         # ROUND-8 SCREEN pass 11, the twin of the pass-10 digest fix that was
         # owed and not paid. `record --name . --dir .` took `.` literally as the

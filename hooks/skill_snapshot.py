@@ -899,6 +899,17 @@ def _cli_record(argv):
             dir_base = os.path.basename(os.fsencode(os.path.realpath(args["dir"])))
         except OSError:
             dir_base = b""
+    # An EMPTY basename was exempted rather than resolved - `--dir ""`, `--dir
+    # "/"` and `--dir "//"` all produce it, and `--name ""` then satisfied the
+    # equality below vacuously, exactly the way `.` == `.` did before pass 11.
+    # The reachability is §3's own template: it mandates quoting every
+    # placeholder, and quoting is precisely what preserves an unset shell
+    # variable as a literal empty argument instead of dropping it (round-8
+    # screen, pass 11). A real candidate directory always has a basename.
+    if not dir_base:
+        print("REFUSED: --dir does not name a candidate directory "
+              "(the value given is not echoed).", file=sys.stderr)
+        return 2
     if os.fsencode(args["name"]) != dir_base:
         # Echo only display-safe forms - a hostile basename (or --name) must not
         # ride out through this stderr, which §3 feeds to the model (round-5
@@ -922,6 +933,19 @@ def _cli_record(argv):
             return 2
         scope = scope_id(os.fsencode(scope[len("proj:"):]))
     snap = snapshot_tree(args["dir"])
+    # A path that could not even be lstat-ed comes back with the single `root`
+    # anomaly and ONE constant digest shared by every missing path. That refused
+    # SAFE-TO-PROPOSE but not BLOCK/SUSPECT, so a mistyped or since-deleted
+    # --dir planted `vetted/BLOCK` under the key a REAL skill of that name would
+    # use, and `status` reported it as "still installed" - for something never
+    # installed and never read. Worse, when a real skill of that name arrives,
+    # its true digest differs from the placeholder, so the hook calls it
+    # "changed" and DROPS the verdict: the adverse record degrades to noise
+    # exactly when it starts mattering (round-8 screen, pass 11).
+    if any(r == "root" for r, _ in snap["anomalies"]):
+        print("REFUSED: --dir could not be observed at all (no such path) - a "
+              "verdict cannot bind a tree that was never read.", file=sys.stderr)
+        return 3
     # Bind the verdict to the digest the caller passes: if the tree has changed
     # since THAT DIGEST WAS TAKEN, refuse. This does not know when a human or an
     # agent read the source - an earlier comment and message claimed it did, and
