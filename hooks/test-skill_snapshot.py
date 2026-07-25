@@ -348,6 +348,35 @@ class TreeObservation(Base):
         self.assertFalse(ss.display_name("危險".encode("utf-8"))[1],
                          "\\w-style unicode names must not pass the allowlist (R2-11)")
 
+    def test_newline_in_a_filename_is_bytes_faithful(self):
+        # The threat model has listed a NEWLINE-named file among the special
+        # filenames the suites cover since round 2. No test ever created one -
+        # backtick, injection text and non-UTF-8 were covered, this was not.
+        # Found by the round-8 screen; a claimed obligation with no test is the
+        # same defect class as a false docstring.
+        d = os.path.join(self.tmp, "s")
+        os.makedirs(d, exist_ok=True)
+        try:
+            with open(os.path.join(d, "we\nird.md"), "wb") as fh:
+                fh.write(b"v1")
+        except (OSError, ValueError):
+            self.skipTest("filesystem rejects newline in a filename")
+        a = self.snap("s")
+        self.assertEqual([], [r for r, _ in a["anomalies"]],
+                         "a nested name is not display-gated (round 6)")
+        with open(os.path.join(d, "we\nird.md"), "wb") as fh:
+            fh.write(b"v2")
+        self.assertNotEqual(a["digest"], self.snap("s")["digest"],
+                            "its bytes must still move the digest (I3)")
+        # ...and the newline must not be able to forge a manifest boundary:
+        # a file named "we\nird.md" and a pair named "we" + "ird.md" must differ.
+        other = os.path.join(self.tmp, "t")
+        os.makedirs(other, exist_ok=True)
+        self.mk("t", "we", content=b"v2")
+        self.mk("t", "ird.md", content=b"v2")
+        self.assertNotEqual(self.snap("s")["digest"], self.snap("t")["digest"],
+                            "I1: a newline must not act as a delimiter")
+
     def test_non_utf8_name_is_bytes_faithful_not_badname(self):
         # REWRITTEN (round 8 screen). The old body asserted that a nested
         # non-UTF-8 name produces a `badname` anomaly. _walk_dir cannot produce

@@ -436,7 +436,9 @@ def _walk_dir(root_fd, entries, anomalies, budget):
                             if len(stack) >= MAX_OPEN_DIRS:
                                 # STRUCTURAL refusal like the depth cap above:
                                 # stop widening THIS directory (which is what
-                                # bounds the fds) and mark it anomalous, without
+                                # bounds the fds) and mark it anomalous with its
+                                # own `fanout` reason (round 7 - it used to be
+                                # reported as `budget`), without
                                 # setting the shared stop that would blind every
                                 # other candidate (round 6). Peak walker-held
                                 # dir fds stay bounded at MAX_OPEN_DIRS pending
@@ -875,13 +877,15 @@ def _cli_record(argv):
             return 2
         scope = scope_id(os.fsencode(scope[len("proj:"):]))
     snap = snapshot_tree(args["dir"])
-    # Bind the verdict to the bytes the reviewer ACTUALLY examined: if they pass
-    # the digest they reviewed and the tree has since changed, refuse - the
-    # verdict would otherwise certify content that was never read (luna F5).
+    # Bind the verdict to the digest the caller passes: if the tree has changed
+    # since THAT DIGEST WAS TAKEN, refuse. This does not know when a human or an
+    # agent read the source - an earlier comment and message claimed it did, and
+    # SKILL.md now says so explicitly (round 8 screen).
     if args["expect-digest"] and args["expect-digest"] != snap["digest"]:
         # Both values are now shape-validated 64-hex, so echoing them is safe.
         print("REFUSED: --expect-digest %s does not match the current tree "
-              "digest %s - the skill changed since you reviewed it; re-vet the "
+              "digest %s - the tree changed since that digest was taken; "
+              "re-digest and re-vet the "
               "current bytes." % (args["expect-digest"], snap["digest"]),
               file=sys.stderr)
         return 3

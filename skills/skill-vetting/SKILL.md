@@ -200,7 +200,9 @@ layer is the same `hooks/skill_snapshot.py` primitive §3 binds verdicts with
 EVERY file - so an add / modify / delete / rename / symlink / filetype change
 anywhere, not just in `SKILL.md`, registers - and treating whatever it cannot
 fully observe (read errors, oversize files, budget breaches, any symlink, special
-files, hostile names) as an **anomaly that always advises and can never be
+files, a hostile TOP-LEVEL skill name — nested names are not gated, since they
+are never echoed and their bytes are already in the digest) as an **anomaly that
+always advises and can never be
 certified unchanged**. For a new, changed, removed, or anomalous skill it injects
 one line routing to THIS skill; names are shown only when they pass a strict
 ASCII allowlist, otherwise as an opaque id, and content is never echoed. It

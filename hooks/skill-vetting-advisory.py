@@ -23,8 +23,9 @@ watched skills root — a top-level regular FILE is deliberately not a candidate
 because a loose `.md` beside the skill directories is not loadable as a skill; any
 observation anomaly — an unreadable file or directory, an oversize file, a
 budget breach, ANY symlink, a special file (FIFO/socket/device), a hostile or
-undecodable name (shown only as an opaque id); an unreadable/corrupt/stale
-baseline. An anomalous tree can never be certified unchanged, so it re-advises
+undecodable TOP-LEVEL candidate name (shown only as an opaque id; NESTED names
+are deliberately not gated, since they are never echoed and their bytes are
+already bound into the digest); an unreadable/corrupt/stale baseline. An anomalous tree can never be certified unchanged, so it re-advises
 EVERY session until the anomaly is resolved — deliberate for a tree that cannot
 be fully observed. A clean, unchanged tree is SILENT; a first run emits one
 labelled bootstrap line. The hook NEVER blocks and NEVER emits a "safe" line.
@@ -149,9 +150,11 @@ def _acquire(lockpath):
     O_EXCL create, bounded wait, and takeover of a stale lock so a process that
     died holding it cannot wedge every later session.
 
-    Returns (fd, state): ("held" with an fd) | (None, "contended") when another
-    live hook holds it | (None, "unavailable") when the lock file cannot be
-    created at all. Those last two are NOT the same thing and must not share a
+    Returns (fd, state): ("held" with an fd) | (None, "contended") when the
+    lock path still exists after the bounded wait - which does NOT establish a
+    live holder, since the file carries no pid and liveness is never checked, so
+    a lock left by a process that died under LOCK_STALE_S lands here too |
+    (None, "unavailable") when the lock file cannot be created at all. Those last two are NOT the same thing and must not share a
     message: an unwritable config directory is a degraded run to be reported on
     its own terms, not a peer session doing the work."""
     deadline = time.time() + LOCK_WAIT_S
@@ -373,7 +376,7 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
                               and old["digest"] != snap["digest"])
                 anomalous = bool(snap["anomalies"])
                 if state == "absent" and not anomalous:
-                    status = "baseline"          # first-run bootstrap: silent
+                    status = "baseline"          # first-run bootstrap (announced)
                 elif state == "absent":
                     status = "seen"              # anomalous first-run: advised, so seen (SV4-N1)
                 elif state != "ok":
@@ -510,7 +513,8 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
 
         # Now advance the baseline. A store that cannot persist is a DETECTION
         # failure for next session — so when this was a SILENT run (nothing
-        # delivered, e.g. a first-run bootstrap), a store failure fails CLOSED
+        # delivered at all, i.e. a clean unchanged tree), a store failure fails
+        # CLOSED
         # with its own advisory rather than repeating a silent bootstrap that
         # would swallow any change made before the next run (sol#2 / luna F4).
         merged = snapmod.fresh_baseline()

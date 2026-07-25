@@ -390,14 +390,15 @@ primitive snapshots every file under each entry of the watched skills roots
 `.claude/skills` via `$CLAUDE_PROJECT_DIR`), so an add / modify / delete /
 rename / symlink / filetype change anywhere — not just in `SKILL.md` — counts,
 and whatever cannot be fully observed (a read error, an oversize file, any
-symlink, a special file, a hostile name, a corrupt or version-stale baseline)
+symlink, a special file, a hostile TOP-LEVEL skill name — nested names are not
+gated, a corrupt or version-stale baseline)
 is an **anomaly that always advises and can never be certified unchanged**. For
 a new, changed, removed, or anomalous skill it injects one line routing to the
 `skill-vetting` skill. It **never blocks and never emits a "safe" line** — a
 `SessionStart` hook cannot deny, and a green-lighting scanner is the
-false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged, or
-first run emits one labelled line naming how many installed
-skills it recorded as the baseline without reviewing them, the advisory prints
+false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
+silent, while a first run emits one labelled line naming how many installed
+skills it recorded as the baseline without reviewing them; the advisory prints
 **before** the baseline
 (`<config>/skill-vetting/baseline.json`) advances — a failed delivery
 re-advises next session — and skill names reach the model only through a strict

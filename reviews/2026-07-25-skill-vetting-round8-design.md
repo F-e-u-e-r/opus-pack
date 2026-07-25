@@ -276,8 +276,10 @@ content in place, before any decision exists.
   emptiness, no network denial, no time or output cap. Step 4 runs before the
   step-5 verdict exists, so the payload executes during the procedure meant to
   decide whether it may run.
-- §3's claim that `--expect-digest` "refuses if the tree changed since you read
-  it" is false: it refuses only if the tree changed since the `digest` RUN, and
+- §3 USED TO claim that `--expect-digest` "refuses if the tree changed since
+  you read it" (corrected in `f83925c`; the CLI's own message was corrected in
+  the round-8 screen). The MECHANISM limitation it described remains, which is
+  why D4 exists: it refuses only if the tree changed since the `digest` RUN, and
   §1 orders that run at step 5, AFTER the step-2 read. A mutation inside the
   read window is invisible.
 

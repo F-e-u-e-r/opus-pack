@@ -691,14 +691,17 @@ class HookE2E(unittest.TestCase):
                 "%s lost its verdict to a transient budget breach" % n)
             self.assertEqual("SAFE-TO-PROPOSE", after[n].get("verdict"))
 
-    def test_concurrent_hooks_under_an_uncontended_lock_do_not_lose_an_update(self):
+    def test_concurrent_hooks_do_not_lose_an_update_when_the_lock_is_fresh(self):
         # RENAMED AND NARROWED (round 8 screen). The old name asserted a
         # property the artifact DOES NOT HAVE: on the stale-takeover path both
         # racers are granted the lock (40/40 trials) and `_cli_record` takes no
-        # lock at all, so updates ARE losable. This test only ever exercised
-        # the uncontended path, so it was a green light for a false claim.
+        # lock at all, so updates ARE losable. What this test covers is the
+        # FRESH-lock path: the racers contend and wait for each other, which
+        # works. It does not cover the stale-takeover path, which is where the
+        # double grant happens - so on its own it was a green light for a
+        # claim the artifact does not support.
         # The real property is design item D2; the gap is pinned by
-        # test_stale_lock_takeover_admits_two_holders_KNOWN_BROKEN below.
+        # test_lock_stale_takeover_is_KNOWN_BROKEN, above.
         # round-6 (sol): load/store are a read-modify-write with no lock, so a
         # slower hook wrote its STALE merge over a faster one's and the delta the
         # faster one advised was un-recorded and never re-advised.

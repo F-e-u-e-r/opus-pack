@@ -73,8 +73,10 @@ observable, advisable event, never a silent state.
 - **G2 — observation honesty (fail closed).** Anything the scanner cannot
   fully and unambiguously observe is an **anomaly** and always advises:
   unreadable file or directory, oversize file, entry/byte/depth budget breach,
-  any symlink, any non-regular file (FIFO/socket/device), undecodable or
-  hostile name, unreadable root, corrupt baseline. An anomalous tree is never
+  any symlink, any non-regular file (FIFO/socket/device), an undecodable or
+  hostile TOP-LEVEL candidate name (a NESTED name is deliberately not gated
+  since round 6 — it is never echoed and its bytes are already bound into the
+  digest, so it produces no anomaly), unreadable root, corrupt baseline. An anomalous tree is never
   "unchanged" and is never silently baselined as clean.
 - **G3 — injection containment. PARTIALLY MET; the gap is stated here rather
   than papered over.** What holds: advisory text is built from fixed template
@@ -169,9 +171,14 @@ observable, advisable event, never a silent state.
 ## Snapshot invariants (the primitive's contract)
 
 - **I1 — injective encoding.** The manifest serializes as a length-prefixed
-  binary stream: a fixed header + schema version, then entries sorted by raw
-  path bytes, each field (path, kind tag, payload) length-prefixed. No
-  delimiter characters exist to collide with path or target bytes; two
+  binary stream: a fixed header + BOTH the schema and policy versions
+  (policy was added at round 5), then entries sorted by raw path bytes, with the path and the payload length-prefixed and the
+  kind tag written raw as a FIXED ONE-BYTE tag. (An earlier wording said "each
+  field ... length-prefixed", which the encoder does not do: injectivity holds
+  because the tag is fixed-width, not because it is framed - a reviewer
+  checking I1 against `_finish` would have found an unprefixed field and had to
+  re-derive the argument.) No delimiter characters exist to collide with path
+  or target bytes; two
   distinct observed trees cannot encode to the same stream. The digest is
   SHA-256 over that stream. (The round-2 collision repro — `a|b -> c` vs
   `a -> b|c` — must produce distinct digests, by construction and by test.)
@@ -292,12 +299,16 @@ to a named executable test in
 `hooks/test-skill_snapshot.sh` (primitive matrix) or
 `hooks/test-skill-vetting-advisory.sh` (hook contract), covering at minimum:
 add / modify / delete / rename / symlink / broken symlink / special filenames
-(newline, backtick, injection text, non-UTF-8 bytes) / encoding-collision
+(backtick, injection text, non-UTF-8 bytes; a NEWLINE in a filename is listed
+here as an obligation and is now covered by
+test_newline_in_a_filename_is_bytes_faithful - it was claimed but untested
+until the round-8 screen) / encoding-collision
 pairs / oversize and budget breach / permission denied (file, subdir, root) /
 mid-scan mutation / FIFO (no hang) / cache corruption, dangling-symlink cache,
 symlinked tmp path / wrong or unset project-root env / delivery failure
 (closed stdout ⇒ baseline not advanced) / version-change invalidation /
 first-run bootstrap announces its count / multi-project baseline stability / display cap
-with anomalies listed first and full count surfaced / advisory references the
+with transient deltas ahead of steady-state anomalies, the
+total never exceeding the cap, and full counts surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
 (checks.py). Anomaly ⇒ advise is asserted per class, not in aggregate.
