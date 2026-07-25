@@ -25,6 +25,19 @@ actually shipped. They run BEFORE any suite does, and a violation is a hard
 error rather than a survivor, because "the tool is broken" and "the fix is
 unprotected" are different findings and must never share an exit path.
 
+Exit codes, in priority order. 2 the measurement did not happen or did not
+finish - a refused invocation, a tool error, or a run that stopped partway;
+this outranks a survivor, because exit 1 asserts that the full matrix ran.
+1 the full matrix ran and a landed fix has no executing test. 3 the full matrix
+ran and everything died, but the repository moved during the run, so the result
+is authoritative for the frozen snapshot and for nothing else. 0 the full matrix
+ran, everything died, and nothing moved.
+
+Every input that can change what is measured is a command-line option. There
+are no environment variables, no config file, and no hidden defaults, which is
+what lets the authoritative gate work by comparing the parsed namespace against
+the parser's own defaults.
+
 Usage:  python3 hooks/mutation_matrix.py [--check-only] [--only M52,M60]
 
 An AUTHORITATIVE run - the one a closure report may cite - is `--authoritative`,
@@ -88,6 +101,46 @@ def check_mutation(src, old, new, expect_def=None):
     if expect_def is not None and where != expect_def:
         raise MatrixError("lands in %s, expected %s" % (where, expect_def))
     return where
+
+
+def authoritative_conflicts(chosen, defaults, flag_of, output_only):
+    """Which supplied options are incompatible with --authoritative.
+
+    An ALLOWLIST: anything not named in `output_only` is incompatible the
+    moment it differs from its default. Enumerating the overrides that exist
+    today would put the burden on whoever adds the next one, and a forgotten
+    entry lets a partial run be reported as a whole one - the exact failure the
+    mode exists to prevent."""
+    return sorted(flag_of.get(d, d) for d, v in chosen.items()
+                  if d not in output_only and d in defaults
+                  and v != defaults[d])
+
+
+def closure_exit(survived, unexpected, drifted, authoritative, incomplete=None):
+    """The run's exit code. Pure, so the contract a CI gate reads is tested
+    rather than described.
+
+    The priority is deliberate and the top of it is the subtle part:
+
+      2  the measurement did not happen or did not finish - a refused
+         invocation, a tool error, or a run that stopped partway. This outranks
+         a survivor, because exit 1 asserts "the full matrix ran and something
+         lived", and a half-finished run has not earned that sentence. Any
+         survivors already seen are still printed; they are just not the
+         headline.
+      1  the full matrix ran and a landed fix has no executing test.
+      3  the full matrix ran, everything died, but the repository moved
+         underneath - true of the frozen snapshot, not evidence about the
+         checkout in front of you. Collapsing this into 0 with a printed note
+         leaves a warning nothing downstream reads.
+      0  the full matrix ran, everything died, nothing moved."""
+    if incomplete:
+        return 2
+    if survived or unexpected:
+        return 1
+    if drifted and authoritative:
+        return 3
+    return 0
 
 
 def dirty_gate(dirty, allow_head_only, head):
@@ -164,10 +217,18 @@ def main(argv=None):
     # branch exists to remove. So the mode is a real flag and the exclusions
     # are checked here.
     if args.authoritative:
-        conflicts = [n for n, v in (("--check-only", args.check_only),
-                                    ("--allow-dirty-head-only",
-                                     args.allow_dirty_head_only),
-                                    ("--only", bool(args.only))) if v]
+        # ALLOWLIST, not a list of known offenders. Enumerating the three
+        # overrides that existed today would put the burden on whoever adds the
+        # fourth to remember this spot - and a forgotten entry silently lets a
+        # partial run be reported as a whole one. Anything that is not purely
+        # about OUTPUT is incompatible by default, so a new flag is refused
+        # until someone deliberately declares it harmless.
+        defaults = {a.dest: a.default for a in ap._actions
+                    if a.dest not in ("help",)}
+        flag_of = {a.dest: (a.option_strings[0] if a.option_strings else a.dest)
+                   for a in ap._actions}
+        conflicts = authoritative_conflicts(vars(args), defaults, flag_of,
+                                            {"authoritative"})
         if conflicts:
             print("REFUSED: --authoritative excludes %s. An authoritative run "
                   "measures EVERY mutation against a clean committed tree with "
@@ -245,11 +306,11 @@ def main(argv=None):
     if args.authoritative:
         print("MODE                AUTHORITATIVE")
         print("OVERRIDES           NONE")
-    print("subject commit      %s" % head)
     print("runner commit       %s%s" % (head, "" if runner_ok
                                         else "  (ON-DISK COPY DIFFERS)"))
     print("definitions commit  %s%s" % (head, "" if defs_ok
                                         else "  (ON-DISK COPY DIFFERS)"))
+    frozen = (head, runner_ok, defs_ok)
     print("measuring commit %s in an isolated worktree" % head[:12])
     parent = tempfile.mkdtemp(prefix="mutation-matrix-")
     wt = os.path.join(parent, "wt")
@@ -264,6 +325,8 @@ def main(argv=None):
                HK: os.path.join(wt, "hooks", os.path.basename(HK))}
     wt_suites = [os.path.join(wt, "hooks", os.path.basename(x)) for x in SUITES]
     killed, survived, equivalent, unexpected = [], [], [], []
+    record = []
+    incomplete = None
     try:
         for name, path, old, new, _expect, equiv in matrix:
             target = wt_file[path]
@@ -272,6 +335,9 @@ def main(argv=None):
             reds = [s for s in wt_suites if not run_suite(s, cwd=wt)]
             open(target, "w").write(pristine_src)
             tag = name.split(" (")[0][:60]
+            record.append({"id": name.split()[0], "desc": name.split(" ", 1)[1],
+                           "path": os.path.basename(path), "where": _expect,
+                           "suites_red": [os.path.basename(r) for r in reds]})
             if reds:
                 where = ", ".join(os.path.basename(r).replace("test-", "")
                                   .replace(".sh", "") for r in reds)
@@ -290,6 +356,8 @@ def main(argv=None):
             else:
                 print("  %-60s ** SURVIVED **" % tag)
                 survived.append(name)
+    except Exception as exc:                      # noqa: BLE001 - reported, not hidden
+        incomplete = "%s: %s" % (type(exc).__name__, exc)
     finally:
         # Best effort: if this is skipped by a signal that cannot be handled,
         # what is left behind is a disposable directory, not a modified source.
@@ -299,10 +367,54 @@ def main(argv=None):
         subprocess.run(["git", "worktree", "prune"], cwd=REPO,
                        capture_output=True)
 
+    # The per-mutant verdicts existed only on stdout, so a pipeline as ordinary
+    # as `| tail -20` destroyed them - which is exactly what happened to this
+    # branch's first two checkpoint runs, leaving only totals to compare. A
+    # comparison of totals cannot see a mutant that changed which suite killed
+    # it. Write the record somewhere a pipe cannot reach.
+    #
+    # No flag: an option would be a non-default input, and the authoritative
+    # gate refuses those. Outside the repo: a file in the tree would dirty it
+    # and the NEXT authoritative run would refuse to start.
+    for entry in record:
+        entry["verdict"] = ("killed" if entry["suites_red"] else "survived")
+    rec_path = os.path.join(tempfile.gettempdir(),
+                            "mutation-matrix-%s.json" % head[:12])
+    try:
+        with open(rec_path, "w") as fh:
+            json.dump({"subject_commit": head, "mutations": record}, fh, indent=1)
+        print("per-mutant record  %s" % rec_path)
+    except OSError as exc:
+        print("per-mutant record  NOT WRITTEN (%s)" % exc)
+
+    # The identity was frozen at startup and the worktree pinned to it, so a
+    # commit landing mid-run cannot change what was measured. Re-read it anyway
+    # and say so, because "the report shows the SHA it measured" is a claim
+    # like any other and this is what makes it checkable.
+    head_now = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO,
+                              capture_output=True, text=True).stdout.strip()
+    drifted = [w for w, ok in (("canonical HEAD", head_now == frozen[0]),
+                               ("runner", _blob_matches_head(
+                                   "hooks/mutation_matrix.py") == frozen[1]),
+                               ("definitions", _blob_matches_head(
+                                   "hooks/mutations.json") == frozen[2]))
+               if not ok]
+
     # Report every category separately. Collapsing them into one ratio is how a
     # tool error, an unkillable mutant and an unprotected fix come to look alike.
     print()
-    print("commit measured     %s" % head)
+    # Drift is a STATUS, not a warning line. A note that leaves the run exiting
+    # 0 as authoritative is a warning downstream ignores - the measurement stays
+    # true of the frozen snapshot, but it stops being evidence about the tree in
+    # front of you, and only one of those two facts survives a CI gate that
+    # reads exit codes.
+    print("subject commit      %s  (frozen at start)" % head)
+    print("MEASUREMENT         VALID FOR FROZEN SNAPSHOT")
+    print("CURRENT CHECKOUT    %s" % ("DRIFTED (%s)" % ", ".join(drifted)
+                                      if drifted else "UNCHANGED"))
+    if args.authoritative:
+        print("AUTHORITATIVE FOR CURRENT CHECKOUT  %s"
+              % ("NO" if drifted else "YES"))
     print("mutation cases      %d" % len(matrix))
     print("  killed            %d" % len(killed))
     print("  survived          %d" % len(survived))
@@ -323,7 +435,24 @@ def main(argv=None):
               % len(survived))
         for s in survived:
             print("  -", s)
-    return 1 if (survived or unexpected) else 0
+    if incomplete is None and len(killed) + len(survived) + len(equivalent) \
+            + len(unexpected) != len(matrix):
+        incomplete = ("only %d of %d mutations produced a verdict"
+                      % (len(killed) + len(survived) + len(equivalent)
+                         + len(unexpected), len(matrix)))
+    if incomplete:
+        print()
+        print("INCOMPLETE          %s" % incomplete)
+        print("  The matrix did not finish, so no verdict about coverage "
+              "follows from it - not even from the mutations that did run.")
+    code = closure_exit(survived, unexpected, drifted, args.authoritative,
+                        incomplete)
+    if code == 3:
+        print()
+        print("EXIT 3: the run is authoritative for %s and for nothing else. "
+              "The repository moved while it ran, so this result cannot close "
+              "out the current checkout - re-run against it." % head[:12])
+    return code
 
 
 if __name__ == "__main__":

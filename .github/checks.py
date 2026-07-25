@@ -456,6 +456,30 @@ for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisor
         ok("%s has %d tests, no shadowed duplicates"
            % (_suite, len(set(_names))))
 
+# The mutation matrix's authoritative gate works by comparing the parsed
+# argparse namespace against the parser's own defaults, which is sound ONLY
+# while every input that can change a measurement is a command-line option. A
+# later environment variable or config read would sit outside that comparison
+# and could silently re-enable an override inside an "authoritative" run. That
+# premise lives in the tool's docstring; this makes it a rule that has to be
+# broken deliberately.
+_matrix = os.path.join(ROOT, "hooks", "mutation_matrix.py")
+if os.path.isfile(_matrix):
+    with open(_matrix, encoding="utf-8") as _fh:
+        _msrc = _fh.read()
+    _env_reads = [tok for tok in ("os.environ", "os.getenv", "configparser",
+                                  "tomllib", "json.load(open")
+                  if tok in _msrc]
+    if _env_reads:
+        fail("hooks/mutation_matrix.py reads outside the command line (%s). "
+             "The authoritative gate compares the parsed namespace against "
+             "argparse defaults, so any other input source escapes it - add it "
+             "to that gate first, then update this check."
+             % ", ".join(_env_reads))
+    else:
+        ok("mutation_matrix.py takes no env/config input, so the authoritative "
+           "gate covers every measurement-changing option")
+
 print()
 if failures:
     print(f"{len(failures)} check(s) failed")

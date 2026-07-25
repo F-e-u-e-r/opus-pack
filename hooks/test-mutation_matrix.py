@@ -152,6 +152,107 @@ class AuthoritativeMode(unittest.TestCase):
         self.assertIn("--only", r.stderr)
         self.assertIn("EVERY mutation", r.stderr)
 
+    def test_a_flag_that_does_not_exist_yet_is_refused_by_default(self):
+        """The gate is an ALLOWLIST. Enumerating today's three overrides would
+        put the burden on whoever adds the fourth, and a forgotten entry lets a
+        partial run be reported as a whole one - the exact failure the mode
+        exists to prevent. So the property under test is about a flag nobody
+        has written: it must be incompatible the moment it is supplied."""
+        defaults = {"authoritative": False, "check_only": False,
+                    "only": "", "some_future_bypass": False}
+        flag_of = {"check_only": "--check-only", "only": "--only",
+                   "some_future_bypass": "--some-future-bypass"}
+        chosen = dict(defaults, authoritative=True, some_future_bypass=True)
+        self.assertEqual(
+            ["--some-future-bypass"],
+            mm.authoritative_conflicts(chosen, defaults, flag_of,
+                                       {"authoritative"}),
+            "a new flag must be refused without anyone remembering to list it")
+
+    def test_defaults_alone_are_not_conflicts(self):
+        defaults = {"authoritative": False, "check_only": False, "only": ""}
+        chosen = dict(defaults, authoritative=True)
+        self.assertEqual([], mm.authoritative_conflicts(
+            chosen, defaults, {}, {"authoritative"}))
+
+    def test_drift_during_the_run_is_a_status_not_a_warning(self):
+        """A measurement whose repository moved underneath it stays true of the
+        frozen snapshot and stops being evidence about the current checkout.
+        Printing that as a NOTE while exiting 0 leaves a warning nothing reads,
+        so it gets its own exit code and a CI gate can act on it."""
+        self.assertEqual(0, mm.closure_exit([], [], [], True),
+                         "clean and authoritative")
+        self.assertEqual(3, mm.closure_exit([], [], ["canonical HEAD"], True),
+                         "all killed, but not about the tree you are looking at")
+        self.assertEqual(0, mm.closure_exit([], [], ["canonical HEAD"], False),
+                         "drift only matters to an authoritative claim")
+
+    def test_a_survivor_outranks_drift(self):
+        """A landed fix with no executing test is the more serious finding, and
+        exit 1 must not be masked by the drift code."""
+        self.assertEqual(1, mm.closure_exit(["M1"], [], ["runner"], True))
+        self.assertEqual(1, mm.closure_exit([], ["M2"], ["runner"], True))
+
+    def test_an_incomplete_run_outranks_a_survivor(self):
+        """Exit 1 asserts that the full matrix ran and something lived. A run
+        that stopped partway has not earned that sentence, whatever it managed
+        to observe first - so a tool error or a short run reports 2, and the
+        survivors it did see are printed rather than promoted."""
+        self.assertEqual(2, mm.closure_exit(["M1"], [], ["runner"], True,
+                                            incomplete="OSError: boom"))
+        self.assertEqual(2, mm.closure_exit([], [], [], True,
+                                            incomplete="only 12 of 55"))
+        self.assertEqual(2, mm.closure_exit([], [], [], False,
+                                            incomplete="only 12 of 55"),
+                         "an unfinished measurement is unfinished whether or "
+                         "not anyone called it authoritative")
+
+    def test_the_per_mutant_record_survives_a_truncated_stdout(self):
+        """Per-mutant verdicts used to exist only on stdout, and a pipeline as
+        ordinary as `| tail -20` destroyed them - which is what happened to
+        this branch's first two checkpoint runs, leaving only totals to
+        compare. Totals cannot show that a mutant changed which suite killed
+        it, which is the difference worth catching.
+
+        The record is written to a file no pipe can reach, with no flag (an
+        option would be a non-default input the authoritative gate refuses) and
+        outside the repository (a file in the tree would dirty it, and the next
+        authoritative run would refuse to start)."""
+        src = open(os.path.join(HOOKS, "mutation_matrix.py")).read()
+        self.assertIn("tempfile.gettempdir()", src,
+                      "the record must land outside the repository")
+        self.assertNotIn('add_argument("--record', src,
+                         "a flag for it would be refused by --authoritative")
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"),
+                            "--allow-dirty-head-only", "--only", "M18"],
+                           capture_output=True, text=True, timeout=900)
+        self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+        path = [l.split(None, 2)[2].strip() for l in r.stdout.splitlines()
+                if l.startswith("per-mutant record")]
+        self.assertTrue(path, "the run must say where the record went")
+        import json as _json
+        with open(path[0]) as fh:
+            rec = _json.load(fh)
+        self.assertTrue(rec["subject_commit"])
+        got = {m["id"]: m for m in rec["mutations"]}
+        self.assertIn("M18", got)
+        for field in ("desc", "path", "where", "suites_red", "verdict"):
+            self.assertIn(field, got["M18"],
+                          "a comparison needs %s, not just a verdict" % field)
+
+    def test_no_measurement_input_escapes_the_authoritative_gate(self):
+        """The gate compares the parsed namespace against argparse's defaults,
+        which is sound only while every measurement-changing input IS a
+        command-line option. An environment variable would sit outside that
+        comparison entirely."""
+        src = open(os.path.join(HOOKS, "mutation_matrix.py")).read()
+        for token in ("os.environ", "os.getenv", "configparser", "tomllib"):
+            self.assertNotIn(token, src,
+                             "%s is an input the authoritative gate cannot "
+                             "see; add it to the gate before adding it here"
+                             % token)
+
     def test_the_mode_is_a_flag_and_not_only_a_docstring(self):
         r = self._run("--help")
         self.assertIn("--authoritative", r.stdout)
