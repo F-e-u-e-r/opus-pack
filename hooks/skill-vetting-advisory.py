@@ -62,8 +62,10 @@ Known limits (documented, not hidden):
   missing skills roots is fully silent - there is nothing recorded without
   review, hence nothing to announce - and a first run in which candidates
   existed but none was observable emits their anomaly lines and no count line.
-  It is not silent (round 6: a silent bootstrap was reachable a second time
-  after a failed first write, which then swallowed a change). Run the
+  What round 6 removed was the case that mattered: a bootstrap that RECORDED
+  skills while saying nothing, which was reachable a second time after a failed
+  first write and then swallowed a change. A run that records nothing cannot
+  swallow anything, so its silence is not that defect. Run the
   `skill-vetting` skill on anything present but not yet reviewed;
   `skill_snapshot.py status` lists entries never recorded as vetted.
 - A delivered advisory is not re-raised once baselined (advisory posture): the
@@ -569,8 +571,11 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             _log("ADVISED %d item(s)" % len(lines))
 
         # Now advance the baseline. A store that cannot persist is a DETECTION
-        # failure for next session — so when this was a SILENT run (nothing
-        # delivered at all, i.e. a clean unchanged tree), a store failure fails
+        # failure for next session. Note which silent run this is about: on a
+        # clean UNCHANGED tree the guard below means store_baseline is never
+        # called at all, so there is nothing to fail. The case that matters is a
+        # silent run that still WRITES - a first-run bootstrap, or a scope whose
+        # entries changed without producing a line - where a store failure fails
         # CLOSED
         # with its own advisory rather than repeating a silent bootstrap that
         # would swallow any change made before the next run (sol#2 / luna F4).

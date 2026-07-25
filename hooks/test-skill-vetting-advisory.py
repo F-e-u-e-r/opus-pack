@@ -2,7 +2,11 @@
 """End-to-end contract tests for hooks/skill-vetting-advisory.py, driven as a
 real subprocess with a real stdin envelope and isolated CLAUDE_CONFIG_DIR /
 CLAUDE_PROJECT_DIR / HOME. Covers both sides of the advisory contract (silent
-and advisory) plus every fail-closed path the threat model promises
+and advisory) plus the fail-closed paths the threat model
+promises, WITH TWO STATED EXCEPTIONS it records as open: G3-SHELL has no test
+(nothing composes the procedure's shipped command templates against a hostile
+directory name), and I11 is NOT MET, so the lock carries a known-broken pin
+rather than an assertion of the property
 (reviews/2026-07-25-skill-vetting-snapshot-threat-model.md). Run via
 hooks/test-skill-vetting-advisory.sh or directly with python3.
 """

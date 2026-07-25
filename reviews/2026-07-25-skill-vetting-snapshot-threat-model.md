@@ -345,7 +345,8 @@ pairs / oversize and budget breach / permission denied (file, subdir, root) /
 mid-scan mutation / FIFO (no hang) / cache corruption, dangling-symlink cache,
 symlinked tmp path / wrong or unset project-root env / delivery failure
 (closed stdout ⇒ baseline not advanced) / version-change invalidation /
-first-run bootstrap announces its count / multi-project baseline stability / display cap
+first-run bootstrap announces its count when it records anything, and is
+silent over empty roots / multi-project baseline stability / display cap
 with transient deltas ahead of steady-state anomalies, the
 total never exceeding the cap, and full counts surfaced / advisory references the
 real `skill-vetting` skill (no phantom command) / repo version sites agree
