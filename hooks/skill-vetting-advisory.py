@@ -555,14 +555,38 @@ def _run(snapmod, roots, bpath, cfg, lock_state="held"):
             for key, old in old_entries.items():
                 scope = old["scope"]
                 if scope in scanned_scopes and key not in new_entries:
-                    if scanned_scopes[scope]:
+                    if old.get("verdict") in ("BLOCK", "SUSPECT"):
+                        # An ADVERSE verdict is the one record worth keeping,
+                        # and this branch used to destroy it silently. §0's
+                        # flow vets a candidate BEFORE the user installs it, so
+                        # at `record` time it is legitimately not under a
+                        # watched root - and the very next SessionStart pruned
+                        # the BLOCK and announced a removal that had not
+                        # happened. `--scope global` made it certain, since
+                        # "global" is always in scanned_scopes (round 8).
+                        # Keeping it costs one baseline entry and preserves the
+                        # judgement if the tree ever appears: unchanged, the
+                        # verdict still stands; changed, the hook says so and
+                        # drops it, which is the correct direction. `status`
+                        # already reports this as recorded-and-not-superseded
+                        # rather than as still-installed.
+                        new_entries[key] = old
+                    elif scanned_scopes[scope]:
                         # Carries `old` so an undelivered removal line can put
                         # the entry back instead of pruning it: a pruned entry
                         # can never re-fire, which made a lost removal line the
                         # one unrecoverable case (round 6).
+                        #
+                        # The wording must hold for BOTH ways to reach here.
+                        # "was removed" asserted a history this hook cannot
+                        # know: an entry recorded for a candidate that was
+                        # never installed had not been removed from anywhere,
+                        # and the line put that falsehood into the session's
+                        # context while the tree sat on disk elsewhere.
                         delta_lines.append((
-                            "skill %s was removed — baseline entry pruned"
-                            % old["name"], key, old))
+                            "skill %s is not under the watched skills roots — "
+                            "baseline entry pruned (removed, or recorded "
+                            "without being installed)" % old["name"], key, old))
                     else:
                         new_entries[key] = old   # incomplete enumeration: keep
                 elif scope not in scanned_scopes:

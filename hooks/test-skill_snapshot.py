@@ -197,17 +197,22 @@ class TreeObservation(Base):
         d = [(b"p", b"D", b"AA" + b"\x00\x00\x00\x01" + b"q" + b"D" + b"BB")]
         self.assertNotEqual(dg(c), dg(d),
                             "the payload length prefix is load-bearing (I1)")
-        # And the version header must reach the digest at all.
-        old_schema = ss.SCHEMA_VERSION
-        try:
-            base = dg(a)
-            ss.SCHEMA_VERSION = old_schema + 1
-            self.assertNotEqual(base, dg(a),
-                                "SCHEMA_VERSION must be bound into the digest, "
-                                "or a verdict reviewed under one policy is "
-                                "reusable under another (I1/G6)")
-        finally:
-            ss.SCHEMA_VERSION = old_schema
+        # And BOTH versions must reach the digest. G6 says schema AND policy are
+        # bound; only the schema half had any coverage, so a policy-only bump
+        # leaving digests stable - which is exactly the case G6 exists to
+        # prevent, a verdict reviewed under one policy reused under another -
+        # was untested (round 8).
+        base = dg(a)
+        for const in ("SCHEMA_VERSION", "POLICY_VERSION"):
+            with self.subTest(const=const):
+                old = getattr(ss, const)
+                try:
+                    setattr(ss, const, old + 1)
+                    self.assertNotEqual(base, dg(a),
+                                        "%s must be bound into the digest "
+                                        "(I1/G6)" % const)
+                finally:
+                    setattr(ss, const, old)
 
     def test_symlink_is_anomaly_and_target_change_is_visible(self):
         self.mk("s", "SKILL.md")
@@ -1142,6 +1147,29 @@ class CommandLine(Base):
         body = st.stdout if st.stdout.strip() else "{}"
         self.assertNotIn("id-cdb4ee2a", body,
                          "nothing may be recorded under the key for `.`")
+
+    def test_status_exit_code_separates_absent_from_unusable(self):
+        """`status` is the audit surface, and it returned 0 for every non-ok
+        baseline state - so the one command whose job is to surface adverse
+        verdicts reported success while surfacing nothing, in a component where
+        every other verb fails closed on its exit code (round 8).
+
+        `absent` stays 0: nothing recorded yet is an ordinary, truthful empty
+        report. `corrupt` and `stale` do not: the audit could not be performed
+        at all, which is not the same as finding nothing."""
+        absent = self.run_cli("status")
+        self.assertEqual(0, absent.returncode,
+                         "an empty world is a real answer, not a failure")
+        self.assertEqual("absent", json.loads(absent.stdout)["baseline"])
+
+        bp = ss.baseline_path(self.cfg)
+        os.makedirs(os.path.dirname(bp), mode=0o700, exist_ok=True)
+        with open(bp, "w") as fh:
+            fh.write("{ this is not json")
+        corrupt = self.run_cli("status")
+        self.assertEqual("corrupt", json.loads(corrupt.stdout)["baseline"])
+        self.assertNotEqual(0, corrupt.returncode,
+                            "an audit that could not run must not exit 0")
 
     def test_record_refuses_a_partial_snapshot(self):
         """snapshot_tree's own contract says a `partial` digest describes the

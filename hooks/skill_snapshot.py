@@ -1153,7 +1153,13 @@ def _cli_status(_argv):
     state, data = load_baseline()
     if state != "ok":
         print(json.dumps({"baseline": state}, ensure_ascii=True))
-        return 0
+        # `absent` is an ordinary state - nothing has been recorded yet, and the
+        # audit correctly reports an empty world. `corrupt` and `stale` are not:
+        # the audit could not be PERFORMED, and returning 0 for that made the
+        # one command whose whole job is to surface adverse verdicts report
+        # success while surfacing nothing (round 8). Every other verb here fails
+        # closed on an exit code; this one did not.
+        return 0 if state == "absent" else 4
     # Round 6: the partition used to be purely `status != "vetted"`, and the
     # verdict was never printed - so recording BLOCK on a live trojan REMOVED it
     # from the only list this command prints, and the audit output became

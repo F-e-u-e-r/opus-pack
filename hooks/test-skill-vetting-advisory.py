@@ -189,7 +189,11 @@ class HookE2E(unittest.TestCase):
         self.run_hook()
         shutil.rmtree(d)
         rc, ctx, _ = self.run_hook()
-        self.assertIn("skill doomed was removed", ctx, "deletions must surface (C4/F1)")
+        self.assertIn("skill doomed is not under the watched skills roots", ctx,
+                      "deletions must surface (C4/F1)")
+        self.assertNotIn("was removed", ctx,
+                         "the line must not assert a history the hook cannot "
+                         "know - an entry may never have been installed")
         rc, ctx, _ = self.run_hook()
         self.assertIsNone(ctx, "after pruning, steady state is silent")
 
@@ -199,7 +203,7 @@ class HookE2E(unittest.TestCase):
         os.rename(os.path.join(self.G, "oldname"), os.path.join(self.G, "newname"))
         rc, ctx, _ = self.run_hook()
         self.assertIn("new skill global:newname", ctx)
-        self.assertIn("oldname was removed", ctx)
+        self.assertIn("oldname is not under the watched skills roots", ctx)
 
     def test_project_scope_scanned_via_env(self):
         self.run_hook()
@@ -979,6 +983,43 @@ class HookE2E(unittest.TestCase):
                 "%s lost its verdict to a transient budget breach" % n)
             self.assertEqual("SAFE-TO-PROPOSE", after[n].get("verdict"))
 
+    def test_an_error_after_delivery_does_not_emit_a_second_json_object(self):
+        """G5 makes the advisory ONE JSON object. main()'s last-resort advisory
+        was guarded on a local `printed` that only _run's same-named local ever
+        assigned, so it read False however much had been delivered, and any
+        exception raised after a successful emit appended a second object -
+        which no consumer parses (round 8).
+
+        Forced by injecting a raise immediately after the emit, because no
+        natural input reaches that window on demand. The assertion is that
+        stdout still parses as exactly one object."""
+        tools = os.path.join(self.tmp, "tools-raise")
+        os.makedirs(tools)
+        for name in ("skill_snapshot.py", "skill-vetting-advisory.py"):
+            src = open(os.path.join(HOOKS, name)).read()
+            if name == "skill-vetting-advisory.py":
+                anchor = '            _log("ADVISED %d item(s)" % len(lines))'
+                self.assertIn(anchor, src, "post-emit anchor moved")
+                src = src.replace(
+                    anchor,
+                    anchor + '\n            raise RuntimeError("after delivery")',
+                    1)
+            with open(os.path.join(tools, name), "w") as fh:
+                fh.write(src)
+        self.mkskill(self.G, "one")
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": self.home,
+               "CLAUDE_CONFIG_DIR": self.cfg, "CLAUDE_PROJECT_DIR": self.projA}
+        res = subprocess.run([PY, os.path.join(tools, "skill-vetting-advisory.py")],
+                             input=b"{}", env=env, cwd=self.neutral,
+                             capture_output=True, timeout=60)
+        out = res.stdout.decode()
+        self.assertTrue(out.strip(), "the first advisory must still be delivered")
+        json.loads(out)      # raises if a second object was appended
+        self.assertEqual(1, out.count('"hookSpecificOutput"'),
+                         "exactly one advisory object may reach stdout (G5); "
+                         "got: " + out)
+        self.assertEqual(0, res.returncode)
+
     def test_lock_wait_stays_bounded_when_the_lock_keeps_coming_back_stale(self):
         """LOCK_WAIT_S and _acquire's docstring both promise a bounded wait, and
         round 8 found one path that did not honour it: the stale branch used
@@ -1112,6 +1153,39 @@ class HookE2E(unittest.TestCase):
         self.assertNotIn("changed skill", ctx,
                          "a budget breach is not evidence of a change - nothing "
                          "on disk moved")
+
+    def test_an_adverse_verdict_is_not_pruned_and_no_false_removal_is_claimed(self):
+        """SKILL.md section 0 vets a candidate BEFORE the user installs it, so
+        at `record` time it is legitimately not under a watched root - and the
+        next SessionStart pruned the verdict and announced a removal that had
+        not happened, while the tree sat on disk elsewhere. `--scope global`
+        makes it certain, since "global" is always scanned (round 8).
+
+        Two properties, both of which failed: an adverse verdict survives, and
+        no line asserts a history the hook cannot know."""
+        outside = os.path.join(self.tmp, "downloads", "evil-skill")
+        os.makedirs(outside)
+        with open(os.path.join(outside, "SKILL.md"), "w") as fh:
+            fh.write("payload\n")
+        self.run_hook()                                  # bootstrap
+        env = dict(os.environ, CLAUDE_CONFIG_DIR=self.cfg, HOME=self.home)
+        rec = subprocess.run(
+            [PY, SNAP, "record", "--scope", "global", "--name", "evil-skill",
+             "--dir", outside, "--verdict", "BLOCK", "--reviewer", "t"],
+            capture_output=True, text=True, env=env, timeout=60)
+        self.assertEqual(0, rec.returncode, rec.stderr)
+
+        rc, ctx, _ = self.run_hook()
+        self.assertNotIn("was removed", ctx or "",
+                         "the tree is still on disk; nothing was removed")
+        self.assertNotIn("evil-skill", ctx or "",
+                         "an entry that was never installed is not a removal "
+                         "event, so it has no line to put its name on")
+        st = subprocess.run([PY, SNAP, "status"], capture_output=True, text=True,
+                            env=env, timeout=60)
+        self.assertIn("evil-skill", st.stdout,
+                      "the BLOCK must survive an ordinary SessionStart")
+        self.assertIn("BLOCK", st.stdout)
 
     def test_record_then_change_flips_vetted_to_seen(self):
         d = self.mkskill(self.G, "alpha")

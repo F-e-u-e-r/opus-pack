@@ -340,8 +340,22 @@ shipped command templates and runs them against a hostile directory name, which
 is why the round-6 remedy for it could ship broken and be "verified" with `;` —
 one of the many metacharacters double quotes DO neutralise, unlike the four
 that carry the attack. Closing G3-SHELL (design D1) must land
-with that test. With that exception stated, every goal and invariant above maps
-to a named executable test in
+with that test.
+
+**G3-SHELL is not the only exception, and this paragraph used to claim it was.**
+Round 8 measured the suites by mutation rather than by reading them, and found
+mechanisms that no test could fail on: I2's mid-scan swap window (the test at
+`test-skill_snapshot.py` says in its own comment that it does not reach it),
+I10's `partial`-with-a-prior-record half, and — until that round — I1's kind tag
+and both length prefixes, G6's policy half, `is_changed`'s `not partial` term,
+and the anomaly overflow count. Those seven were closed in round 8 and are
+anchored by mutations; **I2's swap window and I10's partial-with-prior half
+remain open**, and the concurrency property behind I11 is untestable without a
+forced interleaving and is deliberately left so (see the note in
+`test_concurrent_hooks_converge_and_at_least_one_advises_the_change`).
+
+So the claim below is a MAP, not a proof of coverage: every goal and invariant
+above names a test in
 `hooks/test-skill_snapshot.sh` (primitive matrix) or
 `hooks/test-skill-vetting-advisory.sh` (hook contract), covering at minimum:
 add / modify / delete / rename / symlink / broken symlink / special filenames
