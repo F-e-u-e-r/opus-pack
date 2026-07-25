@@ -851,10 +851,45 @@ def _cli_digest(argv):
     # to put a hostile name in a shell command (round-8 screen, pass 10).
     # Resolve to the real last component and gate THAT instead.
     if base in (b".", b".."):
+        # Resolve to the real last component so `digest .` cannot launder a
+        # hostile basename (pass 10). The DOT SPELLING is the problem, not just
+        # the name: after `cd <hostile-symlink>`, `.` is already the resolved
+        # target as far as this process is concerned - lstat(".") sees a plain
+        # directory, so BOTH the badname and the symlink anomaly vanished and
+        # the tree could be recorded SAFE-TO-PROPOSE under the target's key.
+        # That is pass 10's own defect reopened one spelling over, on the
+        # spelling SKILL.md §3 blesses (round-8 screen, pass 13).
+        #
+        # A dot path cannot express which of several names reached this inode,
+        # and that name is exactly what has to be gated. So resolve it, gate the
+        # resolved name - and additionally refuse when the process arrived here
+        # through a symlink, which $PWD preserves and getcwd() does not.
         try:
-            base = os.path.basename(os.fsencode(os.path.realpath(argv[0])))
+            resolved = os.path.realpath(argv[0])
+            base = os.path.basename(os.fsencode(resolved))
         except OSError:
             base = b""
+        # $PWD is the ONLY evidence available. Once the process is inside the
+        # directory, `.` IS the resolved target - there is no syscall that says
+        # which name reached this inode. A shell maintains PWD across `cd`, so
+        # this catches the agent path (SKILL.md §3 tells an agent to `cd` and
+        # digest `.`); a bare subprocess that does not export PWD gets no
+        # protection here and must address the candidate by name. That
+        # limitation is real and is stated in §3 rather than papered over - the
+        # durable answer is D1's --root/--select addressing, which removes the
+        # dot spelling from the procedure entirely.
+        logical = os.environ.get("PWD", "")
+        if base in (b"", b".", b"..") or (
+                argv[0] in (".", "./") and logical
+                and os.path.realpath(logical) == os.path.realpath(".")
+                and os.path.basename(logical) != os.path.basename(
+                    os.path.realpath("."))):
+            print("REFUSED: a dot-relative path cannot say which name reached "
+                  "this directory, and this one arrived through a symlink - a "
+                  "digest taken here would describe the TARGET and silently "
+                  "drop the symlink anomaly. Address the candidate by a path "
+                  "whose last component is its own name.", file=sys.stderr)
+            return 2
     if base and not display_name(base)[1]:
         anomalies.append(("badname", b""))
     print(json.dumps({

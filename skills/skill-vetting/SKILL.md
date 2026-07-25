@@ -120,8 +120,15 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
 - **A verdict binds to the exact content, not a name or a path - and the binding
   is executable, not prose — with ONE stated exception.** For a candidate whose
   own directory NAME fails the identifier gate, the binding is NOT executable
-  today: `digest` correctly reports `badname` and exits 3 however you address it
-  (including `cd` + `digest .`), and `record` would need that same hostile name
+  today: `digest` reports `badname` and exits 3 for every addressing form
+  the procedure sanctions. One limit worth knowing: `cd` into a candidate
+  and `digest .` is only safe because your SHELL exports `PWD`. Once the
+  process is inside the directory, `.` IS the resolved target and no syscall
+  can say which name reached it — so a symlinked candidate digested as `.`
+  without `PWD` set would lose BOTH its symlink and its badname anomaly.
+  Address a candidate by a path whose last component is its own name
+  whenever you can; D1's `--root`/`--select` addressing removes the dot
+  spelling from this procedure entirely, and `record` would need that same hostile name
   on a command line, which this section forbids two paragraphs down. So for a
   hostile-named candidate the verdict is BLOCK, recorded in prose with the
   reason, and no digest binding is claimed. That is fail-closed and it is the

@@ -432,9 +432,16 @@ for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisor
     _names = re.findall(r"^    def (test_\w+)\(", open(_suite).read(), re.M)
     _dupes = sorted(n for n, c in _collections.Counter(_names).items() if c > 1)
     if _dupes:
-        fail("%s defines these tests more than once (the earlier copy is dead "
-             "code Python never runs): %s" % (_suite, ", ".join(_dupes)))
-    ok("%s has %d tests, no shadowed duplicates" % (_suite, len(_names)))
+        fail("%s defines these tests more than once, so the earlier copy is "
+             "dead code Python never runs: %s" % (_suite, ", ".join(_dupes)))
+    else:
+        # len(set(...)) - the definitions that actually RUN. len(_names) counts
+        # the shadowed copy too, and this ok() used to print in the same run as
+        # its own fail() because it was not in an else: the check contradicted
+        # itself one line apart, and reported 93 tests where 91 ran. Verifying
+        # the exit code is not verifying the output (round-8 screen, pass 13).
+        ok("%s has %d tests, no shadowed duplicates"
+           % (_suite, len(set(_names))))
 
 print()
 if failures:
