@@ -159,7 +159,11 @@ def display_name(name_bytes):
     `id-xxxxxxxx` namespace back as if it were a real name (or an attacker can
     name a directory `id-deadbeef` and impersonate another skill's rendering).
     A name that fails either is displayed only as an opaque id AND is reported
-    not-ok, which every caller turns into a `badname` anomaly.
+    not-ok. Callers differ in what they do with that, and "every caller turns it
+    into a `badname` anomaly" was false (round-8 screen pass 4): `_cli_digest`
+    and the hook DO attach the anomaly, while `_cli_record` uses not-ok only to
+    refuse SAFE-TO-PROPOSE — recording BLOCK or SUSPECT on a hostile-named but
+    otherwise clean tree reports no anomalies.
 
     KNOWN OPEN (round 7): an allowlisted name can still spell a compact
     instruction. A shape cap was tried and reverted - see the comment above

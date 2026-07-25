@@ -58,8 +58,12 @@ privilege either way).
   tamper-evident and is never presented as such. Honest documentation is the
   whole mitigation.
 
-Trust classes: bytes and names under watched roots = untrusted data (never
-echoed, never interpreted). Harness stdin + environment = harness-controlled
+Trust classes: bytes and names under watched roots = untrusted data, never
+interpreted. Never ECHOED holds for file CONTENT and for every nested path; it
+does NOT hold for a top-level candidate name that passes the display gate, which
+reaches the model verbatim in the advisory, the removal line and `status` — see
+G3, which states that gap and the test that pins it open. (This sentence carried
+the absolute form after G3 was narrowed to PARTIAL — round-8 screen pass 4.) Harness stdin + environment = harness-controlled
 (parsed defensively, trusted for root resolution). The baseline file = an
 availability artifact, not security evidence: its absence or corruption is an
 observable, advisable event, never a silent state.
@@ -180,8 +184,13 @@ observable, advisable event, never a silent state.
   because the tag is fixed-width, not because it is framed - a reviewer
   checking I1 against `_finish` would have found an unprefixed field and had to
   re-derive the argument.) No delimiter characters exist to collide with path
-  or target bytes; two
-  distinct observed trees cannot encode to the same stream. The digest is
+  or target bytes; two distinct
+  MANIFESTS cannot encode to the same stream. That is a statement about the
+  encoder, not about the world: two trees the scanner refuses to observe in
+  detail — two unopenable directories, say — produce the SAME manifest and
+  therefore the same digest. They are both anomalies and both always advise, so
+  nothing is lost, but the strong "two distinct observed trees" form is false
+  and the module docstring already said so (round-8 screen pass 4). The digest is
   SHA-256 over that stream. (The round-2 collision repro — `a|b -> c` vs
   `a -> b|c` — must produce distinct digests, by construction and by test.)
 - **I2 — fd-verified observation.** Type is decided by `lstat` and then
@@ -193,8 +202,10 @@ observable, advisable event, never a silent state.
   cannot be certified unchanged). Directories are manifest entries too, so
   empty-directory adds/removes change the digest.
 - **I3 — byte-faithful names.** Paths are handled as bytes end to end
-  (`os.fsencode`); undecodable names still hash exactly and are displayed only
-  as opaque ids.
+  (`os.fsencode`); undecodable names still hash exactly. The DISPLAY half is
+  narrower than it used to be: since round 6 only a TOP-LEVEL candidate name
+  goes through the display gate and is rendered as an opaque id; a nested
+  undecodable name is not gated, not an anomaly, and is never displayed at all.
 - **I4 — hard budgets.** `MAX_ENTRIES`, `MAX_FILE_BYTES`, `MAX_TOTAL_BYTES`,
   `MAX_DEPTH`, `MAX_CANDIDATES`, `MAX_OPEN_DIRS`. A RESOURCE breach
   (`MAX_ENTRIES`, `MAX_TOTAL_BYTES`) stops the run; a STRUCTURAL breach
