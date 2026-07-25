@@ -104,14 +104,46 @@ class HookE2E(unittest.TestCase):
 
     # -- silent side -------------------------------------------------------
 
-    def test_first_run_bootstrap_is_silent_and_baselines(self):
+    def test_first_run_bootstrap_says_so_and_baselines(self):
+        # SUPERSEDES the earlier "first-run bootstrap must be silent" assertion.
+        # That silence was reachable a SECOND time: when the very first baseline
+        # write failed transiently, the next session saw "absent" again and
+        # silently baselined whatever the content had become in between, so a
+        # change across that window was never advised (round 6, reproduced).
+        # One line makes the bootstrap auditable and closes the sequence without
+        # durable failure state. Silence for an UNCHANGED tree is unaffected -
+        # that is the owner-chosen behaviour and the next test still holds it.
         self.mkskill(self.G, "alpha")
         rc, ctx, _ = self.run_hook()
         self.assertEqual(rc, 0)
-        self.assertIsNone(ctx, "first-run bootstrap must be silent (documented limit)")
+        self.assertIn("first run", ctx)
+        self.assertIn("WITHOUT review", ctx)
         data = self.read_baseline()
         self.assertEqual([e["status"] for e in data["entries"].values()],
                          ["baseline"])
+        # ...and the SECOND run, with nothing changed, is silent.
+        self.assertIsNone(self.run_hook()[1])
+
+    def test_failed_first_write_does_not_silently_bootstrap_a_change(self):
+        # round-6 (luna): baseline absent + a transient store failure used to
+        # leave no durable trace, so the next run treated changed content as a
+        # fresh silent bootstrap and the change was never advised.
+        d = self.mkskill(self.G, "thing")
+        os.makedirs(os.path.dirname(self.bpath), exist_ok=True)
+        os.chmod(os.path.dirname(self.bpath), 0o500)      # store will fail
+        try:
+            rc, ctx, _ = self.run_hook()
+            self.assertEqual(rc, 0)
+            self.assertIsNotNone(ctx, "a failed first write must not be silent")
+            self.assertFalse(os.path.exists(self.bpath))
+        finally:
+            os.chmod(os.path.dirname(self.bpath), 0o700)
+        with open(os.path.join(d, "SKILL.md"), "w") as fh:
+            fh.write("v2 CHANGED WHILE UNOBSERVED")
+        rc, ctx, _ = self.run_hook()
+        self.assertIsNotNone(
+            ctx, "the next run must not silently baseline the changed content")
+        self.assertIn("first run", ctx)
 
     def test_no_delta_is_silent_and_baseline_not_rewritten(self):
         self.mkskill(self.G, "alpha")
@@ -446,6 +478,150 @@ class HookE2E(unittest.TestCase):
                       "SV-3 generalized: the highest-signal line must not be capped away")
 
     # -- vetting-status lifecycle ------------------------------------------
+
+    def test_a_global_poisoner_cannot_blind_project_skills(self):
+        # round-6: a per-candidate STRUCTURAL breach used to set the SHARED
+        # budget stop, after which every later candidate got one constant
+        # content-independent digest - so is_changed was permanently False. The
+        # hook scans global before project on one budget, so a poisoner in the
+        # GLOBAL root deterministically blinded every project skill.
+        deep = os.path.join(self.G, "poisoner")
+        os.makedirs(os.path.join(deep, *["d%d" % i for i in range(30)]))
+        with open(os.path.join(deep, "SKILL.md"), "w") as fh:
+            fh.write("x")
+        proj = self.proj_skills(self.projA)
+        for n in ("p_one", "p_two"):
+            self.mkskill(proj, n)
+        self.run_hook()
+        before = self.run_hook()[1]
+        for n in ("p_one", "p_two"):
+            with open(os.path.join(proj, n, "SKILL.md"), "w") as fh:
+                fh.write("TROJAN")
+        after = self.run_hook()[1]
+        self.assertNotEqual(before, after,
+                            "a modification to project skills must be visible")
+        self.assertIn("p_one", after)
+        self.assertIn("p_two", after)
+
+    def test_recurring_anomalies_cannot_starve_a_real_delta(self):
+        # round-6: anomaly lines are STEADY-STATE and were ordered FIRST, while
+        # new/changed/removed are TRANSIENT and were ordered LAST - so >=8
+        # recurring anomalies evicted every real delta forever while the
+        # baseline advanced anyway. A removal was then pruned and unrecoverable.
+        for i in range(9):
+            d = self.mkskill(self.G, "pad%d" % i)
+            os.symlink("x", os.path.join(d, "link"))     # permanent anomaly
+        self.mkskill(self.G, "victim")
+        self.mkskill(self.G, "goner")
+        self.run_hook()
+        self.run_hook()
+        with open(os.path.join(self.G, "victim", "SKILL.md"), "w") as fh:
+            fh.write("PAYLOAD")
+        shutil.rmtree(os.path.join(self.G, "goner"))
+        ctx = self.run_hook()[1]
+        self.assertIn("victim", ctx, "a real change must not be evicted")
+        self.assertIn("goner", ctx, "a removal must not be evicted")
+
+    def test_an_undelivered_delta_is_not_consumed(self):
+        # The general form of G5: whatever the cap holds back must still be
+        # pending, not silently baselined.
+        self.mkskill(self.G, "keeper")
+        self.run_hook()
+        for i in range(20):
+            self.mkskill(self.G, "n%02d" % i)
+        first = self.run_hook()[1]
+        named = {n for n in ("n%02d" % i for i in range(20)) if n in first}
+        self.assertLess(len(named), 20, "premise: the cap held some back")
+        # Every held-back add must keep re-advising until it has been named.
+        for _ in range(6):
+            ctx = self.run_hook()[1]
+            if ctx is None:
+                break
+            named |= {n for n in ("n%02d" % i for i in range(20)) if n in ctx}
+        self.assertEqual(
+            20, len(named),
+            "these were consumed without ever being named: %s"
+            % sorted({"n%02d" % i for i in range(20)} - named))
+        self.assertIsNone(self.run_hook()[1], "and then it settles")
+
+    def test_a_partial_scan_does_not_destroy_a_recorded_verdict(self):
+        # round-6: a RESOURCE-budget exhaustion gives every remaining candidate
+        # one constant content-independent placeholder digest. Storing it as the
+        # skill's digest means the NEXT healthy run compares real bytes against
+        # the placeholder, calls it "changed", and drops the recorded verdict -
+        # so a transient budget breach silently un-vets a reviewed skill.
+        # Both skills are vetted first, so the assertion holds whichever one
+        # os.scandir happens to return second.
+        names = ("one", "two")
+        for n in names:
+            self.mkskill(self.G, n)
+        self.run_hook()
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+               "HOME": self.home, "CLAUDE_CONFIG_DIR": self.cfg}
+        for n in names:
+            d = os.path.join(self.G, n)
+            dg = json.loads(subprocess.run(
+                [PY, SNAP, "digest", d], capture_output=True, text=True,
+                env=env, timeout=60).stdout)["digest"]
+            r = subprocess.run(
+                [PY, SNAP, "record", "--scope", "global", "--name", n,
+                 "--dir", d, "--verdict", "SAFE-TO-PROPOSE",
+                 "--expect-digest", dg],
+                capture_output=True, text=True, env=env, timeout=60)
+            self.assertEqual(0, r.returncode, r.stderr)
+        self.assertEqual({"vetted", "vetted"},
+                         {e["status"] for e in self.read_baseline()["entries"].values()})
+
+        # One run under a budget so tight that whatever is enumerated after the
+        # first candidate can only come back as a placeholder.
+        tools = os.path.join(self.tmp, "tools")
+        os.makedirs(tools)
+        for name in ("skill_snapshot.py", "skill-vetting-advisory.py"):
+            s = open(os.path.join(HOOKS, name)).read()
+            if name == "skill_snapshot.py":
+                s2 = s.replace("MAX_ENTRIES = 4096", "MAX_ENTRIES = 1", 1)
+                self.assertNotEqual(s, s2, "MAX_ENTRIES patch anchor moved")
+                s = s2
+            with open(os.path.join(tools, name), "w") as fh:
+                fh.write(s)
+        subprocess.run([PY, os.path.join(tools, "skill-vetting-advisory.py")],
+                       input=b"{}", env=dict(env, CLAUDE_PROJECT_DIR=self.projA),
+                       capture_output=True, cwd=self.neutral, timeout=60)
+
+        # Now a healthy run, with nothing on disk changed.
+        self.run_hook()
+        after = {e["name"]: e for e in self.read_baseline()["entries"].values()}
+        for n in names:
+            self.assertEqual(
+                "vetted", after[n]["status"],
+                "%s lost its verdict to a transient budget breach" % n)
+            self.assertEqual("SAFE-TO-PROPOSE", after[n].get("verdict"))
+
+    def test_concurrent_hooks_do_not_lose_an_update(self):
+        # round-6 (sol): load/store are a read-modify-write with no lock, so a
+        # slower hook wrote its STALE merge over a faster one's and the delta the
+        # faster one advised was un-recorded and never re-advised.
+        import threading
+        for n in ("g", "h"):
+            self.mkskill(self.G, n)
+        self.run_hook()
+        results = []
+
+        def go():
+            results.append(self.run_hook()[1])
+
+        threads = [threading.Thread(target=go) for _ in range(4)]
+        with open(os.path.join(self.G, "g", "SKILL.md"), "w") as fh:
+            fh.write("CHANGED")
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        advised = [r for r in results if r and "g" in r]
+        self.assertTrue(advised, "the change must be advised by someone")
+        # ...and after the dust settles the baseline must agree with the tree,
+        # so a further run is silent rather than re-reporting a lost update.
+        self.assertIsNone(self.run_hook()[1])
 
     def test_record_then_change_flips_vetted_to_seen(self):
         d = self.mkskill(self.G, "alpha")

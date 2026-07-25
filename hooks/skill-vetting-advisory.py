@@ -68,6 +68,7 @@ regression fixtures for the skill-vetting skill, never as a runtime detector.
 import json
 import os
 import sys
+import time
 import traceback
 
 sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
@@ -125,6 +126,59 @@ def _emit(lines):
         return True
     except Exception:
         return False
+
+
+LOCK_WAIT_S = 5.0     # bounded: a SessionStart hook must never stall a session
+LOCK_STALE_S = 60.0   # a lock older than this belonged to a run that died
+
+
+def _acquire(lockpath):
+    """Serialize load -> scan -> deliver -> store across concurrent hooks.
+
+    load_baseline/store_baseline are a read-modify-write with no lock,
+    generation or compare-and-swap, so two SessionStart hooks racing (two
+    sessions started at once — ordinary, not adversarial) LOSE an update: the
+    slower one writes its stale merge over the faster one's, and the delta the
+    faster one advised is un-recorded and never re-advises (round 6). Atomic
+    replace prevents a torn file; it does not prevent a lost update.
+
+    O_EXCL create, bounded wait, and takeover of a stale lock so a process that
+    died holding it cannot wedge every later session.
+
+    Returns (fd, state): ("held" with an fd) | (None, "contended") when another
+    live hook holds it | (None, "unavailable") when the lock file cannot be
+    created at all. Those last two are NOT the same thing and must not share a
+    message: an unwritable config directory is a degraded run to be reported on
+    its own terms, not a peer session doing the work."""
+    deadline = time.time() + LOCK_WAIT_S
+    while True:
+        try:
+            return os.open(lockpath,
+                           os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_CLOEXEC,
+                           0o600), "held"
+        except FileExistsError:
+            try:
+                if time.time() - os.lstat(lockpath).st_mtime > LOCK_STALE_S:
+                    os.unlink(lockpath)
+                    continue
+            except OSError:
+                pass
+            if time.time() >= deadline:
+                return None, "contended"
+            time.sleep(0.05)
+        except OSError:
+            return None, "unavailable"
+
+
+def _release(fd, lockpath):
+    try:
+        os.close(fd)
+    except OSError:
+        pass
+    try:
+        os.unlink(lockpath)
+    except OSError:
+        pass
 
 
 def _same_dir(a, b):
@@ -213,10 +267,61 @@ def main():
                           proj_skills))
 
         bpath = snapmod.baseline_path(cfg)
+        # Everything from here to the store is one critical section: see
+        # _acquire. A hook that cannot take the lock does NOT scan and does NOT
+        # touch the baseline — the holder is doing exactly this work and will
+        # advise — but it says so rather than looking clean.
+        lockpath = bpath + ".lock"
+        try:
+            os.makedirs(os.path.dirname(bpath), mode=0o700, exist_ok=True)
+        except OSError:
+            pass
+        lock_fd, lock_state = _acquire(lockpath)
+        if lock_state == "contended":
+            # A live peer holds it and is doing exactly this work; it will
+            # advise. Say so rather than looking clean, and touch nothing.
+            _emit(["another session is scanning the skills directories right "
+                   "now, so this session did not — if it reported new or "
+                   "changed skills, they apply here too"])
+            return 0
+        # "unavailable" (the lock file cannot be created at all) is a degraded
+        # run, not contention: proceed unlocked. The store will fail for the
+        # same underlying reason and take its own fail-closed advisory path.
+        try:
+            return _run(snapmod, roots, bpath, cfg, lock_state)
+        finally:
+            if lock_fd is not None:
+                _release(lock_fd, lockpath)
+    except Exception:
+        _log("ERROR " + traceback.format_exc().replace("\n", " | "))
+        if not printed:
+            _emit(["the skill-vetting advisory hook could not complete "
+                   "(internal error) — skill changes may be UNOBSERVED this "
+                   "session; run the skill-vetting skill manually on anything "
+                   "new or changed"])
+        return 0
+
+
+def _run(snapmod, roots, bpath, cfg, lock_state="held"):
+    """The critical section: load the baseline, scan every watched root,
+    deliver the advisory, then advance the baseline. Called with the lock held."""
+    printed = False
+    try:
         state, data = snapmod.load_baseline(bpath)
         old_entries = data["entries"] if state == "ok" else {}
 
         head_lines = []
+        if lock_state == "unavailable":
+            # We could not even create a lock file next to the baseline, so the
+            # store below will fail for the same reason. Say it HERE, in the one
+            # advisory this run emits: delivery-before-advance (G5) means the
+            # store happens after the emit, and a second emit would put two JSON
+            # objects on a stdout the harness reads as one.
+            head_lines.append(
+                "the vetting baseline directory is not writable — the baseline "
+                "could not be saved, so a skill change before the next session "
+                "may go UNOBSERVED; fix the <config>/skill-vetting directory, "
+                "and vet currently installed skills with the skill-vetting skill")
         if state == "corrupt":
             head_lines.append(
                 "the vetting baseline was unreadable and has been rebuilt — "
@@ -229,7 +334,12 @@ def main():
                 "currently installed skills with the skill-vetting skill"
                 % (snapmod.SCHEMA_VERSION, snapmod.POLICY_VERSION))
 
-        anomaly_lines, new_lines, changed_lines, removed_lines = [], [], [], []
+        # delta_lines holds TRANSIENT events (new / changed / removed): each
+        # fires once and is then consumed by the baseline advance. Every item is
+        # (line, key, prior_entry_or_None) so a line that does not fit the
+        # display cap can have its baseline entry put back, leaving the delta
+        # undelivered and therefore still pending (G5, round 6).
+        anomaly_lines, delta_lines = [], []
         new_entries = {}
         scanned_scopes = {}   # scope -> enumeration complete?
         budget = {"bytes": 0, "entries": 0, "stop": False}  # shared across ALL candidates
@@ -241,7 +351,15 @@ def main():
             for key, disp, snap in candidates:
                 old = old_entries.get(key)
                 is_new = old is None
-                is_changed = (old is not None) and old["digest"] != snap["digest"]
+                # A `partial` snap's digest describes the SCAN STATE, not the
+                # tree: a resource-budget short-circuit yields one constant,
+                # content-independent digest. Never let it decide "changed", and
+                # never let it overwrite a real recorded digest - otherwise a
+                # later genuine change compares equal to the placeholder and is
+                # invisible to the detector (round 6).
+                partial = bool(snap.get("partial"))
+                is_changed = (old is not None and not partial
+                              and old["digest"] != snap["digest"])
                 anomalous = bool(snap["anomalies"])
                 if state == "absent" and not anomalous:
                     status = "baseline"          # first-run bootstrap: silent
@@ -253,12 +371,15 @@ def main():
                     status = "seen"
                 else:
                     status = old["status"]       # unchanged: keep status+verdict
-                entry = {"digest": snap["digest"], "status": status,
-                         "name": disp.split(":", 1)[1], "scope": scope}
-                if status == "vetted" and old:   # preserve the full verdict record
-                    for f in ("verdict", "provenance"):   # SV4-09: keep provenance too
-                        if f in old:
-                            entry[f] = old[f]
+                if partial and old is not None:
+                    entry = dict(old)           # not observed: keep the real record
+                else:
+                    entry = {"digest": snap["digest"], "status": status,
+                             "name": disp.split(":", 1)[1], "scope": scope}
+                    if status == "vetted" and old:   # preserve the verdict record
+                        for f in ("verdict", "provenance"):   # SV4-09: provenance too
+                            if f in old:
+                                entry[f] = old[f]
                 new_entries[key] = entry
                 if snap["anomalies"]:
                     reasons = ",".join(sorted({r for r, _ in snap["anomalies"]}))
@@ -269,37 +390,84 @@ def main():
                         "the skill-vetting skill on it before trusting it"
                         % (kind, disp, reasons))
                 elif state == "ok" and is_new:
-                    new_lines.append(
+                    delta_lines.append((
                         "new skill %s — run the skill-vetting skill on it "
-                        "before trusting it or reusing a prior verdict" % disp)
+                        "before trusting it or reusing a prior verdict" % disp,
+                        key, None))
                 elif state == "ok" and is_changed:
-                    changed_lines.append(
+                    delta_lines.append((
                         "changed skill %s — run the skill-vetting skill on it "
-                        "before trusting it or reusing a prior verdict" % disp)
+                        "before trusting it or reusing a prior verdict" % disp,
+                        key, old))
 
         if state == "ok":
             for key, old in old_entries.items():
                 scope = old["scope"]
                 if scope in scanned_scopes and key not in new_entries:
                     if scanned_scopes[scope]:
-                        removed_lines.append(
+                        # Carries `old` so an undelivered removal line can put
+                        # the entry back instead of pruning it: a pruned entry
+                        # can never re-fire, which made a lost removal line the
+                        # one unrecoverable case (round 6).
+                        delta_lines.append((
                             "skill %s was removed — baseline entry pruned"
-                            % old["name"])
+                            % old["name"], key, old))
                     else:
                         new_entries[key] = old   # incomplete enumeration: keep
                 elif scope not in scanned_scopes:
                     new_entries[key] = old       # other project: preserve
+        elif state == "absent" and new_entries:
+            # A first run used to be entirely silent, and that silence was
+            # reachable a second time: if the very first baseline write failed
+            # transiently, the next session saw "absent" again and silently
+            # baselined whatever the content had become in between (round 6).
+            # One honest line makes the bootstrap auditable and closes that
+            # sequence without needing durable failure state.
+            head_lines.append(
+                "first run — %d installed skill(s) recorded as the baseline "
+                "WITHOUT review; run the skill-vetting skill on any you have "
+                "not vetted (`skill_snapshot.py status` lists them)"
+                % len(new_entries))
 
         # Deliver BEFORE advancing the baseline (G5/R2-08): a failed delivery
         # must leave the old baseline so the same deltas re-advise next run.
-        lines = (head_lines + anomaly_lines + new_lines + changed_lines
-                 + removed_lines)
+        # Transient deltas outrank steady-state anomalies for the scarce display
+        # slots. An anomaly line recurs every session until the condition is
+        # fixed, so losing one costs a session; a delta line fires ONCE and is
+        # then consumed by the baseline advance, so losing one costs it
+        # permanently. The old order was the reverse, and eight recurring
+        # anomalies were enough to evict every real add/change/removal forever
+        # while the baseline advanced anyway (round 6). Any delta that still
+        # does not fit is REVERTED in the baseline, so it is genuinely pending
+        # rather than silently consumed — this is what makes G5 literal.
+        room = max(1, MAX_LISTED - len(head_lines))
+        shown_deltas = delta_lines[:max(0, room - (1 if anomaly_lines else 0))]
+        for _l, key, prior in delta_lines[len(shown_deltas):]:
+            if prior is None:
+                new_entries.pop(key, None)       # undelivered add: stays new
+            else:
+                new_entries[key] = prior         # undelivered change/removal
+        lines = head_lines + [l for l, _k, _p in shown_deltas]
+        held = len(delta_lines) - len(shown_deltas)
+        if held:
+            # The cap may hide LINES; it must never hide COUNTS.
+            lines.append("...and %d further new/changed/removed skill(s) held "
+                         "back for the next session — %d total; run the "
+                         "skill-vetting skill on ALL of them"
+                         % (held, len(delta_lines) + len(anomaly_lines)))
+        left = MAX_LISTED - len(lines)
+        if anomaly_lines:
+            if len(anomaly_lines) <= left:
+                lines.extend(anomaly_lines)
+            else:
+                keep = max(0, left - 1)
+                lines.extend(anomaly_lines[:keep])
+                lines.append("...and %d more skill(s) that cannot be certified "
+                             "unchanged — %d total; run the skill-vetting skill "
+                             "on ALL of them"
+                             % (len(anomaly_lines) - keep, len(anomaly_lines)))
         if lines:
-            shown = lines[:MAX_LISTED]
-            if len(lines) > len(shown):
-                shown.append("...and %d more item(s) not shown — %d total; run "
-                             "the skill-vetting skill on ALL of them"
-                             % (len(lines) - len(shown), len(lines)))
+            shown = lines
             if not _emit(shown):
                 _log("WARN advisory delivery failed — baseline NOT advanced "
                      "(will re-advise)")

@@ -78,9 +78,15 @@ observable, advisable event, never a silent state.
   "unchanged" and is never silently baselined as clean.
 - **G3 — injection containment.** Advisory text is built from fixed template
   strings, counts, and validated identifiers only. A directory name is
-  displayed only if it matches a conservative ASCII allowlist; otherwise an
-  opaque digest-derived id is shown (and the hostile name is itself an
-  anomaly). File paths and file content are never echoed.
+  displayed only if it passes the identifier gate: a conservative ASCII
+  allowlist, PLUS a shape limit on length and separator count so an allowlisted
+  name cannot spell an instruction sentence (`.`, `-` and `_` are word
+  separators, and 64 characters of them is a sentence — round 6), PLUS a refusal
+  to echo this tool's own `id-xxxxxxxx` opaque namespace back as if it were a
+  real name. Otherwise an opaque digest-derived id is shown, and the hostile
+  name is itself an anomaly. File paths and file content are never echoed. The
+  same rule governs CLI stdout AND stderr, which the skill's §3 feeds back to
+  the model: no error message echoes an unvalidated argument.
 - **G4 — bounded work, visible degradation.** Entry-count, per-file-byte,
   total-byte, and depth caps bound the scan; opens use `O_NOFOLLOW|O_NONBLOCK`
   so a planted FIFO cannot hang SessionStart; the walk is iterative. An
@@ -107,6 +113,12 @@ observable, advisable event, never a silent state.
   watched; vet those manually.
 - **N4 — same-session installs.** SessionStart-only; content landing after the
   scan is seen next session.
+- **N-CORRECTION (round 6).** First-run bootstrap is no longer fully silent: it
+  emits one line naming the count of skills baselined without review. The old
+  silence was reachable a SECOND time — a transient failure of the very first
+  baseline write left no durable trace, so the next session saw "absent" again
+  and silently baselined whatever the content had become in between.
+
 - **N5 — enforcing follow-through.** Once a delta has been delivered, the hook
   does not re-raise it every session (advisory posture, owner-chosen). The
   compensating, non-nagging control: the baseline records a per-skill vetting
@@ -157,9 +169,41 @@ observable, advisable event, never a silent state.
   anomaly, so it always advises).
 - **I5 — anomaly dominates comparison.** Comparison yields
   `unchanged`/`changed`/`anomalous`; a snapshot containing any anomaly is
-  `anomalous` regardless of digest equality, and always advises. Anomaly
-  records (with stable reason codes) are part of the manifest, so an anomaly
-  appearing or healing is itself a digest change.
+  `anomalous` regardless of digest equality, and always advises. Anomalies are
+  carried alongside the manifest, and an anomaly that REPLACES an observation is
+  also a manifest entry — but not every anomaly class is (round 6 correction to
+  an earlier over-broad claim that all of them were). That is sound because the
+  operative half is the first sentence: any anomaly forces `anomalous`, so the
+  digest never has to carry the signal alone.
+
+- **I8 — structural refusal is not a resource budget.** `MAX_DEPTH` and
+  `MAX_OPEN_DIRS` are per-candidate limits on what the walker is willing to
+  descend; they mark THAT candidate anomalous and must never set the shared
+  cross-candidate stop that `MAX_ENTRIES`/`MAX_TOTAL_BYTES` use. Conflating them
+  let one skill holding 31 empty nested directories hand every later candidate
+  the same constant, content-independent digest, permanently defeating change
+  detection for them (round 6).
+
+- **I9 — an unobserved candidate is never baselined as observed.** A snapshot
+  produced by a budget short-circuit is marked `partial`; its digest describes
+  the scan state, not the tree. A caller must not store it as that skill's
+  digest, or the next healthy run compares real bytes against a placeholder,
+  calls it "changed", and drops the recorded verdict.
+
+- **I10 — a delivered advisory covers exactly what the baseline advance
+  consumes.** Transient deltas (new/changed/removed) fire once and are then
+  consumed; steady-state anomaly lines recur until fixed. Deltas therefore
+  outrank anomalies for display slots, and any delta line that is NOT delivered
+  has its baseline entry restored, so it is genuinely pending rather than
+  silently swallowed. A pruned removal entry can never re-fire, which made a
+  lost removal line the one unrecoverable case (round 6).
+
+- **I11 — the load/store cycle is serialized.** `load_baseline` ->
+  scan -> deliver -> `store_baseline` is a read-modify-write with no inherent
+  concurrency control, so two hooks racing lose an update: the slower writes its
+  stale merge over the faster one's and the delta the faster one advised is
+  un-recorded. Atomic replace prevents a torn file, not a lost update. The hook
+  takes a bounded, stale-recoverable lock around the whole cycle (round 6).
 - **I6 — hardened baseline I/O.** Read: `O_NOFOLLOW`, size-capped, strict JSON
   parse plus shape/enum/schema validation — any deviation is `corrupt`, which
   advises and rebuilds visibly. Write: same-directory `mkstemp` (0600) +

