@@ -26,6 +26,12 @@ error rather than a survivor, because "the tool is broken" and "the fix is
 unprotected" are different findings and must never share an exit path.
 
 Usage:  python3 hooks/mutation_matrix.py [--check-only] [--only M52,M60]
+
+An AUTHORITATIVE run - the one a closure report cites - takes no flags: a clean
+tree, every mutation, and the commit it measured printed with the result.
+--check-only validates anchors and measures nothing; --allow-dirty-head-only
+measures HEAD while your uncommitted work sits outside the run. Neither belongs
+in a closure claim.
 """
 import argparse
 import ast
@@ -82,6 +88,31 @@ def check_mutation(src, old, new, expect_def=None):
     return where
 
 
+def dirty_gate(dirty, allow_head_only, head):
+    """-> (proceed, lines_to_print). Pure, so the decision is testable without
+    building a repository in a fixture.
+
+    The flag's whole hazard is its name. A worktree is checked out at a COMMIT,
+    so uncommitted work is never measured; someone who has just edited a file
+    and reached for a permissive-sounding flag would otherwise read a pass as
+    being about that edit. So the refusal names the commit, and the override
+    itemises exactly what it is leaving out."""
+    if not dirty:
+        return True, []
+    if not allow_head_only:
+        return False, [
+            "REFUSED: the working tree has uncommitted changes, which a "
+            "worktree checkout of %s would NOT include - the run would measure "
+            "a tree that is not the one you are looking at. Commit first, or "
+            "pass --allow-dirty-head-only to measure HEAD alone." % head[:12]
+        ] + dirty.splitlines()
+    return True, [
+        "WARNING: --allow-dirty-head-only - measuring commit %s. The following "
+        "uncommitted changes are NOT in this run:" % head[:12]
+    ] + ["    " + line for line in dirty.splitlines()] + [
+        "    (a result here says nothing about the edits above.)"]
+
+
 def load_matrix():
     """Read MUTATIONS from the sibling data file.
 
@@ -110,8 +141,14 @@ def main(argv=None):
                     help="validate every mutation's shape; run no suites")
     ap.add_argument("--only", default="",
                     help="comma-separated ids, e.g. M52,M60")
-    ap.add_argument("--allow-dirty", action="store_true",
-                    help="run even though uncommitted changes will be EXCLUDED")
+    # NAMED for what it actually does. "--allow-dirty" reads as "include my
+    # uncommitted work"; the truth is the opposite - the worktree is checked
+    # out at HEAD, so those changes are NOT measured. Someone who has just
+    # edited a file and reaches for a permissive-sounding flag would be told
+    # their edit passed when it was never run.
+    ap.add_argument("--allow-dirty-head-only", action="store_true",
+                    help="proceed with a dirty tree, measuring HEAD ONLY - "
+                         "uncommitted changes are EXCLUDED from the run")
     args = ap.parse_args(argv)
 
     matrix = load_matrix()
@@ -137,6 +174,8 @@ def main(argv=None):
     print("shape check: %d/%d mutations are unique, non-empty and in-place"
           % (len(matrix), len(matrix)))
     if args.check_only:
+        print("ANCHOR VALIDATION ONLY - no suite ran, nothing was mutated, and "
+              "this is NOT an authoritative measurement.")
         return 0
 
     # The canonical tree is never mutated. Earlier versions edited
@@ -153,13 +192,10 @@ def main(argv=None):
                           capture_output=True, text=True).stdout.strip()
     dirty = subprocess.run(["git", "status", "--porcelain"], cwd=REPO,
                            capture_output=True, text=True).stdout.strip()
-    if dirty and not args.allow_dirty:
-        print("REFUSED: the working tree has uncommitted changes, which a "
-              "worktree checkout of %s would NOT include - the run would "
-              "measure a tree that is not the one you are looking at. Commit "
-              "first, or pass --allow-dirty to accept that gap knowingly."
-              % head[:12], file=sys.stderr)
-        print(dirty, file=sys.stderr)
+    proceed, notes = dirty_gate(dirty, args.allow_dirty_head_only, head)
+    for line in notes:
+        print(line, file=sys.stderr)
+    if not proceed:
         return 2
 
     # PHASE 2 - execute, inside a throwaway checkout of `head`.

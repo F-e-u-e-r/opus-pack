@@ -79,6 +79,51 @@ class ShapeChecks(unittest.TestCase):
         self.assertEqual("<module>", mm.enclosing_def("y = 2\n", 0))
 
 
+class DirtyTreeGate(unittest.TestCase):
+    """A worktree is checked out at a COMMIT, so uncommitted work is never
+    measured. The flag that overrides the refusal must not let anyone believe
+    otherwise - it was first called --allow-dirty, which reads as "include my
+    changes" and means the opposite."""
+
+    HEAD = "abc123def4567890"
+
+    def test_a_clean_tree_proceeds_silently(self):
+        proceed, notes = mm.dirty_gate("", False, self.HEAD)
+        self.assertTrue(proceed)
+        self.assertEqual([], notes)
+
+    def test_a_dirty_tree_is_refused_and_the_files_are_named(self):
+        proceed, notes = mm.dirty_gate(" M hooks/x.py\n?? y.md", False, self.HEAD)
+        self.assertFalse(proceed)
+        body = "\n".join(notes)
+        self.assertIn("REFUSED", body)
+        self.assertIn("abc123def456", body, "the refusal must name the commit")
+        self.assertIn("hooks/x.py", body)
+        self.assertIn("y.md", body, "every excluded change must be listed")
+
+    def test_the_override_itemises_what_it_leaves_out(self):
+        proceed, notes = mm.dirty_gate(" M hooks/x.py", True, self.HEAD)
+        self.assertTrue(proceed)
+        body = "\n".join(notes)
+        self.assertIn("WARNING", body)
+        self.assertIn("NOT in this run", body,
+                      "the override must say the changes are excluded, not "
+                      "merely tolerated")
+        self.assertIn("hooks/x.py", body)
+        self.assertIn("abc123def456", body)
+
+    def test_the_flag_is_not_named_allow_dirty(self):
+        """The old name invited exactly the misreading this gate exists to
+        prevent: a user who just edited a file, saw a pass, and concluded the
+        edit was measured."""
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"), "--help"],
+                           capture_output=True, text=True, timeout=60)
+        self.assertIn("--allow-dirty-head-only", r.stdout)
+        self.assertNotIn("--allow-dirty ", r.stdout)
+        self.assertIn("EXCLUDED", r.stdout)
+
+
 class TheRealMatrix(unittest.TestCase):
     """The shipped data file must satisfy the gate it declares."""
 
