@@ -133,13 +133,17 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   `.` form it behaves differently on a candidate that is ITSELF a symlink: it
   exits 2 with a REFUSED message and no anomaly list, because a dot path cannot
   express that it arrived through a link. Both are fail-closed; they are not the
-  same signal, and §3 binds a verdict only to an exit-0 digest. One limit worth knowing: `cd` into a candidate
-  and `digest .` is only safe because your SHELL exports `PWD`. Once the
-  process is inside the directory, `.` IS the resolved target and no syscall
-  can say which name reached it — so a symlinked candidate digested as `.`
-  without `PWD` set would lose BOTH its symlink and its badname anomaly.
-  Address a candidate by a path whose last component is its own name
-  whenever you can; D1's `--root`/`--select` addressing removes the dot
+  same signal, and §3 binds a verdict only to an exit-0 digest. What makes `cd` +
+  `.` usable at all is that your SHELL exports `PWD`: once the process is inside
+  the directory, `.` IS the resolved target and no syscall can say which name
+  reached it, so `PWD` is the only evidence of arrival there is. Since round 8
+  both verbs REFUSE every dot spelling that carries no such evidence — `PWD`
+  unset, `PWD` not resolving to the path you gave (which is every `..` spelling,
+  including `<dir>/sub/../.`), or `PWD` itself a symlink. That refusal does not
+  depend on the candidate being hostile, so an ordinary directory reached
+  through `<dir>/sub/..` is refused too: after the kernel resolves it, the name
+  you wrote is gone. Address a candidate by a path whose last component is its
+  own name whenever you can; D1's `--root`/`--select` addressing removes the dot
   spelling from this procedure entirely, and `record` would need that same hostile name
   on a command line, which this section forbids two paragraphs down. So for a
   hostile-named candidate the verdict is BLOCK, recorded in prose with the

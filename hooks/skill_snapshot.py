@@ -845,43 +845,64 @@ _REFUSE = object()
 
 
 def _resolve_dot_base(raw):
-    """For a `.`/`..` spelling: the real last component, or _REFUSE when the
-    process reached this directory THROUGH a symlink.
+    """For a `.`/`..` spelling: the candidate's real last component, or _REFUSE.
 
-    Three things this has to get right, each of which an earlier version got
-    wrong (round-8 screen, passes 13 and 14):
+    A dot spelling does not name anything. To gate the candidate's NAME the
+    caller has to recover it, and the only way to recover it is to resolve the
+    path - which follows symlinks, which is precisely how a planted link gets
+    its target's harmless name gated in place of its own. So resolution is
+    permitted ONLY where independent evidence says no link was followed at the
+    final component, and $PWD is the only such evidence that exists.
 
-    - It must test the property the message claims. Comparing the BASENAME of
-      $PWD against the basename of realpath(".") does not: a planted skill
-      `skills/helper -> elsewhere/helper` shares its target's basename, so the
-      comparison found nothing and the symlink anomaly was silently dropped.
-      `os.path.islink` on the logical path tests arrival directly.
-    - It must key on the NORMALISED spelling. A raw `argv[0] in (".", "./")`
-      test let `./.`, `././` and `.//` past the refusal while the enclosing
-      branch had already accepted them - normalised at one use, raw at another,
-      inside one function, which is the same defect the record-side fix had just
-      removed.
-    - It must not fire on an ANCESTOR symlink. On macOS /tmp -> /private/tmp and
-      /var -> /private/var make ancestor-symlink working directories completely
-      ordinary; refusing those would be a false-BLOCK factory. Only the FINAL
-      component is the candidate.
+    That makes the permitted case narrow and everything else a refusal:
 
-    $PWD remains the only available evidence: once the process is inside the
-    directory, `.` IS the resolved target and no syscall says which name reached
-    it. A shell maintains PWD across `cd`, which is how an agent invokes this; a
-    bare subprocess that does not export PWD gets no protection here and must
-    address the candidate by name. That limit is stated in SKILL.md §3, and D1's
-    --root/--select addressing is what removes the dot spelling entirely."""
+        resolve  when $PWD IS the candidate and $PWD is not itself a symlink
+        REFUSE   otherwise
+
+    Passes 13 and 14 each fixed one spelling and left the shape open; the
+    round-8 cross-model gate then reproduced three more ways through it, two of
+    which need no `cd` at all (all against a planted
+    `skills/<hostile> -> elsewhere/benign`):
+
+    - `..` in any form. The old guard compared realpath($PWD) to realpath(raw);
+      for `..` those are the child and the parent, so they are NEVER equal and
+      the refusal could not fire whatever the candidate was. `digest
+      <link>/sub/..` then returned exit 0 with an EMPTY anomaly list where the
+      full path returns exit 3 with `symlink` + `badname`, and `record` bound
+      SAFE-TO-PROPOSE under name_key(b"benign") - a slot the hook never looks
+      at, leaving the trojan with no verdict at all and an unread name marked
+      safe. Two lenses reported this independently.
+    - `<link>/sub/../.` and `<link>/sub/.././`. _strip_trailing removes the
+      trailing `/.`, so these arrive here as `..` spellings; they were reported
+      as a `..` defect and are not - they are `.` spellings that reach the same
+      laundering, which is why "refuse `..`" (the remedy both lenses proposed)
+      would have closed one hole and left two.
+    - $PWD unset. `cd <link> && digest .` from a bare subprocess resolved to the
+      target and returned exit 0. This was DOCUMENTED as a limitation rather
+      than treated as a hole; a documented laundering path is still a laundering
+      path, and failing closed costs nothing the contract promised.
+
+    Ancestor symlinks stay ordinary: on macOS /tmp -> /private/tmp and
+    /var -> /private/var, so testing anything but the FINAL component would
+    refuse most real working directories. islink($PWD) tests arrival at the
+    candidate itself, not the route to it.
+
+    A refusal is not a dead end - the message names the way through, and it is
+    the same one SKILL.md §3 already prescribes: address the candidate by a path
+    whose last component is its own name. D1's --root/--select removes the dot
+    spelling from the interface entirely."""
     logical = os.environ.get("PWD", "")
+    if not logical:
+        return _REFUSE
     try:
         real = os.path.realpath(raw)
-        base = os.path.basename(os.fsencode(real))
+        if os.path.realpath(logical) != real:
+            return _REFUSE
+        if os.path.islink(logical):
+            return _REFUSE
+        return os.path.basename(os.fsencode(real))
     except OSError:
-        return b""
-    if (logical and os.path.realpath(logical) == os.path.realpath(raw)
-            and os.path.islink(logical)):
         return _REFUSE
-    return base
 
 
 def _cli_digest(argv):
@@ -906,11 +927,13 @@ def _cli_digest(argv):
     if base in (b".", b".."):
         base = _resolve_dot_base(argv[0])
         if base is _REFUSE:
-            print("REFUSED: this directory was entered through a SYMLINK, and a "
-                  "dot-relative path cannot express that - a digest taken here "
-                  "would describe the target and silently drop the symlink "
-                  "anomaly. Address the candidate by a path whose last "
-                  "component is its own name.", file=sys.stderr)
+            print("REFUSED: a dot path does not name the candidate, and nothing "
+                  "here proves which name reached it - $PWD is unset, or does "
+                  "not resolve to this path (every `..` spelling lands here), "
+                  "or is itself a symlink. Resolving anyway would gate the "
+                  "TARGET's name and drop the symlink anomaly. Address the "
+                  "candidate by a path whose last component is its own name.",
+                  file=sys.stderr)
             return 2
     if base and not display_name(base)[1]:
         anomalies.append(("badname", b""))
@@ -988,11 +1011,13 @@ def _cli_record(argv):
         # third time (round-8 screen, pass 14).
         dir_base = _resolve_dot_base(args["dir"])
         if dir_base is _REFUSE:
-            print("REFUSED: --dir was entered through a SYMLINK and given as a "
-                  "dot path, which cannot express that - the verdict would bind "
-                  "the target and drop the symlink anomaly. Address the "
-                  "candidate by a path whose last component is its own name.",
-                  file=sys.stderr)
+            print("REFUSED: --dir is a dot path, which does not name the "
+                  "candidate, and nothing here proves which name reached it - "
+                  "$PWD is unset, or does not resolve to --dir (every `..` "
+                  "spelling lands here), or is itself a symlink. The verdict "
+                  "would bind the TARGET's name, leaving the candidate itself "
+                  "unjudged. Address it by a path whose last component is its "
+                  "own name.", file=sys.stderr)
             return 2
     # An EMPTY basename was exempted rather than resolved - `--dir ""`, `--dir
     # "/"` and `--dir "//"` all produce it, and `--name ""` then satisfied the
