@@ -1354,6 +1354,19 @@ class CommandLine(Base):
                                  "the refusal is evidence-based, so an ordinary "
                                  "candidate reached this way refuses too")
 
+        # ...and the BARE spellings, given from inside a subdirectory rather
+        # than appended to a path. `..` and `../.` name the parent, which is
+        # never the parent's own name, so no $PWD can make them evidence.
+        for spelling in ("..", "../.", "../", ".././"):
+            with self.subTest(bare=spelling):
+                sub = os.path.join(link, "sub")
+                self.assertEqual(2, run(sub, "digest", spelling).returncode,
+                                 "a bare %r must refuse" % spelling)
+                self.assertEqual(2, run(os.path.join(ordinary, "sub"),
+                                        "digest", spelling).returncode,
+                                 "and it refuses for an ordinary parent too - "
+                                 "the refusal is about evidence, not hostility")
+
         # $PWD unset: `cd <link> && digest .` used to resolve to the target and
         # exit 0. It was recorded as a documented limitation; a documented
         # laundering path is still a laundering path.
@@ -1375,6 +1388,83 @@ class CommandLine(Base):
         # nothing above may have reached the baseline
         st = self.run_cli("status")
         self.assertNotIn("benign", st.stdout)
+
+    def test_dot_refuses_when_PWD_disagrees_with_the_real_directory(self):
+        """$PWD is the ONLY evidence of arrival, so it has to be the trusted
+        source - and trusting it means refusing when it does not describe the
+        path being asked about. A shell keeps PWD exact across `cd`; anything
+        else (a stale export, a deliberate one) is not evidence, and resolving
+        anyway would gate whatever realpath landed on."""
+        a = os.path.dirname(self.mk("skill-a", "SKILL.md"))
+        b = os.path.dirname(self.mk("skill-b", "SKILL.md"))
+        env = dict(self.env, PWD=b)              # PWD points somewhere else
+        r = subprocess.run([PY, os.path.join(HOOKS, "skill_snapshot.py"),
+                            "digest", "."], capture_output=True, text=True,
+                           cwd=a, env=env, timeout=60)
+        self.assertEqual(2, r.returncode,
+                         "a PWD that does not resolve to `.` is not evidence")
+        self.assertIn("REFUSED", r.stderr)
+        # ...and the honest pairing still works, so this is not a blanket refusal
+        self.assertEqual(0, subprocess.run(
+            [PY, os.path.join(HOOKS, "skill_snapshot.py"), "digest", "."],
+            capture_output=True, text=True, cwd=a,
+            env=dict(self.env, PWD=a), timeout=60).returncode)
+
+    def test_dot_fails_closed_when_the_working_directory_was_DELETED(self):
+        """A process may outlive its own cwd on POSIX. os.getcwd() then raises
+        FileNotFoundError - an OSError - inside the guard.
+
+        This case was first recorded as UNREACHABLE and the mutation reverting
+        the branch was filed as an equivalent mutant. It is neither: with the
+        branch returning b"" instead of refusing, an empty basename skips
+        _cli_digest's display gate entirely and a deleted directory digests
+        with exit 0. The lesson is narrower than "test more": an
+        unreachability claim is a claim, and this one was never probed with
+        the input that reaches it."""
+        script = os.path.join(self.tmp, "selfdelete.py")
+        with open(script, "w") as fh:
+            fh.write("import os, subprocess, sys\n"
+                     "d, tool = sys.argv[1], sys.argv[2]\n"
+                     "os.chdir(d)\n"
+                     "os.environ['PWD'] = d\n"
+                     "os.rmdir(d)\n"
+                     "r = subprocess.run([sys.executable, tool, 'digest', '.'],"
+                     " capture_output=True, text=True)\n"
+                     "print(r.returncode)\n"
+                     "print(r.stdout)\n")
+        doomed = os.path.join(self.tmp, "doomed")
+        os.makedirs(doomed)
+        r = subprocess.run([PY, script, doomed,
+                            os.path.join(HOOKS, "skill_snapshot.py")],
+                           capture_output=True, text=True, env=self.env,
+                           cwd=self.tmp, timeout=60)
+        self.assertEqual(0, r.returncode, r.stderr)
+        rc, out = r.stdout.split("\n", 1)
+        self.assertEqual("2", rc.strip(),
+                         "a deleted working directory must fail CLOSED, not "
+                         "produce a digest: " + out[:200])
+        self.assertNotIn("digest", out,
+                         "no digest may be emitted for a directory that is gone")
+
+    def test_record_still_accepts_an_arbitrary_directory_outside_any_root(self):
+        """CHARACTERIZATION, not a property under improvement.
+
+        `record` deliberately takes a --dir anywhere on disk, because SKILL.md
+        section 0 vets a candidate BEFORE the user installs it. This guard is
+        about recovering the candidate's NAME from a dot spelling; it is NOT a
+        root-containment check, and none is implemented (that is design item
+        D5). This test exists so that a later reader who sees realpath() here
+        does not "tidy up" by adding a containment check and silently break the
+        pre-install flow."""
+        outside = os.path.join(self.tmp, "elsewhere-entirely", "candidate")
+        os.makedirs(outside)
+        with open(os.path.join(outside, "SKILL.md"), "w") as fh:
+            fh.write("body\n")
+        r = self.run_cli("record", "--scope", "global", "--name", "candidate",
+                         "--dir", outside, "--verdict", "BLOCK")
+        self.assertEqual(0, r.returncode,
+                         "vetting before installation must keep working: "
+                         + r.stderr)
 
 
     def test_digest_dot_on_an_ordinary_name_is_still_clean(self):

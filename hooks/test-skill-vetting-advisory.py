@@ -1020,6 +1020,45 @@ class HookE2E(unittest.TestCase):
                          "got: " + out)
         self.assertEqual(0, res.returncode)
 
+    def test_a_failure_in_the_lock_release_does_not_emit_a_second_object(self):
+        """main() has its own last-resort advisory, guarded on whether stdout is
+        still pristine. Reaching it after a delivered advisory needs an
+        exception between _run's return and main's handler, and the only code
+        there is _release - whose two statements each catch OSError.
+
+        That was first recorded as an equivalent mutant on the strength of the
+        argument alone. The companion claim about the dot guard's OSError branch
+        was recorded the same way and turned out to be FALSE (a deleted working
+        directory reaches it). So this property is tested by injection rather
+        than argued: make _release raise, and require stdout to still hold
+        exactly one object. An argument about unreachability is worth less than
+        a test that forces the reach."""
+        tools = os.path.join(self.tmp, "tools-release")
+        os.makedirs(tools)
+        for name in ("skill_snapshot.py", "skill-vetting-advisory.py"):
+            src = open(os.path.join(HOOKS, name)).read()
+            if name == "skill-vetting-advisory.py":
+                anchor = "def _release(fd, lockpath):\n"
+                self.assertIn(anchor, src, "_release anchor moved")
+                src = src.replace(
+                    anchor,
+                    anchor + '    raise RuntimeError("release exploded")\n', 1)
+            with open(os.path.join(tools, name), "w") as fh:
+                fh.write(src)
+        self.mkskill(self.G, "delta-one")
+        env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": self.home,
+               "CLAUDE_CONFIG_DIR": self.cfg, "CLAUDE_PROJECT_DIR": self.projA}
+        res = subprocess.run([PY, os.path.join(tools, "skill-vetting-advisory.py")],
+                             input=b"{}", env=env, cwd=self.neutral,
+                             capture_output=True, timeout=60)
+        out = res.stdout.decode()
+        self.assertTrue(out.strip(), "the advisory must still be delivered")
+        json.loads(out)          # raises if a second object was appended
+        self.assertEqual(1, out.count('"hookSpecificOutput"'),
+                         "exactly one advisory object may reach stdout (G5); "
+                         "got: " + out)
+        self.assertEqual(0, res.returncode, "the hook must never break startup")
+
     def test_lock_wait_stays_bounded_when_the_lock_keeps_coming_back_stale(self):
         """LOCK_WAIT_S and _acquire's docstring both promise a bounded wait, and
         round 8 found one path that did not honour it: the stale branch used

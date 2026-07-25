@@ -142,7 +142,23 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   including `<dir>/sub/../.`), or `PWD` itself a symlink. That refusal does not
   depend on the candidate being hostile, so an ordinary directory reached
   through `<dir>/sub/..` is refused too: after the kernel resolves it, the name
-  you wrote is gone. Address a candidate by a path whose last component is its
+  you wrote is gone. The rule in one line: **a dot spelling is resolved only
+  when `$PWD` proves the process is standing in the candidate itself and did not
+  arrive through a link; otherwise it is refused.** A deleted or unresolvable
+  working directory is one of the refusals, not an exception to them.
+
+  What this rule is NOT: it is not a check that the candidate lives under a
+  watched root. `record --dir` deliberately accepts a directory anywhere on
+  disk, because §0 has you vet a candidate BEFORE installing it — so at that
+  moment it is legitimately outside every root. Containment is not enforced
+  anywhere today; the hook's candidate set is bounded by what it enumerates,
+  and the `judged-unsafe`/containment state machine is design item D5, not
+  shipped. Stating that here so it stays a decision: nothing in the dot rule
+  above should be read as licence to add a root check, and a characterization
+  test (`test_record_still_accepts_an_arbitrary_directory_outside_any_root`)
+  fails if one appears.
+
+  Address a candidate by a path whose last component is its
   own name whenever you can; D1's `--root`/`--select` addressing removes the dot
   spelling from this procedure entirely, and `record` would need that same hostile name
   on a command line, which this section forbids two paragraphs down. So for a

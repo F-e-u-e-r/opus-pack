@@ -1,0 +1,459 @@
+{
+ "_readme": [
+  "Mutation data for hooks/mutation_matrix.py - one entry per landed fix.",
+  "Each entry reverts exactly ONE fix; the matrix asserts the suites go red.",
+  "`where` is the function the anchor must land in. The matrix refuses to run",
+  "if an anchor moves to another function, matches more than one site, or",
+  "produces no diff - the three ways this tool has silently lied about what it",
+  "measured. `path` is the symbol SS or HK, resolved by the matrix.",
+  "reverts is unreachable; those are reported in their own category, because",
+  "an unkillable mutant and an unprotected fix are different findings.",
+  "No entry is currently marked `equivalent`. Two were, and both records were",
+  "replaced by tests that force the reach instead: M74's branch turned out to be",
+  "REACHABLE (a deleted working directory), and M69's is now exercised by",
+  "injecting a failure into _release. An unreachability argument is a claim; a",
+  "test that reaches the branch is evidence."
+ ],
+ "mutations": [
+  {
+   "id": "M18",
+   "desc": "normpath back (R6-B empty-path + AUTH-2 dotdot)",
+   "path": "SS",
+   "where": "snapshot_tree",
+   "old": "root = _strip_trailing(os.fsencode(root))",
+   "new": "root = os.path.normpath(os.fsencode(root))"
+  },
+  {
+   "id": "M19",
+   "desc": "un-unify the special branch (ENC-SPLIT)",
+   "path": "SS",
+   "where": "snapshot_tree",
+   "old": "    if not stat.S_ISDIR(lst.st_mode):\n        return _anomaly_snap(\"special\", b\"\", budget)",
+   "new": "    if not stat.S_ISDIR(lst.st_mode):\n        e, a = [], []\n        a.append((\"special\", b\"\"))\n        _entry(e, a, budget, b\"\", b\"A\", b\"special\")\n        return _finish(e, a)"
+  },
+  {
+   "id": "M20",
+   "desc": "un-unify the dir-open-failure branch (ENC-SPLIT reason)",
+   "path": "SS",
+   "where": "snapshot_tree",
+   "old": "        return _anomaly_snap(\"unreadable\", b\"\", budget)   # true reason, not \"special\"",
+   "new": "        return _anomaly_snap(\"special\", b\"\", budget)"
+  },
+  {
+   "id": "M21",
+   "desc": "shared-budget stop back on a depth breach (R6-D)",
+   "path": "SS",
+   "where": "_walk_dir",
+   "old": "                    anomalies.append((\"depth\", rel))",
+   "new": "                    budget[\"stop\"] = True\n                    anomalies.append((\"depth\", rel))"
+  },
+  {
+   "id": "M22",
+   "desc": "shared-budget stop back on a fanout breach (R6-D)",
+   "path": "SS",
+   "where": "_walk_dir",
+   "old": "                                anomalies.append((\"fanout\", childrel))",
+   "new": "                                budget[\"stop\"] = True\n                                anomalies.append((\"fanout\", childrel))"
+  },
+  {
+   "id": "M23",
+   "desc": "nested badname flag back (R6-E enabler)",
+   "path": "SS",
+   "where": "_walk_dir",
+   "old": "                        # NO nested-name allowlist check here any more (round 6).",
+   "new": "                        if not _DISPLAY_OK.match(nameb):\n                            anomalies.append((\"badname\", childrel))\n                        # NO nested-name allowlist check here any more (round 6)."
+  },
+  {
+   "id": "M24",
+   "desc": "drop the id-namespace reservation (ID-NAMESPACE)",
+   "path": "SS",
+   "where": "display_name",
+   "old": "    if _DISPLAY_OK.match(name_bytes) and not _ID_FORM.match(name_bytes):",
+   "new": "    if _DISPLAY_OK.match(name_bytes):"
+  },
+  {
+   "id": "M25",
+   "desc": "raw argv echo back (CLI-ECHO)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "            print(\"REFUSED: unrecognized argument (not echoed). Accepted: \"\n                  \"--scope --name --dir --verdict --expect-digest --reviewer\",\n                  file=sys.stderr)",
+   "new": "            print(\"unknown argument: \" + a, file=sys.stderr)"
+  },
+  {
+   "id": "M26",
+   "desc": "drop the --expect-digest shape check (CLI-ECHO half 2)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if args[\"expect-digest\"] is not None and not _HEX64.match(args[\"expect-digest\"]):",
+   "new": "    if False:"
+  },
+  {
+   "id": "M27",
+   "desc": "status partition that hid BLOCK back (STATUS-ADVERSE)",
+   "path": "SS",
+   "where": "_cli_status",
+   "old": "        elif v.get(\"verdict\") != \"SAFE-TO-PROPOSE\":",
+   "new": "        elif False:"
+  },
+  {
+   "id": "M28",
+   "desc": "drop the digest badname check (luna N3)",
+   "path": "SS",
+   "where": "_cli_digest",
+   "old": "    if base and not display_name(base)[1]:",
+   "new": "    if False:"
+  },
+  {
+   "id": "M29",
+   "desc": "drop the scan_root trailing strip (R6-H)",
+   "path": "SS",
+   "where": "scan_root",
+   "old": "    rootb = _strip_trailing(os.fsencode(root))",
+   "new": "    rootb = os.fsencode(root)"
+  },
+  {
+   "id": "M30",
+   "desc": "anomalies consume the slot budget first again (R6-E)",
+   "path": "HK",
+   "where": "_run",
+   "old": "        anom_reserve = 1 if anomaly_lines else 0\n        delta_room = max(0, room - anom_reserve)",
+   "new": "        anom_reserve = len(anomaly_lines)\n        delta_room = max(0, room - anom_reserve)"
+  },
+  {
+   "id": "M35",
+   "desc": "normpath back at the record basename check (R7 twin)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    dirb = _strip_trailing(os.fsencode(args[\"dir\"]))",
+   "new": "    dirb = os.path.normpath(os.fsencode(args[\"dir\"]))"
+  },
+  {
+   "id": "M36",
+   "desc": "re-add the reverted shape cap (R7 false-positive regression)",
+   "path": "SS",
+   "where": "display_name",
+   "old": "    if _DISPLAY_OK.match(name_bytes) and not _ID_FORM.match(name_bytes):",
+   "new": "    if (_DISPLAY_OK.match(name_bytes) and not _ID_FORM.match(name_bytes)\n            and len(name_bytes) <= 48\n            and sum(name_bytes.count(c) for c in (b\".\", b\"-\", b\"_\")) <= 4):"
+  },
+  {
+   "id": "M38",
+   "desc": "let the advisory exceed MAX_LISTED again (R7)",
+   "path": "HK",
+   "where": "_run",
+   "old": "        if len(delta_lines) > delta_room:\n            shown_deltas = delta_lines[:max(0, delta_room - 1)]   # 1 slot: summary",
+   "new": "        if len(delta_lines) > delta_room:\n            shown_deltas = delta_lines[:delta_room]"
+  },
+  {
+   "id": "M31",
+   "desc": "stop reverting undelivered deltas (R6-E / G5)",
+   "path": "HK",
+   "where": "_run",
+   "old": "        for _l, key, prior in delta_lines[len(shown_deltas):]:",
+   "new": "        for _l, key, prior in []:"
+  },
+  {
+   "id": "M39",
+   "desc": "drop the scan_root shared-budget charge (R7)",
+   "path": "SS",
+   "where": "scan_root",
+   "old": "out[\"candidates\"].append((nameb, _anomaly_snap(\"symlink\", tgt, budget)))",
+   "new": "out[\"candidates\"].append((nameb, _anomaly_snap(\"symlink\", tgt)))"
+  },
+  {
+   "id": "M32",
+   "desc": "drop the concurrency lock (R6-C)",
+   "path": "HK",
+   "where": "main",
+   "old": "        lock_fd, lock_state = _acquire(lockpath)",
+   "new": "        lock_fd, lock_state = None, \"unavailable\""
+  },
+  {
+   "id": "M33",
+   "desc": "silent first-run bootstrap back (R6-F)",
+   "path": "HK",
+   "where": "_run",
+   "old": "        elif state == \"absent\" and new_entries:",
+   "new": "        elif False:"
+  },
+  {
+   "id": "M34",
+   "desc": "let a partial snap overwrite a real digest (R6-D half 2)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                if partial and old is not None:",
+   "new": "                if False:"
+  },
+  {
+   "id": "M40",
+   "desc": "restore the round-8 silent-miss (skip the candidate, not just the write)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                skip_baseline = partial and old is None",
+   "new": "                if partial and old is None:\n                    continue\n                skip_baseline = False"
+  },
+  {
+   "id": "M42",
+   "desc": "send a changed anomalous candidate back to the anomaly queue (SV8-1)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                    if state == \"ok\" and (is_new or is_changed) and not skip_baseline:",
+   "new": "                    if False:"
+  },
+  {
+   "id": "M44",
+   "desc": "exempt an empty --dir basename again (SV11-1)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if not dir_base:\n        print(\"REFUSED: --dir does not name a candidate directory \"",
+   "new": "    if False:\n        print(\"REFUSED: --dir does not name a candidate directory \""
+  },
+  {
+   "id": "M50",
+   "desc": "make fd overhead grow with the cap (pass 12 shape claim)",
+   "path": "SS",
+   "where": "_walk_dir",
+   "old": "                            if len(stack) >= MAX_OPEN_DIRS:",
+   "new": "                            if len(stack) >= MAX_OPEN_DIRS * 2:"
+  },
+  {
+   "id": "M47",
+   "desc": "let record bind a verdict to a loose regular file again (pass 12)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if _is_loose_file:",
+   "new": "    if False:"
+  },
+  {
+   "id": "M51",
+   "desc": "classify the loose file off the RAW --dir string again (pass 13)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "        _lst = os.lstat(dirb)",
+   "new": "        _lst = os.lstat(args[\"dir\"])"
+  },
+  {
+   "id": "M48",
+   "desc": "claim a completed store in the pre-store first-run line (pass 12)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                \"first run — %d installed skill(s) are being baselined WITHOUT \"",
+   "new": "                \"first run — %d installed skill(s) recorded as the baseline WITHOUT \""
+  },
+  {
+   "id": "M49",
+   "desc": "rename the status field back to the presence claim (pass 12)",
+   "path": "SS",
+   "where": "_cli_status",
+   "old": "\"adverse_verdicts_in_baseline\": sorted(adverse),",
+   "new": "\"adverse_verdict_still_installed\": sorted(adverse),"
+  },
+  {
+   "id": "M45",
+   "desc": "let a never-observable --dir bind a verdict again (SV11-2)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if any(r == \"root\" for r, _ in snap[\"anomalies\"]):",
+   "new": "    if False:"
+  },
+  {
+   "id": "M46",
+   "desc": "stop resolving dot-paths in record (pass-11 twin)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if dir_base in (b\".\", b\"..\"):",
+   "new": "    if False:"
+  },
+  {
+   "id": "M43",
+   "desc": "let unconsumable candidates into the transient queue again (SV9-1)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                    if state == \"ok\" and (is_new or is_changed) and not skip_baseline:",
+   "new": "                    if state == \"ok\" and (is_new or is_changed):"
+  },
+  {
+   "id": "M41",
+   "desc": "stop skipping the baseline write for an unobserved candidate",
+   "path": "HK",
+   "where": "_run",
+   "old": "                if not skip_baseline:\n                    new_entries[key] = entry",
+   "new": "                if True:\n                    new_entries[key] = entry"
+  },
+  {
+   "id": "M53",
+   "desc": "record stops resolving the dot spelling (pass-14 twin)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "        dir_base = _resolve_dot_base(args[\"dir\"])",
+   "new": "        dir_base = os.path.basename(os.fsencode(os.path.realpath(args[\"dir\"])))"
+  },
+  {
+   "id": "M55",
+   "desc": "_log fallback ignores CLAUDE_CONFIG_DIR again (pass 14)",
+   "path": "HK",
+   "where": "_log",
+   "old": "            _env = os.environ.get(\"CLAUDE_CONFIG_DIR\", \"\")\n            cfg = _env if (_env and os.path.isabs(_env)) else os.path.join(\n                os.path.expanduser(\"~\"), \".claude\")",
+   "new": "            cfg = os.path.join(os.path.expanduser(\"~\"), \".claude\")"
+  },
+  {
+   "id": "M56",
+   "desc": "both overflow lines report the cross-category sum again (round 8)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                         \"back for the next session — %d new/changed/removed in \"\n                         \"all; run the skill-vetting skill on ALL of them\"\n                         % (held, len(delta_lines)))",
+   "new": "                         \"back for the next session — %d new/changed/removed in \"\n                         \"all; run the skill-vetting skill on ALL of them\"\n                         % (held, len(delta_lines) + len(anomaly_lines)))"
+  },
+  {
+   "id": "M57",
+   "desc": "the anomaly overflow line counts deltas too (round 8)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                                len(anomaly_lines)))",
+   "new": "                                len(anomaly_lines) + len(delta_lines)))"
+  },
+  {
+   "id": "M59",
+   "desc": "drop the kind tag from the encoder (opus5 F5)",
+   "path": "SS",
+   "where": "_finish",
+   "old": "    h.update(kind)",
+   "new": "    pass  # h.update(kind)"
+  },
+  {
+   "id": "M60",
+   "desc": "drop the path length prefix (opus5 F5 / M6)",
+   "path": "SS",
+   "where": "_finish",
+   "old": "        h.update(struct.pack(\">I\", len(path)))\n        h.update(path)",
+   "new": "        h.update(path)"
+  },
+  {
+   "id": "M61",
+   "desc": "drop the payload length prefix (opus5 F5 / N1)",
+   "path": "SS",
+   "where": "_finish",
+   "old": "        h.update(struct.pack(\">I\", len(payload)))\n        h.update(payload)",
+   "new": "        h.update(payload)"
+  },
+  {
+   "id": "M62",
+   "desc": "drop the version header from the digest (opus5 F5 / N3)",
+   "path": "SS",
+   "where": "_finish",
+   "old": "    h.update(struct.pack(\">II\", SCHEMA_VERSION, POLICY_VERSION))",
+   "new": "    pass"
+  },
+  {
+   "id": "M63",
+   "desc": "drop `not partial` from is_changed (opus5 F6)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                is_changed = (old is not None and not partial",
+   "new": "                is_changed = (old is not None and True"
+  },
+  {
+   "id": "M64",
+   "desc": "record stores a partial digest again (opus5 F3)",
+   "path": "SS",
+   "where": "_cli_record",
+   "old": "    if snap.get(\"partial\"):",
+   "new": "    if False:"
+  },
+  {
+   "id": "M65",
+   "desc": "the stale branch skips the deadline again (fable5 F5)",
+   "path": "HK",
+   "where": "_acquire",
+   "old": "                    os.unlink(lockpath)\n                    took_over = True",
+   "new": "                    os.unlink(lockpath)\n                    continue"
+  },
+  {
+   "id": "M67",
+   "desc": "prune adverse verdicts again (opus5 F2 half 1)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                    if old.get(\"verdict\") in (\"BLOCK\", \"SUSPECT\"):",
+   "new": "                    if False:"
+  },
+  {
+   "id": "M68",
+   "desc": "claim a removal that may not have happened (opus5 F2 half 2)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                            \"skill %s is not under the watched skills roots — \"\n                            \"baseline entry pruned (removed, or recorded \"\n                            \"without being installed)\" % old[\"name\"], key, old))",
+   "new": "                            \"skill %s was removed — baseline entry pruned\"\n                            % old[\"name\"], key, old))"
+  },
+  {
+   "id": "M69",
+   "desc": "main double-emits after a delivered advisory (fable5 F6)",
+   "path": "HK",
+   "where": "main",
+   "old": "                _release(lock_fd, lockpath)\n    except Exception:\n        _log(\"ERROR \" + traceback.format_exc().replace(\"\\n\", \" | \"))\n        if not _ANY_BYTES_WRITTEN:\n            _emit([\"the skill-vetting advisory hook could not complete \"",
+   "new": "                _release(lock_fd, lockpath)\n    except Exception:\n        _log(\"ERROR \" + traceback.format_exc().replace(\"\\n\", \" | \"))\n        if True:\n            _emit([\"the skill-vetting advisory hook could not complete \""
+  },
+  {
+   "id": "M70",
+   "desc": "_run double-emits after a delivered advisory (the reachable twin)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                if not _ANY_BYTES_WRITTEN:\n                    _emit([\"the vetting baseline could not be saved",
+   "new": "                if True:\n                    _emit([\"the vetting baseline could not be saved"
+  },
+  {
+   "id": "M71",
+   "desc": "_run post-exception guard ignores delivery (reachable)",
+   "path": "HK",
+   "where": "_run",
+   "old": "        return 0\n    except Exception:\n        _log(\"ERROR \" + traceback.format_exc().replace(\"\\n\", \" | \"))\n        if not _ANY_BYTES_WRITTEN:",
+   "new": "        return 0\n    except Exception:\n        _log(\"ERROR \" + traceback.format_exc().replace(\"\\n\", \" | \"))\n        if True:"
+  },
+  {
+   "id": "M52",
+   "desc": "drop the islink half of the dot guard (symlinked arrival)",
+   "path": "SS",
+   "where": "_resolve_dot_base",
+   "old": "        if os.path.islink(logical):\n            return _REFUSE\n",
+   "new": ""
+  },
+  {
+   "id": "M54",
+   "desc": "refuse on an ANCESTOR symlink too (false-BLOCK factory)",
+   "path": "SS",
+   "where": "_resolve_dot_base",
+   "old": "        if os.path.islink(logical):",
+   "new": "        if os.path.islink(os.path.dirname(logical) or logical):"
+  },
+  {
+   "id": "M72",
+   "desc": "resolve a dot path with no $PWD evidence again",
+   "path": "SS",
+   "where": "_resolve_dot_base",
+   "old": "    logical = os.environ.get(\"PWD\", \"\")\n    if not logical:\n        return _REFUSE\n",
+   "new": "    logical = os.environ.get(\"PWD\", \"\") or os.getcwd()\n"
+  },
+  {
+   "id": "M73",
+   "desc": "drop the $PWD-is-the-candidate test (every `..` spelling)",
+   "path": "SS",
+   "where": "_resolve_dot_base",
+   "old": "        if os.path.realpath(logical) != real:\n            return _REFUSE\n",
+   "new": ""
+  },
+  {
+   "id": "M74",
+   "desc": "the dot guard OSError path fails OPEN again",
+   "path": "SS",
+   "where": "_resolve_dot_base",
+   "old": "    except OSError:\n        return _REFUSE",
+   "new": "    except OSError:\n        return b\"\""
+  },
+  {
+   "id": "M58",
+   "desc": "delete the anomaly overflow count line (opus5 F7)",
+   "path": "HK",
+   "where": "_run",
+   "old": "                lines.append(\"...and %d %s skill(s) that cannot be certified \"",
+   "new": "                _dropped = (\"...and %d %s skill(s) that cannot be certified \""
+  }
+ ]
+}

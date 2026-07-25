@@ -354,6 +354,28 @@ remain open**, and the concurrency property behind I11 is untestable without a
 forced interleaving and is deliberately left so (see the note in
 `test_concurrent_hooks_converge_and_at_least_one_advises_the_change`).
 
+**What the measurement is, and is not.** The mutation matrix
+(`hooks/mutation_matrix.py`, data in `hooks/mutations.json`) reverts each landed
+fix one at a time inside a throwaway git worktree checked out at a named commit,
+and requires the suites to go red. That is a **measured behaviour** of the test
+suites on CPython 3.8+ under POSIX, on the platform it was run on — not a proof
+that the invariant holds, and not a safety guarantee. It says a fix cannot
+silently regress; it says nothing about defects no mutation encodes.
+
+Three categories are kept apart on purpose, because collapsing them is how a
+broken tool comes to look like a clean result: a **killed** mutant means the fix
+has an executing test; a **survivor** means it does not; a **tool error**
+(anchor absent, matching more than one site, or producing no diff) means the
+measurement never happened and is refused before any suite runs. `equivalent` —
+a mutant that cannot be killed because its code is unreachable — is available but
+currently unused, and deliberately so: two were once declared equivalent on the
+strength of an argument, and one of those arguments was false.
+
+Fail-closed versus diagnostic: every refusal named in this document is
+fail-closed (a non-zero exit and no digest). `status` reports **diagnostics** —
+`absent` exits 0 because an empty world is a truthful answer, while `corrupt`
+and `stale` exit non-zero because the audit could not be performed.
+
 So the claim below is a MAP, not a proof of coverage: every goal and invariant
 above names a test in
 `hooks/test-skill_snapshot.sh` (primitive matrix) or
