@@ -269,6 +269,36 @@ A generic green test is not proof. A gate is real only if:
    elsewhere — is legitimate as-is and needs no anchor, as does an intrinsic gate
    like a syntax or forbidden-character scan. The rule bites only when agreement
    is made to stand in for an external fact.)
+8. **A gate over hardcoded facts asserts the facts, not just the shape — and
+   the cross-check that established them belongs IN the fixture, not in the
+   chat** (`unprobed` — private incident as shape; see Provenance). When code
+   embeds domain constants (holiday dates, a tax rate, a fee schedule, a
+   jurisdiction's valid state codes), a suite that checks structure — the
+   array is non-empty,
+   each entry parses, the shape is right — passes identically whether the
+   values are correct or a later edit corrupted one. Those values were usually
+   cross-checked once, against an authority or several independent sources or a
+   reviewer's recall — but that check happened in the conversation and
+   evaporates when the session ends, so the next bad edit sails through a
+   shape-only gate. Anchor the fact: assert every load-bearing value
+   (a fixed holiday falls on its known date, the standard rate equals the
+   published number), each assertion naming its authority (source, and its
+   version or URL where it has one) and consultation date beside the value —
+   an unattributed literal is indistinguishable from item 3's copied-back
+   expected value — so a future silent change to a constant fails. This *extends* item 2's carve-out —
+   from an output-interface string to an embedded input constant — and is NOT
+   item 3's "hardcoded expected value" fake pass: the anchor's value comes from
+   an external authority, not copied back from the code's own output. Item 3's
+   tautology asserts the code agrees with its own output; this asserts the
+   code matches the world. It shares rule 7's remedy — an external anchor — but not its
+   trigger: rule 7 bites where *agreement between artifacts* is made to stand
+   in for an external fact, this one where *structure* is. A fact that
+   legitimately changes gets its anchor updated as a contract edit (rule 4:
+   state which contract changed and who approved it); an always-fixed one is
+   cheap to anchor permanently.
+   ❌ "the holiday tests pass" — they assert the list has the right count and
+   types, never that any date is the right day; a fat-fingered edit to one
+   date stays green.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -446,5 +476,13 @@ unless the project opted in (MIT, ideas only), corroborated by
 NYCU-Chung/my-claude-devteam's bypassPermissions-hook framing (MIT) — it
 matches this pack's own no-auto-registered-hooks invariant. All three ship
 `unprobed` per the covenant; their probes join the private round-5 queue.
+Rule 8 (fact-anchoring; 2026-07-24) is class-distilled from a mining pass
+over the owner's own sessions (no code taken): hardcoded public-holiday dates
+were cross-checked against four independent sources, but a cross-model
+reviewer noted the suite validated structure only — "tests check shape, not
+date-truth" — so the truth evidence lived in the conversation, not the gate;
+the fix added anchor-date assertions as a regression guard against a future
+bad edit. Ships `unprobed` per the covenant; its probe joins the private
+round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.

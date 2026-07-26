@@ -84,6 +84,19 @@ artifact-producing step.
 - What cannot be verified is labeled `unverified` or `user-must-provide` —
   never silently invented. Unproven ideas stay labeled open/candidate; no
   oversell.
+- **Verify-before-you-write-it bites hardest on a capability you describe for a
+  weaker executor** (`unprobed` — private incident as shape; see Provenance).
+  "The engine auto-searches every category", "this flag does X" — a weak model
+  executes such a line verbatim, with none of your context to catch it when it
+  is wrong, so an unverified capability claim is a false instruction to the one
+  reader least able to notice. When the behavior is new or just-patched, order
+  it: prove it against a real gate (ground-truth-gates), THEN finalize the doc
+  that describes it. A scarce live session (an auth window about to expire, a
+  costly remote setup) argues for verifying FIRST, not for shipping the doc on
+  the theory it probably works.
+  ❌ drafting "the engine now self-heals across categories" into the skill
+  while the self-heal fix is still unproven, to spend the login session before
+  it expires.
 - Embed the knowledge itself; do not make private paths or one person's
   memory a load-bearing reference. A hard-coded machine-absolute path is worse
   than a broken link: a stale duplicate clone resolves *silently* to an
@@ -94,6 +107,17 @@ artifact-producing step.
 ## 3. Provenance and decay
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
+- **Staleness concentrates in the world-fact rules — audit there first**
+  (`unprobed` — private incident as shape; see Provenance). A rule encoding a
+  mutable fact about the outside world (which model or tool is default, how a
+  CLI behaves, a numeric threshold someone measured) can go stale within
+  days; a rule encoding method (reproduce before trusting, verify by
+  execution) goes stale rarely and slowly. A staleness audit therefore
+  concentrates the search on the world-fact files and treats the
+  method-encoding files as low-yield — not as exempt. One sweep of four rules
+  files found every stale instance — 8 of 8 — in the single file that carried
+  world-facts; the three method files were clean. This scopes the SEARCH only:
+  a method file still gets corrected when something does surface in it.
 - **Capability-negative claims rot the worst** (`unprobed` — private incident
   as shape; see Provenance). About to write "no such flag", "only works
   interactively", "the API can't do X" into an instruction file — or
@@ -158,6 +182,16 @@ artifact-producing step.
 - End each skill with a short provenance note and a one-line re-verification
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
+  **And that command has to hang off something the work already touches**
+  (`unprobed` — private incident as shape; see Provenance): an invalidation
+  condition needing a separate act of remembering is inert no matter how
+  precisely it is written. Bind it to a surface the next pass crosses anyway —
+  a line in the maintenance entry that pass must read, an assertion in a gate
+  that already runs, a trigger on a file someone edits regardless. A measured
+  finding carrying the clause "re-test if either file grows past ~250 lines"
+  sat at 297 and 318 for days, still cited as current: the threshold was
+  right, the condition was true, and nothing was reading it.
+  ❌ "the invalidation condition is documented at the end of the finding."
 - **A merged upstream integration is not necessarily the end of the
   campaign** (`unprobed` — the upstream half of the incident is
   verifiable in this repo's PR history, the sync half
@@ -557,6 +591,61 @@ default; an AI rewrite does not launder a derivative).
   the §6 review. Ask the user first before weakening or deleting any rule
   that gates destructive actions, spending, or publishing — or any rule the
   user set explicitly.
+- **Probe a candidate rule against the bare executor before folding it in**
+  (`unprobed` — measured in-house; see Provenance). §6's behavioral probe hunts
+  gaps: what the file fails to make happen. This asks the opposite question,
+  before the rule exists — run the scenario twice against the file's target
+  executor, as independent fresh invocations (no shared state or history
+  between the arms), once with no rule and once with it. An arm counts only
+  when its run demonstrably met the rule's trigger (ground-truth-gates'
+  not-armed discipline: a run that never hit the guarded condition is
+  excluded and re-run), and one run per arm screens for a large effect
+  only — a close or surprising call re-runs before deciding. Score each arm
+  against the rule's INTENDED outcome — for a preventive rule the intended
+  outcome is the abstention or refusal, so a bare arm that commits the
+  prohibited act FAILS its arm — then read the pair, not the bare arm
+  alone: both arms produce the intended outcome → the rule is
+  non-discriminating — it costs a line and buys nothing, and belongs in a
+  reference file or nowhere, not in the always-loaded one; only the ruled
+  arm produces it → the rule earns its line; neither arm does → the rule as
+  written is ineffective — rewrite or drop it, never fold it in on truth
+  alone; only the bare arm produces it → the rule is harmful — dropped, not
+  filed as reference. Eight rules folded into two files over one week were
+  probed this way afterwards; three were reproduced unaided. Non-discriminating
+  is not the same as wrong — the rule can be true and still not worth its line,
+  and that is the judgment the probe is for.
+  ❌ "the rule is correct and clearly written, so it earns a line."
+- **A derived file contradicting reality has not necessarily drifted — read its
+  source before fixing it** (`unprobed` — private incident as shape; see
+  Provenance). Where a file is compiled from another (a cache over a playbook, a
+  rules file over a spec), the obvious reading of a wrong line is that the
+  derivative fell behind. Check whether the SOURCE carries the same wrong
+  content first — the identical text, or the source-side value it is
+  generated from. If it does, this is not drift: the derivative is faithfully
+  mirroring a source that itself disagrees with the world, and correcting only
+  the derivative gets it silently re-broken by the next compile or write-back.
+  Fix the source, then bring the derivative along through its regeneration or
+  write-back path; a machine-compiled artifact is never hand-edited
+  (ground-truth-gates' regenerate-and-diff rule), while a hand-maintained
+  derivative with no mechanical path is corrected by hand against the fixed
+  source. Record which side was authoritative. A source that checks out
+  clean does not yet establish true drift — with a mechanical path,
+  trial-regenerate and diff: correct output means the derivative had merely
+  fallen behind, so land that regenerated output; wrong output again means
+  the generation path itself is defective and gets fixed before any
+  regeneration is trusted. For a pair that is hand-maintained by design, a
+  clean source and a wrong derivative is manual drift: hand-correct the
+  derivative against the clean source and record it as such. A
+  machine-compiled artifact whose generator is merely unavailable is NOT
+  that case — restoring the generation path is the fix, and the artifact
+  stays un-hand-edited (blocked, not manually drifted).
+  Distinct from §3's sync contract, which
+  keeps coupled files agreeing and names which wins when they disagree — this
+  rule's trap subcase is the pair that agrees while both are wrong
+  (ground-truth-gates rule 7's mutual-agreement trap, arising in maintenance
+  rather than in a gate); the drift branches above already cover the
+  disagreeing pair.
+  ❌ "the cache says X, reality says Y — so the cache drifted; fix the cache."
 - Compaction triggers — act when any of these is true: a skill outgrows what
   a reader can hold (~150 lines for discipline skills; domain-reference packs
   run longer, but every line must still earn its place); its description no
@@ -880,3 +969,30 @@ its scope-install / invoke-by-name / prune mitigation ladder (MathWorks
 field-of-use license — ideas only, no text). Both ship `unprobed` per the
 covenant; their probes join the private round-5 queue — the catalog-collision
 rule's is directly runnable against this pack's own 13 skills.
+The §2 verify-capability-before-shipping-the-doc rule (2026-07-24) is
+class-distilled from a mining pass over the owner's own sessions (no code
+taken): with a scarce authenticated remote session about to expire, doc edits
+describing a just-patched self-heal behavior were held until a regression gate
+proved the behavior, on the explicit reasoning that telling the weaker model
+"the engine auto-searches all categories" is a capability claim that must be
+verified live first or it ships a false instruction. Ships `unprobed` per the
+covenant;
+its probe joins the private round-5 queue.
+The §3 world-fact-staleness and bound-invalidation rules and the §7
+bare-executor-probe and read-the-source-before-fixing rules (2026-07-25) are
+class-distilled from a maintenance session on the owner's own rules files (no
+code taken), and are one incident seen from four sides. A finding measuring
+rule-following at two file sizes carried the clause "re-test if either file
+grows past ~250 lines"; both files reached 297 and 318 and the clause never
+fired, because nothing read it — the bound-invalidation rule. The re-test that
+eventually ran added a bare-executor control arm the original lacked, and found
+3 of 8 recently-folded rules reproduced with no rules file at all — the
+bare-executor-probe rule, the one item here with a measurement rather than a
+shape behind it (n=8 rules, 1 probe per cell; it detects a large effect, not a
+small one). The staleness sweep that followed found all 8 stale instances in
+the one file carrying model names and CLI behavior, none in the three carrying
+method — the world-fact rule. And one of those stale lines turned out to be
+copied faithfully from a source file carrying the same error, so fixing the
+derived file alone would have been undone by the next write-back — the
+read-the-source rule. All four ship `unprobed` per the covenant; their probes
+join the private round-5 queue.

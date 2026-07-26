@@ -105,6 +105,42 @@ objection is not re-litigated — but a *reproduced* correctness or safety defec
 stays must-fix (§3 triage): it may be deferred only with the owner's explicit
 acceptance, never closed by the reviewers on their own.
 
+**Pre-existing is a disposition you establish, not assume — reproduce the
+finding on the merge-base too** (`unprobed` — see Provenance). On a
+behavior-preserving refactor branch a
+*reproduced* defect can still be one the branch faithfully carried over from
+its base, not one it introduced; recording it against the branch is a false
+regression that blocks a clean refactor for a fault it did not create. Before
+you count a reproduced finding as the branch's defect, re-run it against the
+merge-base: the SAME failure on both — same trigger, same outcome,
+comparable blast radius — → `pre-existing-tracked`, spun off as its own
+fix, never bloating the refactor — pre-existing moves where a reproduced
+correctness or safety defect gets fixed, never whether (deferral stays the
+owner's call per this section's triage), and any widening the branch adds
+(a new trigger path, a broader blast radius) is not carried over: the
+widened part is the branch's own regression; gone on the merge-base and
+live on the branch → a real regression this branch owns. Reviewers do not
+see the base (§2 packet is your
+inlined lines), so this classification is yours to make, not theirs — a
+reviewer's severity label ("not merge-ready", "CRITICAL") is a claim about
+the code in front of it, blind to whether the branch introduced the behavior.
+And applicability is itself a **runtime/deployment-state** question, not a
+source one: adjudicate a migration or identifier case-collision finding
+against what actually shipped (query the collection, check the deploy),
+never only against synthetic data the bug reproduces on but the running
+system never holds. A finding whose premise no shipped state satisfies —
+empty store, writer never deployed — is recorded `rejected-with-reason`
+with that runtime counter-evidence attached, or held as an owner-accepted
+deferral where the state could yet arrive; do not file it under §4's
+irreproducible-false-positive bucket, which is for findings that do not
+reproduce at all. Non-applicability is severity evidence, not ownership
+evidence: a latent path the branch itself introduces stays its own
+must-fix however empty today's store is — deployment catches up.
+neg: filing a reviewer's "P1, not merge-ready" against a refactor for a quirk
+that reproduces identically on the merge-base — the review still pays off (spin
+the quirk off as its own fix), but the branch is clean and the label was
+baseline-blind.
+
 **A proposed fix is a suggestion, not a patch.** Reproducing a finding
 licenses the finding, not its remedy — these are separate judgments, and a
 reviewer writes the remedy against only the lines you inlined (§2), so a real
@@ -232,6 +268,19 @@ the reason recorded. The landed side is verifiable in-repo (PR #32's
 commits); the held side was never pushed, so the comparison itself is
 contributor-reported — the rule ships with an in-body `unprobed` marker
 per the README covenant's second branch.
+The §3 baseline-classification and runtime-state adjudication rules
+(2026-07-24) are class-distilled from a mining pass over the owner's own
+sessions (no code taken): a moira-web behavior-preserving refactor where
+codex's "not merge-ready" and agy's "CRITICAL" both dissolved under
+reproduction as pre-existing base-branch behaviors the branch faithfully
+preserved
+(0 regressions, 4 pre-existing quirks spun off), and a TG-bot review where
+codex's identifier-migration and case-collision findings were non-applicable
+because the store was empty and the writer had never deployed. The lesson
+is the general one — pre-existing-vs-regression is a baseline diff, and
+applicability is a runtime-state question — not the specific findings.
+Both rules ship `unprobed` per the covenant; their probes join the private
+round-5 queue.
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier

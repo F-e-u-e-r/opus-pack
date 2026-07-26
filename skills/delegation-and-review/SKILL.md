@@ -576,6 +576,22 @@ reviewers that they silently absorb as implementers.
   its inputs arrived.
   ❌ "the synthesis stage returned a thorough report, so the finders
   must have run."
+- **A read-only survey reports leads, not facts — re-verify each in source
+  before you spec work on it** (`unprobed` — private evidence as shape; see
+  Provenance). Fan-out finders scanning for dedup targets,
+  dead code, or duplication over-claim in the direction that makes the work
+  look bigger: a substring grep calls "66 import sites" what is really 2
+  files; "byte-identical" components turn out to diverge on a prop or a
+  fallback; a "duplicated" helper is two semantically incompatible families
+  that must not be merged; "dead" code has a live registry entry the finder
+  never traced. Each finding is a hypothesis — open the cited files, tracing
+  the references its verdict depends on (registries, routes, call sites), and
+  confirm the claim before it enters the plan, and re-check after any finding
+  that reverses scope (a dissolved dedup, a resurrected dead file), because
+  the tier ranking built on the survey is now stale. Speccing on an
+  unverified survey buys a plan that reverses mid-execution.
+  ❌ "the survey found 66 three.js sites, so the dedup is a big win" — the
+  finder counted substrings; there are 2.
 - **Miss-is-costly audits** ("find ALL of X": security holes, money paths,
   data leaving the machine) need a different loop than one review pass:
   - Scout the work-list once in-context first — fan out over a known list,
@@ -975,6 +991,19 @@ Rules bullet was also extended from "do not merge" to "do not commit, push, or
 merge" (generalizing mindfold-ai/Trellis's check-agent forbidden-operations
 list, AGPLv3 — strictly ideas only) — a widening of an existing prohibition, not
 a new standalone rule, so it owes no separate probe.
+The §3 survey-reports-leads bullet (2026-07-24) is class-distilled from a
+private mining pass over the owner's own sessions (no code taken): a single
+codebase-lightening session whose read-only fan-out survey was wrong four
+separate ways, each over-claiming — a substring count of "66 three.js sites"
+that was 2 files, "byte-identical" components that diverged on a prop and a
+fallback, a "NumField duplication" that dissolved into two incompatible
+families, and a "dead" component with a live registry entry — each reversal
+re-ordering the tiered plan. Distinct from the synthesizer-fed-nothing bullet
+above (empty input → confident synthesis) and the settled-tree bullet
+(re-reading an already-fixed file): here the survey ran and returned
+non-empty, confidently wrong leads. Private evidence, cited as shape per the
+README covenant's second branch; no in-repo probe has run — in-body
+`unprobed` marker.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
