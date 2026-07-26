@@ -212,16 +212,32 @@ class AuthoritativeMode(unittest.TestCase):
                           "failing to write it is not a measurement failure")
 
     def _require_clean_authoritative_preconditions(self):
-        """--authoritative refuses a dirty tree and a runner blob that differs
-        from HEAD, and BOTH also return 2. So a writer-failure test run on a
-        dirty tree would pass for the wrong reason - which it did, until this
-        guard was added. Skip rather than assert into ambiguity."""
+        """--authoritative refuses a dirty tree AND a runner blob that differs
+        from HEAD, and both also return 2. So a writer-failure test run under
+        either would pass for the wrong reason - which it did, until this guard
+        existed. Skip rather than assert into ambiguity.
+
+        The skip NAMES the unmet precondition. A closure run must show 0 skips
+        here: a critical orchestration test that vanishes into a skip is not a
+        pass, and "environment unsuitable" would not say which one to fix."""
+        unmet = []
         dirty = subprocess.run(["git", "status", "--porcelain"], cwd=REPO,
                                capture_output=True, text=True).stdout.strip()
         if dirty:
-            self.skipTest("authoritative preconditions unmet (tree dirty), so "
-                          "exit 2 would not distinguish the writer failure "
-                          "from the refusal: " + dirty.splitlines()[0])
+            unmet.append("working tree is dirty (%s%s)"
+                         % (dirty.splitlines()[0].strip(),
+                            ", +%d more" % (len(dirty.splitlines()) - 1)
+                            if len(dirty.splitlines()) > 1 else ""))
+        for rel in ("hooks/mutation_matrix.py", "hooks/mutations.json"):
+            disk = subprocess.run(["git", "hash-object", rel], cwd=REPO,
+                                  capture_output=True, text=True).stdout.strip()
+            head = subprocess.run(["git", "rev-parse", "HEAD:" + rel], cwd=REPO,
+                                  capture_output=True, text=True).stdout.strip()
+            if not disk or disk != head:
+                unmet.append("%s on disk differs from HEAD" % rel)
+        if unmet:
+            self.skipTest("exit 2 would not distinguish the writer failure from "
+                          "the refusal, because: " + "; ".join(unmet))
 
     def test_main_ACTUALLY_consumes_a_record_write_failure(self):
         """The rule test above proves `unrecorded_run_is_fatal` is right. It
