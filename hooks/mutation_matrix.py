@@ -285,7 +285,10 @@ def main(argv=None):
     # PHASE 1 - shape. Every entry is validated against the pristine sources
     # before anything is mutated, so a broken tool is reported as a broken tool
     # and never as a finding about the artifact.
-    pristine = {SS: open(SS).read(), HK: open(HK).read()}
+    pristine = {}
+    for _p in (SS, HK):
+        with open(_p) as _fh:
+            pristine[_p] = _fh.read()
     broken = []
     for name, path, old, new, expect, _eq in matrix:
         try:

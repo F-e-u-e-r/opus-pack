@@ -296,7 +296,8 @@ class AuthoritativeMode(unittest.TestCase):
         option would be a non-default input the authoritative gate refuses) and
         outside the repository (a file in the tree would dirty it, and the next
         authoritative run would refuse to start)."""
-        src = open(os.path.join(HOOKS, "mutation_matrix.py")).read()
+        with open(os.path.join(HOOKS, "mutation_matrix.py")) as _fh:
+            src = _fh.read()
         self.assertIn("tempfile.gettempdir()", src,
                       "the record must land outside the repository")
         self.assertIn('"x"', src,
@@ -343,7 +344,8 @@ class AuthoritativeMode(unittest.TestCase):
         which is sound only while every measurement-changing input IS a
         command-line option. An environment variable would sit outside that
         comparison entirely."""
-        src = open(os.path.join(HOOKS, "mutation_matrix.py")).read()
+        with open(os.path.join(HOOKS, "mutation_matrix.py")) as _fh:
+            src = _fh.read()
         for token in ("os.environ", "os.getenv", "configparser", "tomllib"):
             self.assertNotIn(token, src,
                              "%s is an input the authoritative gate cannot "
@@ -364,7 +366,10 @@ class TheRealMatrix(unittest.TestCase):
         self.matrix = mm.load_matrix()
 
     def test_every_entry_is_unique_non_empty_and_where_it_claims(self):
-        src = {mm.SS: open(mm.SS).read(), mm.HK: open(mm.HK).read()}
+        src = {}
+        for _p in (mm.SS, mm.HK):
+            with open(_p) as _fh:
+                src[_p] = _fh.read()
         for name, path, old, new, expect, _eq in self.matrix:
             with self.subTest(mutation=name.split()[0]):
                 self.assertIsNotNone(expect,
@@ -392,7 +397,8 @@ class TheRealMatrix(unittest.TestCase):
         than the property under test."""
         for name, path, old, new, _expect, _eq in self.matrix:
             with self.subTest(mutation=name.split()[0]):
-                src = open(path).read()
+                with open(path) as _fh:
+                    src = _fh.read()
                 mutated = src.replace(old, new, 1)
                 i = src.find(old)
                 self.assertEqual(src[:i], mutated[:i], "prefix must be intact")
