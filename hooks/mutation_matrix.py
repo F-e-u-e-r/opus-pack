@@ -457,23 +457,44 @@ def main(argv=None):
     # killed and produce a flawless 55/55 with no discriminating power at all.
     # A cross-family review named this; the tool had exactly one run_suite call
     # site, inside the mutant loop.
-    pristine_red = [s for s in wt_suites if not run_suite(s, cwd=wt)]
+    control = []
+    for suite in wt_suites:
+        r = subprocess.run([suite], capture_output=True, text=True, cwd=wt,
+                           timeout=900)
+        control.append({"suite": os.path.basename(suite),
+                        "returncode": r.returncode,
+                        "ok_marker": "\nOK" in (r.stdout + r.stderr),
+                        "green": suite_is_green(r.returncode,
+                                                r.stdout + r.stderr)})
+    pristine_red = [c["suite"] for c in control if not c["green"]]
     if pristine_red:
         print("TOOL ERROR: the suites are not green on the UNMUTATED tree (%s), "
               "so 'the suite went red' cannot distinguish a killed mutant from "
-              "a broken run." % ", ".join(os.path.basename(x) for x in pristine_red),
-              file=sys.stderr)
+              "a broken run." % ", ".join(pristine_red), file=sys.stderr)
         subprocess.run(["git", "worktree", "remove", "--force", wt], cwd=REPO,
                        capture_output=True)
         shutil.rmtree(parent, ignore_errors=True)
         return 2
-    print("control            suites green on the unmutated tree")
+    for c in control:
+        print("control            %-34s rc=%d ok=%s green=%s"
+              % (c["suite"], c["returncode"], c["ok_marker"], c["green"]))
 
     killed, survived, equivalent, unexpected = [], [], [], []
     record = []
     incomplete = None
     try:
         for name, path, old, new, _expect, equiv in matrix:
+            # Every mutant shares one worktree, and the suites write into it.
+            # A verdict is only about ITS mutation if the tracked content is
+            # back at the frozen snapshot first; otherwise the previous
+            # mutant's side effects are part of this one's input.
+            residue = subprocess.run(["git", "status", "--porcelain"], cwd=wt,
+                                     capture_output=True, text=True).stdout.strip()
+            if residue:
+                incomplete = ("the worktree was not at the frozen snapshot "
+                              "before %s: %s" % (name.split()[0],
+                                                 residue.splitlines()[0]))
+                break
             target = wt_file[path]
             pristine_src = open(target).read()
             open(target, "w").write(pristine_src.replace(old, new, 1))
@@ -554,6 +575,7 @@ def main(argv=None):
             "pid": os.getpid(),
             "invocation": ["mutation_matrix.py"] + list(argv if argv is not None
                                                         else sys.argv[1:]),
+            "pristine_control": control,
             "mutations": record})
         print("per-mutant record  %s" % rec_path)
     except OSError as exc:

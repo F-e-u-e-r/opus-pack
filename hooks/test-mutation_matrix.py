@@ -141,6 +141,42 @@ class SuiteOracle(unittest.TestCase):
                          "recognisably green - scoring it red inflates kills")
         self.assertFalse(mm.suite_is_green(2, "crash"))
 
+    def test_the_control_is_recorded_not_merely_printed(self):
+        """A control that exists only as a stdout line cannot be re-checked
+        later, and the whole point of the record is that stdout is losable. The
+        record must carry each suite's return code, marker and verdict, bound
+        to the same run id and subject as the mutants."""
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"),
+                            "--allow-dirty-head-only", "--only", "M18"],
+                           capture_output=True, text=True, timeout=900)
+        self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+        path = [l.split(None, 2)[2].strip() for l in r.stdout.splitlines()
+                if l.startswith("per-mutant record")][0]
+        import json as _json
+        with open(path) as fh:
+            rec = _json.load(fh)
+        control = rec.get("pristine_control")
+        self.assertTrue(control, "the control must be in the record")
+        for c in control:
+            for field in ("suite", "returncode", "ok_marker", "green"):
+                self.assertIn(field, c)
+            self.assertTrue(c["green"], "a run whose control was red must not "
+                                        "have produced mutant verdicts at all")
+
+    def test_each_mutation_starts_from_the_frozen_snapshot(self):
+        """All mutants share one worktree and the suites write into it. A
+        verdict is only about ITS mutation if the tracked content is back at
+        the frozen snapshot first."""
+        with open(os.path.join(HOOKS, "mutation_matrix.py")) as fh:
+            src = fh.read()
+        self.assertIn("was not at the frozen snapshot", src)
+        gate = 'residue = subprocess.run(["git", "status", "--porcelain"], cwd=wt,'
+        self.assertEqual(1, src.count(gate), "anchor is not unique")
+        loop = "for name, path, old, new, _expect, equiv in matrix:"
+        self.assertLess(src.index(loop), src.index(gate),
+                        "the gate belongs INSIDE the loop, before each mutation")
+
     def test_the_matrix_runs_a_pristine_control(self):
         """The tool had exactly one run_suite call site, inside the mutant
         loop, so always-red suites would have marked every mutant killed and
