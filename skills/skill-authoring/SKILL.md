@@ -84,6 +84,19 @@ artifact-producing step.
 - What cannot be verified is labeled `unverified` or `user-must-provide` —
   never silently invented. Unproven ideas stay labeled open/candidate; no
   oversell.
+- **Verify-before-you-write-it bites hardest on a capability you describe for a
+  weaker executor** (`unprobed` — private incident as shape; see Provenance).
+  "The engine auto-searches every category", "this flag does X" — a weak model
+  executes such a line verbatim, with none of your context to catch it when it
+  is wrong, so an unverified capability claim is a false instruction to the one
+  reader least able to notice. When the behavior is new or just-patched, order
+  it: prove it against a real gate (ground-truth-gates), THEN finalize the doc
+  that describes it. A scarce live session (an auth window about to expire, a
+  costly remote setup) argues for verifying FIRST, not for shipping the doc on
+  the theory it probably works.
+  ❌ drafting "the engine now self-heals across categories" into the skill
+  while the self-heal fix is still unproven, to spend the login session before
+  it expires.
 - Embed the knowledge itself; do not make private paths or one person's
   memory a load-bearing reference. A hard-coded machine-absolute path is worse
   than a broken link: a stale duplicate clone resolves *silently* to an
@@ -880,3 +893,12 @@ its scope-install / invoke-by-name / prune mitigation ladder (MathWorks
 field-of-use license — ideas only, no text). Both ship `unprobed` per the
 covenant; their probes join the private round-5 queue — the catalog-collision
 rule's is directly runnable against this pack's own 13 skills.
+The §2 verify-capability-before-shipping-the-doc rule (2026-07-24) is
+class-distilled from a mining pass over the owner's own sessions (no code
+taken): with a scarce authenticated remote session about to expire, doc edits
+describing a just-patched self-heal behavior were held until a regression gate
+proved the behavior, on the explicit reasoning that telling the weaker model
+"the engine auto-searches all categories" is a capability claim that must be
+verified live first or it ships a false instruction. Ships `unprobed` per the
+covenant;
+its probe joins the private round-5 queue.
