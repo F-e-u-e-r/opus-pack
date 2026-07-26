@@ -611,17 +611,21 @@ default; an AI rewrite does not launder a derivative).
   source before fixing it** (`unprobed` — private incident as shape; see
   Provenance). Where a file is compiled from another (a cache over a playbook, a
   rules file over a spec), the obvious reading of a wrong line is that the
-  derivative fell behind. Check whether the SOURCE carries the identical wrong
-  text first. If it does, this is not drift: the derivative is faithfully
+  derivative fell behind. Check whether the SOURCE carries the same wrong
+  content first — the identical text, or the source-side value it is
+  generated from. If it does, this is not drift: the derivative is faithfully
   mirroring a source that itself disagrees with the world, and correcting only
   the derivative gets it silently re-broken by the next compile or write-back.
-  Fix the source, bring the derivative along through its own regeneration or
-  write-back path where one exists (hand-editing a machine-compiled artifact
-  is what ground-truth-gates' regenerate-and-diff rule forbids), and record
-  which was authoritative. Distinct from §3's sync
-  contract, which governs two files that DISAGREE — here they agree with each
-  other and are both wrong (ground-truth-gates rule 7's mutual-agreement trap,
-  arising in maintenance rather than in a gate).
+  Fix the source, then bring the derivative along through its regeneration or
+  write-back path; a machine-compiled artifact is never hand-edited
+  (ground-truth-gates' regenerate-and-diff rule), while a hand-maintained
+  derivative with no mechanical path is corrected by hand against the fixed
+  source. Record which side was authoritative. Only a source that checks out
+  clean makes it true drift — then the derivative alone is regenerated, or
+  corrected through that same path. Distinct from §3's sync contract, which
+  keeps coupled files agreeing and names which wins when they disagree — here
+  the pair already agrees and both are wrong (ground-truth-gates rule 7's
+  mutual-agreement trap, arising in maintenance rather than in a gate).
   ❌ "the cache says X, reality says Y — so the cache drifted; fix the cache."
 - Compaction triggers — act when any of these is true: a skill outgrows what
   a reader can hold (~150 lines for discipline skills; domain-reference packs

@@ -109,14 +109,18 @@ acceptance, never closed by the reviewers on their own.
 finding on the merge-base too** (`unprobed` — see Provenance). On a
 behavior-preserving refactor branch a
 *reproduced* defect can still be one the branch faithfully carried over from
-master, not one it introduced; recording it against the branch is a false
+its base, not one it introduced; recording it against the branch is a false
 regression that blocks a clean refactor for a fault it did not create. Before
 you count a reproduced finding as the branch's defect, re-run it against the
-merge-base: present on both → `pre-existing-tracked`, spun off as its own
+merge-base: the SAME failure on both — same trigger, same outcome,
+comparable blast radius — → `pre-existing-tracked`, spun off as its own
 fix, never bloating the refactor — pre-existing moves where a reproduced
 correctness or safety defect gets fixed, never whether (deferral stays the
-owner's call per this section's triage); gone on the merge-base and live on
-the branch → a real regression this branch owns. Reviewers do not see master (§2 packet is your
+owner's call per this section's triage), and any widening the branch adds
+(a new trigger path, a broader blast radius) is not carried over: the
+widened part is the branch's own regression; gone on the merge-base and
+live on the branch → a real regression this branch owns. Reviewers do not
+see the base (§2 packet is your
 inlined lines), so this classification is yours to make, not theirs — a
 reviewer's severity label ("not merge-ready", "CRITICAL") is a claim about
 the code in front of it, blind to whether the branch introduced the behavior.

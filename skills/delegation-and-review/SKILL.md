@@ -993,7 +993,7 @@ list, AGPLv3 — strictly ideas only) — a widening of an existing prohibition,
 a new standalone rule, so it owes no separate probe.
 The §3 survey-reports-leads bullet (2026-07-24) is class-distilled from a
 private mining pass over the owner's own sessions (no code taken): a single
-lightweight-the-codebase session whose read-only fan-out survey was wrong four
+codebase-lightening session whose read-only fan-out survey was wrong four
 separate ways, each over-claiming — a substring count of "66 three.js sites"
 that was 2 files, "byte-identical" components that diverged on a prop and a
 fallback, a "NumField duplication" that dissolved into two incompatible
