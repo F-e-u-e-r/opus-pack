@@ -170,6 +170,70 @@ def closure_exit(survived, unexpected, drifted, authoritative, incomplete=None):
     return 0
 
 
+MEASUREMENT_PATHS = ("hooks/skill_snapshot.py", "hooks/skill-vetting-advisory.py",
+                     "hooks/test-skill_snapshot.sh",
+                     "hooks/test-skill-vetting-advisory.sh",
+                     "hooks/mutation_matrix.py", "hooks/mutations.json")
+
+
+def porcelain_paths(porcelain):
+    """Paths out of `git status --porcelain`, tolerating a stripped first line.
+
+    `dirty` is stored .strip()ed for display, which eats the LEADING space of
+    the first entry - so a fixed `line[3:]` slice returned "ooks/x.py" for the
+    first path and the right answer for every other one. My probe fed the raw
+    output and looked correct; the code fed the stripped one."""
+    out = set()
+    for line in porcelain.splitlines():
+        line = line.strip()
+        if not line or " " not in line:
+            continue
+        path = line.split(None, 1)[1].strip().strip('"')
+        if " -> " in path:                      # rename: the destination is live
+            path = path.split(" -> ", 1)[1].strip().strip('"')
+        out.add(path)
+    return out
+
+
+def hidden_modifications(paths, ls_files_v, blob_of_disk, blob_at_head,
+                         reported=()):
+    """-> list of paths whose on-disk content can differ from HEAD INVISIBLY.
+
+    `git status --porcelain` is not a sufficient definition of a clean tree.
+    `git update-index --assume-unchanged` and `--skip-worktree` tell git to stop
+    reporting a path, so an edit to it never appears in porcelain - while the
+    worktree the matrix measures is checked out at HEAD and therefore never
+    contains that edit. The run would then be presented as AUTHORITATIVE FOR
+    CURRENT CHECKOUT while the checkout held unmeasured modifications: the same
+    hazard --allow-dirty-head-only exists to make loud, reached silently.
+
+    Found by a cross-family verifier review and reproduced before this fix:
+    porcelain empty, `ls-files -v` showing `h`, disk blob != HEAD blob,
+    dirty_gate proceeding with no warning.
+
+    The blob comparison is the check that does not depend on knowing every flag
+    git might grow; the flag check is what names the cause when it fires.
+
+    `reported` is what porcelain already named. A path in it is not HIDDEN -
+    dirty_gate has already refused it, or the caller knowingly accepted its
+    exclusion - and re-refusing it here made --allow-dirty-head-only
+    unusable."""
+    problems = []
+    for path in paths:
+        if path in reported:
+            continue
+        flag = (ls_files_v(path) or " ").split()[0] if ls_files_v(path) else ""
+        if flag and (flag.islower() or flag == "S"):
+            problems.append("%s is marked %s (assume-unchanged/skip-worktree), "
+                            "so git will not report changes to it" % (path, flag))
+            continue
+        disk, head = blob_of_disk(path), blob_at_head(path)
+        if disk and head and disk != head:
+            problems.append("%s on disk differs from HEAD without appearing in "
+                            "`git status`" % path)
+    return problems
+
+
 def dirty_gate(dirty, allow_head_only, head):
     """-> (proceed, lines_to_print). Pure, so the decision is testable without
     building a repository in a fixture.
@@ -325,6 +389,25 @@ def main(argv=None):
     for line in notes:
         print(line, file=sys.stderr)
     if not proceed:
+        return 2
+
+    # Porcelain is not the whole definition of clean - see hidden_modifications.
+    hidden = hidden_modifications(
+        MEASUREMENT_PATHS,
+        lambda rel: subprocess.run(["git", "ls-files", "-v", rel], cwd=REPO,
+                                   capture_output=True, text=True).stdout.strip(),
+        lambda rel: subprocess.run(["git", "hash-object", rel], cwd=REPO,
+                                   capture_output=True, text=True).stdout.strip(),
+        lambda rel: subprocess.run(["git", "rev-parse", "HEAD:" + rel], cwd=REPO,
+                                   capture_output=True, text=True).stdout.strip(),
+        reported=porcelain_paths(dirty))
+    if hidden:
+        print("REFUSED: the working tree differs from %s in ways `git status` "
+              "does not report, so a worktree checkout of it would exclude them "
+              "while the run claimed to be authoritative for this checkout:"
+              % head[:12], file=sys.stderr)
+        for h in hidden:
+            print("    " + h, file=sys.stderr)
         return 2
 
     # PHASE 2 - execute, inside a throwaway checkout of `head`.

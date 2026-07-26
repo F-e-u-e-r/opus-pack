@@ -126,6 +126,83 @@ class DirtyTreeGate(unittest.TestCase):
         self.assertIn("EXCLUDED", r.stdout)
 
 
+class HiddenModifications(unittest.TestCase):
+    """`git status --porcelain` is not the whole definition of a clean tree.
+
+    Found by a cross-family verifier review: `git update-index
+    --assume-unchanged` (or --skip-worktree) tells git to stop reporting a
+    path, so an edit to it never reaches porcelain - while the worktree the
+    matrix measures is checked out at HEAD and never contains that edit. The
+    run would be presented as AUTHORITATIVE FOR CURRENT CHECKOUT while the
+    checkout held unmeasured modifications. Reproduced before the fix:
+    porcelain empty, ls-files -v showing `h`, disk blob != HEAD blob,
+    dirty_gate proceeding with no warning."""
+
+    PATHS = ("hooks/skill_snapshot.py",)
+
+    def _probe(self, flag, disk, head, reported=()):
+        return mm.hidden_modifications(self.PATHS, lambda p: flag,
+                                       lambda p: disk, lambda p: head,
+                                       reported=reported)
+
+    def test_porcelain_paths_survives_a_stripped_first_line(self):
+        """`dirty` is stored stripped for display, which removes the leading
+        space of the FIRST entry only. A fixed line[3:] slice then returned
+        "ooks/x.py" for it and the correct path for every other line - so the
+        first changed file silently stopped being recognised as reported."""
+        raw = " M hooks/a.py\n?? hooks/b.md\n M hooks/c.py"
+        self.assertEqual({"hooks/a.py", "hooks/b.md", "hooks/c.py"},
+                         mm.porcelain_paths(raw.strip()))
+        self.assertEqual({"hooks/a.py", "hooks/b.md", "hooks/c.py"},
+                         mm.porcelain_paths(raw))
+        self.assertEqual({"new.py"},
+                         mm.porcelain_paths("R  old.py -> new.py"))
+        self.assertEqual(set(), mm.porcelain_paths(""))
+
+    def test_a_change_porcelain_ALREADY_reported_is_not_hidden(self):
+        """The check is about what git does NOT report. Re-refusing a path
+        porcelain already named made --allow-dirty-head-only unusable: the
+        caller had knowingly accepted that exclusion one gate earlier."""
+        self.assertEqual([], self._probe("H hooks/skill_snapshot.py", "abc",
+                                         "def",
+                                         reported=("hooks/skill_snapshot.py",)))
+        self.assertEqual(1, len(self._probe("H hooks/skill_snapshot.py", "abc",
+                                            "def")),
+                         "and it still fires when porcelain is silent")
+
+    def test_an_ordinary_matching_file_is_clean(self):
+        self.assertEqual([], self._probe("H hooks/skill_snapshot.py",
+                                         "abc", "abc"))
+
+    def test_assume_unchanged_is_refused_even_when_blobs_match(self):
+        """The flag alone is disqualifying: it means git has been told not to
+        report future edits, so a later one would be equally invisible."""
+        out = self._probe("h hooks/skill_snapshot.py", "abc", "abc")
+        self.assertEqual(1, len(out))
+        self.assertIn("assume-unchanged", out[0])
+
+    def test_skip_worktree_is_refused(self):
+        out = self._probe("S hooks/skill_snapshot.py", "abc", "abc")
+        self.assertEqual(1, len(out))
+        self.assertIn("skip-worktree", out[0])
+
+    def test_a_blob_mismatch_is_refused_whatever_the_flag(self):
+        """The blob comparison is the check that does not depend on knowing
+        every flag git might grow; the flag check only names the cause."""
+        out = self._probe("H hooks/skill_snapshot.py", "abc", "def")
+        self.assertEqual(1, len(out))
+        self.assertIn("without appearing in `git status`", out[0])
+
+    def test_the_measured_paths_include_the_subjects_and_the_suites(self):
+        """The authoritative blob check covered the runner and the definitions
+        but NOT the files being mutated, which is what left the hole."""
+        for rel in ("hooks/skill_snapshot.py", "hooks/skill-vetting-advisory.py",
+                    "hooks/test-skill_snapshot.sh",
+                    "hooks/test-skill-vetting-advisory.sh",
+                    "hooks/mutation_matrix.py", "hooks/mutations.json"):
+            self.assertIn(rel, mm.MEASUREMENT_PATHS)
+
+
 class AuthoritativeMode(unittest.TestCase):
     """`--authoritative` is the mode a closure report may cite, so the thing
     that makes it authoritative has to be ENFORCED. It was first written as a
