@@ -275,10 +275,21 @@ def load_matrix():
     return out
 
 
+def suite_is_green(returncode, output):
+    """The oracle. Both signals must agree, because each alone misreads.
+
+    It used to be `"\nOK" in (stdout + stderr)` with the return code ignored,
+    and a cross-family review demonstrated the misreads in both directions: a
+    suite exiting 0 without printing OK was scored RED, and one exiting 1 while
+    printing OK was scored GREEN. The first inflates kills, the second hides a
+    survivor."""
+    return returncode == 0 and "\nOK" in output
+
+
 def run_suite(script, cwd=REPO):
     r = subprocess.run([script], capture_output=True, text=True, cwd=cwd,
                        timeout=900)
-    return "\nOK" in (r.stdout + r.stderr)
+    return suite_is_green(r.returncode, r.stdout + r.stderr)
 
 
 def main(argv=None):
@@ -439,6 +450,25 @@ def main(argv=None):
     wt_file = {SS: os.path.join(wt, "hooks", os.path.basename(SS)),
                HK: os.path.join(wt, "hooks", os.path.basename(HK))}
     wt_suites = [os.path.join(wt, "hooks", os.path.basename(x)) for x in SUITES]
+    # THE CONTROL. Every verdict below is "the suite went red when this fix was
+    # reverted", which means nothing unless the suite is GREEN when nothing is
+    # reverted. Without this, suites that were red for an unrelated reason -
+    # a broken environment, a missing dependency - would mark every mutant
+    # killed and produce a flawless 55/55 with no discriminating power at all.
+    # A cross-family review named this; the tool had exactly one run_suite call
+    # site, inside the mutant loop.
+    pristine_red = [s for s in wt_suites if not run_suite(s, cwd=wt)]
+    if pristine_red:
+        print("TOOL ERROR: the suites are not green on the UNMUTATED tree (%s), "
+              "so 'the suite went red' cannot distinguish a killed mutant from "
+              "a broken run." % ", ".join(os.path.basename(x) for x in pristine_red),
+              file=sys.stderr)
+        subprocess.run(["git", "worktree", "remove", "--force", wt], cwd=REPO,
+                       capture_output=True)
+        shutil.rmtree(parent, ignore_errors=True)
+        return 2
+    print("control            suites green on the unmutated tree")
+
     killed, survived, equivalent, unexpected = [], [], [], []
     record = []
     incomplete = None

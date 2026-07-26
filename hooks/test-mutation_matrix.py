@@ -126,6 +126,41 @@ class DirtyTreeGate(unittest.TestCase):
         self.assertIn("EXCLUDED", r.stdout)
 
 
+class SuiteOracle(unittest.TestCase):
+    """Every verdict the matrix produces is "the suite went red when this fix
+    was reverted". That means nothing unless the suite is green when nothing is
+    reverted, and it means nothing if the oracle misreads the suite."""
+
+    def test_both_signals_must_agree(self):
+        self.assertTrue(mm.suite_is_green(0, "...\nOK\n"))
+        self.assertFalse(mm.suite_is_green(1, "...\nOK\n"),
+                         "a suite that printed OK and then FAILED is not green "
+                         "- scoring it green hides a survivor")
+        self.assertFalse(mm.suite_is_green(0, "tests ran\n"),
+                         "a suite that exited 0 without the OK marker is not "
+                         "recognisably green - scoring it red inflates kills")
+        self.assertFalse(mm.suite_is_green(2, "crash"))
+
+    def test_the_matrix_runs_a_pristine_control(self):
+        """The tool had exactly one run_suite call site, inside the mutant
+        loop, so always-red suites would have marked every mutant killed and
+        produced a flawless 55/55 with no discriminating power."""
+        with open(os.path.join(HOOKS, "mutation_matrix.py")) as fh:
+            src = fh.read()
+        self.assertIn("pristine_red", src)
+        self.assertIn("not green on the UNMUTATED tree", src)
+        # The anchor must be UNIQUE, or this ordering assertion compares
+        # against the wrong loop - "for name, path, old, new" also matches the
+        # PHASE 1 shape check, which runs earlier, so the test failed while the
+        # code was right. The same non-unique-anchor mistake the matrix's own
+        # shape gate exists to reject.
+        mutation_loop = "for name, path, old, new, _expect, equiv in matrix:"
+        self.assertEqual(1, src.count(mutation_loop), "anchor is not unique")
+        self.assertEqual(1, src.count("pristine_red = "))
+        self.assertLess(src.index("pristine_red = "), src.index(mutation_loop),
+                        "the control must run BEFORE the first mutation")
+
+
 class HiddenModifications(unittest.TestCase):
     """`git status --porcelain` is not the whole definition of a clean tree.
 
