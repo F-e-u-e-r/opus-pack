@@ -227,6 +227,43 @@ class SuiteOracle(unittest.TestCase):
         self.assertIn("$HOME", rec["restore_scope"],
                       "the scope must say what it does NOT reset")
 
+    def test_the_printed_restore_summary_agrees_with_the_record(self):
+        """The summary was printed from a separate count BEFORE the mutation
+        loop ran, so an authoritative run reported "1 (1 control + 0
+        mutations)" while its record held 56. The machine evidence was right
+        and the sentence a human reads was wrong.
+
+        So the assertion is CROSS-CONSISTENCY, not a literal number: whatever
+        the record holds, the printed line must be derivable from it. A test
+        that only checked for "3" would pass again the moment the two sources
+        drifted in the same direction."""
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"),
+                            "--allow-dirty-head-only", "--only", "M18,M59"],
+                           capture_output=True, text=True, timeout=900)
+        self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+        printed = [l for l in r.stdout.splitlines() if l.startswith("restores")]
+        self.assertEqual(1, len(printed), "exactly one summary line")
+        path = [l.split(None, 2)[2].strip() for l in r.stdout.splitlines()
+                if l.startswith("per-mutant record")][0]
+        import json as _json
+        with open(path) as fh:
+            rec = _json.load(fh)
+        self.assertEqual(mm.restore_summary(rec["restores"]), printed[0],
+                         "the printed line must be exactly what the record's "
+                         "own data produces")
+        self.assertEqual(3, len(rec["restores"]), "fixture premise: 1 + 2")
+
+    def test_restore_summary_counts_control_and_mutations_separately(self):
+        line = mm.restore_summary([{"before": "pristine-control", "ok": True},
+                                   {"before": "M18", "ok": True},
+                                   {"before": "M59", "ok": True}])
+        self.assertEqual("restores           3 (1 control + 2 mutations), "
+                         "all ok=True", line)
+        self.assertIn("all ok=False",
+                      mm.restore_summary([{"before": "pristine-control",
+                                           "ok": False}]))
+
     def test_a_failed_restore_is_reported_not_swallowed(self):
         class Fail:
             returncode = 1

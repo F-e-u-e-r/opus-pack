@@ -117,6 +117,21 @@ def authoritative_conflicts(chosen, defaults, flag_of, output_only):
                   and v != defaults[d])
 
 
+def restore_summary(restores):
+    """The one-line summary, derived from the SAME list the record stores.
+
+    It used to be printed from a separate count, before the mutation loop had
+    run - so an authoritative run reported "1 (1 control + 0 mutations)" while
+    its record held 56. The machine evidence was right and the sentence a human
+    reads was wrong, which is the defect class this whole branch exists to
+    remove, appearing in its own summary. One source, computed once."""
+    control = sum(1 for r in restores if r.get("before") == "pristine-control")
+    mutations = len(restores) - control
+    return ("restores           %d (%d control + %d mutations), all ok=%s"
+            % (len(restores), control, mutations,
+               all(r.get("ok") for r in restores)))
+
+
 def restore_worktree(wt, sha, run):
     """Rebuild the worktree to `sha` EXACTLY, ignored files included.
 
@@ -522,9 +537,6 @@ def main(argv=None):
                        capture_output=True)
         shutil.rmtree(parent, ignore_errors=True)
         return 2
-    print("restores           %d (1 control + %d mutations), all ok=%s"
-          % (len(restores), len(restores) - 1,
-             all(r["ok"] for r in restores)))
     for c in control:
         print("control            %-34s rc=%d ok=%s green=%s"
               % (c["suite"], c["returncode"], c["ok_marker"], c["green"]))
@@ -664,6 +676,7 @@ def main(argv=None):
     # front of you, and only one of those two facts survives a CI gate that
     # reads exit codes.
     print("run id             %s" % run_id)
+    print(restore_summary(restores))
     print("subject commit      %s  (frozen at start)" % head)
     print("MEASUREMENT         VALID FOR FROZEN SNAPSHOT")
     print("CURRENT CHECKOUT    %s" % ("DRIFTED (%s)" % ", ".join(drifted)
