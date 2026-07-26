@@ -596,15 +596,18 @@ default; an AI rewrite does not launder a derivative).
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
-  between the arms), once with no rule and once with it. A bare pass counts
-  only when
-  the run demonstrably met the rule's trigger (ground-truth-gates' not-armed
-  discipline: a run that never hit the guarded condition is excluded and
-  re-run), and one pass screens for a large effect only — a close or
-  surprising call re-runs before demoting. Where the armed bare run already
-  produces the behavior, the rule is non-discriminating: it costs a line and
-  buys nothing, and belongs in a reference file or nowhere, not in the
-  always-loaded one. Eight rules folded into two files over one week were
+  between the arms), once with no rule and once with it. An arm counts only
+  when its run demonstrably met the rule's trigger (ground-truth-gates'
+  not-armed discipline: a run that never hit the guarded condition is
+  excluded and re-run), and one run per arm screens for a large effect
+  only — a close or surprising call re-runs before deciding. Read the pair,
+  not the bare arm alone: both arms produce the behavior → the rule is
+  non-discriminating — it costs a line and buys nothing, and belongs in a
+  reference file or nowhere, not in the always-loaded one; only the ruled
+  arm produces it → the rule earns its line; neither arm does → the rule as
+  written is ineffective — rewrite or drop it, never fold it in on truth
+  alone; and a ruled arm that loses behavior the bare arm had is a harmful
+  rule — dropped, not filed as reference. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for.
@@ -623,9 +626,13 @@ default; an AI rewrite does not launder a derivative).
   (ground-truth-gates' regenerate-and-diff rule), while a hand-maintained
   derivative with no mechanical path is corrected by hand against the fixed
   source. Record which side was authoritative. A source that checks out
-  clean does not yet establish true drift — trial-regenerate and diff:
-  correct output means the derivative had merely fallen behind; wrong output
-  again means the generation path itself is defective and gets fixed first.
+  clean does not yet establish true drift — with a mechanical path,
+  trial-regenerate and diff: correct output means the derivative had merely
+  fallen behind, so land that regenerated output; wrong output again means
+  the generation path itself is defective and gets fixed before any
+  regeneration is trusted. With no mechanical path, a clean source and a
+  wrong derivative is manual drift: hand-correct the derivative against the
+  clean source and record it as such.
   Distinct from §3's sync contract, which
   keeps coupled files agreeing and names which wins when they disagree — here
   the pair already agrees and both are wrong (ground-truth-gates rule 7's
