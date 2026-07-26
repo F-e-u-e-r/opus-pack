@@ -132,6 +132,17 @@ def restore_worktree(wt, sha, run):
     platform, not of the tool. Anywhere else the cache lands in the worktree.
     So the state is rebuilt rather than inspected.
 
+    SCOPE, stated because the guarantee travels with the repository and the
+    evidence for it does not: this restores REPO-LOCAL state. It does not touch
+    $HOME, $TMPDIR, XDG caches or platform caches. Measured on the two suites
+    this matrix runs: $TMPDIR showed 0 new and 0 changed files across a full
+    run (they use mktemp and clean up), and the only ~/.claude deltas were this
+    session's own transcript and usage file - confirmed by a control that
+    waited the same interval WITHOUT running them and saw the same two files
+    move. Python bytecode goes to sys.pycache_prefix on this platform and is
+    not shown to change any verdict. A suite that later grows external state
+    would need its own isolation; this function would not provide it.
+
     -> None on success, or a reason string."""
     for cmd in (["git", "reset", "--hard", sha], ["git", "clean", "-fdx"]):
         r = run(cmd, wt)
@@ -481,8 +492,11 @@ def main(argv=None):
     # killed and produce a flawless 55/55 with no discriminating power at all.
     # A cross-family review named this; the tool had exactly one run_suite call
     # site, inside the mutant loop.
+    restores = []
     why = restore_worktree(wt, head, lambda c, d: subprocess.run(
         c, cwd=d, capture_output=True, text=True))
+    restores.append({"before": "pristine-control", "ok": why is None,
+                     "sha": head})
     if why:
         print("TOOL ERROR: could not establish the frozen snapshot before the "
               "control run (%s)" % why, file=sys.stderr)
@@ -508,6 +522,9 @@ def main(argv=None):
                        capture_output=True)
         shutil.rmtree(parent, ignore_errors=True)
         return 2
+    print("restores           %d (1 control + %d mutations), all ok=%s"
+          % (len(restores), len(restores) - 1,
+             all(r["ok"] for r in restores)))
     for c in control:
         print("control            %-34s rc=%d ok=%s green=%s"
               % (c["suite"], c["returncode"], c["ok_marker"], c["green"]))
@@ -523,6 +540,8 @@ def main(argv=None):
             # mutant's side effects are part of this one's input.
             why = restore_worktree(wt, head, lambda c, d: subprocess.run(
                 c, cwd=d, capture_output=True, text=True))
+            restores.append({"before": name.split()[0], "ok": why is None,
+                             "sha": head})
             if why:
                 incomplete = ("could not restore the frozen snapshot before "
                               "%s: %s" % (name.split()[0], why))
@@ -608,6 +627,9 @@ def main(argv=None):
             "invocation": ["mutation_matrix.py"] + list(argv if argv is not None
                                                         else sys.argv[1:]),
             "pristine_control": control,
+            "restores": restores,
+            "restore_scope": "repo-local (git reset --hard + git clean -fdx); "
+                             "$HOME, $TMPDIR and platform caches are NOT reset",
             "mutations": record})
         print("per-mutant record  %s" % rec_path)
     except OSError as exc:

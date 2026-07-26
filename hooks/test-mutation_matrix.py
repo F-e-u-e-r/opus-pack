@@ -201,6 +201,32 @@ class SuiteOracle(unittest.TestCase):
         with open(os.path.join(repo, "f.py")) as fh:
             self.assertEqual("x = 1\n", fh.read(), "tracked content restored")
 
+    def test_the_record_shows_one_restore_per_case_plus_the_control(self):
+        """"Restored before each mutation" must be re-derivable, not a
+        procedural sentence in a report. The count is 1 + the number of cases
+        measured, each naming what it preceded and the SHA it restored to."""
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"),
+                            "--allow-dirty-head-only", "--only", "M18,M59"],
+                           capture_output=True, text=True, timeout=900)
+        self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+        path = [l.split(None, 2)[2].strip() for l in r.stdout.splitlines()
+                if l.startswith("per-mutant record")][0]
+        import json as _json
+        with open(path) as fh:
+            rec = _json.load(fh)
+        restores = rec["restores"]
+        self.assertEqual(rec["measured"] + 1, len(restores),
+                         "one restore per case, plus the control")
+        self.assertEqual("pristine-control", restores[0]["before"])
+        self.assertEqual(["M18", "M59"], [x["before"] for x in restores[1:]])
+        self.assertTrue(all(x["ok"] for x in restores))
+        self.assertTrue(all(x["sha"] == rec["subject_commit"] for x in restores),
+                        "every restore must target the frozen subject")
+        self.assertIn("repo-local", rec["restore_scope"])
+        self.assertIn("$HOME", rec["restore_scope"],
+                      "the scope must say what it does NOT reset")
+
     def test_a_failed_restore_is_reported_not_swallowed(self):
         class Fail:
             returncode = 1
