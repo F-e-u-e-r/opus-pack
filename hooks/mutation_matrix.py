@@ -116,6 +116,20 @@ def authoritative_conflicts(chosen, defaults, flag_of, output_only):
                   and v != defaults[d])
 
 
+def unrecorded_run_is_fatal(authoritative, exc):
+    """-> the incompleteness reason, or None.
+
+    An authoritative run that leaves no durable record has produced a claim
+    with nothing behind it, and it used to exit 0 after printing one line
+    nobody downstream reads. Reachable without malice: a PID reused at the same
+    commit with the same selection collides under the exclusive create, and a
+    read-only temp directory does it too."""
+    if not authoritative:
+        return None
+    return ("the per-mutant record could not be written (%s), so this run has "
+            "no durable evidence" % exc)
+
+
 def closure_exit(survived, unexpected, drifted, authoritative, incomplete=None):
     """The run's exit code. Pure, so the contract a CI gate reads is tested
     rather than described.
@@ -403,7 +417,14 @@ def main(argv=None):
                        "mutations": record}, fh, indent=1)
         print("per-mutant record  %s" % rec_path)
     except OSError as exc:
+        # An authoritative run that leaves no durable record has produced a
+        # claim with nothing behind it - and it used to exit 0 anyway, printing
+        # one line nobody downstream reads. Reachable without malice: a PID
+        # reused at the same commit with the same selection collides under the
+        # exclusive create this same fold introduced.
         print("per-mutant record  NOT WRITTEN (%s)" % exc)
+        rec_path = None
+        incomplete = unrecorded_run_is_fatal(args.authoritative, exc) or incomplete
 
     # The identity was frozen at startup and the worktree pinned to it, so a
     # commit landing mid-run cannot change what was measured. Re-read it anyway

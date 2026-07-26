@@ -193,6 +193,22 @@ class AuthoritativeMode(unittest.TestCase):
         self.assertEqual(1, mm.closure_exit(["M1"], [], ["runner"], True))
         self.assertEqual(1, mm.closure_exit([], ["M2"], ["runner"], True))
 
+    def test_an_authoritative_run_that_records_nothing_is_incomplete(self):
+        """The record is the durable half of the evidence. A run that could not
+        write it has a claim with nothing behind it, and it used to exit 0 with
+        one printed line - the same "warning nothing reads" shape as the drift
+        note. Reachable without malice: a PID reused at the same commit with the
+        same selection collides under the exclusive create introduced to stop a
+        partial run overwriting an authoritative one."""
+        why = mm.unrecorded_run_is_fatal(True, OSError("File exists"))
+        self.assertTrue(why)
+        self.assertIn("no durable evidence", why)
+        self.assertEqual(2, mm.closure_exit([], [], [], True, incomplete=why),
+                         "an unrecorded authoritative run must not exit 0")
+        self.assertIsNone(mm.unrecorded_run_is_fatal(False, OSError("x")),
+                          "a partial run's record is not a closure artifact, so "
+                          "failing to write it is not a measurement failure")
+
     def test_an_incomplete_run_outranks_a_survivor(self):
         """Exit 1 asserts that the full matrix ran and something lived. A run
         that stopped partway has not earned that sentence, whatever it managed
