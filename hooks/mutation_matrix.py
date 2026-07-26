@@ -117,6 +117,30 @@ def authoritative_conflicts(chosen, defaults, flag_of, output_only):
                   and v != defaults[d])
 
 
+def restore_worktree(wt, sha, run):
+    """Rebuild the worktree to `sha` EXACTLY, ignored files included.
+
+    `git status --porcelain` was the earlier gate and it is not enough: it
+    cannot see ignored paths, so a suite's __pycache__, .pytest_cache or any
+    generated fixture would survive into the next mutant and become part of its
+    input. A verdict would then be about the mutation plus whatever the last
+    run left behind.
+
+    Observing "no residue" does not close this. On the machine where that was
+    measured, sys.pycache_prefix is /Users/.../Library/Caches/com.apple.python,
+    so this interpreter writes bytecode OUTSIDE the tree - a property of the
+    platform, not of the tool. Anywhere else the cache lands in the worktree.
+    So the state is rebuilt rather than inspected.
+
+    -> None on success, or a reason string."""
+    for cmd in (["git", "reset", "--hard", sha], ["git", "clean", "-fdx"]):
+        r = run(cmd, wt)
+        if r.returncode != 0:
+            return "%s failed in the worktree: %s" % (" ".join(cmd[:3]),
+                                                      r.stderr.strip()[:200])
+    return None
+
+
 def write_record(path, payload):
     """Write the run's durable evidence. Exclusive create, so a second run can
     never silently take an earlier one's place.
@@ -457,6 +481,15 @@ def main(argv=None):
     # killed and produce a flawless 55/55 with no discriminating power at all.
     # A cross-family review named this; the tool had exactly one run_suite call
     # site, inside the mutant loop.
+    why = restore_worktree(wt, head, lambda c, d: subprocess.run(
+        c, cwd=d, capture_output=True, text=True))
+    if why:
+        print("TOOL ERROR: could not establish the frozen snapshot before the "
+              "control run (%s)" % why, file=sys.stderr)
+        subprocess.run(["git", "worktree", "remove", "--force", wt], cwd=REPO,
+                       capture_output=True)
+        shutil.rmtree(parent, ignore_errors=True)
+        return 2
     control = []
     for suite in wt_suites:
         r = subprocess.run([suite], capture_output=True, text=True, cwd=wt,
@@ -488,12 +521,11 @@ def main(argv=None):
             # A verdict is only about ITS mutation if the tracked content is
             # back at the frozen snapshot first; otherwise the previous
             # mutant's side effects are part of this one's input.
-            residue = subprocess.run(["git", "status", "--porcelain"], cwd=wt,
-                                     capture_output=True, text=True).stdout.strip()
-            if residue:
-                incomplete = ("the worktree was not at the frozen snapshot "
-                              "before %s: %s" % (name.split()[0],
-                                                 residue.splitlines()[0]))
+            why = restore_worktree(wt, head, lambda c, d: subprocess.run(
+                c, cwd=d, capture_output=True, text=True))
+            if why:
+                incomplete = ("could not restore the frozen snapshot before "
+                              "%s: %s" % (name.split()[0], why))
                 break
             target = wt_file[path]
             pristine_src = open(target).read()

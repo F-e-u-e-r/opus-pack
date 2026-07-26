@@ -164,17 +164,66 @@ class SuiteOracle(unittest.TestCase):
             self.assertTrue(c["green"], "a run whose control was red must not "
                                         "have produced mutant verdicts at all")
 
+    def test_restore_clears_IGNORED_residue_not_just_tracked(self):
+        """`git status --porcelain` cannot see ignored paths, so a suite's
+        __pycache__ or generated fixture would survive into the next mutant.
+        Measuring "no residue" does not close it either: on this machine
+        sys.pycache_prefix redirects bytecode outside the tree, which is a
+        property of the platform, not of the tool. So the state is REBUILT."""
+        import tempfile
+        repo = tempfile.mkdtemp(prefix="restore-")
+        self.addCleanup(__import__("shutil").rmtree, repo, ignore_errors=True)
+        run = lambda c, d=repo: subprocess.run(c, cwd=d, capture_output=True,
+                                               text=True)
+        run(["git", "init", "-q", "."])
+        with open(os.path.join(repo, ".gitignore"), "w") as fh:
+            fh.write("junk/\n")
+        with open(os.path.join(repo, "f.py"), "w") as fh:
+            fh.write("x = 1\n")
+        run(["git", "add", "-A"])
+        run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+             "commit", "-qm", "i"])
+        sha = run(["git", "rev-parse", "HEAD"]).stdout.strip()
+
+        os.makedirs(os.path.join(repo, "junk"))
+        with open(os.path.join(repo, "junk", "cache"), "w") as fh:
+            fh.write("left by the previous mutant\n")
+        with open(os.path.join(repo, "f.py"), "w") as fh:
+            fh.write("x = 999   # a mutation\n")
+        self.assertEqual("", run(["git", "status", "--porcelain",
+                                  "--"] + ["junk"]).stdout.strip(),
+                         "premise: the ignored path is invisible to status")
+        self.assertTrue(os.path.exists(os.path.join(repo, "junk", "cache")))
+
+        self.assertIsNone(mm.restore_worktree(repo, sha, run))
+        self.assertFalse(os.path.exists(os.path.join(repo, "junk")),
+                         "ignored residue must be gone")
+        with open(os.path.join(repo, "f.py")) as fh:
+            self.assertEqual("x = 1\n", fh.read(), "tracked content restored")
+
+    def test_a_failed_restore_is_reported_not_swallowed(self):
+        class Fail:
+            returncode = 1
+            stderr = "fatal: cannot reset"
+        why = mm.restore_worktree("/nowhere", "deadbeef", lambda c, d: Fail())
+        self.assertIn("git reset --hard failed", why)
+        self.assertEqual(2, mm.closure_exit([], [], [], True, incomplete=why),
+                         "a run that could not establish its own starting "
+                         "state must not produce verdicts")
+
     def test_each_mutation_starts_from_the_frozen_snapshot(self):
         """All mutants share one worktree and the suites write into it. A
         verdict is only about ITS mutation if the tracked content is back at
         the frozen snapshot first."""
         with open(os.path.join(HOOKS, "mutation_matrix.py")) as fh:
             src = fh.read()
-        self.assertIn("was not at the frozen snapshot", src)
-        gate = 'residue = subprocess.run(["git", "status", "--porcelain"], cwd=wt,'
-        self.assertEqual(1, src.count(gate), "anchor is not unique")
+        self.assertIn("could not restore the frozen snapshot before", src)
+        gate = "why = restore_worktree(wt, head, lambda c, d: subprocess.run("
+        self.assertEqual(2, src.count(gate),
+                         "restore runs before the control AND before each "
+                         "mutation")
         loop = "for name, path, old, new, _expect, equiv in matrix:"
-        self.assertLess(src.index(loop), src.index(gate),
+        self.assertLess(src.index(loop), src.rindex(gate),
                         "the gate belongs INSIDE the loop, before each mutation")
 
     def test_the_matrix_runs_a_pristine_control(self):
