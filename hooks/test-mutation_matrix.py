@@ -221,6 +221,10 @@ class AuthoritativeMode(unittest.TestCase):
         src = open(os.path.join(HOOKS, "mutation_matrix.py")).read()
         self.assertIn("tempfile.gettempdir()", src,
                       "the record must land outside the repository")
+        self.assertIn('"x"', src,
+                      "the record must be opened exclusively: a later run "
+                      "overwriting an earlier one is how a 55-row "
+                      "authoritative record became a 1-row partial one")
         self.assertNotIn('add_argument("--record', src,
                          "a flag for it would be refused by --authoritative")
         r = subprocess.run([sys.executable,
@@ -240,6 +244,17 @@ class AuthoritativeMode(unittest.TestCase):
         for field in ("desc", "path", "where", "suites_red", "verdict"):
             self.assertIn(field, got["M18"],
                           "a comparison needs %s, not just a verdict" % field)
+        # A PARTIAL run must be unable to occupy a full run's evidence path,
+        # and must say what it is. Keying the name on the commit alone let a
+        # `--only M18` run from THIS test destroy a 55-row authoritative
+        # record two minutes after the closure verifier had passed against it.
+        self.assertRegex(path[0], r"-1of\d+-pid\d+\.json$",
+                         "the path must encode the selection and the process")
+        self.assertNotEqual("authoritative", rec.get("mode"),
+                            "a --only run is not authoritative")
+        self.assertEqual(1, rec["measured"])
+        self.assertGreater(rec["total_definitions"], 1,
+                           "the record must say how many it did NOT measure")
 
     def test_no_measurement_input_escapes_the_authoritative_gate(self):
         """The gate compares the parsed namespace against argparse's defaults,

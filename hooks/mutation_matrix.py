@@ -249,6 +249,7 @@ def main(argv=None):
         return bool(disk) and disk == committed
 
     matrix = load_matrix()
+    total_defined = len(matrix)
     wanted = {x.strip() for x in args.only.split(",") if x.strip()}
     if wanted:
         matrix = [m for m in matrix if m[0].split()[0] in wanted]
@@ -378,11 +379,28 @@ def main(argv=None):
     # and the NEXT authoritative run would refuse to start.
     for entry in record:
         entry["verdict"] = ("killed" if entry["suites_red"] else "survived")
-    rec_path = os.path.join(tempfile.gettempdir(),
-                            "mutation-matrix-%s.json" % head[:12])
+    # The name was keyed on the COMMIT alone, so every run at that commit wrote
+    # the same file - and a `--only M18` run silently replaced a full
+    # authoritative run's 55 rows with one. It happened: the harness's own test
+    # for this record destroyed the record two minutes after the closure
+    # verifier had passed against it. A partial measurement occupying a full
+    # one's path is the evidence-layer form of exactly what the authoritative
+    # mode exists to prevent, so the name now carries the selection and the
+    # process, and the body carries the mode - a reader can no longer mistake
+    # one for the other, and a later run cannot overwrite an earlier one.
+    rec_path = os.path.join(
+        tempfile.gettempdir(),
+        "mutation-matrix-%s-%dof%d-pid%d.json"
+        % (head[:12], len(matrix), total_defined, os.getpid()))
     try:
-        with open(rec_path, "w") as fh:
-            json.dump({"subject_commit": head, "mutations": record}, fh, indent=1)
+        with open(rec_path, "x") as fh:          # x: never clobber
+            json.dump({"subject_commit": head,
+                       "mode": "authoritative" if args.authoritative
+                               else "partial-or-unqualified",
+                       "measured": len(matrix),
+                       "total_definitions": total_defined,
+                       "invocation": ["mutation_matrix.py"] + (argv or sys.argv[1:]),
+                       "mutations": record}, fh, indent=1)
         print("per-mutant record  %s" % rec_path)
     except OSError as exc:
         print("per-mutant record  NOT WRITTEN (%s)" % exc)
