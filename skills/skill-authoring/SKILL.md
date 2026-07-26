@@ -113,7 +113,7 @@ artifact-producing step.
   CLI behaves, a numeric threshold someone measured) can go stale within
   days; a rule encoding method (reproduce before trusting, verify by
   execution) goes stale rarely and slowly. A staleness audit therefore
-  concentrates the search on the files carrying dated facts and treats the
+  concentrates the search on the world-fact files and treats the
   method-encoding files as low-yield — not as exempt. One sweep of four rules
   files found every stale instance — 8 of 8 — in the single file that carried
   world-facts; the three method files were clean. This scopes the SEARCH only:
@@ -600,8 +600,11 @@ default; an AI rewrite does not launder a derivative).
   when its run demonstrably met the rule's trigger (ground-truth-gates'
   not-armed discipline: a run that never hit the guarded condition is
   excluded and re-run), and one run per arm screens for a large effect
-  only — a close or surprising call re-runs before deciding. Read the pair,
-  not the bare arm alone: both arms produce the behavior → the rule is
+  only — a close or surprising call re-runs before deciding. Score each arm
+  against the rule's INTENDED outcome — for a preventive rule the intended
+  outcome is the abstention or refusal, so a bare arm that commits the
+  prohibited act FAILS its arm — then read the pair, not the bare arm
+  alone: both arms produce the intended outcome → the rule is
   non-discriminating — it costs a line and buys nothing, and belongs in a
   reference file or nowhere, not in the always-loaded one; only the ruled
   arm produces it → the rule earns its line; neither arm does → the rule as
@@ -630,9 +633,12 @@ default; an AI rewrite does not launder a derivative).
   trial-regenerate and diff: correct output means the derivative had merely
   fallen behind, so land that regenerated output; wrong output again means
   the generation path itself is defective and gets fixed before any
-  regeneration is trusted. With no mechanical path, a clean source and a
-  wrong derivative is manual drift: hand-correct the derivative against the
-  clean source and record it as such.
+  regeneration is trusted. For a pair that is hand-maintained by design, a
+  clean source and a wrong derivative is manual drift: hand-correct the
+  derivative against the clean source and record it as such. A
+  machine-compiled artifact whose generator is merely unavailable is NOT
+  that case — restoring the generation path is the fix, and the artifact
+  stays un-hand-edited (blocked, not manually drifted).
   Distinct from §3's sync contract, which
   keeps coupled files agreeing and names which wins when they disagree — this
   rule's trap subcase is the pair that agrees while both are wrong
