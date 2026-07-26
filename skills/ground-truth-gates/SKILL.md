@@ -290,8 +290,9 @@ A generic green test is not proof. A gate is real only if:
    the world. It shares rule 7's remedy — an external anchor — but not its
    trigger: rule 7 bites where *agreement between artifacts* is made to stand
    in for an external fact, this one where *structure* is. A fact that
-   legitimately changes gets the value versioned (the regenerate-and-diff rule
-   below), an always-fixed one is cheap to anchor permanently.
+   legitimately changes gets its anchor updated as a contract edit (rule 4:
+   state which contract changed and who approved it); an always-fixed one is
+   cheap to anchor permanently.
    ❌ "the holiday tests pass" — they assert the list has the right count and
    types, never that any date is the right day; a fat-fingered edit to one
    date stays green.

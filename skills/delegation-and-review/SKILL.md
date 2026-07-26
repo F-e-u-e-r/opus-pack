@@ -577,7 +577,8 @@ reviewers that they silently absorb as implementers.
   ❌ "the synthesis stage returned a thorough report, so the finders
   must have run."
 - **A read-only survey reports leads, not facts — re-verify each in source
-  before you spec work on it.** Fan-out finders scanning for dedup targets,
+  before you spec work on it** (`unprobed` — private evidence as shape; see
+  Provenance). Fan-out finders scanning for dedup targets,
   dead code, or duplication over-claim in the direction that makes the work
   look bigger: a substring grep calls "66 import sites" what is really 2
   files; "byte-identical" components turn out to diverge on a prop or a

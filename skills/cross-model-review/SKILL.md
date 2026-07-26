@@ -106,23 +106,30 @@ stays must-fix (§3 triage): it may be deferred only with the owner's explicit
 acceptance, never closed by the reviewers on their own.
 
 **Pre-existing is a disposition you establish, not assume — reproduce the
-finding on the merge-base too.** On a behavior-preserving refactor branch a
+finding on the merge-base too** (`unprobed` — see Provenance). On a
+behavior-preserving refactor branch a
 *reproduced* defect can still be one the branch faithfully carried over from
 master, not one it introduced; recording it against the branch is a false
 regression that blocks a clean refactor for a fault it did not create. Before
 you count a reproduced finding as the branch's defect, re-run it against the
 merge-base: present on both → `pre-existing-tracked`, spun off as its own
-fix, never bloating the refactor; gone on master and live on the branch → a real
-regression this branch owns. Reviewers do not see master (§2 packet is your
+fix, never bloating the refactor; gone on the merge-base and live on the
+branch → a real regression this branch owns. Reviewers do not see master (§2 packet is your
 inlined lines), so this classification is yours to make, not theirs — a
 reviewer's severity label ("not merge-ready", "CRITICAL") is a claim about
 the code in front of it, blind to whether the branch introduced the behavior.
 And applicability is itself a **runtime/deployment-state** question, not a
-source one: a migration or identifier case-collision finding that no live
-data can trigger — empty store, writer never deployed — is an irreproducible
-false positive (§4), not a regression this branch owns. Reproduce against
-what actually shipped (query the collection, check the deploy), not synthetic
-data the bug reproduces on but the running system never holds.
+source one: adjudicate a migration or identifier case-collision finding
+against what actually shipped (query the collection, check the deploy),
+never only against synthetic data the bug reproduces on but the running
+system never holds. A finding whose premise no shipped state satisfies —
+empty store, writer never deployed — is recorded `rejected-with-reason`
+with that runtime counter-evidence attached, or held as an owner-accepted
+deferral where the state could yet arrive; do not file it under §4's
+irreproducible-false-positive bucket, which is for findings that do not
+reproduce at all. Non-applicability is severity evidence, not ownership
+evidence: a latent path the branch itself introduces stays its own
+must-fix however empty today's store is — deployment catches up.
 neg: filing a reviewer's "P1, not merge-ready" against a refactor for a quirk
 that reproduces identically on the merge-base — the review still pays off (spin
 the quirk off as its own fix), but the branch is clean and the label was
@@ -265,6 +272,8 @@ codex's identifier-migration and case-collision findings were non-applicable
 because the store was empty and the writer had never deployed. The lesson
 is the general one — pre-existing-vs-regression is a baseline diff, and
 applicability is a runtime-state question — not the specific findings.
+Both rules ship `unprobed` per the covenant; their probes join the private
+round-5 queue.
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier
