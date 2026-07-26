@@ -593,16 +593,31 @@ def main(argv=None):
     for suite in wt_suites:
         r = subprocess.run([suite], capture_output=True, text=True, cwd=wt,
                            timeout=900)
+        _out = r.stdout + r.stderr
         control.append({"suite": os.path.basename(suite),
                         "returncode": r.returncode,
-                        "ok_marker": "\nOK" in (r.stdout + r.stderr),
-                        "green": suite_is_green(r.returncode,
-                                                r.stdout + r.stderr)})
+                        "ok_marker": "\nOK" in _out,
+                        "green": suite_is_green(r.returncode, _out),
+                        # The evidence of WHY, not just that. A control that
+                        # reports which suites were red and discards their
+                        # output is an instrument that does not say what it
+                        # measured - and it cost a CI cycle to notice, because
+                        # the suites run inside the worktree and this is the
+                        # only place their output exists.
+                        "tail": _out.strip().splitlines()[-25:]})
     pristine_red = [c["suite"] for c in control if not c["green"]]
     if pristine_red:
         print("TOOL ERROR: the suites are not green on the UNMUTATED tree (%s), "
               "so 'the suite went red' cannot distinguish a killed mutant from "
               "a broken run." % ", ".join(pristine_red), file=sys.stderr)
+        for c in control:
+            if c["green"]:
+                continue
+            print("---- %s: rc=%d, ok_marker=%s ----"
+                  % (c["suite"], c["returncode"], c["ok_marker"]),
+                  file=sys.stderr)
+            for line in c["tail"]:
+                print("     " + line, file=sys.stderr)
         subprocess.run(["git", "worktree", "remove", "--force", wt], cwd=REPO,
                        capture_output=True)
         shutil.rmtree(parent, ignore_errors=True)
