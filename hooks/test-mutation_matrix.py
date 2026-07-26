@@ -126,6 +126,105 @@ class DirtyTreeGate(unittest.TestCase):
         self.assertIn("EXCLUDED", r.stdout)
 
 
+class CrossFamilyBlockRegressions(unittest.TestCase):
+    """The four BLOCKs a two-family verifier review found against the
+    c26603e evidence chain. Each test reproduces the ORIGINAL exploit shape,
+    not a paraphrase of it."""
+
+    def test_measurement_paths_cover_the_test_BODIES_not_just_the_wrappers(self):
+        """BLOCK 1. The .sh entries are twelve lines that `exec` the sibling
+        .py, where all the test logic lives - so concealing a change to
+        test-skill_snapshot.py bypassed the check entirely. The first
+        concealment fix protected the shell and missed the substance."""
+        for rel in ("hooks/test-skill_snapshot.py",
+                    "hooks/test-skill-vetting-advisory.py",
+                    "hooks/skill_snapshot.py", "hooks/skill-vetting-advisory.py",
+                    "hooks/test-skill_snapshot.sh",
+                    "hooks/test-skill-vetting-advisory.sh",
+                    "hooks/mutation_matrix.py", "hooks/mutations.json"):
+            self.assertIn(rel, mm.MEASUREMENT_PATHS)
+        out = mm.hidden_modifications(("hooks/test-skill_snapshot.py",),
+                                      lambda p: "h hooks/test-skill_snapshot.py",
+                                      lambda p: "a", lambda p: "a")
+        self.assertEqual(1, len(out), "a concealed test body must be refused")
+
+    def test_start_and_end_identity_use_the_SAME_path_set(self):
+        """BLOCK 2. The start check covered all measurement paths; the end
+        check covered HEAD, runner and definitions only - so a flag set AFTER
+        preflight still printed AUTHORITATIVE FOR CURRENT CHECKOUT."""
+        lsv, disk, head = (lambda p: "H x"), (lambda p: "a"), (lambda p: "a")
+        start = mm.identity_snapshot(mm.MEASUREMENT_PATHS, lsv, disk, head, "S")
+        self.assertEqual(set(mm.MEASUREMENT_PATHS) | {"head"}, set(start))
+        # the exploit: a subject gains a concealment flag after preflight
+        end = mm.identity_snapshot(
+            mm.MEASUREMENT_PATHS,
+            lambda p: ("h x" if p == "hooks/skill_snapshot.py" else "H x"),
+            disk, head, "S")
+        self.assertEqual(["hooks/skill_snapshot.py"],
+                         mm.identity_drift(start, end),
+                         "a flag set after preflight must show as drift")
+        self.assertEqual([], mm.identity_drift(start, start))
+        self.assertEqual(["canonical HEAD"],
+                         mm.identity_drift(start, dict(start, head="T")))
+
+    def test_a_restore_is_only_ok_if_the_tree_actually_came_back(self):
+        """BLOCK 3. "restore ok" meant two commands returned zero, which is a
+        claim about the commands, not the tree."""
+        calls = {"n": 0}
+
+        def run(cmd, cwd):
+            calls["n"] += 1
+
+            class R:
+                returncode = 0
+                stderr = ""
+                stdout = (" M hooks/x.py\n" if cmd[:2] == ["git", "status"]
+                          else "deadbeef")
+            return R()
+        why = mm.restore_worktree("/wt", "deadbeef", run)
+        self.assertIn("not clean after reset+clean", why or "",
+                      "residue after a zero-exit reset must fail the restore")
+
+        def run_wrong_head(cmd, cwd):
+            class R:
+                returncode = 0
+                stderr = ""
+                stdout = ("" if cmd[:2] == ["git", "status"] else "0" * 40)
+            return R()
+        why = mm.restore_worktree("/wt", "deadbeef", run_wrong_head)
+        self.assertIn("not the frozen subject", why or "")
+
+    def test_every_verdict_names_the_digest_of_the_definition_it_measured(self):
+        """BLOCK 4. The row comparison checked desc and where, so a
+        definitions file rotating old/new between entries sharing a
+        (path, where) passed shape validation and the verifier while
+        measuring the wrong spans."""
+        r = subprocess.run([sys.executable,
+                            os.path.join(HOOKS, "mutation_matrix.py"),
+                            "--allow-dirty-head-only", "--only", "M18"],
+                           capture_output=True, text=True, timeout=900)
+        self.assertEqual(0, r.returncode, r.stdout + r.stderr)
+        path = [l.split(None, 2)[2].strip() for l in r.stdout.splitlines()
+                if l.startswith("per-mutant record")][0]
+        import hashlib as _h, json as _j
+        with open(path) as fh:
+            row = _j.load(fh)["mutations"][0]
+        with open(os.path.join(HOOKS, "mutations.json")) as fh:
+            d = [x for x in _j.load(fh)["mutations"] if x["id"] == "M18"][0]
+        want = _h.sha256(_j.dumps({k: d.get(k) for k in
+                                   ("id", "path", "where", "old", "new", "desc")},
+                                  sort_keys=True,
+                                  ensure_ascii=True).encode("utf-8")).hexdigest()
+        self.assertEqual(want, row["definition_digest"])
+        swapped = dict(d, old=d["new"], new=d["old"])
+        other = _h.sha256(_j.dumps({k: swapped.get(k) for k in
+                                    ("id", "path", "where", "old", "new", "desc")},
+                                   sort_keys=True,
+                                   ensure_ascii=True).encode("utf-8")).hexdigest()
+        self.assertNotEqual(want, other,
+                            "rotating the spans must change the digest")
+
+
 class SuiteOracle(unittest.TestCase):
     """Every verdict the matrix produces is "the suite went red when this fix
     was reverted". That means nothing unless the suite is green when nothing is

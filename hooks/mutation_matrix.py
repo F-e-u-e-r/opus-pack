@@ -50,6 +50,7 @@ enforced here rather than asked for in prose.
 """
 import argparse
 import ast
+import hashlib
 import json
 import os
 import shutil
@@ -164,6 +165,17 @@ def restore_worktree(wt, sha, run):
         if r.returncode != 0:
             return "%s failed in the worktree: %s" % (" ".join(cmd[:3]),
                                                       r.stderr.strip()[:200])
+    # POSTCONDITION. Two commands exiting 0 is a claim about the commands, not
+    # about the tree: "restore ok" meant only that git returned zero (raised by
+    # a cross-family review). Check the state the restore was for.
+    r = run(["git", "status", "--porcelain"], wt)
+    if r.returncode != 0 or r.stdout.strip():
+        return ("the worktree is not clean after reset+clean: %s"
+                % (r.stdout.strip().splitlines() or [r.stderr.strip()])[0][:120])
+    r = run(["git", "rev-parse", "HEAD"], wt)
+    if r.stdout.strip() != sha:
+        return ("the worktree is at %s, not the frozen subject"
+                % r.stdout.strip()[:12])
     return None
 
 
@@ -220,10 +232,50 @@ def closure_exit(survived, unexpected, drifted, authoritative, incomplete=None):
     return 0
 
 
+# THE authoritative set. Every stage - preflight concealment check, blob
+# equality, and the end-of-run drift check - reads THIS and nothing else.
+#
+# It listed the .sh wrappers and not the .py bodies, which is where all the
+# test logic lives: the wrappers are twelve lines that `exec` the sibling .py.
+# So concealing a modification to test-skill_snapshot.py bypassed the check
+# entirely - the fix for the first concealment finding protected the shell and
+# missed the substance (found by a cross-family verifier review). Keeping one
+# list, read by every stage, is what stops the next path from being covered in
+# one place and not another.
 MEASUREMENT_PATHS = ("hooks/skill_snapshot.py", "hooks/skill-vetting-advisory.py",
+                     "hooks/test-skill_snapshot.py",
+                     "hooks/test-skill-vetting-advisory.py",
                      "hooks/test-skill_snapshot.sh",
                      "hooks/test-skill-vetting-advisory.sh",
                      "hooks/mutation_matrix.py", "hooks/mutations.json")
+
+
+def identity_snapshot(paths, ls_files_v, blob_of_disk, blob_at_head, head):
+    """Everything that must not move during a run, captured the same way at
+    both ends. The start check covered all measurement paths; the end check
+    covered HEAD, the runner and the definitions only - so a concealment flag
+    set AFTER preflight left the run printing AUTHORITATIVE FOR CURRENT
+    CHECKOUT while the checkout held unmeasured edits (cross-family review).
+    Asymmetry between two checks of the same property is the defect; one
+    function used twice is the fix."""
+    snap = {"head": head}
+    for path in paths:
+        flag = (ls_files_v(path) or " ").split()[0] if ls_files_v(path) else ""
+        snap[path] = (flag, blob_of_disk(path), blob_at_head(path))
+    return snap
+
+
+def identity_drift(start, end):
+    """-> list of what moved between two snapshots."""
+    out = []
+    if start.get("head") != end.get("head"):
+        out.append("canonical HEAD")
+    for key in sorted(set(start) | set(end)):
+        if key == "head":
+            continue
+        if start.get(key) != end.get(key):
+            out.append(key)
+    return out
 
 
 def porcelain_paths(porcelain):
@@ -403,6 +455,17 @@ def main(argv=None):
     run_id = uuid.uuid4().hex[:12]
     matrix = load_matrix()
     total_defined = len(matrix)
+    # The digest binds a verdict to the FULL definition it measured - id, path,
+    # landing function, both spans and the description - so a definitions file
+    # with matching descriptions but rotated spans cannot pass for the one that
+    # was measured (cross-family review).
+    _defdigest = {}
+    with open(os.path.join(HOOKS, "mutations.json")) as _fh:
+        for _d in json.load(_fh)["mutations"]:
+            _defdigest[_d["id"]] = hashlib.sha256(json.dumps(
+                {k: _d.get(k) for k in ("id", "path", "where", "old", "new",
+                                        "desc")},
+                sort_keys=True, ensure_ascii=True).encode("utf-8")).hexdigest()
     wanted = {x.strip() for x in args.only.split(",") if x.strip()}
     if wanted:
         matrix = [m for m in matrix if m[0].split()[0] in wanted]
@@ -452,6 +515,14 @@ def main(argv=None):
     if not proceed:
         return 2
 
+    _lsv = lambda rel: subprocess.run(["git", "ls-files", "-v", rel], cwd=REPO,
+                                      capture_output=True, text=True).stdout.strip()
+    _disk = lambda rel: subprocess.run(["git", "hash-object", rel], cwd=REPO,
+                                       capture_output=True, text=True).stdout.strip()
+    _head = lambda rel: subprocess.run(["git", "rev-parse", "HEAD:" + rel], cwd=REPO,
+                                       capture_output=True, text=True).stdout.strip()
+    start_identity = identity_snapshot(MEASUREMENT_PATHS, _lsv, _disk, _head, head)
+
     # Porcelain is not the whole definition of clean - see hidden_modifications.
     hidden = hidden_modifications(
         MEASUREMENT_PATHS,
@@ -486,7 +557,6 @@ def main(argv=None):
                                         else "  (ON-DISK COPY DIFFERS)"))
     print("definitions commit  %s%s" % (head, "" if defs_ok
                                         else "  (ON-DISK COPY DIFFERS)"))
-    frozen = (head, runner_ok, defs_ok)
     print("measuring commit %s in an isolated worktree" % head[:12])
     parent = tempfile.mkdtemp(prefix="mutation-matrix-")
     wt = os.path.join(parent, "wt")
@@ -566,6 +636,7 @@ def main(argv=None):
             tag = name.split(" (")[0][:60]
             record.append({"id": name.split()[0], "desc": name.split(" ", 1)[1],
                            "path": os.path.basename(path), "where": _expect,
+                           "definition_digest": _defdigest[name.split()[0]],
                            "suites_red": [os.path.basename(r) for r in reds]})
             if reds:
                 where = ", ".join(os.path.basename(r).replace("test-", "")
@@ -660,12 +731,9 @@ def main(argv=None):
     # like any other and this is what makes it checkable.
     head_now = subprocess.run(["git", "rev-parse", "HEAD"], cwd=REPO,
                               capture_output=True, text=True).stdout.strip()
-    drifted = [w for w, ok in (("canonical HEAD", head_now == frozen[0]),
-                               ("runner", _blob_matches_head(
-                                   "hooks/mutation_matrix.py") == frozen[1]),
-                               ("definitions", _blob_matches_head(
-                                   "hooks/mutations.json") == frozen[2]))
-               if not ok]
+    end_identity = identity_snapshot(MEASUREMENT_PATHS, _lsv, _disk, _head,
+                                     head_now)
+    drifted = identity_drift(start_identity, end_identity)
 
     # Report every category separately. Collapsing them into one ratio is how a
     # tool error, an unkillable mutant and an unprotected fix come to look alike.
@@ -676,6 +744,7 @@ def main(argv=None):
     # front of you, and only one of those two facts survives a CI gate that
     # reads exit codes.
     print("run id             %s" % run_id)
+    print("run identity       %s %s" % (run_id, head))
     print(restore_summary(restores))
     print("subject commit      %s  (frozen at start)" % head)
     print("MEASUREMENT         VALID FOR FROZEN SNAPSHOT")
