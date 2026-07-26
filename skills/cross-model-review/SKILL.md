@@ -113,8 +113,10 @@ master, not one it introduced; recording it against the branch is a false
 regression that blocks a clean refactor for a fault it did not create. Before
 you count a reproduced finding as the branch's defect, re-run it against the
 merge-base: present on both → `pre-existing-tracked`, spun off as its own
-fix, never bloating the refactor; gone on the merge-base and live on the
-branch → a real regression this branch owns. Reviewers do not see master (§2 packet is your
+fix, never bloating the refactor — pre-existing moves where a reproduced
+correctness or safety defect gets fixed, never whether (deferral stays the
+owner's call per this section's triage); gone on the merge-base and live on
+the branch → a real regression this branch owns. Reviewers do not see master (§2 packet is your
 inlined lines), so this classification is yours to make, not theirs — a
 reviewer's severity label ("not merge-ready", "CRITICAL") is a claim about
 the code in front of it, blind to whether the branch introduced the behavior.

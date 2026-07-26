@@ -584,7 +584,8 @@ reviewers that they silently absorb as implementers.
   files; "byte-identical" components turn out to diverge on a prop or a
   fallback; a "duplicated" helper is two semantically incompatible families
   that must not be merged; "dead" code has a live registry entry the finder
-  never traced. Each finding is a hypothesis — open the cited files and
+  never traced. Each finding is a hypothesis — open the cited files, tracing
+  the references its verdict depends on (registries, routes, call sites), and
   confirm the claim before it enters the plan, and re-check after any finding
   that reverses scope (a dissolved dedup, a resurrected dead file), because
   the tier ranking built on the survey is now stale. Speccing on an

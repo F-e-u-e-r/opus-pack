@@ -111,11 +111,11 @@ artifact-producing step.
   (`unprobed` — private incident as shape; see Provenance). A rule encoding a
   fact about the outside world (which model or tool is default, how a CLI
   behaves, a numeric threshold someone measured) goes stale on a timescale of
-  days. A rule encoding method (reproduce before trusting, verify by execution)
-  does not go stale at all. A staleness audit is therefore not a uniform sweep
-  of every file: concentrate the search on the files carrying dated facts and
-  treat the method-encoding files as low-yield. One sweep of four rules files
-  found every stale instance — 8 of 8 — in the single file that carried
+  days; a rule encoding method (reproduce before trusting, verify by
+  execution) goes stale rarely and slowly. A staleness audit therefore
+  concentrates the search on the files carrying dated facts and treats the
+  method-encoding files as low-yield — not as exempt. One sweep of four rules
+  files found every stale instance — 8 of 8 — in the single file that carried
   world-facts; the three method files were clean. This scopes the SEARCH only:
   a method file still gets corrected when something does surface in it.
 - **Capability-negative claims rot the worst** (`unprobed` — private incident
@@ -595,7 +595,11 @@ default; an AI rewrite does not launder a derivative).
   (`unprobed` — measured in-house; see Provenance). §6's behavioral probe hunts
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
-  executor, once with no rule and once with it. Where the bare run already
+  executor, once with no rule and once with it. A bare pass counts only when
+  the run demonstrably met the rule's trigger (ground-truth-gates' not-armed
+  discipline: a run that never hit the guarded condition is excluded and
+  re-run), and one pass screens for a large effect only — a close or
+  surprising call re-runs before demoting. Where the armed bare run already
   produces the behavior, the rule is non-discriminating: it costs a line and
   buys nothing, and belongs in a reference file or nowhere, not in the
   always-loaded one. Eight rules folded into two files over one week were
@@ -611,7 +615,10 @@ default; an AI rewrite does not launder a derivative).
   text first. If it does, this is not drift: the derivative is faithfully
   mirroring a source that itself disagrees with the world, and correcting only
   the derivative gets it silently re-broken by the next compile or write-back.
-  Fix both, and record which was authoritative. Distinct from §3's sync
+  Fix the source, bring the derivative along through its own regeneration or
+  write-back path where one exists (hand-editing a machine-compiled artifact
+  is what ground-truth-gates' regenerate-and-diff rule forbids), and record
+  which was authoritative. Distinct from §3's sync
   contract, which governs two files that DISAGREE — here they agree with each
   other and are both wrong (ground-truth-gates rule 7's mutual-agreement trap,
   arising in maintenance rather than in a gate).

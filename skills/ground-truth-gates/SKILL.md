@@ -281,8 +281,10 @@ A generic green test is not proof. A gate is real only if:
    evaporates when the session ends, so the next bad edit sails through a
    shape-only gate. Anchor the fact: assert the specific load-bearing values
    (a fixed holiday falls on its known date, the standard rate equals the
-   published number), from the authority you already consulted, so a future
-   silent change to a constant fails. This *extends* item 2's carve-out —
+   published number), each assertion naming its authority and consultation
+   date beside the value — an unattributed literal is indistinguishable from
+   item 3's copied-back expected value — so a future silent change to a
+   constant fails. This *extends* item 2's carve-out —
    from an output-interface string to an embedded input constant — and is NOT
    item 3's "hardcoded expected value" fake pass: the anchor's value comes from
    an external authority, not copied back from the code's own output. Item 3's
