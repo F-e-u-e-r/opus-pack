@@ -606,8 +606,8 @@ default; an AI rewrite does not launder a derivative).
   reference file or nowhere, not in the always-loaded one; only the ruled
   arm produces it → the rule earns its line; neither arm does → the rule as
   written is ineffective — rewrite or drop it, never fold it in on truth
-  alone; and a ruled arm that loses behavior the bare arm had is a harmful
-  rule — dropped, not filed as reference. Eight rules folded into two files over one week were
+  alone; only the bare arm produces it → the rule is harmful — dropped, not
+  filed as reference. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for.
@@ -634,9 +634,11 @@ default; an AI rewrite does not launder a derivative).
   wrong derivative is manual drift: hand-correct the derivative against the
   clean source and record it as such.
   Distinct from §3's sync contract, which
-  keeps coupled files agreeing and names which wins when they disagree — here
-  the pair already agrees and both are wrong (ground-truth-gates rule 7's
-  mutual-agreement trap, arising in maintenance rather than in a gate).
+  keeps coupled files agreeing and names which wins when they disagree — this
+  rule's trap subcase is the pair that agrees while both are wrong
+  (ground-truth-gates rule 7's mutual-agreement trap, arising in maintenance
+  rather than in a gate); the drift branches above already cover the
+  disagreeing pair.
   ❌ "the cache says X, reality says Y — so the cache drifted; fix the cache."
 - Compaction triggers — act when any of these is true: a skill outgrows what
   a reader can hold (~150 lines for discipline skills; domain-reference packs
