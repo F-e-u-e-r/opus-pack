@@ -16,6 +16,8 @@ import subprocess
 import sys
 import unittest
 
+REPO = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+
 HOOKS = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, HOOKS)
 import mutation_matrix as mm            # noqa: E402
@@ -209,6 +211,66 @@ class AuthoritativeMode(unittest.TestCase):
                           "a partial run's record is not a closure artifact, so "
                           "failing to write it is not a measurement failure")
 
+    def _require_clean_authoritative_preconditions(self):
+        """--authoritative refuses a dirty tree and a runner blob that differs
+        from HEAD, and BOTH also return 2. So a writer-failure test run on a
+        dirty tree would pass for the wrong reason - which it did, until this
+        guard was added. Skip rather than assert into ambiguity."""
+        dirty = subprocess.run(["git", "status", "--porcelain"], cwd=REPO,
+                               capture_output=True, text=True).stdout.strip()
+        if dirty:
+            self.skipTest("authoritative preconditions unmet (tree dirty), so "
+                          "exit 2 would not distinguish the writer failure "
+                          "from the refusal: " + dirty.splitlines()[0])
+
+    def test_main_ACTUALLY_consumes_a_record_write_failure(self):
+        """The rule test above proves `unrecorded_run_is_fatal` is right. It
+        does not prove main() asks it - a runner that forgot to thread the
+        writer's failure into the rule would keep exiting 0 while every unit
+        test stayed green. So this drives the real main() control flow and only
+        stubs what makes it slow or environment-dependent.
+
+        The stubs are deliberately narrow: the matrix is reduced to one entry,
+        the suites are not executed, and the dirty gate is satisfied. Everything
+        else - the authoritative gate, the worktree, the record path, the
+        completeness accounting and the exit contract - is the shipped code."""
+        self._require_clean_authoritative_preconditions()
+        one = mm.load_matrix()[:1]
+        original = (mm.load_matrix, mm.run_suite, mm.dirty_gate, mm.write_record)
+        try:
+            mm.load_matrix = lambda: one
+            mm.run_suite = lambda script, cwd=None: False      # every mutant dies
+            mm.dirty_gate = lambda dirty, allow, head: (True, [])
+            mm.write_record = self._explode
+            rc = mm.main(["--authoritative"])
+        finally:
+            (mm.load_matrix, mm.run_suite, mm.dirty_gate,
+             mm.write_record) = original
+        self.assertEqual(2, rc,
+                         "an authoritative run whose evidence could not be "
+                         "written must report an incomplete measurement, not "
+                         "a clean pass")
+
+    @staticmethod
+    def _explode(path, payload):
+        raise OSError(17, "File exists")
+
+    def test_the_same_stub_run_passes_when_the_record_IS_written(self):
+        """The two-sided half: with the writer working, the identical stubbed
+        run exits 0. Without this, the test above would also pass if main()
+        were broken in some unrelated way that always returned 2."""
+        self._require_clean_authoritative_preconditions()
+        one = mm.load_matrix()[:1]
+        original = (mm.load_matrix, mm.run_suite, mm.dirty_gate)
+        try:
+            mm.load_matrix = lambda: one
+            mm.run_suite = lambda script, cwd=None: False
+            mm.dirty_gate = lambda dirty, allow, head: (True, [])
+            rc = mm.main(["--authoritative"])
+        finally:
+            mm.load_matrix, mm.run_suite, mm.dirty_gate = original
+        self.assertEqual(0, rc, "the same run must pass when evidence lands")
+
     def test_an_incomplete_run_outranks_a_survivor(self):
         """Exit 1 asserts that the full matrix ran and something lived. A run
         that stopped partway has not earned that sentence, whatever it managed
@@ -264,8 +326,12 @@ class AuthoritativeMode(unittest.TestCase):
         # and must say what it is. Keying the name on the commit alone let a
         # `--only M18` run from THIS test destroy a 55-row authoritative
         # record two minutes after the closure verifier had passed against it.
-        self.assertRegex(path[0], r"-1of\d+-pid\d+\.json$",
-                         "the path must encode the selection and the process")
+        self.assertRegex(path[0], r"-1of\d+-[0-9a-f]{12}\.json$",
+                         "the path must encode the selection and a per-run "
+                         "nonce - a pid is reused, so a leftover file would "
+                         "make a legitimate later run fail for no reason")
+        self.assertEqual(12, len(rec.get("run_id", "")),
+                         "the record must carry the same run id the path does")
         self.assertNotEqual("authoritative", rec.get("mode"),
                             "a --only run is not authoritative")
         self.assertEqual(1, rec["measured"])

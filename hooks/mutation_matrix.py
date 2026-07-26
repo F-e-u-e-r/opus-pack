@@ -56,6 +56,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import uuid
 
 HOOKS = os.path.dirname(os.path.realpath(__file__))
 REPO = os.path.dirname(HOOKS)
@@ -114,6 +115,18 @@ def authoritative_conflicts(chosen, defaults, flag_of, output_only):
     return sorted(flag_of.get(d, d) for d, v in chosen.items()
                   if d not in output_only and d in defaults
                   and v != defaults[d])
+
+
+def write_record(path, payload):
+    """Write the run's durable evidence. Exclusive create, so a second run can
+    never silently take an earlier one's place.
+
+    A separate function because the orchestration has to be shown CONSUMING a
+    failure, not just holding a rule about one. Testing `unrecorded_run_is_fatal`
+    proves the rule; patching this proves main() actually asks it."""
+    with open(path, "x") as fh:
+        json.dump(payload, fh, indent=1)
+    return path
 
 
 def unrecorded_run_is_fatal(authoritative, exc):
@@ -262,6 +275,7 @@ def main(argv=None):
                                    capture_output=True, text=True).stdout.strip()
         return bool(disk) and disk == committed
 
+    run_id = uuid.uuid4().hex[:12]
     matrix = load_matrix()
     total_defined = len(matrix)
     wanted = {x.strip() for x in args.only.split(",") if x.strip()}
@@ -402,19 +416,29 @@ def main(argv=None):
     # mode exists to prevent, so the name now carries the selection and the
     # process, and the body carries the mode - a reader can no longer mistake
     # one for the other, and a later run cannot overwrite an earlier one.
+    # The uniqueness primitive is a NONCE, not the pid. A pid is reused, and a
+    # leftover file from a dead run would then make a perfectly legitimate new
+    # measurement fail closed for no reason - a false incomplete rather than a
+    # false success, but still a wrong answer. The pid stays as diagnostics.
+    #
+    # The same id is printed, stored, and cross-checked, so a report cannot be
+    # assembled from one run's stdout and another run's record.
     rec_path = os.path.join(
         tempfile.gettempdir(),
-        "mutation-matrix-%s-%dof%d-pid%d.json"
-        % (head[:12], len(matrix), total_defined, os.getpid()))
+        "mutation-matrix-%s-%dof%d-%s.json"
+        % (head[:12], len(matrix), total_defined, run_id))
     try:
-        with open(rec_path, "x") as fh:          # x: never clobber
-            json.dump({"subject_commit": head,
-                       "mode": "authoritative" if args.authoritative
-                               else "partial-or-unqualified",
-                       "measured": len(matrix),
-                       "total_definitions": total_defined,
-                       "invocation": ["mutation_matrix.py"] + (argv or sys.argv[1:]),
-                       "mutations": record}, fh, indent=1)
+        write_record(rec_path, {
+            "run_id": run_id,
+            "subject_commit": head,
+            "mode": "authoritative" if args.authoritative
+                    else "partial-or-unqualified",
+            "measured": len(matrix),
+            "total_definitions": total_defined,
+            "pid": os.getpid(),
+            "invocation": ["mutation_matrix.py"] + list(argv if argv is not None
+                                                        else sys.argv[1:]),
+            "mutations": record})
         print("per-mutant record  %s" % rec_path)
     except OSError as exc:
         # An authoritative run that leaves no durable record has produced a
@@ -447,6 +471,7 @@ def main(argv=None):
     # true of the frozen snapshot, but it stops being evidence about the tree in
     # front of you, and only one of those two facts survives a CI gate that
     # reads exit codes.
+    print("run id             %s" % run_id)
     print("subject commit      %s  (frozen at start)" % head)
     print("MEASUREMENT         VALID FOR FROZEN SNAPSHOT")
     print("CURRENT CHECKOUT    %s" % ("DRIFTED (%s)" % ", ".join(drifted)
