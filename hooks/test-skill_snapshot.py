@@ -562,11 +562,23 @@ class TreeObservation(Base):
                 "peak %d below the cap %d means the instrument never observed "
                 "the peak — the failure mode of the two earlier versions"
                 % (peak, cap))
+        # BOUNDED, which is what the name says and what the comment above
+        # already admitted: "no exact constant: the total depends on CPython
+        # using fdopendir on a dup". The assertion demanded exact equality
+        # anyway, so it contradicted its own reasoning - and a sampled peak has
+        # legitimate variance. It was green on Linux one CI run and red the
+        # next with {4: 3, 16: 3, 32: 2}, which satisfies the real property
+        # perfectly.
+        #
+        # What must be excluded is fds SCALING with the cap. If the walker held
+        # one per level, the overhead would be about the cap itself - 16 and 32
+        # here - so a fixed ceiling well below the largest cap discriminates,
+        # while tolerating a sample landing one descriptor either side.
         overheads = {cap: peak - cap for cap, peak in peaks.items()}
-        self.assertEqual(
-            1, len(set(overheads.values())),
-            "fd overhead above the cap must be one constant, not grow with the "
-            "cap: %r" % overheads)
+        self.assertLessEqual(
+            max(overheads.values()), 8,
+            "fd overhead above the cap must be bounded by a constant that does "
+            "not grow with the cap: %r" % overheads)
 
 
     def test_wide_tree_fd_fanout_fails_closed(self):
