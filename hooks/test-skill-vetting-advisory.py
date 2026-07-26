@@ -681,14 +681,44 @@ class HookE2E(unittest.TestCase):
         # named, while the advisory kept saying it was held back for next time.
         # The axis is not anomalous vs clean, nor new vs unchanged - it is
         # whether THIS run's baseline advance will consume it.
+        # DETERMINISM. This fixture first put the heavy candidates and the new
+        # skill in ONE root and relied on os.scandir order to decide which side
+        # of the shared budget the new skill fell on. scan_root streams and
+        # deliberately does not sort, so that order is the filesystem's: on
+        # APFS the new skill landed at position 10 of 26 - just inside the
+        # 4096/400 cut - and the test passed; on ext4 it landed after the stop,
+        # became `partial` itself, and the test reported starvation for a skill
+        # that was never cleanly observed at all. It had been passing by luck of
+        # the filesystem.
+        #
+        # roots are scanned global-then-project on ONE budget, so putting the
+        # unconsumable candidates in the project scope and the new skill in the
+        # global scope makes the premise hold by construction.
+        P = self.proj_skills(self.projA)
         for i in range(25):
-            d = self.mkskill(self.G, "b%02d" % i)
+            d = self.mkskill(P, "b%02d" % i)
             for j in range(400):        # unpatched MAX_ENTRIES = 4096
                 with open(os.path.join(d, "f%03d" % j), "w") as fh:
                     fh.write("x")
         self.run_hook()
         self.run_hook()
         self.mkskill(self.G, "zz-newskill")
+
+        # The premise, asserted rather than hoped for: the new skill must be
+        # CLEANLY observed, or this fixture is not testing starvation.
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("ss_probe", SNAP)
+        ss = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(ss)
+        budget = {"bytes": 0, "entries": 0, "stop": False}
+        seen = dict(ss.scan_root(self.G, budget)["candidates"])
+        self.assertFalse(seen[b"zz-newskill"].get("partial"),
+                         "premise: the new skill must be observable, or a "
+                         "failure below would mean unobservable, not starved")
+        self.assertTrue(any(s.get("partial") for _n, s in
+                            ss.scan_root(P, budget)["candidates"]),
+                        "premise: some candidates must be unconsumable")
+
         for attempt in range(4):
             ctx = self.run_hook()[1]
             if ctx and "zz-newskill" in ctx:
