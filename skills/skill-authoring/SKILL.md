@@ -109,8 +109,8 @@ artifact-producing step.
 - Date-stamp volatile facts (versions, flags, model names, defaults).
 - **Staleness concentrates in the world-fact rules — audit there first**
   (`unprobed` — private incident as shape; see Provenance). A rule encoding a
-  fact about the outside world (which model or tool is default, how a CLI
-  behaves, a numeric threshold someone measured) goes stale on a timescale of
+  mutable fact about the outside world (which model or tool is default, how a
+  CLI behaves, a numeric threshold someone measured) can go stale within
   days; a rule encoding method (reproduce before trusting, verify by
   execution) goes stale rarely and slowly. A staleness audit therefore
   concentrates the search on the files carrying dated facts and treats the
@@ -595,7 +595,9 @@ default; an AI rewrite does not launder a derivative).
   (`unprobed` — measured in-house; see Provenance). §6's behavioral probe hunts
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
-  executor, once with no rule and once with it. A bare pass counts only when
+  executor, as independent fresh invocations (no shared state or history
+  between the arms), once with no rule and once with it. A bare pass counts
+  only when
   the run demonstrably met the rule's trigger (ground-truth-gates' not-armed
   discipline: a run that never hit the guarded condition is excluded and
   re-run), and one pass screens for a large effect only — a close or
@@ -620,9 +622,11 @@ default; an AI rewrite does not launder a derivative).
   write-back path; a machine-compiled artifact is never hand-edited
   (ground-truth-gates' regenerate-and-diff rule), while a hand-maintained
   derivative with no mechanical path is corrected by hand against the fixed
-  source. Record which side was authoritative. Only a source that checks out
-  clean makes it true drift — then the derivative alone is regenerated, or
-  corrected through that same path. Distinct from §3's sync contract, which
+  source. Record which side was authoritative. A source that checks out
+  clean does not yet establish true drift — trial-regenerate and diff:
+  correct output means the derivative had merely fallen behind; wrong output
+  again means the generation path itself is defective and gets fixed first.
+  Distinct from §3's sync contract, which
   keeps coupled files agreeing and names which wins when they disagree — here
   the pair already agrees and both are wrong (ground-truth-gates rule 7's
   mutual-agreement trap, arising in maintenance rather than in a gate).

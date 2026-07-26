@@ -272,7 +272,8 @@ The §3 baseline-classification and runtime-state adjudication rules
 (2026-07-24) are class-distilled from a mining pass over the owner's own
 sessions (no code taken): a moira-web behavior-preserving refactor where
 codex's "not merge-ready" and agy's "CRITICAL" both dissolved under
-reproduction as pre-existing master behaviors the branch faithfully preserved
+reproduction as pre-existing base-branch behaviors the branch faithfully
+preserved
 (0 regressions, 4 pre-existing quirks spun off), and a TG-bot review where
 codex's identifier-migration and case-collision findings were non-applicable
 because the store was empty and the writer had never deployed. The lesson

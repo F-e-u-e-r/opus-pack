@@ -272,14 +272,15 @@ A generic green test is not proof. A gate is real only if:
 8. **A gate over hardcoded facts asserts the facts, not just the shape — and
    the cross-check that established them belongs IN the fixture, not in the
    chat** (`unprobed` — private incident as shape; see Provenance). When code
-   embeds domain constants (holiday dates, a tax rate, a fee schedule, the set
-   of valid states), a suite that checks structure — the array is non-empty,
+   embeds domain constants (holiday dates, a tax rate, a fee schedule, a
+   jurisdiction's valid state codes), a suite that checks structure — the
+   array is non-empty,
    each entry parses, the shape is right — passes identically whether the
    values are correct or a later edit corrupted one. Those values were usually
    cross-checked once, against an authority or several independent sources or a
    reviewer's recall — but that check happened in the conversation and
    evaporates when the session ends, so the next bad edit sails through a
-   shape-only gate. Anchor the fact: assert the specific load-bearing values
+   shape-only gate. Anchor the fact: assert every load-bearing value
    (a fixed holiday falls on its known date, the standard rate equals the
    published number), each assertion naming its authority (source, and its
    version or URL where it has one) and consultation date beside the value —
