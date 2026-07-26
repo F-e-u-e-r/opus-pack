@@ -611,7 +611,7 @@ default; an AI rewrite does not launder a derivative).
   text first. If it does, this is not drift: the derivative is faithfully
   mirroring a source that itself disagrees with the world, and correcting only
   the derivative gets it silently re-broken by the next compile or write-back.
-  Fix both, and record which was authoritative. Distinct from §4's sync
+  Fix both, and record which was authoritative. Distinct from §3's sync
   contract, which governs two files that DISAGREE — here they agree with each
   other and are both wrong (ground-truth-gates rule 7's mutual-agreement trap,
   arising in maintenance rather than in a gate).
