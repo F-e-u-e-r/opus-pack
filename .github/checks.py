@@ -1,7 +1,12 @@
 #!/usr/bin/env python3
 """Repo consistency checks. Run locally or in CI: python3 .github/checks.py
 
-Scope: what the published repo carries, enumerated via `git ls-files` (the
+Scope: what the published repo carries. NOTE which checks actually use that
+enumeration: only the plugin-reachability check and the hidden-directive sweep
+read the `tracked` list. Skill discovery and hook-entry discovery walk the
+WORKING TREE with os.listdir, so an untracked directory under a skills root, or
+an untracked script under hooks/, is seen by those and invisible to these
+(round-8 screen, pass 13). Tracked-file enumeration is via `git ls-files` (the
 .claude/ live-install copy and the private evals are gitignored - keeping
 those in sync is a local concern, not a repo one). Fail direction: every
 check fails CLOSED on what it claims to cover - a tracked file the sweep
@@ -40,7 +45,11 @@ tracked = [
 
 # 1. Every skill has a CLOSED frontmatter block (byte-exact fences) whose
 #    interior carries exactly one name: (== directory) and exactly one
-#    single-line description: long enough to be a load trigger. A trailing
+#    description: long enough to be a load trigger. NOTE what this does NOT
+#    establish: it collects lines matching ^description:(\s|$) and measures the
+#    remainder of THAT line, so a YAML continuation on the following lines is
+#    neither seen nor rejected - "single-line" describes what is measured, not
+#    a property that is enforced (round-8 screen). A trailing
 #    " #" comment is stripped before judging the value (YAML semantics);
 #    a bare "name:" counts as a duplicate entry, not nothing. Single-line
 #    description is a deliberate house-style tripwire (skill-authoring:
@@ -417,6 +426,59 @@ if isinstance(plugin, dict) and "hooks" in plugin:
     fail("plugin.json declares a hooks field - the plugin must never register hooks (standing invariant)")
 if isinstance(plugin, dict) and "hooks" not in plugin and not os.path.exists(os.path.join(ROOT, "hooks", "hooks.json")):
     ok("plugin registers no hooks (standing invariant holds)")
+
+# 5. No test function is defined twice in a suite. Python keeps only the last
+#    definition, so a duplicate silently shadows an earlier one - the earlier
+#    body stops running while the suite still reports it as present. Found live
+#    at the round-8 screen: one hook test had been added twice by two folds of
+#    the same finding, and the shadowed copy was dead for several commits.
+import collections as _collections
+for _suite in ("hooks/test-skill_snapshot.py", "hooks/test-skill-vetting-advisory.py"):
+    _src = open(_suite).read()
+    _names = re.findall(r"^    def (test_\w+)\(", _src, re.M)
+    # A duplicate CLASS name shadows exactly as silently as a duplicate method:
+    # Python keeps the last, and every test method on the earlier class stops
+    # running while the file still shows them. Same failure, same invisibility
+    # (round-8 screen, pass 13).
+    _classes = re.findall(r"^class (\w+)\(", _src, re.M)
+    _dupes = sorted(n for n, c in _collections.Counter(_names).items() if c > 1)
+    _dupes += sorted("class " + n for n, c in _collections.Counter(_classes).items()
+                     if c > 1)
+    if _dupes:
+        fail("%s defines these tests more than once, so the earlier copy is "
+             "dead code Python never runs: %s" % (_suite, ", ".join(_dupes)))
+    else:
+        # len(set(...)) - the definitions that actually RUN. len(_names) counts
+        # the shadowed copy too, and this ok() used to print in the same run as
+        # its own fail() because it was not in an else: the check contradicted
+        # itself one line apart, and reported 93 tests where 91 ran. Verifying
+        # the exit code is not verifying the output (round-8 screen, pass 13).
+        ok("%s has %d tests, no shadowed duplicates"
+           % (_suite, len(set(_names))))
+
+# The mutation matrix's authoritative gate works by comparing the parsed
+# argparse namespace against the parser's own defaults, which is sound ONLY
+# while every input that can change a measurement is a command-line option. A
+# later environment variable or config read would sit outside that comparison
+# and could silently re-enable an override inside an "authoritative" run. That
+# premise lives in the tool's docstring; this makes it a rule that has to be
+# broken deliberately.
+_matrix = os.path.join(ROOT, "hooks", "mutation_matrix.py")
+if os.path.isfile(_matrix):
+    with open(_matrix, encoding="utf-8") as _fh:
+        _msrc = _fh.read()
+    _env_reads = [tok for tok in ("os.environ", "os.getenv", "configparser",
+                                  "tomllib", "json.load(open")
+                  if tok in _msrc]
+    if _env_reads:
+        fail("hooks/mutation_matrix.py reads outside the command line (%s). "
+             "The authoritative gate compares the parsed namespace against "
+             "argparse defaults, so any other input source escapes it - add it "
+             "to that gate first, then update this check."
+             % ", ".join(_env_reads))
+    else:
+        ok("mutation_matrix.py takes no env/config input, so the authoritative "
+           "gate covers every measurement-changing option")
 
 print()
 if failures:

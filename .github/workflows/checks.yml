@@ -33,12 +33,26 @@ jobs:
       - name: Run every hook test suite (discovered, not hard-coded)
         run: |
           set -euo pipefail
+          # Discovery order is the glob's, which is alphabetical - and that put
+          # test-mutation_matrix.sh ahead of the two suites its own pristine
+          # control runs. On the first Linux run those suites were red inside
+          # the matrix's worktree, the harness aborted, `set -e` stopped the
+          # job, and their standalone output never appeared. A tool whose
+          # control DEPENDS on other suites must not be able to mask them, so
+          # the harness runs last while discovery stays automatic.
           found=0
+          last=""
           for t in hooks/test-*.sh; do
+            case "$t" in *test-mutation_matrix.sh) last="$t"; continue;; esac
             echo "== $t"
             bash "$t"
             found=1
           done
+          if [ -n "$last" ]; then
+            echo "== $last (runs last: its control depends on the suites above)"
+            bash "$last"
+            found=1
+          fi
           [ "$found" = "1" ] || { echo "no hook test suites discovered"; exit 1; }
 
   gate-template:

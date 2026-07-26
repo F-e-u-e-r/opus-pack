@@ -6,7 +6,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
-  <img alt="Version alpha-0.1.15" src="https://img.shields.io/badge/version-alpha--0.1.15-orange.svg">
+  <img alt="Version alpha-0.1.16" src="https://img.shields.io/badge/version-alpha--0.1.16-orange.svg">
   <img alt="For Claude Code" src="https://img.shields.io/badge/for-Claude%20Code-8A2BE2.svg">
   <a href="https://github.com/F-e-u-e-r/opus-pack/issues"><img alt="PRs welcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg"></a>
   <a href="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml"><img alt="checks" src="https://github.com/F-e-u-e-r/opus-pack/actions/workflows/checks.yml/badge.svg"></a>
@@ -17,15 +17,15 @@
 ---
 
 **Opus Pack is a Claude Code plugin marketplace** — one repo, two plugins you
-install independently, 12 skills in total, for the daily-driver models that
+install independently, 13 skills in total, for the daily-driver models that
 remain after Fable 5's window closes (Opus 4.8 / Sonnet 5 / Haiku):
 
 | Plugin | Focus | Installs |
 |---|---|---|
-| **`opus-pack`** | Agent discipline — how work gets done: rigor, delegation, verification, evidence | 9 skills |
+| **`opus-pack`** | Agent discipline — how work gets done: rigor, delegation, verification, evidence | 10 skills |
 | **`design-pack`** | Design-craft — visual/UI judgment in the same style: layout, motion, review | 3 skills |
 
-Plus **three optional hooks** — repo-level, installed by hand; neither plugin
+Plus **four optional hooks** — repo-level, installed by hand; neither plugin
 registers them (see [Enforcement: hooks](#enforcement-setting-up-hooks)). All of
 it encodes one bet: the judgment strong models already have improves less from
 **more prose** than from **gates that fail loudly when the work is wrong.**
@@ -35,7 +35,7 @@ opus-pack simply resolve when opus-pack is present; see
 [`design-pack`](#design-pack-the-design-skills)).
 
 > [!NOTE]
-> **Early alpha (`alpha-0.1.15`).** Rules change as real sessions expose misses,
+> **Early alpha (`alpha-0.1.16`).** Rules change as real sessions expose misses,
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
@@ -60,7 +60,7 @@ want. Install targets use `plugin@marketplace`, and the marketplace ID is
 /plugin install design-pack@opus-pack
 ```
 
-`opus-pack@opus-pack` installs the discipline plugin (9 skills);
+`opus-pack@opus-pack` installs the discipline plugin (10 skills);
 `design-pack@opus-pack` installs the design plugin (3 skills). Install either,
 or both. Skills arrive namespaced (`opus-pack:operational-rigor`,
 `design-pack:ui-design-craft`, …) and update via `/plugin marketplace update`.
@@ -96,6 +96,7 @@ occupies context until triggered.
 | `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | user-supplied roadmap reference draft — ceremony cut, judgment added |
 | `personal-goal-planning` | Coach-style five steps: minimal intake, tiered goals (2–4w / 2–3m / 6–12m) with one mainline, executable tasks with observable done-criteria, realistic weekly rhythm, weekly review with a stuck rule | @pro_ai.news goal-coaching protocol (Threads) + this pack's house rules |
 | `domain-evidence-discipline` | Evidence discipline for non-code deliverables (marketing / research / data / ops): per-domain minimum evidence set, authority order, what verification-by-observation means, and the fraud table a reviewer hunts; red-line professional judgment refused and routed to a qualified human | Sahir619/fable-method's domain-adapter schema (MIT, ideas only) condensed into one pattern skill; the worked instances are this pack's own compressions |
+| `skill-vetting` | Vet a third-party skill / plugin / hook / instruction file for trojan patterns before it runs: turns operational-rigor §2's install gate into a runnable procedure, with a trojan-shape checklist and a fail-closed verdict (a clean scan is never "safe"); ships an opt-in advisory session-start tripwire (`hooks/skill-vetting-advisory.py`) | operational-rigor §2 (canonical) + the 2026-07 twelve-source community-security-skill audit and a 2026-07-24 starred-repo mining pass that caught a 4th live trojan — see Acknowledgements |
 | `cross-model-review` | Adversarial review from a *different model family* before a load-bearing merge: session-time reviewer discovery (no hard-coded lineup), self-contained packet, findings-are-claims, bounded review-and-fix loop (merge only when every reviewer returned a confirmed verdict — each one PROCEED, or a FIX whose every remaining item is a recorded, justified gap; a timeout/empty body is not a verdict), exit-code≠pass. Doctrine only — concrete CLIs stay out of the pack | promoted from the owner's private cross-model-review CLI notes; doctrine generalized, machine recipes kept personal |
 
 `ground-truth-gates/template/` was verified by execution (Node v23, 2026-07-06):
@@ -285,15 +286,19 @@ silently allowing one):
 mkdir -p .claude/hooks
 cp hooks/gate-before-commit.sh hooks/parse-commit-command.py .claude/hooks/
 cp hooks/verify-before-stop.py hooks/gate-credential-destruction.py .claude/hooks/
+cp hooks/skill-vetting-advisory.py hooks/skill_snapshot.py .claude/hooks/
 ```
 
-Maintainers can regression-test every hook (each suite covers both the
-allow path and the block path):
+Maintainers can regression-test every hook (each suite covers both sides of
+its hook's behavior — allow and block for the gating hooks, silent and
+advisory for the advisory hook):
 
 ```bash
 bash hooks/test-gate-before-commit.sh
 bash hooks/test-verify-before-stop.sh
 bash hooks/test-gate-credential-destruction.sh
+bash hooks/test-skill-vetting-advisory.sh
+bash hooks/test-skill_snapshot.sh
 ```
 
 Then add to `.claude/settings.json`:
@@ -373,9 +378,58 @@ second command under the same `PreToolUse`/`Bash` matcher:
   "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/gate-credential-destruction.py" }
 ```
 
-All three hooks append audit events to `~/.claude/hooks/hooks.log`, so
-"how often does the gate fire, and what happened after a block" is auditable
-instead of invisible.
+**Fourth (optional) hook — an advisory tripwire for unvetted or changed
+third-party skills.** `hooks/skill-vetting-advisory.py` (Python 3 stdlib, tested)
+is a **pure-advisory** `SessionStart` hook, the companion to the `skill-vetting`
+skill; its whole observation layer lives in the sibling module
+`hooks/skill_snapshot.py` — install both files into the same directory (design
+record: `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md`).
+**Signature scanning is not a security boundary and has been removed**: the
+primitive snapshots every file under each entry of the watched skills roots
+(`$CLAUDE_CONFIG_DIR/skills`, default `~/.claude/skills`, plus the project's
+`.claude/skills` via `$CLAUDE_PROJECT_DIR`), so an add / modify / delete /
+rename / symlink / filetype change anywhere inside a skill — not just in its
+`SKILL.md` — counts (one carve-out, stated under G1 in the threat model: a loose
+regular file sitting directly in the skills root is not a candidate at all,
+because it is not loadable as a skill),
+and whatever cannot be fully observed (a read error, an oversize file, a scan-budget
+breach and everything enumerated after it, any
+symlink, a special file, a hostile TOP-LEVEL skill name — nested names are not
+gated, a corrupt or version-stale baseline)
+is an **anomaly that always advises and can never be certified unchanged**. For
+a new, changed, removed, or anomalous skill it injects one line routing to the
+`skill-vetting` skill. It **never blocks and never emits a "safe" line** — a
+`SessionStart` hook cannot deny, and a green-lighting scanner is the
+false-assurance trap `skill-vetting` exists to avoid; a clean, unchanged run is
+silent — as is a first run that found nothing to record — while a first run
+that HAS something to baseline emits one labelled line naming how many
+installed skills it is BASELINING without reviewing them (the line is emitted
+before the write and says so; a write that then fails is not announced
+separately - it cannot be, under the one-message rule - and does not need to be,
+because nothing was written and the next session says the same thing again) — a count that
+includes candidates whose observation was COMPLETE but adverse (a symlink, an
+unreadable directory, a special file, a hostile name), and excludes only those
+lost to a resource-budget short-circuit, whose digest would be a placeholder;
+each excluded one still advises through its own anomaly line; the advisory prints
+**before** the baseline
+(`<config>/skill-vetting/baseline.json`) advances — a failed delivery
+re-advises next session — and skill names reach the model only through a strict
+ASCII allowlist or an opaque id. The baseline is not tamper-evident (it shares
+a trust level with the skills themselves); that limit is documented, not
+defended. It is a tripwire that routes to the full vetting read, never a
+substitute for it. Wire it with:
+
+```json
+"SessionStart": [
+  { "matcher": "", "hooks": [ { "type": "command",
+      "command": "python3 \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/skill-vetting-advisory.py" } ] }
+]
+```
+
+The three gating hooks append audit events to `~/.claude/hooks/hooks.log` and the
+advisory vetting hook to `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`
+(default `~/.claude/skill-vetting/advisory.log`), so gate activity — and the
+vetting hook's advisories — is auditable instead of invisible.
 
 **Two cautions.** Hooks run arbitrary shell with your permissions: read any
 hook script before enabling it, and prefer committing hooks so they are
