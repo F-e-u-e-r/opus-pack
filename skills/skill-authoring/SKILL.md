@@ -596,7 +596,20 @@ default; an AI rewrite does not launder a derivative).
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
-  between the arms), once with no rule and once with it. An arm counts only
+  between the arms), once with no rule and once with it. The bare arm is
+  bare of THIS rule, not of the world: it runs in the executor's real
+  baseline — standing global rules, always-loaded caches, whatever the
+  environment ships to every invocation — because that baseline is the
+  live counterfactual for the fold decision, and stripping it makes the
+  probe answer a question nobody asked (does the rule beat a blank
+  model?). Every verdict then inherits the baseline's scope: a bare ✓
+  means redundant IN THAT ENVIRONMENT, not redundant everywhere — a
+  baseline carrying a standing general form of the candidate (a global
+  verify-before-relaying order) fails the specific form's probe locally
+  while the same rule still earns its line wherever no such standing
+  order exists, so record what the baseline contained next to the
+  verdict, and never export a non-discrimination result to an
+  environment with a different baseline. An arm counts only
   when its run demonstrably met the rule's trigger (ground-truth-gates'
   not-armed discipline: a run that never hit the guarded condition is
   excluded and re-run), and one run per arm screens for a large effect
@@ -610,7 +623,17 @@ default; an AI rewrite does not launder a derivative).
   arm produces it → the rule earns its line; neither arm does → the rule as
   written is ineffective — rewrite or drop it, never fold it in on truth
   alone; only the bare arm produces it → the rule is harmful — dropped, not
-  filed as reference. Eight rules folded into two files over one week were
+  filed as reference. The verdicts are not the whole harvest — read each
+  arm's stated REASONING before writing the fold. A failing bare arm hands
+  you the exact rationalization the folded rule must refute; carry that
+  excuse and its rebuttal into the rule line near-verbatim rather than
+  restating the principle (the excuse is what fires under pressure — the
+  compression bullet below is why the rebuttal must survive). And a
+  passing ruled arm can still over-fire, satisfying the rule by refusing
+  the surrounding task outright; that over-fire is a wording warning, not
+  a win — reword the fold so compliance composes with doing the job
+  (verify FIRST, then proceed), or the folded rule trades one failure
+  mode for another. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for.
@@ -996,3 +1019,18 @@ copied faithfully from a source file carrying the same error, so fixing the
 derived file alone would have been undone by the next write-back — the
 read-the-source rule. All four ship `unprobed` per the covenant; their probes
 join the private round-5 queue.
+The §7 bare-probe bullet's environment-relative-baseline and
+read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
+downstream consumer's first fold probes of this repo's own merged rules (four
+rules probed, pre-registered arms, weaker-tier executor). Two probes produced
+the clauses. A fact-anchoring rule failed to discriminate solely because the
+consumer's global rules file carries a standing verify-before-relaying order —
+the general form of the candidate — so the local verdict (redundant) was real
+there and false anywhere without that baseline: the environment clause. And in
+both discriminating probes the arms' reasoning outlived their verdicts: one
+failing bare arm defended shipping an unverified capability doc with "the
+document didn't lie — it described the intended behavior", which became the
+folded rule's named rebuttal, while one passing ruled arm over-fired and
+refused to produce any plan at all, forcing a reword so compliance composed
+with the task: the reasoning clause. Both clauses ship `unprobed` per the
+covenant; their probes join the private round-5 queue.
