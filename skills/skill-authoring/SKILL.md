@@ -55,7 +55,16 @@ artifact-producing step.
 
 - Verify every command, flag, path, and claim against the actual repo/system
   before writing it down. **A wrong runbook is worse than none, because it is
-  trusted.**
+  trusted.** That includes the pointer inside a rule you are writing: a
+  cross-reference's section number is a claim about the target file — derive
+  it by opening the file, or from the line a search already quoted, never
+  from recall of the file's structure. Two dangling §-references were written
+  by one author in one day, each from memory while the correct location sat
+  already-quoted in that author's working context. One reached main and cost
+  a maintainer fix commit, verifiable in this repo as `8f8413f`; the second
+  was caught in the author's own draft before submission
+  (contributor-reported).
+  ❌ "the sync contract is in §4" (recalled; the quoted line was in §3).
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
@@ -108,7 +117,9 @@ artifact-producing step.
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
 - **Staleness concentrates in the world-fact rules — audit there first**
-  (`unprobed` — private incident as shape; see Provenance). A rule encoding a
+  (first in-house probe 2026-07-27 did NOT discriminate — a bare arm produced
+  the scoping unaided; one run screens for a large effect only, so it is
+  flagged rather than demoted — see Provenance). A rule encoding a
   mutable fact about the outside world (which model or tool is default, how a
   CLI behaves, a numeric threshold someone measured) can go stale within
   days; a rule encoding method (reproduce before trusting, verify by
@@ -183,7 +194,8 @@ artifact-producing step.
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
   **And that command has to hang off something the work already touches**
-  (`unprobed` — private incident as shape; see Provenance): an invalidation
+  (first in-house probe 2026-07-27 discriminated: bare arm documented the
+  condition with nothing reading it, ruled arm bound it — see Provenance): an invalidation
   condition needing a separate act of remembering is inert no matter how
   precisely it is written. Bind it to a surface the next pass crosses anyway —
   a line in the maintenance entry that pass must read, an assertion in a gate
@@ -592,7 +604,10 @@ default; an AI rewrite does not launder a derivative).
   that gates destructive actions, spending, or publishing — or any rule the
   user set explicitly.
 - **Probe a candidate rule against the bare executor before folding it in**
-  (`unprobed` — measured in-house; see Provenance). §6's behavioral probe hunts
+  (first in-house probe of this rule itself, 2026-07-27, discriminated: both
+  arms were armed — each faced the add-or-not decision — and the bare arm
+  failed it, reaching the instinct but settling the question by judgment
+  instead of by running the two arms — see Provenance). §6's behavioral probe hunts
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
@@ -615,11 +630,19 @@ default; an AI rewrite does not launder a derivative).
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for.
   ❌ "the rule is correct and clearly written, so it earns a line."
-- **A derived file contradicting reality has not necessarily drifted — read its
-  source before fixing it** (`unprobed` — private incident as shape; see
-  Provenance). Where a file is compiled from another (a cache over a playbook, a
-  rules file over a spec), the obvious reading of a wrong line is that the
-  derivative fell behind. Check whether the SOURCE carries the same wrong
+- **A file's content contradicts reality and you are about to correct it —
+  first establish whether anything generates that file** (trigger repaired
+  2026-07-27 after an in-house probe found the original form ineffective; the
+  repaired form is `unprobed` — see Provenance). The trigger is that
+  observable state — wrong content, correction imminent — never the
+  classification "this is a derived file": recognizing a file as derived is
+  the discovery this rule exists to force, so a trigger phrased "where a file
+  is compiled from another" fires only when provenance is already known
+  (exactly when the rule is least needed) and stays silent when it is not.
+  Where the provenance check finds the file IS compiled from another (a cache
+  over a playbook, a rules file over a spec), the obvious reading of a wrong
+  line is that the derivative fell behind — and not necessarily the right
+  one. Check whether the SOURCE carries the same wrong
   content first — the identical text, or the source-side value it is
   generated from. If it does, this is not drift: the derivative is faithfully
   mirroring a source that itself disagrees with the world, and correcting only
@@ -646,6 +669,8 @@ default; an AI rewrite does not launder a derivative).
   rather than in a gate); the drift branches above already cover the
   disagreeing pair.
   ❌ "the cache says X, reality says Y — so the cache drifted; fix the cache."
+  ❌ "nothing marks `src/config/timeouts.ts` as generated, so this rule does
+  not apply — edit the value in place."
 - Compaction triggers — act when any of these is true: a skill outgrows what
   a reader can hold (~150 lines for discipline skills; domain-reference packs
   run longer, but every line must still earn its place); its description no
@@ -979,7 +1004,9 @@ verified live first or it ships a false instruction. Ships `unprobed` per the
 covenant;
 its probe joins the private round-5 queue.
 The §3 world-fact-staleness and bound-invalidation rules and the §7
-bare-executor-probe and read-the-source-before-fixing rules (2026-07-25) are
+bare-executor-probe and read-the-source rules (2026-07-25 — the last of these
+shipped under the bold name "a derived file contradicting reality has not
+necessarily drifted", retriggered 2026-07-27 per the entry below) are
 class-distilled from a maintenance session on the owner's own rules files (no
 code taken), and are one incident seen from four sides. A finding measuring
 rule-following at two file sizes carried the clause "re-test if either file
@@ -994,5 +1021,37 @@ the one file carrying model names and CLI behavior, none in the three carrying
 method — the world-fact rule. And one of those stale lines turned out to be
 copied faithfully from a source file carrying the same error, so fixing the
 derived file alone would have been undone by the next write-back — the
-read-the-source rule. All four ship `unprobed` per the covenant; their probes
-join the private round-5 queue.
+read-the-source rule. All four shipped `unprobed` per the covenant; the
+2026-07-27 entry below records their first probe results.
+The §7 read-the-source trigger repair and the §2 derive-cross-references
+clause (2026-07-27) come from the first probe run of the four 2026-07-25
+rules above — the covenant's queued probe, run against the merged text
+(n=1 per arm, one weaker-tier executor, screens for a large effect only; a
+first round was discarded because its scenarios leaked the taught
+distinction, and one bare arm was discarded as contaminated by the author's
+own session memory reaching the subagent — a bare arm must be checked for
+citations of the finding under test). Results: bound-invalidation and the
+bare-executor-probe each discriminated (bare arm failed, ruled arm passed;
+the bare-probe rule's own bare arm reached the instinct — "correct and
+non-duplicate clears the bar for truth, not for inclusion" — but decided by
+judgment, never running an arm). The world-fact-staleness rule did not
+discriminate — a bare arm produced the scoping unaided; at one run per arm
+this is flagged in its marker for a demotion judgment, not demoted here. The
+read-the-source rule failed BOTH arms: handed a wrong value in a file with
+no provenance cue, each arm edited it in place — the written trigger named
+the very classification ("a derived file") the rule exists to force, so it
+fired only when provenance was already known. The repair restates the
+trigger as the observable state; the repaired form is unprobed and its
+marker records that. Across the four, the two that discriminated hand the
+executor a procedure and the one that did not hands it an observation a
+careful bare executor states unaided. That pattern was itself drafted as a
+candidate rule — triage the probe queue by asking whether a candidate hands
+the executor a procedure or an observation, and skip probes on the
+observations — and probed the same day: a clean bare arm produced its
+substance unaided, so by this section's own verdict table it is
+non-discriminating and stays out of the always-loaded file. It is recorded
+here as an observed pattern, not shipped as a rule. The §2 clause's incident is verifiable
+in this repo's history: two dangling section references shipped by one
+author in one day, each written from recall while the correct location sat
+already-quoted in the working context; one reached main and cost the
+maintainer fix commit `8f8413f`.
