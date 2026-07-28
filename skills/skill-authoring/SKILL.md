@@ -609,7 +609,24 @@ default; an AI rewrite does not launder a derivative).
   while the same rule still earns its line wherever no such standing
   order exists, so record what the baseline contained next to the
   verdict, and never export a non-discrimination result to an
-  environment with a different baseline. An arm counts only
+  environment with a different baseline. Baseline is not the same as
+  leakage, and the line between them is what the arm would have without
+  YOU: the baseline is what every invocation in that environment ships
+  with, while episodic recall of the very finding under test is
+  contamination — a persistent auto-memory store, a summary of the
+  session that produced the candidate, notes from the run you are
+  probing. That store survives a "fresh invocation", so the
+  no-shared-state requirement above does not catch it: the arm loads the
+  conclusion, restates it, and scores as an unaided reproduction. Frame
+  the bare arm to dodge recall (a generic scenario, no names or phrasing
+  from the finding), instruct it explicitly to disregard prior findings
+  and stored notes, and CHECK the output before the run counts — an arm
+  citing the finding, its vocabulary, or its incident is contaminated
+  and gets re-run, not scored. Ask of each element: would a stranger
+  installing this file have it? Yes → baseline, keep. No → leakage,
+  strip.
+  ❌ a bare arm that "independently reproduced" the rule while quoting
+  the incident that produced it. An arm counts only
   when its run demonstrably met the rule's trigger (ground-truth-gates'
   not-armed discipline: a run that never hit the guarded condition is
   excluded and re-run), and one run per arm screens for a large effect
@@ -1032,5 +1049,12 @@ failing bare arm defended shipping an unverified capability doc with "the
 document didn't lie — it described the intended behavior", which became the
 folded rule's named rebuttal, while one passing ruled arm over-fired and
 refused to produce any plan at all, forcing a reword so compliance composed
-with the task: the reasoning clause. Both clauses ship `unprobed` per the
-covenant; their probes join the private round-5 queue.
+with the task: the reasoning clause. The baseline-versus-leakage clause comes
+from the same consumer's earlier probe round, where subagent bare arms were
+found not to be bare at all: an auto-memory store persisted across the fresh
+invocations and the arms recalled the findings under test, so runs that read
+as unaided reproductions were partly recall — the countermeasures (recall-
+dodging framing, an explicit disregard instruction, and a citation check on
+the output before scoring) were added to the later pre-registrations for that
+reason. All three clauses ship `unprobed` per the covenant; their probes join
+the private round-5 queue.
