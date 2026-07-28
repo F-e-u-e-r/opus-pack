@@ -156,7 +156,16 @@ When rigor conflicts with finishing sooner, rigor wins.
   starting state (`git status` + run the safe checks) and attribute every red to
   pre-existing-vs-your-change — never assume a clean baseline, and confirm intent
   before "restoring" a dirty tree (a deletion may be the user's deliberate
-  migration). Then check you are not building on already-merged work: if your
+  migration). That attribution then binds how you COMMIT, not just how you
+  read the tree: with pre-existing changes present that you did not author,
+  stage by explicit pathspec — `git add <path>` for the files you touched —
+  never `git add -A`/`-u`/`.`, which sweeps that unreviewed state into your
+  commit and publishes edits you have never read under your message. On a
+  tree whose every change is yours, `-A` is fine; the baseline is what tells
+  you which case you are in, so a baseline read and not applied at commit
+  time was wasted. Verify before pushing: `git show --stat HEAD` lists only
+  files you meant to touch. Then check you are not building on
+  already-merged work: if your
   branch's tip is an ancestor of the upstream default (often origin/main —
   `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is
   already merged and continuing on it can silently revert merged work; the tell
@@ -703,6 +712,16 @@ forbid a silent degraded fallback and prescribe an explicitly-labelled degraded
 mode (all MIT, ideas only; see README acknowledgements). The two behavioral
 rules ship `unprobed` per the covenant; their probes join the private round-5
 queue.
+The §2 stage-by-pathspec clause on the baseline rule (2026-07-28) is
+contributor-reported (private repo; not linkable). An agent ran the baseline
+check, correctly identified a tree carrying uncommitted changes it had not
+authored, then committed its own one-line edit with `git add -A` — twice —
+sweeping several unrelated instruction and memory files it had never read
+into commits under its own message; caught on the follow-up `--stat` read,
+reverted, and restaged by pathspec. The clause is the mutation-side half of a
+baseline the rule already required: the diagnosis was performed and then not
+applied at commit time. Ships `unprobed` per the covenant; its probe joins the
+private round-5 queue.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

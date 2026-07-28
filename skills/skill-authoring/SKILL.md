@@ -255,12 +255,55 @@ artifact-producing step.
   HITS — the candidate lists may be nonempty — and a clean local
   diff against the anchor state; that makes the anchor safe AS OF the
   check, never forever; otherwise it carries the provisional label.
+  That campaign runs upstream. The same merge leaves a SECOND thing open
+  in the other direction, and an author is the likeliest reader to miss
+  it: contributing a rule is not adopting it. When you write a rule INTO
+  a shared library, the merge closes the contribution while your own
+  always-loaded files still do not carry it — and because you have been
+  applying the rule by hand all along (you wrote it; it is in your working
+  context), nothing feels missing. It is not adopted, it is remembered,
+  and remembering ends with the session; the next one reverts to whatever
+  the files say. Treat every merge of your own rule as opening an
+  adoption debt alongside the sync, and bind that debt to a surface
+  something re-reads — the same ledger row or sync record that logs the
+  merge carries it, so the row cannot be closed without deciding port /
+  probe-then-port / deliberately-declined-because. A debt parked only in
+  a plan, a summary, or an owed-line nothing re-opens is the
+  invalidation-clause failure this file already warns about, wearing a
+  different hat.
+  ❌ "the rules merged upstream and I have been following them all
+  session, so that batch is done" — followed from conversation context,
+  by the one reader who cannot notice their absence.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
   Do not paraphrase a load-bearing clause in a secondary location — quote it
   verbatim or point to the canonical copy (a paraphrase drifts silently), and
   the sync contract must name which file wins on disagreement.
+- **A skill's internal citations are addressed to ITS library — re-resolve
+  every one against the destination on install.** A distributable skill
+  cites siblings by section number and by name ("delegation-and-review §3",
+  "the author-is-not-the-judge rule"). Those addresses are relative to the
+  library it was written in. Installed into a library that numbers its
+  sections differently, or that never adopted the sibling, each one still
+  READS as valid and now points somewhere else — the silent failure the
+  §2 absolute-path rule names, in citation form: a dangling `§3` resolves
+  to a real section with the wrong content, where a 404 would at least
+  fail loud. So on install, resolve every citation against the
+  DESTINATION file — grep the referenced heading and the named anchor, do
+  not trust the number — and classify each: retargeted (number differs),
+  unchanged, or absent-here (the sibling rule does not exist locally; a
+  pointer to nothing is deleted or the gap recorded, never left dangling).
+  Then record the retargets in the port note as upstream-citation →
+  local-target pairs, because the edits are now local divergences from
+  upstream: unrecorded, the next diff-against-upstream reads your own
+  retargets as drift and a re-sync silently restores the broken numbers.
+  The port note is what makes them re-appliable and lets the diff exclude
+  them. Done when no citation in the installed copy resolves to a section
+  the author did not mean, and every difference from upstream is either
+  in the port note or a real drift.
+  ❌ "the port is byte-identical to upstream" — for a file full of §
+  references, byte-identical IS the bug.
 - **Package a set with its own honesty ledger.** Alongside its START-HERE router
   (§4), a multi-skill project *library* ships two more companion files — a
   MANIFEST (one line per skill → what it is + the evidence backing it, so the next
@@ -996,3 +1039,20 @@ copied faithfully from a source file carrying the same error, so fixing the
 derived file alone would have been undone by the next write-back — the
 read-the-source rule. All four ship `unprobed` per the covenant; their probes
 join the private round-5 queue.
+The §3 contributing-is-not-adopting clause and the §3 re-resolve-citations-on-
+install rule (2026-07-28) are contributor-reported from one downstream
+consumer's adoption pass over this repo (the upstream half — the merges and
+their PR numbers — is verifiable in this repo's history; the local half is
+not linkable). One incident, two faces. A batch of the consumer's own rules
+merged here and was never ported into the files that govern their sessions;
+it went unnoticed for days precisely because the author kept applying the
+rules from working context, and surfaced only when their user asked why the
+rules were not in use — the contributing clause. Porting them then required
+installing sibling skills whose `§N` citations addressed THIS library's
+numbering: several resolved to differently-numbered local sections and two
+named anchors had no local counterpart, caught by grepping the destination
+rather than trusting the numbers — the citation rule, whose
+record-the-retargets half exists because the retargeted copy would otherwise
+read as drift on the consumer's next diff against upstream, inviting a
+re-sync to restore the broken numbers. Both ship `unprobed` per the covenant;
+their probes join the private round-5 queue.
