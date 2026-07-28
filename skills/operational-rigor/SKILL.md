@@ -107,6 +107,16 @@ When rigor conflicts with finishing sooner, rigor wins.
 - **Approval is not a verdict.** A go-ahead that arrives while a verification
   artifact is still pending authorizes the action after the verdict lands, not
   skipping the verification (per-invocation scope is the next bullet).
+  A blanket go — "proceed", "do them all" — reaches every item you have put in
+  front of the user as pending, not your most recent message alone. Narrowing
+  it to the nearest item is a defensible reading of the words and a bad reading
+  of the intent: the user is clearing a queue they believe you are holding, and
+  they cannot re-authorize what they think is already moving. If you are
+  deliberately leaving part of that queue out — different risk class, blocked
+  on something else — name the excluded items before you start, not when the
+  user asks where they went. The extension runs one way only: a blanket go
+  covers what you surfaced, never work you never put in front of them.
+  ❌ "they said proceed all, so I'll do the three from my last message."
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
   destructive, spending, publishing, or credential action, it exists to make a
@@ -703,6 +713,15 @@ forbid a silent degraded fallback and prescribe an explicitly-labelled degraded
 mode (all MIT, ideas only; see README acknowledgements). The two behavioral
 rules ship `unprobed` per the covenant; their probes join the private round-5
 queue.
+The §2 blanket-go scope clause (2026-07-28) comes from one downstream
+consumer's session: the user answered a list of pending items with "proceed
+all", the agent applied it only to the items named in its immediately
+preceding message, and the remainder sat untouched until the user asked why
+they were skipped — the agent's own answer at the time was "no good reason,
+scope habit". It complements rather than contradicts the surrounding
+per-invocation rules: those stop an approval from reaching FORWARD to
+unsurfaced work, this one stops it from being silently trimmed BACKWARD.
+Ships `unprobed` per the covenant.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
