@@ -609,7 +609,19 @@ default; an AI rewrite does not launder a derivative).
   while the same rule still earns its line wherever no such standing
   order exists, so record what the baseline contained next to the
   verdict, and never export a non-discrimination result to an
-  environment with a different baseline. Baseline is not the same as
+  environment with a different baseline.
+  "Target executor" means tier as well as environment: run both arms at
+  the tier the file is written for — the weaker model the file exists to
+  instruct — not the tier the probing session happens to be on. A bare ✓
+  from a stronger arm is a claim only about readers stronger than the
+  ones the file must protect; one downstream consumer's same-fixture
+  tier replication flipped a bare arm 3/3 → 0/3. Record the tier next to
+  each verdict as you record the baseline. The inference runs one way:
+  a strong-arm ruled FAIL still proves the wording ineffective, and a
+  strong-arm bare FAIL still earns the line — but no bare-pass from an
+  arm stronger than the file's audience licenses removing one.
+  ❌ "the bare arm handled it, so the line is redundant" — at which tier?
+  Baseline is not the same as
   leakage, and the line between them is what the arm would have without
   YOU: the baseline is what every invocation in that environment ships
   with, while episodic recall of the very finding under test is
@@ -1056,5 +1068,16 @@ invocations and the arms recalled the findings under test, so runs that read
 as unaided reproductions were partly recall — the countermeasures (recall-
 dodging framing, an explicit disregard instruction, and a citation check on
 the output before scoring) were added to the later pre-registrations for that
-reason. All three clauses ship `unprobed` per the covenant; their probes join
+reason.
+
+The §7 tier-inheritance clause (2026-07-28) distills the same downstream
+consumer's tier replication: a fold probe run at the probing session's own
+strong tier returned bare 3/3 on a citation-re-resolve rule ("redundant
+with model capability"); a same-day replication of the same fixture and
+task at a weak tier returned bare 0/3 — every weak arm copied the stale
+citation verbatim, two reporting they had "verified the content
+transferred intact" (byte-fidelity of the copy, the one check that cannot
+catch an already-wrong citation). N=3 per cell, one fixture, one rule.
+
+All four clauses ship `unprobed` per the covenant; their probes join
 the private round-5 queue.
