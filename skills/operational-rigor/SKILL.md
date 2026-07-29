@@ -174,7 +174,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   before "restoring" a dirty tree (a deletion may be the user's deliberate
   migration). That attribution then binds how you COMMIT, not just how you
   read the tree: with pre-existing changes present that you did not author,
-  stage by explicit pathspec — `git add <path>` for the files you touched —
+  stage by explicit pathspec — `git add -- <path>` for the files you
+  touched (the `--` keeps a pathological filename from parsing as an
+  option) —
   never a stage-everything form (`git add -A`/`--all`/`-u`/`--update`/`.`,
   `git commit -a`/`--all`), which sweeps that
   unreviewed state into your
@@ -205,7 +207,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   sends (`HEAD` only when it is the refspec's source) —
   `git show HEAD` covers only the tip, and
   `--stat` alone lists files, not foreign
-  hunks; confirm only changes you meant to make
+  hunks; confirm only changes you meant to make. This recipe audits what
+  a fast-forward push ADDS — a non-fast-forward push deletes remote
+  history and is a destructive action under this section's own gates,
+  not covered here
   (`unprobed` — see Provenance). Then check you
   are not building on already-merged work — an orientation check that
   binds to the tip you BASELINED: run it before your first commit moves
