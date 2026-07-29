@@ -55,7 +55,19 @@ artifact-producing step.
 
 - Verify every command, flag, path, and claim against the actual repo/system
   before writing it down. **A wrong runbook is worse than none, because it is
-  trusted.**
+  trusted.** That includes the pointer inside a rule you are writing: a
+  cross-reference's section number is a claim about the target file — derive
+  it by opening the file, or from search output that is current and shows
+  the enclosing heading (a bare quoted body line does not establish its
+  section), never
+  from recall of the file's structure. Two mis-targeted §-references were
+  written
+  by one author in one day, each from memory while the correct location sat
+  already-quoted in that author's working context. One reached main and cost
+  a maintainer fix commit, verifiable in this repo as `8f8413f`; the second
+  was caught in the author's own draft before submission
+  (contributor-reported). (This clause ships `unprobed` — see Provenance.)
+  ❌ "the sync contract is in §4" (recalled; the quoted line was in §3).
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
@@ -108,7 +120,11 @@ artifact-producing step.
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
 - **Staleness concentrates in the world-fact rules — audit there first**
-  (`unprobed` — private incident as shape; see Provenance). A rule encoding a
+  (first in-house probe 2026-07-27 did NOT discriminate — both arms
+  produced the scoping, the bare one unaided; one run screens for a
+  large effect only, so it is
+  flagged for a demotion judgment rather than demoted — see Provenance). A
+  rule encoding a
   mutable fact about the outside world (which model or tool is default, how a
   CLI behaves, a numeric threshold someone measured) can go stale within
   days; a rule encoding method (reproduce before trusting, verify by
@@ -183,7 +199,9 @@ artifact-producing step.
   command for anything that may drift. A skill without a re-verification path
   decays into exactly the stale-instruction problem it was meant to solve.
   **And that command has to hang off something the work already touches**
-  (`unprobed` — private incident as shape; see Provenance): an invalidation
+  (first in-house probe 2026-07-27 discriminated: bare arm documented the
+  condition with nothing reading it, ruled arm bound it — see Provenance):
+  an invalidation
   condition needing a separate act of remembering is inert no matter how
   precisely it is written. Bind it to a surface the next pass crosses anyway —
   a line in the maintenance entry that pass must read, an assertion in a gate
@@ -255,12 +273,70 @@ artifact-producing step.
   HITS — the candidate lists may be nonempty — and a clean local
   diff against the anchor state; that makes the anchor safe AS OF the
   check, never forever; otherwise it carries the provisional label.
+- **Contributing a rule is not adopting it — a merge of your own rule
+  into a shared library opens an adoption debt** (`unprobed` — see
+  Provenance). The campaign bullet above runs upstream; the same merge
+  leaves a SECOND thing open in the other direction, and the author is
+  the likeliest reader to miss it. The merge closes the contribution
+  while your own always-loaded files still do not carry the rule — and
+  because you have been applying it by hand all along (you wrote it; it
+  is in your working context), nothing feels missing. It is not adopted,
+  it is remembered, and remembering ends with the session; the next one
+  reverts to whatever the files say. Bind the debt to a surface
+  something re-reads — the same ledger row or sync record that logs the
+  merge carries it, and the row closes only on the port done or a
+  reasoned decline recorded; probe-then-port keeps it open (or moves the
+  debt to another surface something re-reads). A debt parked only in
+  a plan, a summary, or an owed-line nothing re-opens is the
+  invalidation-clause failure this file already warns about, wearing a
+  different hat.
+  ❌ "the rules merged upstream and I have been following them all
+  session, so that batch is done" — followed from conversation context,
+  by the one reader who cannot notice their absence.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
   Do not paraphrase a load-bearing clause in a secondary location — quote it
   verbatim or point to the canonical copy (a paraphrase drifts silently), and
   the sync contract must name which file wins on disagreement.
+- **A skill's internal citations are addressed to ITS library — re-resolve
+  every one against the destination on install** (`unprobed` — contributor
+  incident as shape; see Provenance). A distributable skill
+  cites siblings by section number and by name ("delegation-and-review §3",
+  "the author-is-not-the-judge rule"). Those addresses are relative to the
+  library it was written in. Installed into a library that numbers its
+  sections differently, or that never adopted the sibling, each one still
+  READS as valid and now points somewhere else — the silent failure the
+  §2 absolute-path rule names, in citation form: a stale `§3` resolves
+  to a real section with the wrong content, where a 404 would at least
+  fail loud. So on install, resolve every citation against the
+  DESTINATION file — first pin what it addresses upstream (the section
+  heading or the named rule; a bare `§N` carries no greppable name until
+  you do), then grep the destination for that, never the number alone —
+  and classify each: retargeted (the local address
+  differs), unchanged, or absent-here (the sibling rule does not exist
+  locally; delete the pointer — rewriting the sentence to stand without
+  it, not to absorb the missing sibling's semantics (the no-paraphrase
+  rule above holds) — or replace it with a non-resolving gap marker,
+  never a live `§N`
+  that resolves locally to unintended content; the port note
+  records either, so nothing is dropped silently or left dangling).
+  Then record the retargets in the port note as upstream-citation →
+  local-target pairs — each carrying its heading or named anchor, since
+  numbers alone go stale on the next renumber; re-resolve anchors on
+  every re-sync rather than replaying numeric pairs — and each
+  absent-here outcome as delete-or-gap,
+  because the edits are now local divergences from
+  upstream: unrecorded, the next diff-against-upstream reads your own
+  retargets or deletes as drift and a re-sync silently restores the
+  broken pointers.
+  The port note is what makes them re-applicable and lets the diff exclude
+  them. Done when no citation in the installed copy resolves to a section
+  the author did not mean, and every difference from upstream is either
+  in the port note or a real drift.
+  ❌ "the port is byte-identical to upstream" — byte-fidelity is the
+  wrong test: into a differently-numbered library, byte-identical IS
+  the bug.
 - **Package a set with its own honesty ledger.** Alongside its START-HERE router
   (§4), a multi-skill project *library* ships two more companion files — a
   MANIFEST (one line per skill → what it is + the evidence backing it, so the next
@@ -592,11 +668,71 @@ default; an AI rewrite does not launder a derivative).
   that gates destructive actions, spending, or publishing — or any rule the
   user set explicitly.
 - **Probe a candidate rule against the bare executor before folding it in**
-  (`unprobed` — measured in-house; see Provenance). §6's behavioral probe hunts
+  (first in-house probe of this rule itself, 2026-07-27, discriminated: both
+  arms were armed — each faced the add-or-not decision — and the bare arm
+  failed it, reaching the instinct but settling the question by judgment
+  instead of by running the two arms — see Provenance). §6's behavioral
+  probe hunts
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
-  between the arms), once with no rule and once with it. An arm counts only
+  between the arms), once with no rule and once with it. The bare arm is
+  bare of THIS rule, not of the world: it runs in the executor's real
+  baseline — standing global rules, always-loaded caches, whatever the
+  environment ships to every invocation — because that baseline is the
+  live counterfactual for the fold decision, and stripping it makes the
+  probe answer a question nobody asked (does the rule beat a blank
+  model?). Every verdict then inherits the baseline's scope: a bare ✓
+  argues redundancy IN THAT ENVIRONMENT at most — only the pair, read
+  by the table below, settles it, and never for everywhere — a
+  baseline carrying a standing general form of the candidate (a global
+  verify-before-relaying order) makes the specific form's probe
+  non-discriminating locally
+  while the same rule may still earn its line wherever no such standing
+  order exists, so record what the baseline contained next to the
+  verdict, and never export a non-discrimination result to an
+  environment with a different baseline.
+  "Target executor" means tier as well as environment: run both arms at
+  the tier the file is written for — the weaker model the file exists to
+  instruct (for a multi-tier audience, the weakest tier it must
+  protect) — not the tier the probing session happens to be on. A bare ✓
+  from a stronger arm is a claim only about readers stronger than the
+  ones the file must protect; one downstream consumer's same-fixture
+  tier replication flipped a bare arm 3/3 → 0/3. Record the tier next to
+  each verdict as you record the baseline. The inference runs one way:
+  a strong-arm ruled FAIL is still evidence against the wording, and a
+  strong-arm bare FAIL is still evidence the line is needed — neither
+  substitutes for the audience-tier pair — but no bare-pass from an
+  arm stronger than the file's audience licenses removing one.
+  ❌ "the bare arm handled it, so the line is redundant" — at which tier?
+  Baseline is not the same as
+  leakage, and the line between them is what the arm would have without
+  YOU: the baseline is what every invocation in that environment ships
+  with, while episodic recall of the very finding under test is
+  contamination — finding content carried into the arm by a persistent
+  auto-memory store, a summary of the session that produced the
+  candidate, or notes from the run you are probing. An auto-memory
+  store in particular
+  survives a "fresh invocation", so the no-shared-state requirement
+  alone does not catch that vector: the arm loads the
+  conclusion, restates it, and scores as an unaided reproduction. Frame
+  BOTH arms identically to dodge recall (a generic scenario, no names or
+  phrasing from the finding), instruct each explicitly to disregard
+  prior findings and stored notes — the candidate rule stays the arms'
+  only difference, or the controls confound the probe — and CHECK each
+  output before the run counts — an arm
+  citing the finding, its distinctive phrasing, or its incident (details
+  supplied neither by the scenario nor, in the ruled arm, by the
+  candidate rule itself) is contaminated
+  and gets re-run, not scored. A clean check bounds only quoted recall —
+  influence that never surfaces in the output survives it, so a
+  surprising bare-pass from a memory-bearing arm stays suspect, not
+  license. Ask of each element: does every ordinary invocation of this
+  executor ship with it? Yes → baseline, keep (recorded next to the
+  verdict). Episodic content about the finding itself → leakage, strip,
+  whatever carrier auto-loads it.
+  ❌ a bare arm that "independently reproduced" the rule while quoting
+  the incident that produced it. An arm counts only
   when its run demonstrably met the rule's trigger (ground-truth-gates'
   not-armed discipline: a run that never hit the guarded condition is
   excluded and re-run), and one run per arm screens for a large effect
@@ -610,16 +746,42 @@ default; an AI rewrite does not launder a derivative).
   arm produces it → the rule earns its line; neither arm does → the rule as
   written is ineffective — rewrite or drop it, never fold it in on truth
   alone; only the bare arm produces it → the rule is harmful — dropped, not
-  filed as reference. Eight rules folded into two files over one week were
-  probed this way afterwards; three were reproduced unaided. Non-discriminating
+  filed as reference. The verdicts are not the whole harvest — read each
+  arm's stated REASONING before writing the fold. A failing bare arm hands
+  you the exact rationalization the folded rule must refute; carry that
+  excuse and its rebuttal into the rule line near-verbatim rather than
+  restating the principle (the excuse is what fires under pressure — the
+  compression bullet below is why the rebuttal must survive). And a
+  passing ruled arm can still over-fire, satisfying the rule by refusing
+  the surrounding task outright; that over-fire is a wording warning, not
+  a win — where refusal is not the rule's intended outcome, reword the
+  fold so compliance composes with doing the job (verify FIRST, then
+  proceed on a pass), or the folded rule trades one failure
+  mode for another. Eight rules folded into two files over one week were
+  probed this way afterwards (an earlier form — those bare arms ran with
+  the rules file absent outright, predating the baseline clauses
+  above); three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
-  and that is the judgment the probe is for.
+  and that is the judgment the probe is for. (The 2026-07-27/28 clauses
+  here — environment-relative baseline, tier inheritance,
+  baseline-vs-leakage, and arms'-reasoning — ship `unprobed`; see
+  Provenance.)
   ❌ "the rule is correct and clearly written, so it earns a line."
-- **A derived file contradicting reality has not necessarily drifted — read its
-  source before fixing it** (`unprobed` — private incident as shape; see
-  Provenance). Where a file is compiled from another (a cache over a playbook, a
-  rules file over a spec), the obvious reading of a wrong line is that the
-  derivative fell behind. Check whether the SOURCE carries the same wrong
+- **A file's content contradicts reality and you are about to correct it —
+  first establish whether anything generates that file, or serves as a
+  source it is maintained from** (trigger repaired
+  2026-07-27 after an in-house probe found the original form ineffective; the
+  repaired form is `unprobed` — see Provenance). The trigger is that
+  observable state — wrong content, correction imminent — never the
+  classification "this is a derived file": recognizing a file as derived is
+  the discovery this rule exists to force, so a trigger phrased "where a file
+  is compiled from another" fires only when provenance is already known
+  (exactly when the rule is least needed) and stays silent when it is not.
+  Where the provenance check finds the file IS derived from another —
+  compiled mechanically or maintained by hand (a cache
+  over a playbook, a rules file over a spec) — the obvious reading of a wrong
+  line is that the derivative fell behind — and not necessarily the right
+  one. Check whether the SOURCE carries the same wrong
   content first — the identical text, or the source-side value it is
   generated from. If it does, this is not drift: the derivative is faithfully
   mirroring a source that itself disagrees with the world, and correcting only
@@ -646,6 +808,8 @@ default; an AI rewrite does not launder a derivative).
   rather than in a gate); the drift branches above already cover the
   disagreeing pair.
   ❌ "the cache says X, reality says Y — so the cache drifted; fix the cache."
+  ❌ "nothing marks `src/config/timeouts.ts` as generated, so this rule does
+  not apply — edit the value in place."
 - Compaction triggers — act when any of these is true: a skill outgrows what
   a reader can hold (~150 lines for discipline skills; domain-reference packs
   run longer, but every line must still earn its place); its description no
@@ -979,7 +1143,9 @@ verified live first or it ships a false instruction. Ships `unprobed` per the
 covenant;
 its probe joins the private round-5 queue.
 The §3 world-fact-staleness and bound-invalidation rules and the §7
-bare-executor-probe and read-the-source-before-fixing rules (2026-07-25) are
+bare-executor-probe and read-the-source rules (2026-07-25 — the last of these
+shipped under the bold name "a derived file contradicting reality has not
+necessarily drifted", retriggered 2026-07-27 per the entry below) are
 class-distilled from a maintenance session on the owner's own rules files (no
 code taken), and are one incident seen from four sides. A finding measuring
 rule-following at two file sizes carried the clause "re-test if either file
@@ -994,5 +1160,96 @@ the one file carrying model names and CLI behavior, none in the three carrying
 method — the world-fact rule. And one of those stale lines turned out to be
 copied faithfully from a source file carrying the same error, so fixing the
 derived file alone would have been undone by the next write-back — the
-read-the-source rule. All four ship `unprobed` per the covenant; their probes
-join the private round-5 queue.
+read-the-source rule. All four shipped `unprobed` per the covenant; the
+2026-07-27 entry below records their first probe results.
+The §7 read-the-source trigger repair (2026-07-27) comes from the first
+probe run of the four 2026-07-25
+rules above — the covenant's queued probe, run against the merged text
+(contributor-run and contributor-reported, not linkable; n=1 per arm, one
+weaker-tier executor, screens for a large effect only; a
+first round was discarded because its scenarios leaked the taught
+distinction, and one bare arm was discarded as contaminated by the author's
+own session memory reaching the subagent — a bare arm must be checked for
+citations of the finding under test). Results: bound-invalidation and the
+bare-executor-probe each discriminated (bare arm failed, ruled arm passed;
+the bare-probe rule's own bare arm reached the instinct — "correct and
+non-duplicate clears the bar for truth, not for inclusion" — but decided by
+judgment, never running an arm). The world-fact-staleness rule did not
+discriminate — both arms produced the scoping, the bare one unaided; at one
+run per arm
+this is flagged in its marker for a demotion judgment, not demoted here. The
+read-the-source rule failed BOTH arms: handed a wrong value in a file with
+no provenance cue, each arm edited it in place — the written trigger named
+the very classification ("a derived file") the rule exists to force, so it
+fired only when provenance was already known. The repair restates the
+trigger as the observable state; the repaired form is unprobed and its
+marker records that. Across the four, the two that discriminated hand the
+executor a procedure and the one reproduced unaided hands it an observation
+a careful bare executor states without help (the repaired fourth failed
+both arms and sits outside this contrast). That pattern was itself drafted as a
+candidate rule — triage the probe queue by asking whether a candidate hands
+the executor a procedure or an observation, and skip probes on the
+observations — and probed the same day: a clean bare arm produced its
+substance unaided; whichever pair-cell that lands in (non-discriminating
+or harmful), the always-loaded file is not its home. It is recorded
+here as an observed pattern, not shipped as a rule.
+The §2 derive-cross-references clause (2026-07-27) has its own evidence
+chain, distinct from that probe run: two mis-targeted section references
+written from recall by one author in one day, each while the correct
+location sat already-quoted in the working context — one reached main and
+cost the maintainer fix commit `8f8413f` (repo-verifiable); the second was
+caught in the author's draft before submission (contributor-reported). The
+clause itself ships `unprobed` per the covenant; its probe joins the
+private round-5 queue.
+The §7 bare-probe bullet's environment-relative-baseline and
+read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
+downstream consumer's first fold probes of this repo's own merged rules
+(contributor-reported, not linkable; four
+rules probed, pre-registered arms, weaker-tier executor). Three of the
+probes produced
+the clauses. A fact-anchoring rule failed to discriminate solely because the
+consumer's global rules file carries a standing verify-before-relaying order —
+the general form of the candidate — so the local verdict (redundant) was real
+there and not exportable to any environment without that baseline: the
+environment clause. And in
+both discriminating probes the arms' reasoning outlived their verdicts: one
+failing bare arm defended shipping an unverified capability doc with "the
+document didn't lie — it described the intended behavior", which became the
+folded rule's named rebuttal, while one passing ruled arm over-fired and
+refused to produce any plan at all, forcing a reword so compliance composed
+with the task: the reasoning clause. The baseline-versus-leakage clause comes
+from the same consumer's earlier probe round, where subagent bare arms were
+found not to be bare at all: an auto-memory store persisted across the fresh
+invocations and the arms recalled the findings under test, so runs that read
+as unaided reproductions were partly recall — the countermeasures (recall-
+dodging framing, an explicit disregard instruction, and a citation check on
+the output before scoring) were added to the later pre-registrations for that
+reason.
+The §7 tier-inheritance clause (2026-07-28) distills the same downstream
+consumer's tier replication (contributor-reported, not linkable): a fold
+probe run at the probing session's own
+strong tier returned bare 3/3 on a citation-re-resolve rule ("redundant
+with model capability"); a same-day replication of the same fixture and
+task at a weak tier returned bare 0/3 — every weak arm copied the stale
+citation verbatim, two reporting they had "verified the content
+transferred intact" (byte-fidelity of the copy, the one check that cannot
+catch an already-wrong citation). N=3 per cell, one fixture, one rule.
+All four clauses ship `unprobed` per the covenant; their probes join
+the private round-5 queue.
+The §3 contributing-is-not-adopting rule and the §3 re-resolve-citations-on-
+install rule (2026-07-28) are contributor-reported from one downstream
+consumer's adoption pass over this repo (the upstream half — the merges and
+their PR numbers — is verifiable in this repo's history; the local half is
+not linkable). One incident, two faces. A batch of the consumer's own rules
+merged here and was never ported into the files that govern their sessions;
+it went unnoticed for days precisely because the author kept applying the
+rules from working context, and surfaced only when their user asked why the
+rules were not in use — the contributing rule. Porting them then required
+installing sibling skills whose `§N` citations addressed THIS library's
+numbering: several resolved to differently-numbered local sections and two
+named anchors had no local counterpart, caught by grepping the destination
+rather than trusting the numbers — the citation rule, whose
+record-the-retargets half exists because the retargeted copy would otherwise
+read as drift on the consumer's next diff against upstream, inviting a
+re-sync to restore the broken numbers. Both ship `unprobed` per the covenant;
+their probes join the private round-5 queue.

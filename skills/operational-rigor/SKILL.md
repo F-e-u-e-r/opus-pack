@@ -107,6 +107,22 @@ When rigor conflicts with finishing sooner, rigor wins.
 - **Approval is not a verdict.** A go-ahead that arrives while a verification
   artifact is still pending authorizes the action after the verdict lands, not
   skipping the verification (per-invocation scope is the next bullet).
+  A blanket go — "proceed all", "do them all" — reaches every item you have
+  put in
+  front of the user as pending, not your most recent message alone. Narrowing
+  it to the nearest item is a defensible reading of the words and a bad reading
+  of the intent: the user is clearing a queue they believe you are holding, and
+  they cannot re-authorize what they think is already moving. If you are
+  deliberately leaving part of that queue out — different risk class, blocked
+  on something else — name the excluded items before you start, not when the
+  user asks where they went. The extension runs one way only: a blanket go
+  covers what you surfaced, never work you never put in front of them.
+  It widens which surfaced items one go reaches, never when a fresh grant
+  is due — the per-invocation and confirmation-gate rules below are
+  untouched. Blanket is read from the words against the question they
+  answer: a bare "proceed" with more than one plausible referent is not
+  a blanket go — ask. (`unprobed` — see Provenance.)
+  ❌ "they said proceed all, so I'll do the three from my last message."
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
   destructive, spending, publishing, or credential action, it exists to make a
@@ -156,9 +172,52 @@ When rigor conflicts with finishing sooner, rigor wins.
   starting state (`git status` + run the safe checks) and attribute every red to
   pre-existing-vs-your-change — never assume a clean baseline, and confirm intent
   before "restoring" a dirty tree (a deletion may be the user's deliberate
-  migration). Then check you are not building on already-merged work: if your
-  branch's tip is an ancestor of the upstream default (often origin/main —
-  `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is
+  migration). That attribution then binds how you COMMIT, not just how you
+  read the tree: with pre-existing changes present that you did not author,
+  stage by explicit pathspec — `git add -- <path>` for the files you
+  touched (the `--` keeps a pathological filename from parsing as an
+  option) —
+  never a stage-everything form (`git add -A`/`--all`/`-u`/`--update`/`.`,
+  `git commit -a`/`--all`), which sweeps that
+  unreviewed state into your
+  commit and publishes edits you have never read under your message. A
+  touched file can itself carry hunks you did not author — or your own
+  from another task — and the pathspec
+  cannot see inside a file: on any tree whose changes exceed this
+  commit's intent, read the staged diff
+  (`git diff --staged`) before every commit and commit only when it
+  contains solely the changes this commit
+  intends. Unstage what YOU staged beyond that and leave it in the working
+  tree; an index the baseline already carried staged is the user's
+  arrangement — stop and surface it rather than unstaging their work or
+  committing over it (stashing or committing foreign changes is likewise
+  its own act, needing its own authorization). Only on a
+  tree whose every change is yours and belongs in this commit is `-A`
+  fine — any other state stages by pathspec; the baseline is what tells
+  you which case you are in, so a baseline read and not applied at commit
+  time was wasted. Verify before pushing: read every outgoing commit's
+  patch, measured against the real push destination (`@{push}` where it
+  resolves; `@{u}` only if it provably names the same destination; an
+  explicit refspec or a new branch means resolving the destination — or
+  the fork base — yourself; refresh it from the remote first — a
+  tracking ref names the address, not its freshness, and a stale one
+  omits commits the push will actually carry) and with merge
+  diffs shown — e.g. `git log -p --diff-merges=first-parent
+  <dest>..<source>`, where `<source>` is the ref the push actually
+  sends (`HEAD` only when it is the refspec's source) —
+  `git show HEAD` covers only the tip, and
+  `--stat` alone lists files, not foreign
+  hunks; confirm only changes you meant to make. This recipe audits what
+  a fast-forward push ADDS — a non-fast-forward push deletes remote
+  history and is a destructive action under this section's own gates,
+  not covered here
+  (`unprobed` — see Provenance). Then check you
+  are not building on already-merged work — an orientation check that
+  binds to the tip you BASELINED: run it before your first commit moves
+  HEAD, or run it against the recorded starting tip: if that starting
+  tip is an ancestor of the upstream default (often origin/main —
+  `git merge-base --is-ancestor <baseline-tip> origin/main` succeeds,
+  where `<baseline-tip>` is HEAD only pre-mutation), its unique work is
   already merged and continuing on it can silently revert merged work; the tell
   is your tree lacking a feature you know shipped. Being merely *behind* the
   default is normal for a feature branch — don't "fix" it by auto-merging or
@@ -703,6 +762,26 @@ forbid a silent degraded fallback and prescribe an explicitly-labelled degraded
 mode (all MIT, ideas only; see README acknowledgements). The two behavioral
 rules ship `unprobed` per the covenant; their probes join the private round-5
 queue.
+The §2 stage-by-pathspec clause on the baseline rule (2026-07-28) is
+contributor-reported (private repo; not linkable). An agent ran the baseline
+check, correctly identified a tree carrying uncommitted changes it had not
+authored, then committed its own one-line edit with `git add -A` — twice —
+sweeping several unrelated instruction and memory files it had never read
+into commits under its own message; caught on the follow-up `--stat` read,
+reverted, and restaged by pathspec. The clause is the mutation-side half of a
+baseline the rule already required: the diagnosis was performed and then not
+applied at commit time. Ships `unprobed` per the covenant; its probe joins the
+private round-5 queue.
+The §2 blanket-go scope clause (2026-07-28) comes from one downstream
+consumer's session (contributor-reported, not linkable): the user answered
+a list of pending items with "proceed
+all", the agent applied it only to the items named in its immediately
+preceding message, and the remainder sat untouched until the user asked why
+they were skipped — the agent's own answer at the time was "no good reason,
+scope habit". It complements rather than contradicts the surrounding
+per-invocation rules: those stop an approval from reaching FORWARD to
+unsurfaced work, this one stops it from being silently trimmed BACKWARD.
+Ships `unprobed` per the covenant.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
