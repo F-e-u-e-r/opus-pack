@@ -84,7 +84,24 @@ The golden runner doubles as an experiment grader: pre-register expected
 outputs as cases before any runs, then grade with code, not impressions —
 no harness, no experiment. Pre-register the full **outcome → action table**
 too (what each result will make you do), so a result cannot be rationalized
-into a favored action afterward. Calibrate the difficulty of the SHARED
+into a favored action afterward. **Write the pre-registration somewhere
+durable and timestamped BEFORE the first run, and cite that timestamp in
+the finding** (`unprobed` — contributor incident as shape; see Provenance).
+Durable = version-controlled, or written into the project's permanent
+record; ephemeral = `/tmp`, a scratch/sandbox/session directory, anything
+`git check-ignore` matches. On overlap, check-ignore wins: an ignored
+working path is ephemeral for this rule even when an external archive
+preserves it — cite the archive or permanent-record path itself, not the
+ignored working copy. Transcribing the criteria into the write-up
+afterwards is a weaker record than it looks: it is made once results are
+in, so it cannot evidence the ordering that pre-registration exists to
+prove, and it fails quietly — a dead link at least tells a later reader the
+claim is unbacked. Re-check that every path a finding cites still resolves
+before publishing.
+❌ "criteria: see `scratch/PREREG.md`" — reclaimed a session later, and
+the frozen criteria can no longer be distinguished from fitted ones.
+
+Calibrate the difficulty of the SHARED
 case set before comparing — never each arm's separately, which destroys
 comparability: a comparison where every arm sits at the same ceiling (every
 case passes in every arm) or the same floor (none does) carries no
@@ -506,5 +523,14 @@ mid-run"). Every arm passed, including three that recorded nothing — the run
 read as a 4/4 null result and would have retired a rule that did in fact
 discriminate 0/3 vs 1/1 once regraded on a port-note heading. Ships
 `unprobed` per the covenant.
+The pre-registration-ordering clause (2026-07-28) comes from a contributor
+incident (contributor-reported, not linkable). Three pre-registered probe
+rounds in one session wrote their
+pre-regs to a session scratch directory, which was later reclaimed — leaving
+five citations across a finding file, an always-loaded rules file, and a
+maintenance ledger pointing at paths that no longer existed. The criteria
+had genuinely been frozen before each run, which is the point: nothing that
+survived could show it. Ships `unprobed` per the covenant; its probe joins
+the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
