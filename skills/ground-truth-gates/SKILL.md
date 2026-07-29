@@ -221,7 +221,18 @@ A generic green test is not proof. A gate is real only if:
    scanning nothing (a guard script once did this for the very file its outage
    check was written for). A passing scan must also prove its input set is
    non-empty — assert the matched count is non-zero; merely printing it is the
-   same vacuous green if nothing fails on 0. Worker-written guard scripts
+   same vacuous green if nothing fails on 0. A **substring grader whose match
+   token can occur in the graded corpus** — scanning prose for a word that the
+   corpus itself may contain scores the corpus, not the behavior, and unlike
+   the empty-scan shapes above this one runs correctly over a non-empty input
+   and still passes every arm. Key on a token the graded material cannot
+   produce on its own (a structural marker — a heading, a filename, a field
+   the subject must create), and sanity-check the grader against a known-bad
+   arm before trusting a clean sweep: a grader that passes an arm you KNOW
+   failed is the finding, not a formality. Its damage runs opposite to a
+   vacuous green — it manufactures agreement, so an A/B whose arms all pass
+   reads as "no effect" and retires a real one. (`unprobed` — contributor
+   incident as shape; see Provenance.) Worker-written guard scripts
    especially: item 2's known-broken run applies before trust, no exemption —
    whoever wrote a guard has never seen it fail. (`unprobed` — private
    incident as shape; see Provenance.)
@@ -484,5 +495,13 @@ date-truth" — so the truth evidence lived in the conversation, not the gate;
 the fix added anchor-date assertions as a regression guard against a future
 bad edit. Ships `unprobed` per the covenant; its probe joins the private
 round-5 queue.
+The item-3 substring-grader-token-collision shape (2026-07-28) comes from one
+downstream consumer's A/B probe: the grader for a "did the arm record the
+change?" axis scanned each arm's output file for the word `drift`, which the
+fixture's own body text already contained ("a batch that drifts model
+mid-run"). Every arm passed, including three that recorded nothing — the run
+read as a 4/4 null result and would have retired a rule that did in fact
+discriminate 0/3 vs 1/1 once regraded on a port-note heading. Ships
+`unprobed` per the covenant.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
