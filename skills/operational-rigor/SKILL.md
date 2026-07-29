@@ -116,6 +116,7 @@ When rigor conflicts with finishing sooner, rigor wins.
   on something else — name the excluded items before you start, not when the
   user asks where they went. The extension runs one way only: a blanket go
   covers what you surfaced, never work you never put in front of them.
+  (`unprobed` — see Provenance.)
   ❌ "they said proceed all, so I'll do the three from my last message."
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
@@ -174,8 +175,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   tree whose every change is yours, `-A` is fine; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
   time was wasted. Verify before pushing: `git show --stat HEAD` lists only
-  files you meant to touch. Then check you are not building on
-  already-merged work: if your
+  files you meant to touch (`unprobed` — see Provenance). Then check you
+  are not building on already-merged work: if your
   branch's tip is an ancestor of the upstream default (often origin/main —
   `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is
   already merged and continuing on it can silently revert merged work; the tell

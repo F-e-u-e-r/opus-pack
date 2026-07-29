@@ -63,7 +63,7 @@ artifact-producing step.
   already-quoted in that author's working context. One reached main and cost
   a maintainer fix commit, verifiable in this repo as `8f8413f`; the second
   was caught in the author's own draft before submission
-  (contributor-reported).
+  (contributor-reported). (This clause ships `unprobed` — see Provenance.)
   ❌ "the sync contract is in §4" (recalled; the quoted line was in §3).
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
@@ -195,7 +195,8 @@ artifact-producing step.
   decays into exactly the stale-instruction problem it was meant to solve.
   **And that command has to hang off something the work already touches**
   (first in-house probe 2026-07-27 discriminated: bare arm documented the
-  condition with nothing reading it, ruled arm bound it — see Provenance): an invalidation
+  condition with nothing reading it, ruled arm bound it — see Provenance):
+  an invalidation
   condition needing a separate act of remembering is inert no matter how
   precisely it is written. Bind it to a surface the next pass crosses anyway —
   a line in the maintenance entry that pass must read, an assertion in a gate
@@ -285,7 +286,8 @@ artifact-producing step.
   different hat.
   ❌ "the rules merged upstream and I have been following them all
   session, so that batch is done" — followed from conversation context,
-  by the one reader who cannot notice their absence.
+  by the one reader who cannot notice their absence. (This adoption-debt
+  clause ships `unprobed` — see Provenance.)
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
@@ -293,7 +295,8 @@ artifact-producing step.
   verbatim or point to the canonical copy (a paraphrase drifts silently), and
   the sync contract must name which file wins on disagreement.
 - **A skill's internal citations are addressed to ITS library — re-resolve
-  every one against the destination on install.** A distributable skill
+  every one against the destination on install** (`unprobed` — contributor
+  incident as shape; see Provenance). A distributable skill
   cites siblings by section number and by name ("delegation-and-review §3",
   "the author-is-not-the-judge rule"). Those addresses are relative to the
   library it was written in. Installed into a library that numbers its
@@ -650,7 +653,8 @@ default; an AI rewrite does not launder a derivative).
   (first in-house probe of this rule itself, 2026-07-27, discriminated: both
   arms were armed — each faced the add-or-not decision — and the bare arm
   failed it, reaching the instinct but settling the question by judgment
-  instead of by running the two arms — see Provenance). §6's behavioral probe hunts
+  instead of by running the two arms — see Provenance). §6's behavioral
+  probe hunts
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
@@ -723,7 +727,10 @@ default; an AI rewrite does not launder a derivative).
   mode for another. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
-  and that is the judgment the probe is for.
+  and that is the judgment the probe is for. (The 2026-07-27/28 clauses
+  here — environment-relative baseline, tier inheritance,
+  baseline-vs-leakage, and arms'-reasoning — ship `unprobed`; see
+  Provenance.)
   ❌ "the rule is correct and clearly written, so it earns a line."
 - **A file's content contradicts reality and you are about to correct it —
   first establish whether anything generates that file** (trigger repaired
@@ -1145,7 +1152,8 @@ the executor a procedure or an observation, and skip probes on the
 observations — and probed the same day: a clean bare arm produced its
 substance unaided, so by this section's own verdict table it is
 non-discriminating and stays out of the always-loaded file. It is recorded
-here as an observed pattern, not shipped as a rule. The §2 clause's incident is verifiable
+here as an observed pattern, not shipped as a rule. The §2 clause's incident
+is verifiable
 in this repo's history: two dangling section references shipped by one
 author in one day, each written from recall while the correct location sat
 already-quoted in the working context; one reached main and cost the
