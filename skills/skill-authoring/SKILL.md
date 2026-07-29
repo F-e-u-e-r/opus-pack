@@ -718,9 +718,10 @@ default; an AI rewrite does not launder a derivative).
   and gets re-run, not scored. A clean check bounds only quoted recall —
   influence that never surfaces in the output survives it, so a
   surprising bare-pass from a memory-bearing arm stays suspect, not
-  license. Ask of each element: would a stranger
-  installing this file have it? Yes → baseline, keep. No → leakage,
-  strip.
+  license. Ask of each element: does every ordinary invocation of this
+  executor ship with it? Yes → baseline, keep (recorded next to the
+  verdict). Episodic content about the finding itself → leakage, strip,
+  whatever carrier auto-loads it.
   ❌ a bare arm that "independently reproduced" the rule while quoting
   the incident that produced it. An arm counts only
   when its run demonstrably met the rule's trigger (ground-truth-gates'
@@ -748,7 +749,9 @@ default; an AI rewrite does not launder a derivative).
   fold so compliance composes with doing the job (verify FIRST, then
   proceed on a pass), or the folded rule trades one failure
   mode for another. Eight rules folded into two files over one week were
-  probed this way afterwards; three were reproduced unaided. Non-discriminating
+  probed this way afterwards (an earlier form — those bare arms ran with
+  the rules file absent outright, predating the baseline clauses
+  above); three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for. (The 2026-07-27/28 clauses
   here — environment-relative baseline, tier inheritance,
@@ -1175,8 +1178,8 @@ both arms and sits outside this contrast). That pattern was itself drafted as a
 candidate rule — triage the probe queue by asking whether a candidate hands
 the executor a procedure or an observation, and skip probes on the
 observations — and probed the same day: a clean bare arm produced its
-substance unaided, so by this section's own verdict table it is
-non-discriminating and stays out of the always-loaded file. It is recorded
+substance unaided; whichever pair-cell that lands in (non-discriminating
+or harmful), the always-loaded file is not its home. It is recorded
 here as an observed pattern, not shipped as a rule.
 The §2 derive-cross-references clause (2026-07-27) has its own evidence
 chain, distinct from that probe run: two mis-targeted section references

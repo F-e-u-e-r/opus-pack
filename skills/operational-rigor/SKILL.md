@@ -182,15 +182,20 @@ When rigor conflicts with finishing sooner, rigor wins.
   touched file can itself carry hunks you did not author and the pathspec
   cannot see inside a file: on such a tree, read the staged diff
   (`git diff --staged`) before every commit and commit only when it
-  contains solely changes you authored — unstage the rest first and
-  leave it in the working tree (stashing or committing foreign changes
-  is its own act, needing its own authorization). Only on a
+  contains solely the changes this commit intends — yours and belonging
+  here. Unstage what YOU staged beyond that and leave it in the working
+  tree; an index the baseline already carried staged is the user's
+  arrangement — stop and surface it rather than unstaging their work or
+  committing over it (stashing or committing foreign changes is likewise
+  its own act, needing its own authorization). Only on a
   tree whose every change is yours and belongs in this commit is `-A`
   fine — any other state stages by pathspec; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
-  time was wasted. Verify before pushing: `git show HEAD` shows only
-  changes you meant to make — `--stat` alone lists files, not foreign
-  hunks (`unprobed` — see Provenance). Then check you
+  time was wasted. Verify before pushing: read every outgoing commit's
+  patch (`git log -p @{u}..` — `git show HEAD` covers only the tip, and
+  `--stat` alone lists files, not foreign
+  hunks) and confirm only changes you meant to make
+  (`unprobed` — see Provenance). Then check you
   are not building on already-merged work: if your
   branch's tip is an ancestor of the upstream default (often origin/main —
   `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is
