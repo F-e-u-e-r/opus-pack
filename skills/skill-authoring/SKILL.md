@@ -316,7 +316,9 @@ artifact-producing step.
   and classify each: retargeted (the local address
   differs), unchanged, or absent-here (the sibling rule does not exist
   locally; delete the pointer — rewriting the sentence to stand without
-  it — or replace it with a non-resolving gap marker, never a live `§N`
+  it, not to absorb the missing sibling's semantics (the no-paraphrase
+  rule above holds) — or replace it with a non-resolving gap marker,
+  never a live `§N`
   that resolves locally to unintended content; the port note
   records either, so nothing is dropped silently or left dangling).
   Then record the retargets in the port note as upstream-citation →

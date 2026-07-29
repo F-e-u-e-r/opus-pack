@@ -197,7 +197,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   patch, measured against the real push destination (`@{push}` where it
   resolves; `@{u}` only if it provably names the same destination; an
   explicit refspec or a new branch means resolving the destination — or
-  the fork base — yourself) and with merge
+  the fork base — yourself; refresh it from the remote first — a
+  tracking ref names the address, not its freshness, and a stale one
+  omits commits the push will actually carry) and with merge
   diffs shown — e.g. `git log -p --diff-merges=first-parent
   <dest>..<source>`, where `<source>` is the ref the push actually
   sends (`HEAD` only when it is the refspec's source) —
@@ -205,9 +207,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   `--stat` alone lists files, not foreign
   hunks; confirm only changes you meant to make
   (`unprobed` — see Provenance). Then check you
-  are not building on already-merged work: if your
-  branch's tip is an ancestor of the upstream default (often origin/main —
-  `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is
+  are not building on already-merged work — an orientation check that
+  binds to the tip you BASELINED: run it before your first commit moves
+  HEAD, or run it against the recorded starting tip: if that starting
+  tip is an ancestor of the upstream default (often origin/main —
+  `git merge-base --is-ancestor <baseline-tip> origin/main` succeeds,
+  where `<baseline-tip>` is HEAD only pre-mutation), its unique work is
   already merged and continuing on it can silently revert merged work; the tell
   is your tree lacking a feature you know shipped. Being merely *behind* the
   default is normal for a feature branch — don't "fix" it by auto-merging or
