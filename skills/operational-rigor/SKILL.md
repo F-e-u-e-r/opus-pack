@@ -107,7 +107,8 @@ When rigor conflicts with finishing sooner, rigor wins.
 - **Approval is not a verdict.** A go-ahead that arrives while a verification
   artifact is still pending authorizes the action after the verdict lands, not
   skipping the verification (per-invocation scope is the next bullet).
-  A blanket go — "proceed", "do them all" — reaches every item you have put in
+  A blanket go — "proceed all", "do them all" — reaches every item you have
+  put in
   front of the user as pending, not your most recent message alone. Narrowing
   it to the nearest item is a defensible reading of the words and a bad reading
   of the intent: the user is clearing a queue they believe you are holding, and
@@ -118,7 +119,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   covers what you surfaced, never work you never put in front of them.
   It widens which surfaced items one go reaches, never when a fresh grant
   is due — the per-invocation and confirmation-gate rules below are
-  untouched. (`unprobed` — see Provenance.)
+  untouched. Blanket is read from the words against the question they
+  answer: a bare "proceed" with more than one plausible referent is not
+  a blanket go — ask. (`unprobed` — see Provenance.)
   ❌ "they said proceed all, so I'll do the three from my last message."
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
@@ -172,13 +175,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   migration). That attribution then binds how you COMMIT, not just how you
   read the tree: with pre-existing changes present that you did not author,
   stage by explicit pathspec — `git add <path>` for the files you touched —
-  never `git add -A`/`-u`/`.`, which sweeps that unreviewed state into your
-  commit and publishes edits you have never read under your message. A
+  never `git add -A`/`-u`/`.` or `git commit -a`/`--all`, which sweep that
+  unreviewed state into your
+  commit and publish edits you have never read under your message. A
   touched file can itself carry hunks you did not author and the pathspec
   cannot see inside a file: on such a tree, read the staged diff
   (`git diff --staged`) before every commit and commit only when it
-  contains solely changes you authored — unstage or checkpoint the rest
-  first. On a
+  contains solely changes you authored — unstage the rest first and
+  leave it in the working tree (stashing or committing foreign changes
+  is its own act, needing its own authorization). On a
   tree whose every change is yours and belongs in this commit, `-A` is
   fine; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
@@ -743,7 +748,8 @@ baseline the rule already required: the diagnosis was performed and then not
 applied at commit time. Ships `unprobed` per the covenant; its probe joins the
 private round-5 queue.
 The §2 blanket-go scope clause (2026-07-28) comes from one downstream
-consumer's session: the user answered a list of pending items with "proceed
+consumer's session (contributor-reported, not linkable): the user answered
+a list of pending items with "proceed
 all", the agent applied it only to the items named in its immediately
 preceding message, and the remainder sat untouched until the user asked why
 they were skipped — the agent's own answer at the time was "no good reason,

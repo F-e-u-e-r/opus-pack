@@ -58,7 +58,8 @@ artifact-producing step.
   trusted.** That includes the pointer inside a rule you are writing: a
   cross-reference's section number is a claim about the target file — derive
   it by opening the file, or from the line a search already quoted, never
-  from recall of the file's structure. Two dangling §-references were written
+  from recall of the file's structure. Two mis-targeted §-references were
+  written
   by one author in one day, each from memory while the correct location sat
   already-quoted in that author's working context. One reached main and cost
   a maintainer fix commit, verifiable in this repo as `8f8413f`; the second
@@ -302,7 +303,7 @@ artifact-producing step.
   library it was written in. Installed into a library that numbers its
   sections differently, or that never adopted the sibling, each one still
   READS as valid and now points somewhere else — the silent failure the
-  §2 absolute-path rule names, in citation form: a dangling `§3` resolves
+  §2 absolute-path rule names, in citation form: a stale `§3` resolves
   to a real section with the wrong content, where a 404 would at least
   fail loud. So on install, resolve every citation against the
   DESTINATION file — first pin what it addresses upstream (the section
@@ -310,10 +311,12 @@ artifact-producing step.
   you do), then grep the destination for that, never the number alone —
   and classify each: retargeted (the local address
   differs), unchanged, or absent-here (the sibling rule does not exist
-  locally; delete the pointer or keep a recorded gap — the port note
+  locally; delete the pointer — rewriting the sentence to stand without
+  it — or keep a recorded gap; the port note
   records either, so nothing is dropped silently or left dangling).
   Then record the retargets in the port note as upstream-citation →
-  local-target pairs, because the edits are now local divergences from
+  local-target pairs, and each absent-here outcome as delete-or-gap,
+  because the edits are now local divergences from
   upstream: unrecorded, the next diff-against-upstream reads your own
   retargets as drift and a re-sync silently restores the broken numbers.
   The port note is what makes them re-applicable and lets the diff exclude
@@ -669,17 +672,19 @@ default; an AI rewrite does not launder a derivative).
   live counterfactual for the fold decision, and stripping it makes the
   probe answer a question nobody asked (does the rule beat a blank
   model?). Every verdict then inherits the baseline's scope: a bare ✓
-  means redundant IN THAT ENVIRONMENT, not redundant everywhere — a
+  argues redundancy IN THAT ENVIRONMENT at most — only the pair, read
+  by the table below, settles it, and never for everywhere — a
   baseline carrying a standing general form of the candidate (a global
   verify-before-relaying order) makes the specific form's probe
   non-discriminating locally
-  while the same rule still earns its line wherever no such standing
+  while the same rule may still earn its line wherever no such standing
   order exists, so record what the baseline contained next to the
   verdict, and never export a non-discrimination result to an
   environment with a different baseline.
   "Target executor" means tier as well as environment: run both arms at
   the tier the file is written for — the weaker model the file exists to
-  instruct — not the tier the probing session happens to be on. A bare ✓
+  instruct (for a multi-tier audience, the weakest tier it must
+  protect) — not the tier the probing session happens to be on. A bare ✓
   from a stronger arm is a claim only about readers stronger than the
   ones the file must protect; one downstream consumer's same-fixture
   tier replication flipped a bare arm 3/3 → 0/3. Record the tier next to
@@ -693,14 +698,17 @@ default; an AI rewrite does not launder a derivative).
   leakage, and the line between them is what the arm would have without
   YOU: the baseline is what every invocation in that environment ships
   with, while episodic recall of the very finding under test is
-  contamination — a persistent auto-memory store, a summary of the
-  session that produced the candidate, notes from the run you are
-  probing. That store survives a "fresh invocation", so the
+  contamination — finding content carried into the arm by a persistent
+  auto-memory store, a summary of the session that produced the
+  candidate, or notes from the run you are probing. Such a store
+  survives a "fresh invocation", so the
   no-shared-state requirement above does not catch it: the arm loads the
   conclusion, restates it, and scores as an unaided reproduction. Frame
-  the bare arm to dodge recall (a generic scenario, no names or phrasing
-  from the finding), instruct it explicitly to disregard prior findings
-  and stored notes, and CHECK the output before the run counts — an arm
+  BOTH arms identically to dodge recall (a generic scenario, no names or
+  phrasing from the finding), instruct each explicitly to disregard
+  prior findings and stored notes — the candidate rule stays the arms'
+  only difference, or the controls confound the probe — and CHECK each
+  output before the run counts — an arm
   citing the finding, its distinctive phrasing, or its incident (details
   the scenario itself did not supply) is contaminated
   and gets re-run, not scored. A clean check bounds only quoted recall —
@@ -732,8 +740,9 @@ default; an AI rewrite does not launder a derivative).
   compression bullet below is why the rebuttal must survive). And a
   passing ruled arm can still over-fire, satisfying the rule by refusing
   the surrounding task outright; that over-fire is a wording warning, not
-  a win — reword the fold so compliance composes with doing the job
-  (verify FIRST, then proceed), or the folded rule trades one failure
+  a win — where refusal is not the rule's intended outcome, reword the
+  fold so compliance composes with doing the job (verify FIRST, then
+  proceed on a pass), or the folded rule trades one failure
   mode for another. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
@@ -1155,8 +1164,9 @@ the very classification ("a derived file") the rule exists to force, so it
 fired only when provenance was already known. The repair restates the
 trigger as the observable state; the repaired form is unprobed and its
 marker records that. Across the four, the two that discriminated hand the
-executor a procedure and the one that did not hands it an observation a
-careful bare executor states unaided. That pattern was itself drafted as a
+executor a procedure and the one reproduced unaided hands it an observation
+a careful bare executor states without help (the repaired fourth failed
+both arms and sits outside this contrast). That pattern was itself drafted as a
 candidate rule — triage the probe queue by asking whether a candidate hands
 the executor a procedure or an observation, and skip probes on the
 observations — and probed the same day: a clean bare arm produced its
@@ -1164,7 +1174,7 @@ substance unaided, so by this section's own verdict table it is
 non-discriminating and stays out of the always-loaded file. It is recorded
 here as an observed pattern, not shipped as a rule.
 The §2 derive-cross-references clause (2026-07-27) has its own evidence
-chain, distinct from that probe run: two dangling section references
+chain, distinct from that probe run: two mis-targeted section references
 written from recall by one author in one day, each while the correct
 location sat already-quoted in the working context — one reached main and
 cost the maintainer fix commit `8f8413f` (repo-verifiable); the second was
@@ -1173,7 +1183,8 @@ clause itself ships `unprobed` per the covenant; its probe joins the
 private round-5 queue.
 The §7 bare-probe bullet's environment-relative-baseline and
 read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
-downstream consumer's first fold probes of this repo's own merged rules (four
+downstream consumer's first fold probes of this repo's own merged rules
+(contributor-reported, not linkable; four
 rules probed, pre-registered arms, weaker-tier executor). Two probes produced
 the clauses. A fact-anchoring rule failed to discriminate solely because the
 consumer's global rules file carries a standing verify-before-relaying order —
@@ -1193,7 +1204,8 @@ dodging framing, an explicit disregard instruction, and a citation check on
 the output before scoring) were added to the later pre-registrations for that
 reason.
 The §7 tier-inheritance clause (2026-07-28) distills the same downstream
-consumer's tier replication: a fold probe run at the probing session's own
+consumer's tier replication (contributor-reported, not linkable): a fold
+probe run at the probing session's own
 strong tier returned bare 3/3 on a citation-re-resolve rule ("redundant
 with model capability"); a same-day replication of the same fixture and
 task at a weak tier returned bare 0/3 — every weak arm copied the stale

@@ -226,8 +226,9 @@ A generic green test is not proof. A gate is real only if:
    corpus itself may contain scores the corpus, not the behavior, and unlike
    the zero-input scanner above this one runs correctly over a non-empty input
    and still passes every arm. Key on a token the graded material cannot
-   produce on its own (a structural marker — a heading, a filename, a field
-   the subject must create), and sanity-check the grader against a known-bad
+   produce on its own (a structural marker the subject must create and
+   fill — a heading, a filename, a field), and sanity-check the grader
+   against a known-bad
    arm before trusting a clean sweep: a grader that passes an arm you KNOW
    failed is the finding, not a formality. Its damage runs opposite to a
    vacuous green — it manufactures agreement, so an A/B whose arms all pass
@@ -496,7 +497,8 @@ the fix added anchor-date assertions as a regression guard against a future
 bad edit. Ships `unprobed` per the covenant; its probe joins the private
 round-5 queue.
 The item-3 substring-grader-token-collision shape (2026-07-28) comes from one
-downstream consumer's A/B probe: the grader for a "did the arm record the
+downstream consumer's A/B probe (contributor-reported, not linkable): the
+grader for a "did the arm record the
 change?" axis scanned each arm's output file for the word `drift`, which the
 fixture's own body text already contained ("a batch that drifts model
 mid-run"). Every arm passed, including three that recorded nothing — the run
