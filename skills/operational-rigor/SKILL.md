@@ -184,9 +184,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   (`git diff --staged`) before every commit and commit only when it
   contains solely changes you authored — unstage the rest first and
   leave it in the working tree (stashing or committing foreign changes
-  is its own act, needing its own authorization). On a
-  tree whose every change is yours and belongs in this commit, `-A` is
-  fine; the baseline is what tells
+  is its own act, needing its own authorization). Only on a
+  tree whose every change is yours and belongs in this commit is `-A`
+  fine — any other state stages by pathspec; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
   time was wasted. Verify before pushing: `git show HEAD` shows only
   changes you meant to make — `--stat` alone lists files, not foreign

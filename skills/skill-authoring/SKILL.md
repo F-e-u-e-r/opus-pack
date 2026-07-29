@@ -118,8 +118,9 @@ artifact-producing step.
 
 - Date-stamp volatile facts (versions, flags, model names, defaults).
 - **Staleness concentrates in the world-fact rules — audit there first**
-  (first in-house probe 2026-07-27 did NOT discriminate — a bare arm produced
-  the scoping unaided; one run screens for a large effect only, so it is
+  (first in-house probe 2026-07-27 did NOT discriminate — both arms
+  produced the scoping, the bare one unaided; one run screens for a
+  large effect only, so it is
   flagged for a demotion judgment rather than demoted — see Provenance). A
   rule encoding a
   mutable fact about the outside world (which model or tool is default, how a
@@ -1159,7 +1160,8 @@ bare-executor-probe each discriminated (bare arm failed, ruled arm passed;
 the bare-probe rule's own bare arm reached the instinct — "correct and
 non-duplicate clears the bar for truth, not for inclusion" — but decided by
 judgment, never running an arm). The world-fact-staleness rule did not
-discriminate — a bare arm produced the scoping unaided; at one run per arm
+discriminate — both arms produced the scoping, the bare one unaided; at one
+run per arm
 this is flagged in its marker for a demotion judgment, not demoted here. The
 read-the-source rule failed BOTH arms: handed a wrong value in a file with
 no provenance cue, each arm edited it in place — the written trigger named
