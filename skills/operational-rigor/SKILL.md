@@ -174,10 +174,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   stage by explicit pathspec — `git add <path>` for the files you touched —
   never `git add -A`/`-u`/`.`, which sweeps that unreviewed state into your
   commit and publishes edits you have never read under your message. A
-  touched file can itself carry hunks you did not author — when it does,
-  the pathspec is not enough: review the staged diff (`git diff --staged`)
-  before committing. On a
-  tree whose every change is yours, `-A` is fine; the baseline is what tells
+  touched file can itself carry hunks you did not author and the pathspec
+  cannot see inside a file: on such a tree, read the staged diff
+  (`git diff --staged`) before every commit and commit only when it
+  contains solely changes you authored — unstage or checkpoint the rest
+  first. On a
+  tree whose every change is yours and belongs in this commit, `-A` is
+  fine; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
   time was wasted. Verify before pushing: `git show HEAD` shows only
   changes you meant to make — `--stat` alone lists files, not foreign

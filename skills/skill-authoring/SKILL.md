@@ -119,7 +119,8 @@ artifact-producing step.
 - **Staleness concentrates in the world-fact rules — audit there first**
   (first in-house probe 2026-07-27 did NOT discriminate — a bare arm produced
   the scoping unaided; one run screens for a large effect only, so it is
-  flagged rather than demoted — see Provenance). A rule encoding a
+  flagged for a demotion judgment rather than demoted — see Provenance). A
+  rule encoding a
   mutable fact about the outside world (which model or tool is default, how a
   CLI behaves, a numeric threshold someone measured) can go stale within
   days; a rule encoding method (reproduce before trusting, verify by
@@ -268,16 +269,16 @@ artifact-producing step.
   HITS — the candidate lists may be nonempty — and a clean local
   diff against the anchor state; that makes the anchor safe AS OF the
   check, never forever; otherwise it carries the provisional label.
-  That campaign runs upstream. The same merge leaves a SECOND thing open
-  in the other direction, and an author is the likeliest reader to miss
-  it: contributing a rule is not adopting it. When you write a rule INTO
-  a shared library, the merge closes the contribution while your own
-  always-loaded files still do not carry it — and because you have been
-  applying the rule by hand all along (you wrote it; it is in your working
-  context), nothing feels missing. It is not adopted, it is remembered,
-  and remembering ends with the session; the next one reverts to whatever
-  the files say. Treat every merge of your own rule as opening an
-  adoption debt alongside the sync, and bind that debt to a surface
+- **Contributing a rule is not adopting it — a merge of your own rule
+  into a shared library opens an adoption debt** (`unprobed` — see
+  Provenance). The campaign bullet above runs upstream; the same merge
+  leaves a SECOND thing open in the other direction, and the author is
+  the likeliest reader to miss it. The merge closes the contribution
+  while your own always-loaded files still do not carry the rule — and
+  because you have been applying it by hand all along (you wrote it; it
+  is in your working context), nothing feels missing. It is not adopted,
+  it is remembered, and remembering ends with the session; the next one
+  reverts to whatever the files say. Bind the debt to a surface
   something re-reads — the same ledger row or sync record that logs the
   merge carries it, so the row cannot be closed without deciding port /
   probe-then-port / deliberately-declined-because. A debt parked only in
@@ -286,8 +287,7 @@ artifact-producing step.
   different hat.
   ❌ "the rules merged upstream and I have been following them all
   session, so that batch is done" — followed from conversation context,
-  by the one reader who cannot notice their absence. (This adoption-debt
-  clause ships `unprobed` — see Provenance.)
+  by the one reader who cannot notice their absence.
 - When two files must agree, write the sync contract down ("change X → update
   Y") in the canonical file. Prose inventories rot; prefer "read the
   directory" over hand-kept lists, and pin unavoidable lists with a rule or test.
@@ -305,11 +305,13 @@ artifact-producing step.
   §2 absolute-path rule names, in citation form: a dangling `§3` resolves
   to a real section with the wrong content, where a 404 would at least
   fail loud. So on install, resolve every citation against the
-  DESTINATION file — grep the referenced heading and the named anchor, do
-  not trust the number — and classify each: retargeted (the local address
+  DESTINATION file — first pin what it addresses upstream (the section
+  heading or the named rule; a bare `§N` carries no greppable name until
+  you do), then grep the destination for that, never the number alone —
+  and classify each: retargeted (the local address
   differs), unchanged, or absent-here (the sibling rule does not exist
-  locally; a
-  pointer to nothing is deleted or the gap recorded, never left dangling).
+  locally; delete the pointer or keep a recorded gap — the port note
+  records either, so nothing is dropped silently or left dangling).
   Then record the retargets in the port note as upstream-citation →
   local-target pairs, because the edits are now local divergences from
   upstream: unrecorded, the next diff-against-upstream reads your own
@@ -699,8 +701,12 @@ default; an AI rewrite does not launder a derivative).
   the bare arm to dodge recall (a generic scenario, no names or phrasing
   from the finding), instruct it explicitly to disregard prior findings
   and stored notes, and CHECK the output before the run counts — an arm
-  citing the finding, its vocabulary, or its incident is contaminated
-  and gets re-run, not scored. Ask of each element: would a stranger
+  citing the finding, its distinctive phrasing, or its incident (details
+  the scenario itself did not supply) is contaminated
+  and gets re-run, not scored. A clean check bounds only quoted recall —
+  influence that never surfaces in the output survives it, so a
+  surprising bare-pass from a memory-bearing arm stays suspect, not
+  license. Ask of each element: would a stranger
   installing this file have it? Yes → baseline, keep. No → leakage,
   strip.
   ❌ a bare arm that "independently reproduced" the rule while quoting
@@ -1196,7 +1202,7 @@ transferred intact" (byte-fidelity of the copy, the one check that cannot
 catch an already-wrong citation). N=3 per cell, one fixture, one rule.
 All four clauses ship `unprobed` per the covenant; their probes join
 the private round-5 queue.
-The §3 contributing-is-not-adopting clause and the §3 re-resolve-citations-on-
+The §3 contributing-is-not-adopting rule and the §3 re-resolve-citations-on-
 install rule (2026-07-28) are contributor-reported from one downstream
 consumer's adoption pass over this repo (the upstream half — the merges and
 their PR numbers — is verifiable in this repo's history; the local half is
@@ -1204,7 +1210,7 @@ not linkable). One incident, two faces. A batch of the consumer's own rules
 merged here and was never ported into the files that govern their sessions;
 it went unnoticed for days precisely because the author kept applying the
 rules from working context, and surfaced only when their user asked why the
-rules were not in use — the contributing clause. Porting them then required
+rules were not in use — the contributing rule. Porting them then required
 installing sibling skills whose `§N` citations addressed THIS library's
 numbering: several resolved to differently-numbered local sections and two
 named anchors had no local counterpart, caught by grepping the destination
