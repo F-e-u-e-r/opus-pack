@@ -198,7 +198,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   resolves; `@{u}` only if it provably names the same destination; an
   explicit refspec or a new branch means resolving the destination — or
   the fork base — yourself) and with merge
-  diffs shown — e.g. `git log -p --diff-merges=first-parent <dest>..` —
+  diffs shown — e.g. `git log -p --diff-merges=first-parent
+  <dest>..<source>`, where `<source>` is the ref the push actually
+  sends (`HEAD` only when it is the refspec's source) —
   `git show HEAD` covers only the tip, and
   `--stat` alone lists files, not foreign
   hunks; confirm only changes you meant to make
