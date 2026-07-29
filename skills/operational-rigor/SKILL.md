@@ -116,7 +116,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   on something else — name the excluded items before you start, not when the
   user asks where they went. The extension runs one way only: a blanket go
   covers what you surfaced, never work you never put in front of them.
-  (`unprobed` — see Provenance.)
+  It widens which surfaced items one go reaches, never when a fresh grant
+  is due — the per-invocation and confirmation-gate rules below are
+  untouched. (`unprobed` — see Provenance.)
   ❌ "they said proceed all, so I'll do the three from my last message."
 - **A confirmation gate on a consequential action is addressed to the human, not
   to you.** When a `[y/N]` / "are you sure?" / `*_ACK` / `--force` guards a
@@ -171,11 +173,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   read the tree: with pre-existing changes present that you did not author,
   stage by explicit pathspec — `git add <path>` for the files you touched —
   never `git add -A`/`-u`/`.`, which sweeps that unreviewed state into your
-  commit and publishes edits you have never read under your message. On a
+  commit and publishes edits you have never read under your message. A
+  touched file can itself carry hunks you did not author — when it does,
+  the pathspec is not enough: review the staged diff (`git diff --staged`)
+  before committing. On a
   tree whose every change is yours, `-A` is fine; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
-  time was wasted. Verify before pushing: `git show --stat HEAD` lists only
-  files you meant to touch (`unprobed` — see Provenance). Then check you
+  time was wasted. Verify before pushing: `git show HEAD` shows only
+  changes you meant to make — `--stat` alone lists files, not foreign
+  hunks (`unprobed` — see Provenance). Then check you
   are not building on already-merged work: if your
   branch's tip is an ancestor of the upstream default (often origin/main —
   `git merge-base --is-ancestor HEAD origin/main` succeeds), its unique work is

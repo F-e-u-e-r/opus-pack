@@ -204,7 +204,7 @@ A generic green test is not proof. A gate is real only if:
    fails when you deliberately break the code — not merely that it compiles. For
    a guard/error path, assert three things, not just the exit code: the
    returncode, a message string unique to THIS check (many errors share exit 2),
-   and that the dangerous side-effect did NOT occur (`assertNotIn`). Four more
+   and that the dangerous side-effect did NOT occur (`assertNotIn`). Five more
    fake-pass shapes: a **warm-state pass on init-only code** — a zero-violation
    observation window proves nothing about code that only executes at
    initialization (cold start, first run, migration); exercise the cold path in
@@ -224,7 +224,7 @@ A generic green test is not proof. A gate is real only if:
    same vacuous green if nothing fails on 0. A **substring grader whose match
    token can occur in the graded corpus** — scanning prose for a word that the
    corpus itself may contain scores the corpus, not the behavior, and unlike
-   the empty-scan shapes above this one runs correctly over a non-empty input
+   the zero-input scanner above this one runs correctly over a non-empty input
    and still passes every arm. Key on a token the graded material cannot
    produce on its own (a structural marker — a heading, a filename, a field
    the subject must create), and sanity-check the grader against a known-bad

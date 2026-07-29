@@ -306,19 +306,21 @@ artifact-producing step.
   to a real section with the wrong content, where a 404 would at least
   fail loud. So on install, resolve every citation against the
   DESTINATION file — grep the referenced heading and the named anchor, do
-  not trust the number — and classify each: retargeted (number differs),
-  unchanged, or absent-here (the sibling rule does not exist locally; a
+  not trust the number — and classify each: retargeted (the local address
+  differs), unchanged, or absent-here (the sibling rule does not exist
+  locally; a
   pointer to nothing is deleted or the gap recorded, never left dangling).
   Then record the retargets in the port note as upstream-citation →
   local-target pairs, because the edits are now local divergences from
   upstream: unrecorded, the next diff-against-upstream reads your own
   retargets as drift and a re-sync silently restores the broken numbers.
-  The port note is what makes them re-appliable and lets the diff exclude
+  The port note is what makes them re-applicable and lets the diff exclude
   them. Done when no citation in the installed copy resolves to a section
   the author did not mean, and every difference from upstream is either
   in the port note or a real drift.
-  ❌ "the port is byte-identical to upstream" — for a file full of §
-  references, byte-identical IS the bug.
+  ❌ "the port is byte-identical to upstream" — byte-fidelity is the
+  wrong test: into a differently-numbered library, byte-identical IS
+  the bug.
 - **Package a set with its own honesty ledger.** Alongside its START-HERE router
   (§4), a multi-skill project *library* ships two more companion files — a
   MANIFEST (one line per skill → what it is + the evidence backing it, so the next
@@ -667,7 +669,8 @@ default; an AI rewrite does not launder a derivative).
   model?). Every verdict then inherits the baseline's scope: a bare ✓
   means redundant IN THAT ENVIRONMENT, not redundant everywhere — a
   baseline carrying a standing general form of the candidate (a global
-  verify-before-relaying order) fails the specific form's probe locally
+  verify-before-relaying order) makes the specific form's probe
+  non-discriminating locally
   while the same rule still earns its line wherever no such standing
   order exists, so record what the baseline contained next to the
   verdict, and never export a non-discrimination result to an
@@ -679,8 +682,9 @@ default; an AI rewrite does not launder a derivative).
   ones the file must protect; one downstream consumer's same-fixture
   tier replication flipped a bare arm 3/3 → 0/3. Record the tier next to
   each verdict as you record the baseline. The inference runs one way:
-  a strong-arm ruled FAIL still proves the wording ineffective, and a
-  strong-arm bare FAIL still earns the line — but no bare-pass from an
+  a strong-arm ruled FAIL is still evidence against the wording, and a
+  strong-arm bare FAIL is still evidence the line is needed — neither
+  substitutes for the audience-tier pair — but no bare-pass from an
   arm stronger than the file's audience licenses removing one.
   ❌ "the bare arm handled it, so the line is redundant" — at which tier?
   Baseline is not the same as
@@ -1125,8 +1129,8 @@ copied faithfully from a source file carrying the same error, so fixing the
 derived file alone would have been undone by the next write-back — the
 read-the-source rule. All four shipped `unprobed` per the covenant; the
 2026-07-27 entry below records their first probe results.
-The §7 read-the-source trigger repair and the §2 derive-cross-references
-clause (2026-07-27) come from the first probe run of the four 2026-07-25
+The §7 read-the-source trigger repair (2026-07-27) comes from the first
+probe run of the four 2026-07-25
 rules above — the covenant's queued probe, run against the merged text
 (n=1 per arm, one weaker-tier executor, screens for a large effect only; a
 first round was discarded because its scenarios leaked the taught
@@ -1152,12 +1156,15 @@ the executor a procedure or an observation, and skip probes on the
 observations — and probed the same day: a clean bare arm produced its
 substance unaided, so by this section's own verdict table it is
 non-discriminating and stays out of the always-loaded file. It is recorded
-here as an observed pattern, not shipped as a rule. The §2 clause's incident
-is verifiable
-in this repo's history: two dangling section references shipped by one
-author in one day, each written from recall while the correct location sat
-already-quoted in the working context; one reached main and cost the
-maintainer fix commit `8f8413f`.
+here as an observed pattern, not shipped as a rule.
+The §2 derive-cross-references clause (2026-07-27) has its own evidence
+chain, distinct from that probe run: two dangling section references
+written from recall by one author in one day, each while the correct
+location sat already-quoted in the working context — one reached main and
+cost the maintainer fix commit `8f8413f` (repo-verifiable); the second was
+caught in the author's draft before submission (contributor-reported). The
+clause itself ships `unprobed` per the covenant; its probe joins the
+private round-5 queue.
 The §7 bare-probe bullet's environment-relative-baseline and
 read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
 downstream consumer's first fold probes of this repo's own merged rules (four
