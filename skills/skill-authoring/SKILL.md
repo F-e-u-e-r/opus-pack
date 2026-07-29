@@ -282,8 +282,9 @@ artifact-producing step.
   it is remembered, and remembering ends with the session; the next one
   reverts to whatever the files say. Bind the debt to a surface
   something re-reads — the same ledger row or sync record that logs the
-  merge carries it, so the row cannot be closed without deciding port /
-  probe-then-port / deliberately-declined-because. A debt parked only in
+  merge carries it, and the row closes only on the port done or a
+  reasoned decline recorded; probe-then-port keeps it open (or moves the
+  debt to another surface something re-reads). A debt parked only in
   a plan, a summary, or an owed-line nothing re-opens is the
   invalidation-clause failure this file already warns about, wearing a
   different hat.
@@ -759,7 +760,8 @@ default; an AI rewrite does not launder a derivative).
   Provenance.)
   ❌ "the rule is correct and clearly written, so it earns a line."
 - **A file's content contradicts reality and you are about to correct it —
-  first establish whether anything generates that file** (trigger repaired
+  first establish whether anything generates that file, or serves as a
+  source it is maintained from** (trigger repaired
   2026-07-27 after an in-house probe found the original form ineffective; the
   repaired form is `unprobed` — see Provenance). The trigger is that
   observable state — wrong content, correction imminent — never the
@@ -767,8 +769,9 @@ default; an AI rewrite does not launder a derivative).
   the discovery this rule exists to force, so a trigger phrased "where a file
   is compiled from another" fires only when provenance is already known
   (exactly when the rule is least needed) and stays silent when it is not.
-  Where the provenance check finds the file IS compiled from another (a cache
-  over a playbook, a rules file over a spec), the obvious reading of a wrong
+  Where the provenance check finds the file IS derived from another —
+  compiled mechanically or maintained by hand (a cache
+  over a playbook, a rules file over a spec) — the obvious reading of a wrong
   line is that the derivative fell behind — and not necessarily the right
   one. Check whether the SOURCE carries the same wrong
   content first — the identical text, or the source-side value it is
@@ -1154,7 +1157,8 @@ read-the-source rule. All four shipped `unprobed` per the covenant; the
 The §7 read-the-source trigger repair (2026-07-27) comes from the first
 probe run of the four 2026-07-25
 rules above — the covenant's queued probe, run against the merged text
-(n=1 per arm, one weaker-tier executor, screens for a large effect only; a
+(contributor-run and contributor-reported, not linkable; n=1 per arm, one
+weaker-tier executor, screens for a large effect only; a
 first round was discarded because its scenarios leaked the taught
 distinction, and one bare arm was discarded as contaminated by the author's
 own session memory reaching the subagent — a bare arm must be checked for

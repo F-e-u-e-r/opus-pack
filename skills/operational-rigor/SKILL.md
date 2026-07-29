@@ -179,11 +179,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   `git commit -a`/`--all`), which sweeps that
   unreviewed state into your
   commit and publishes edits you have never read under your message. A
-  touched file can itself carry hunks you did not author and the pathspec
-  cannot see inside a file: on such a tree, read the staged diff
+  touched file can itself carry hunks you did not author — or your own
+  from another task — and the pathspec
+  cannot see inside a file: on any tree whose changes exceed this
+  commit's intent, read the staged diff
   (`git diff --staged`) before every commit and commit only when it
-  contains solely the changes this commit intends — yours and belonging
-  here. Unstage what YOU staged beyond that and leave it in the working
+  contains solely the changes this commit
+  intends. Unstage what YOU staged beyond that and leave it in the working
   tree; an index the baseline already carried staged is the user's
   arrangement — stop and surface it rather than unstaging their work or
   committing over it (stashing or committing foreign changes is likewise
@@ -192,9 +194,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   fine — any other state stages by pathspec; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
   time was wasted. Verify before pushing: read every outgoing commit's
-  patch (`git log -p @{u}..` — `git show HEAD` covers only the tip, and
+  patch, measured against the real push destination (`@{push}` or `@{u}`
+  where set, else the base the new branch forks from) and with merge
+  diffs shown — e.g. `git log -p --diff-merges=first-parent <dest>..` —
+  `git show HEAD` covers only the tip, and
   `--stat` alone lists files, not foreign
-  hunks) and confirm only changes you meant to make
+  hunks; confirm only changes you meant to make
   (`unprobed` — see Provenance). Then check you
   are not building on already-merged work: if your
   branch's tip is an ancestor of the upstream default (often origin/main —
