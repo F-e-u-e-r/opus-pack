@@ -611,7 +611,49 @@ default; an AI rewrite does not launder a derivative).
   gaps: what the file fails to make happen. This asks the opposite question,
   before the rule exists — run the scenario twice against the file's target
   executor, as independent fresh invocations (no shared state or history
-  between the arms), once with no rule and once with it. An arm counts only
+  between the arms), once with no rule and once with it. The bare arm is
+  bare of THIS rule, not of the world: it runs in the executor's real
+  baseline — standing global rules, always-loaded caches, whatever the
+  environment ships to every invocation — because that baseline is the
+  live counterfactual for the fold decision, and stripping it makes the
+  probe answer a question nobody asked (does the rule beat a blank
+  model?). Every verdict then inherits the baseline's scope: a bare ✓
+  means redundant IN THAT ENVIRONMENT, not redundant everywhere — a
+  baseline carrying a standing general form of the candidate (a global
+  verify-before-relaying order) fails the specific form's probe locally
+  while the same rule still earns its line wherever no such standing
+  order exists, so record what the baseline contained next to the
+  verdict, and never export a non-discrimination result to an
+  environment with a different baseline.
+  "Target executor" means tier as well as environment: run both arms at
+  the tier the file is written for — the weaker model the file exists to
+  instruct — not the tier the probing session happens to be on. A bare ✓
+  from a stronger arm is a claim only about readers stronger than the
+  ones the file must protect; one downstream consumer's same-fixture
+  tier replication flipped a bare arm 3/3 → 0/3. Record the tier next to
+  each verdict as you record the baseline. The inference runs one way:
+  a strong-arm ruled FAIL still proves the wording ineffective, and a
+  strong-arm bare FAIL still earns the line — but no bare-pass from an
+  arm stronger than the file's audience licenses removing one.
+  ❌ "the bare arm handled it, so the line is redundant" — at which tier?
+  Baseline is not the same as
+  leakage, and the line between them is what the arm would have without
+  YOU: the baseline is what every invocation in that environment ships
+  with, while episodic recall of the very finding under test is
+  contamination — a persistent auto-memory store, a summary of the
+  session that produced the candidate, notes from the run you are
+  probing. That store survives a "fresh invocation", so the
+  no-shared-state requirement above does not catch it: the arm loads the
+  conclusion, restates it, and scores as an unaided reproduction. Frame
+  the bare arm to dodge recall (a generic scenario, no names or phrasing
+  from the finding), instruct it explicitly to disregard prior findings
+  and stored notes, and CHECK the output before the run counts — an arm
+  citing the finding, its vocabulary, or its incident is contaminated
+  and gets re-run, not scored. Ask of each element: would a stranger
+  installing this file have it? Yes → baseline, keep. No → leakage,
+  strip.
+  ❌ a bare arm that "independently reproduced" the rule while quoting
+  the incident that produced it. An arm counts only
   when its run demonstrably met the rule's trigger (ground-truth-gates'
   not-armed discipline: a run that never hit the guarded condition is
   excluded and re-run), and one run per arm screens for a large effect
@@ -625,7 +667,17 @@ default; an AI rewrite does not launder a derivative).
   arm produces it → the rule earns its line; neither arm does → the rule as
   written is ineffective — rewrite or drop it, never fold it in on truth
   alone; only the bare arm produces it → the rule is harmful — dropped, not
-  filed as reference. Eight rules folded into two files over one week were
+  filed as reference. The verdicts are not the whole harvest — read each
+  arm's stated REASONING before writing the fold. A failing bare arm hands
+  you the exact rationalization the folded rule must refute; carry that
+  excuse and its rebuttal into the rule line near-verbatim rather than
+  restating the principle (the excuse is what fires under pressure — the
+  compression bullet below is why the rebuttal must survive). And a
+  passing ruled arm can still over-fire, satisfying the rule by refusing
+  the surrounding task outright; that over-fire is a wording warning, not
+  a win — reword the fold so compliance composes with doing the job
+  (verify FIRST, then proceed), or the folded rule trades one failure
+  mode for another. Eight rules folded into two files over one week were
   probed this way afterwards; three were reproduced unaided. Non-discriminating
   is not the same as wrong — the rule can be true and still not worth its line,
   and that is the judgment the probe is for.
@@ -1055,3 +1107,34 @@ in this repo's history: two dangling section references shipped by one
 author in one day, each written from recall while the correct location sat
 already-quoted in the working context; one reached main and cost the
 maintainer fix commit `8f8413f`.
+The §7 bare-probe bullet's environment-relative-baseline and
+read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
+downstream consumer's first fold probes of this repo's own merged rules (four
+rules probed, pre-registered arms, weaker-tier executor). Two probes produced
+the clauses. A fact-anchoring rule failed to discriminate solely because the
+consumer's global rules file carries a standing verify-before-relaying order —
+the general form of the candidate — so the local verdict (redundant) was real
+there and false anywhere without that baseline: the environment clause. And in
+both discriminating probes the arms' reasoning outlived their verdicts: one
+failing bare arm defended shipping an unverified capability doc with "the
+document didn't lie — it described the intended behavior", which became the
+folded rule's named rebuttal, while one passing ruled arm over-fired and
+refused to produce any plan at all, forcing a reword so compliance composed
+with the task: the reasoning clause. The baseline-versus-leakage clause comes
+from the same consumer's earlier probe round, where subagent bare arms were
+found not to be bare at all: an auto-memory store persisted across the fresh
+invocations and the arms recalled the findings under test, so runs that read
+as unaided reproductions were partly recall — the countermeasures (recall-
+dodging framing, an explicit disregard instruction, and a citation check on
+the output before scoring) were added to the later pre-registrations for that
+reason.
+The §7 tier-inheritance clause (2026-07-28) distills the same downstream
+consumer's tier replication: a fold probe run at the probing session's own
+strong tier returned bare 3/3 on a citation-re-resolve rule ("redundant
+with model capability"); a same-day replication of the same fixture and
+task at a weak tier returned bare 0/3 — every weak arm copied the stale
+citation verbatim, two reporting they had "verified the content
+transferred intact" (byte-fidelity of the copy, the one check that cannot
+catch an already-wrong citation). N=3 per cell, one fixture, one rule.
+All four clauses ship `unprobed` per the covenant; their probes join
+the private round-5 queue.
