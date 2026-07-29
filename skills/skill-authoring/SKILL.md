@@ -312,13 +312,15 @@ artifact-producing step.
   and classify each: retargeted (the local address
   differs), unchanged, or absent-here (the sibling rule does not exist
   locally; delete the pointer — rewriting the sentence to stand without
-  it — or keep a recorded gap; the port note
+  it — or replace it with a non-resolving gap marker, never a live `§N`
+  that resolves locally to unintended content; the port note
   records either, so nothing is dropped silently or left dangling).
   Then record the retargets in the port note as upstream-citation →
   local-target pairs, and each absent-here outcome as delete-or-gap,
   because the edits are now local divergences from
   upstream: unrecorded, the next diff-against-upstream reads your own
-  retargets as drift and a re-sync silently restores the broken numbers.
+  retargets or deletes as drift and a re-sync silently restores the
+  broken pointers.
   The port note is what makes them re-applicable and lets the diff exclude
   them. Done when no citation in the installed copy resolves to a section
   the author did not mean, and every difference from upstream is either
@@ -700,9 +702,10 @@ default; an AI rewrite does not launder a derivative).
   with, while episodic recall of the very finding under test is
   contamination — finding content carried into the arm by a persistent
   auto-memory store, a summary of the session that produced the
-  candidate, or notes from the run you are probing. Such a store
-  survives a "fresh invocation", so the
-  no-shared-state requirement above does not catch it: the arm loads the
+  candidate, or notes from the run you are probing. An auto-memory
+  store in particular
+  survives a "fresh invocation", so the no-shared-state requirement
+  alone does not catch that vector: the arm loads the
   conclusion, restates it, and scores as an unaided reproduction. Frame
   BOTH arms identically to dodge recall (a generic scenario, no names or
   phrasing from the finding), instruct each explicitly to disregard
@@ -1185,7 +1188,8 @@ The §7 bare-probe bullet's environment-relative-baseline and
 read-the-arms'-reasoning clauses (2026-07-27) are class-distilled from one
 downstream consumer's first fold probes of this repo's own merged rules
 (contributor-reported, not linkable; four
-rules probed, pre-registered arms, weaker-tier executor). Two probes produced
+rules probed, pre-registered arms, weaker-tier executor). Three of the
+probes produced
 the clauses. A fact-anchoring rule failed to discriminate solely because the
 consumer's global rules file carries a standing verify-before-relaying order —
 the general form of the candidate — so the local verdict (redundant) was real

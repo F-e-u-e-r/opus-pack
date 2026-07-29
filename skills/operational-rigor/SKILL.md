@@ -175,9 +175,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   migration). That attribution then binds how you COMMIT, not just how you
   read the tree: with pre-existing changes present that you did not author,
   stage by explicit pathspec — `git add <path>` for the files you touched —
-  never `git add -A`/`-u`/`.` or `git commit -a`/`--all`, which sweep that
+  never a stage-everything form (`git add -A`/`--all`/`-u`/`--update`/`.`,
+  `git commit -a`/`--all`), which sweeps that
   unreviewed state into your
-  commit and publish edits you have never read under your message. A
+  commit and publishes edits you have never read under your message. A
   touched file can itself carry hunks you did not author and the pathspec
   cannot see inside a file: on such a tree, read the staged diff
   (`git diff --staged`) before every commit and commit only when it

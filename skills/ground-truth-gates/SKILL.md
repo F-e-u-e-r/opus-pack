@@ -230,8 +230,9 @@ A generic green test is not proof. A gate is real only if:
    fill — a heading, a filename, a field), and sanity-check the grader
    against a known-bad
    arm before trusting a clean sweep: a grader that passes an arm you KNOW
-   failed is the finding, not a formality. Its damage runs opposite to a
-   vacuous green — it manufactures agreement, so an A/B whose arms all pass
+   failed is the finding, not a formality. Its damage is not a vacuous
+   empty run — it manufactures agreement over real input, so an A/B whose
+   arms all pass
    reads as "no effect" and retires a real one. (`unprobed` — contributor
    incident as shape; see Provenance.) Worker-written guard scripts
    especially: item 2's known-broken run applies before trust, no exemption —
