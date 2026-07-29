@@ -57,7 +57,9 @@ artifact-producing step.
   before writing it down. **A wrong runbook is worse than none, because it is
   trusted.** That includes the pointer inside a rule you are writing: a
   cross-reference's section number is a claim about the target file — derive
-  it by opening the file, or from the line a search already quoted, never
+  it by opening the file, or from search output that is current and shows
+  the enclosing heading (a bare quoted body line does not establish its
+  section), never
   from recall of the file's structure. Two mis-targeted §-references were
   written
   by one author in one day, each from memory while the correct location sat
@@ -318,7 +320,10 @@ artifact-producing step.
   that resolves locally to unintended content; the port note
   records either, so nothing is dropped silently or left dangling).
   Then record the retargets in the port note as upstream-citation →
-  local-target pairs, and each absent-here outcome as delete-or-gap,
+  local-target pairs — each carrying its heading or named anchor, since
+  numbers alone go stale on the next renumber; re-resolve anchors on
+  every re-sync rather than replaying numeric pairs — and each
+  absent-here outcome as delete-or-gap,
   because the edits are now local divergences from
   upstream: unrecorded, the next diff-against-upstream reads your own
   retargets or deletes as drift and a re-sync silently restores the
@@ -715,7 +720,8 @@ default; an AI rewrite does not launder a derivative).
   only difference, or the controls confound the probe — and CHECK each
   output before the run counts — an arm
   citing the finding, its distinctive phrasing, or its incident (details
-  the scenario itself did not supply) is contaminated
+  supplied neither by the scenario nor, in the ruled arm, by the
+  candidate rule itself) is contaminated
   and gets re-run, not scored. A clean check bounds only quoted recall —
   influence that never surfaces in the output survives it, so a
   surprising bare-pass from a memory-bearing arm stays suspect, not
@@ -1202,7 +1208,8 @@ probes produced
 the clauses. A fact-anchoring rule failed to discriminate solely because the
 consumer's global rules file carries a standing verify-before-relaying order —
 the general form of the candidate — so the local verdict (redundant) was real
-there and false anywhere without that baseline: the environment clause. And in
+there and not exportable to any environment without that baseline: the
+environment clause. And in
 both discriminating probes the arms' reasoning outlived their verdicts: one
 failing bare arm defended shipping an unverified capability doc with "the
 document didn't lie — it described the intended behavior", which became the

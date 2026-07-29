@@ -194,8 +194,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   fine — any other state stages by pathspec; the baseline is what tells
   you which case you are in, so a baseline read and not applied at commit
   time was wasted. Verify before pushing: read every outgoing commit's
-  patch, measured against the real push destination (`@{push}` or `@{u}`
-  where set, else the base the new branch forks from) and with merge
+  patch, measured against the real push destination (`@{push}` where it
+  resolves; `@{u}` only if it provably names the same destination; an
+  explicit refspec or a new branch means resolving the destination — or
+  the fork base — yourself) and with merge
   diffs shown — e.g. `git log -p --diff-merges=first-parent <dest>..` —
   `git show HEAD` covers only the tip, and
   `--stat` alone lists files, not foreign
