@@ -259,6 +259,34 @@ When rigor conflicts with finishing sooner, rigor wins.
     security-critical clause above (cross-family review + re-gate on
     update), not a lighter pass — that claim seeks standing triggers and
     authority over other components, the trojan's preferred shape.
+- **An env var defined only in an interactive rc file is not loaded in a
+  non-interactive shell** (`unprobed` — contributor incident as shape; see
+  Provenance). `~/.bashrc`, `~/.zshrc`, and their equivalents load only for
+  an interactive shell — a cron job, a launchd job, a hook, or a plain
+  `sh -c`/`zsh -c` invocation never sources them, and unless a parent that
+  DID load them handed the var down, the automation starts without it:
+  `os.environ.get("THE_KEY")` returns `None` there and an unguarded shell
+  `$THE_KEY` expands to empty (the bracket form raises KeyError; `set -u`
+  fails loud). zsh has
+  a non-interactive startup file (`~/.zshenv`) to move it to; bash has no
+  default equivalent (only `$BASH_ENV`, itself opt-in) — where the shell
+  offers no such file, put the var in the automation's own declared
+  environment instead. Before trusting that a var is set where automation
+  will actually run, read it back from that exact invocation shape, not
+  from an interactive terminal.
+  ❌ "exported the key to `~/.zshrc`, it works in my terminal, ship it" — a
+  cron job invoking the same script gets an unset variable.
+- **An append-style "run this once per credential" instruction is wrong for
+  an env-var assignment line** (`unprobed` — contributor incident as shape;
+  see Provenance). `KEY=a` followed by `KEY=b` appended below it leaves only
+  the shell's last assignment live; the rest are silently discarded, with no
+  error at write time or read time. Collect every value first and write the
+  var exactly once, in the form its consumer expects (a serialized list, or
+  distinct per-credential names) — never let the shell silently pick one;
+  where values already landed as repeated assignments, resolve them into
+  that form rather than trusting whichever one the shell resolves.
+  ❌ "run `printf 'export KEY=%s\n' \"$k\" >> ~/.zshenv` once per key" —
+  the file gains N lines, the shell keeps 1.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
   replan. Before every retry, including the first, fill "attempt N failed because
   ___" with a mechanism; if it will not fill, reproduce the failure in isolation.
@@ -782,6 +810,17 @@ scope habit". It complements rather than contradicts the surrounding
 per-invocation rules: those stop an approval from reaching FORWARD to
 unsurfaced work, this one stops it from being silently trimmed BACKWARD.
 Ships `unprobed` per the covenant.
+The §2 non-interactive-shell rule and its append-key companion (2026-07-30)
+come from a contributor incident (contributor-reported, not linkable), two
+separate failure modes on the same underlying file. A key exported from the
+interactive startup file worked from a terminal and was silently unset for
+every non-interactive invocation of the same script (cron, a hook, a plain
+`sh -c`) until moved to the non-interactive one. The append-key trap
+surfaced in the same session: a "run this append command once per
+credential" instruction, followed three times, produced three assignment
+lines for the same variable — the shell kept only the last, discarding the
+other two with no error at write time or read time. Both ship `unprobed`
+per the covenant; their probes join the private round-5 queue.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

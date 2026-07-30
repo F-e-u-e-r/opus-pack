@@ -111,6 +111,22 @@ those extremes, compare the pre-registered per-arm scores (arms clearing a
 shared gate at different scores is still a result). Grade blind to which
 arm produced each output.
 
+The same calibration discipline applies within one arm across time
+(`unprobed` — contributor incident as shape; see Provenance). A
+stochastic subject — a model, a scheduler, a network path, anything whose
+output can differ on identical input — has a distribution, and a single
+full-marks sweep shows it CAN pass, not that it does; "stable", "no
+regression" and "matches baseline" are all claims about that distribution.
+Replicate before such a claim leaves your notes, and where an arm was not
+replicated, carry its run count beside its score so a lone sweep cannot read
+as a measurement. Every claimed run needs a persisted row of its own: a run
+quoted from recall, or one whose output the next run overwrote, cannot be
+re-checked and is not a run — publishing four while one is on disk is how an
+unreplicated result becomes an unfalsifiable one.
+❌ "30/30, no thinking step — make it the default." Replicated to N=4 the
+same candidate scored 30/30/20/29, failing twice by mechanisms the first run
+never produced.
+
 **replay:** replace `replay/corpus.jsonl` with a representative sample of
 real logged inputs. Replace `transform()` with the step being changed. Run
 `node replay/run.mjs --update` once to freeze current behavior — and eyeball
@@ -329,6 +345,23 @@ A generic green test is not proof. A gate is real only if:
    ❌ "the holiday tests pass" — they assert the list has the right count and
    types, never that any date is the right day; a fat-fingered edit to one
    date stays green.
+9. **Independence across N things is a pairwise claim** (`unprobed` —
+   contributor incident as shape; see Provenance). Where a gate rests on N
+   items being independent — separate rate-limit buckets, separate failure
+   domains, separate credentials, separate blast radii — establishing that
+   takes all N(N-1)/2 comparisons, or a directly-read partition (each item's
+   owning account queried from the provider) that replaces the comparisons
+   rather than shortening them. Exhausting one item and watching the other
+   N-1 survive proves only that each is outside THAT one's bucket, and says
+   nothing about whether the remaining N-1 share a bucket with each other:
+   the probe returns the same reading for N genuinely separate items as for
+   one separate item plus N-1 that are all the same, so a baseline-vs-all
+   measurement supports a 2x claim while presenting as Nx. Transitivity does
+   not rescue it — sharing a bucket is transitive, not-sharing is not, so a
+   reader who correctly identifies the property as transitive still owes
+   every pair.
+   ❌ "key 0 hit its limit and keys 1-3 kept serving — four independent
+   accounts, 4x throughput." Keys 1-3 were never tested against each other.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -532,5 +565,23 @@ maintenance ledger pointing at paths that no longer existed. The criteria
 had genuinely been frozen before each run, which is the point: nothing that
 survived could show it. Ships `unprobed` per the covenant; its probe joins
 the private round-5 queue.
+Item 9 (pairwise independence; 2026-07-30) comes from a contributor incident
+(contributor-reported, not linkable). Four API keys were probed for separate
+rate-limit accounting by exhausting the first alone and observing the other
+three keep serving; the finding published "four independent organizations, 4x
+throughput", which that probe cannot support. A fresh-context review caught
+the inference and the pairwise re-measure came back 6/6 — the conclusion was
+right and the method was not, which is the shape worth recording, since a
+lucky confirmation is what keeps the method in use. Ships `unprobed` per the
+covenant; its probe joins the private round-5 queue.
+The single-arm replication clause under the experiment-grader rules
+(2026-07-30) comes from a contributor's model battery (contributor-reported,
+not linkable). A model written up at N=1 as "30/30, no thinking step, the
+default for anything" scored 30/30/20/29 once replicated to N=4 — an invalid
+emitted regex that threw, and a null-handling edge case — and was retracted
+as a default; a second model in the same battery moved from 4/4 to 3/4 the
+same way, its control green on the failing run. The same write-up had
+quoted four runs while only one was on disk. Ships `unprobed` per the
+covenant; its probe joins the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
