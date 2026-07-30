@@ -362,6 +362,33 @@ A generic green test is not proof. A gate is real only if:
    every pair.
    ❌ "key 0 hit its limit and keys 1-3 kept serving — four independent
    accounts, 4x throughput." Keys 1-3 were never tested against each other.
+10. **A green suite names the artifact it exercised** (`unprobed` — contributor
+   incident as shape; see Provenance). A suite reaches its subject by name — an
+   import, a `PATH` lookup, a package entry — and that name can resolve to a
+   copy other than the one you edited: a file left behind at a previous
+   location, an installed version shadowing the working tree, a build output
+   stale by one step. Every assertion then passes honestly, about an artifact
+   nobody chose. This is operational-rigor §4's run-attribution rule made a
+   standing property of the suite: there, a cited run is traced to the change
+   once, when it is cited; here the suite re-establishes its own subject on
+   every run, because a shadowing copy can reappear after any later move,
+   install, or sync. It is neither item 3's never-registered test (that one
+   never runs) nor item 2's failed load (that one throws, and the scorecard
+   looks wrong): here the code runs to completion and the scorecard is real,
+   so the green is evidence — about whatever the edit did not touch. Assert
+   that the location the running subject reports for itself (`__file__`, the
+   loaded module's path, the running process's own resolved path) equals the
+   path you changed. That match already proves nothing shadowed it in THIS
+   resolution — a shadow would have won and the paths would differ — so what
+   it leaves open is the contexts that resolve differently: a suite that
+   prepends the repo root to the search path finds your copy while production
+   resolves the installed one. Assert the shadow's absence where the
+   production lookup would reach it, and prefer running the suite through
+   that same lookup. Done when pointing the suite at the wrong copy fails it,
+   demonstrated once by execution.
+   ❌ "all 30 checks pass after the move" — they would have passed identically
+   against the pre-move copy still sitting in the old directory, which is why
+   the count says nothing about the move.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -421,6 +448,39 @@ enforces one at runtime — and has its own failure design:
   path fails open today — a disclosed gap." ❌ "the hook is flaky and blocks my
   commands, so I'll make it fail-open" — that converts a guard into a
   rationalized bypass.
+- **A detector's positives come from the corpus it will guard, not from the
+  author's examples of them** (`unprobed` — two contributor incidents as shape;
+  see Provenance). A guard that classifies real material — a secret scanner, a
+  redactor, a quality or corruption check — is written beside the positives its
+  author pictured, and those are the ones it gets tried against. The miss is
+  silent and total: it passes the exposed-path check above, it fires on the
+  author's examples, and it still catches nothing the live corpus holds. Two
+  shapes seen. A matcher whose *form* excludes every real instance: an
+  assignment pattern written lowercase where every credential on the host is
+  uppercase, reporting clean across all of them. And a score measured at the
+  wrong *granularity*: a repetition check keyed on the most frequent single
+  token where the corruption is a repeated multi-word phrase — a transcript
+  roughly one third watermark junk scored 0.078 against a 0.30 threshold, and
+  summaries of it shipped for weeks. Granularity is the harder shape, and not
+  simply a mistuned threshold: the author's synthetic single-token repetition
+  clears any threshold easily, which is what made the check look sound; the
+  phrase also moves the statistic, so its score is not zero, but it lands
+  inside the band ordinary prose already produces — one common token is a few
+  percent of ordinary text — so no threshold separates the real positive from
+  clean material and tuning cannot rescue it. The golden-gate rules above on
+  how cases are captured — drawn from the real corpus, provenance recorded,
+  hard negatives included, never a hand-written "plausible" row — govern a
+  guard's validation samples the same way: the positive comes from the corpus
+  the guard will face, never written by hand. Before enabling, confirm it
+  fires on that positive — and
+  where the guard scores rather than matches, confirm the score clears the
+  threshold, since a real positive scoring a tenth of the threshold is a
+  failure wearing the look of a margin — then confirm a captured clean sample
+  does not fire. Done when both directions are shown against captured material
+  and that positive is kept as the guard's regression case.
+  ❌ "it flags my test key, so the scanner works" — the test key is the shape
+  you already had in mind; the question is whether it flags the ones that are
+  actually there.
 - **A relief valve is a pre-existing, owner-designed, friction-plus-log override
   — never one an agent invents to unblock itself**, and never added to a control
   the owner designated non-bypassable (an immutable policy-checker). Security /
@@ -583,5 +643,33 @@ as a default; a second model in the same battery moved from 4/4 to 3/4 the
 same way, its control green on the failing run. The same write-up had
 quoted four runs while only one was on disk. Ships `unprobed` per the
 covenant; its probe joins the private round-5 queue.
+Item 10 (subject identity; 2026-07-30) comes from a contributor incident
+(contributor-reported, not linkable). A utility module was moved into a shared
+library directory and its suite passed 30/30 afterwards — but nothing asserted
+the module's own `__file__`, so the same 30 would have passed against the copy
+still sitting in the old directory; a fresh-context review found the hole and
+the suite grew a canonical-path plus no-shadowing-copy check (32/32). Scoped
+honestly: the review caught it before it certified a wrong artifact, so the
+harm — a green run reported for code that was never exercised — is reasoned
+from the mechanism, not observed. It is placed as its own item rather than
+folded into operational-rigor §4 because the remedy differs in kind: §4 traces
+a run to a change at citation time, this asserts the subject inside the suite
+on every run. Ships `unprobed` per the covenant; its probe joins the private
+round-5 queue.
+The detector-positives bullet under "Designing the guard itself" (2026-07-30)
+comes from two contributor incidents in one environment (contributor-reported,
+not linkable), which is why it is stated as a class rather than as either
+symptom. A credential scanner's assignment-tier pattern was written lowercase
+while every credential on that host is uppercase, so it reported clean across
+all of them; it was caught before deployment by trying it against a known-live
+key. A meeting-summary pipeline's corruption check scored the most frequent
+single token where the real corruption is a repeated multi-word phrase; a
+transcript that was roughly one third watermark junk scored 0.078 against a
+0.30 threshold and passed, and summaries derived from such transcripts were
+published for weeks before the mismatch was diagnosed — the observed half of
+the pair. A cross-family review of this addition corrected its first draft,
+which claimed a token statistic "can never fire" on a phrase: the statistic
+does respond, and the real barrier is separability, not response. Ships
+`unprobed` per the covenant; its probe joins the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
