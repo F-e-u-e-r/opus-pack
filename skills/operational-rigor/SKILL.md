@@ -259,12 +259,14 @@ When rigor conflicts with finishing sooner, rigor wins.
     security-critical clause above (cross-family review + re-gate on
     update), not a lighter pass — that claim seeks standing triggers and
     authority over other components, the trojan's preferred shape.
-- **An env var set for a login/interactive shell is unset in every
-  non-interactive one** (`unprobed` — contributor incident as shape; see
+- **An env var defined only in an interactive rc file is not loaded in a
+  non-interactive shell** (`unprobed` — contributor incident as shape; see
   Provenance). `~/.bashrc`, `~/.zshrc`, and their equivalents load only for
   an interactive shell — a cron job, a launchd job, a hook, or a plain
-  `sh -c`/`zsh -c` invocation never sources them, so `os.environ["THE_KEY"]`
-  (or its shell equivalent) silently reads empty outside a terminal. zsh has
+  `sh -c`/`zsh -c` invocation never sources them, and unless a parent that
+  DID load them handed the var down, the automation starts without it:
+  `os.environ.get("THE_KEY")` and an unguarded shell `$THE_KEY` read empty
+  there (the bracket form raises KeyError; `set -u` fails loud). zsh has
   a non-interactive startup file (`~/.zshenv`) to move it to; bash has no
   default equivalent (only `$BASH_ENV`, itself opt-in) — where the shell
   offers no such file, put the var in the automation's own declared
@@ -278,8 +280,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   see Provenance). `KEY=a` followed by `KEY=b` appended below it leaves only
   the shell's last assignment live; the rest are silently discarded, with no
   error at write time or read time. Collect every value first and write the
-  var exactly once; where values already landed as repeated appends, de-dupe
-  and rewrite the line rather than trusting whichever one the shell resolves.
+  var exactly once, in the form its consumer expects (a serialized list, or
+  distinct per-credential names) — never let the shell silently pick one;
+  where values already landed as repeated assignments, resolve them into
+  that form rather than trusting whichever one the shell resolves.
   ❌ "run `printf 'export KEY=%s\\n' \"$k\" >> ~/.zshenv` once per key" —
   the file gains N lines, the shell keeps 1.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
