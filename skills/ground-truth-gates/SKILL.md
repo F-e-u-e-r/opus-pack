@@ -329,6 +329,23 @@ A generic green test is not proof. A gate is real only if:
    ❌ "the holiday tests pass" — they assert the list has the right count and
    types, never that any date is the right day; a fat-fingered edit to one
    date stays green.
+9. **Independence across N things is a pairwise claim** (`unprobed` —
+   contributor incident as shape; see Provenance). Where a gate rests on N
+   items being independent — separate rate-limit buckets, separate failure
+   domains, separate credentials, separate blast radii — establishing that
+   takes all N(N-1)/2 comparisons, or a directly-read partition (each item's
+   owning account queried from the provider) that replaces the comparisons
+   rather than shortening them. Exhausting one item and watching the other
+   N-1 survive proves only that each is outside THAT one's bucket, and says
+   nothing about whether the remaining N-1 share a bucket with each other:
+   the probe returns the same reading for N genuinely separate items as for
+   one separate item plus N-1 that are all the same, so a baseline-vs-all
+   measurement supports a 2x claim while presenting as Nx. Transitivity does
+   not rescue it — sharing a bucket is transitive, not-sharing is not, so a
+   reader who correctly identifies the property as transitive still owes
+   every pair.
+   ❌ "key 0 hit its limit and keys 1-3 kept serving — four independent
+   accounts, 4x throughput." Keys 1-3 were never tested against each other.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -532,5 +549,14 @@ maintenance ledger pointing at paths that no longer existed. The criteria
 had genuinely been frozen before each run, which is the point: nothing that
 survived could show it. Ships `unprobed` per the covenant; its probe joins
 the private round-5 queue.
+Item 9 (pairwise independence; 2026-07-30) comes from a contributor incident
+(contributor-reported, not linkable). Four API keys were probed for separate
+rate-limit accounting by exhausting the first alone and observing the other
+three keep serving; the finding published "four independent organizations, 4x
+throughput", which that probe cannot support. A fresh-context review caught
+the inference and the pairwise re-measure came back 6/6 — the conclusion was
+right and the method was not, which is the shape worth recording, since a
+lucky confirmation is what keeps the method in use. Ships `unprobed` per the
+covenant; its probe joins the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
