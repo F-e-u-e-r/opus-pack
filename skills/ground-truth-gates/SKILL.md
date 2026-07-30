@@ -111,7 +111,8 @@ those extremes, compare the pre-registered per-arm scores (arms clearing a
 shared gate at different scores is still a result). Grade blind to which
 arm produced each output.
 
-The same calibration discipline applies within one arm across time. A
+The same calibration discipline applies within one arm across time
+(`unprobed` — contributor incident as shape; see Provenance). A
 stochastic subject — a model, a scheduler, a network path, anything whose
 output can differ on identical input — has a distribution, and a single
 full-marks sweep shows it CAN pass, not that it does; "stable", "no
