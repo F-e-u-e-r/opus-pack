@@ -265,8 +265,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   an interactive shell — a cron job, a launchd job, a hook, or a plain
   `sh -c`/`zsh -c` invocation never sources them, and unless a parent that
   DID load them handed the var down, the automation starts without it:
-  `os.environ.get("THE_KEY")` and an unguarded shell `$THE_KEY` read empty
-  there (the bracket form raises KeyError; `set -u` fails loud). zsh has
+  `os.environ.get("THE_KEY")` returns `None` there and an unguarded shell
+  `$THE_KEY` expands to empty (the bracket form raises KeyError; `set -u`
+  fails loud). zsh has
   a non-interactive startup file (`~/.zshenv`) to move it to; bash has no
   default equivalent (only `$BASH_ENV`, itself opt-in) — where the shell
   offers no such file, put the var in the automation's own declared
@@ -284,7 +285,7 @@ When rigor conflicts with finishing sooner, rigor wins.
   distinct per-credential names) — never let the shell silently pick one;
   where values already landed as repeated assignments, resolve them into
   that form rather than trusting whichever one the shell resolves.
-  ❌ "run `printf 'export KEY=%s\\n' \"$k\" >> ~/.zshenv` once per key" —
+  ❌ "run `printf 'export KEY=%s\n' \"$k\" >> ~/.zshenv` once per key" —
   the file gains N lines, the shell keeps 1.
 - **Two-failure rule:** after two consecutive failures of the same step, stop and
   replan. Before every retry, including the first, fill "attempt N failed because
