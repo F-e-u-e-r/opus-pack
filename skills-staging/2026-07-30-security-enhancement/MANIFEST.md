@@ -116,9 +116,13 @@ rule (e.g. the mutation core principle → `ground-truth-gates`; OPS stop condit
 → `delegation-and-review`/`cross-model-review`) rather than re-asserting it — noting
 that OPS-1/OPS-5 TIGHTEN those canonical rules for this campaign (a hard cap, a
 human-authorization gate) rather than purely restating them; a tightening that
-composes with the canonical rule owes no new probe. If a
-future edit turns any of these into a standalone behavioral claim, that edit owes
-the covenant's probe-or-`unprobed` marker.
+composes with the canonical rule owes no new probe. Of the twelve OPS rules,
+OPS-2/6/8/9/10/11 have no canonical counterpart and each already carries an
+in-body `(unprobed — project observation, no probe)` marker (probe debt tracked
+in issue #105); OPS-1/3/4/5/7/12 cite and defer to a canonical rule. If a
+future edit turns any of the deferring rules into a standalone behavioral
+claim, that edit owes the covenant's probe-or-`unprobed` marker in the same
+way.
 
 ## Re-verification
 
