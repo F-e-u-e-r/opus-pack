@@ -607,10 +607,11 @@ This pack distills and adapts ideas from:
   retention keyed on what a reader can reconstruct, same-attempt/
   same-failure-only merging, labelled elisions with working retrieval
   steps, and the spot-check-what-was-dropped audit duty
-  (`delegation-and-review` §5). From the security product's completion
-  and comparison rules: the costumed-as-completion shapes a blocked run
-  refuses (`delegation-and-review` §2), absence-is-not-resolution for
-  recurring review campaigns (`references/recurring-sweep-ledgers.md`),
+  (`delegation-and-review` §5). From the security product's completion,
+  comparison, and release-pipeline rules: the costumed-as-completion
+  shapes a blocked run refuses (`delegation-and-review` §2),
+  absence-is-not-resolution for recurring review campaigns
+  (`references/recurring-sweep-ledgers.md`),
   convergence-raises-priority-not-status (`cross-model-review` §3), and
   consumer-position verification (`operational-rigor` §4).
 - **Sahir619** —

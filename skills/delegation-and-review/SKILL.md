@@ -732,20 +732,27 @@ reviewers that they silently absorb as implementers.
   lines it saved — paid by a reader with less context than you have now.
 - **Collapsing repetition may reduce volume, never variety** (`unprobed`
   — see Provenance). Merge repeated failed attempts into one line only
-  when they are the SAME attempt failing the SAME way — same operation
-  and target AND same error: identical error text on different
-  operations is coincidence, not repetition, and distinct errors under
-  one repeated command never merge. Distinct failures each keep their
-  own line; the merged line keeps a reference to the last attempt (the
-  state the loop converged to); and when in doubt, under-collapse — a
-  reader skims redundancy easily but cannot recover a distinct error
-  the merge hid.
-- **Every elision is labelled and recoverable; a lossy record carries an
-  audit path** (`unprobed` — see Provenance). An omission marker names
-  what was dropped, of what kind, and how much, and includes a
-  retrieval step that works exactly as printed. Before relying on a
-  compressed record, spot-check what the compression dropped — a
-  sample catches category-level loss, never everything, so treat any
+  when they are CONSECUTIVE and the SAME attempt failing the SAME way —
+  same operation and target AND same error: identical error text on
+  different operations is coincidence, not repetition; distinct errors
+  under one repeated command never merge; and an intervening success, a
+  different operation, or any rendered event between attempts breaks
+  the group — two matching failures either side of a success are two
+  stories, not one. Distinct failures each keep their own line; the
+  merged line carries the count and a reference to the last attempt
+  (the state the loop converged to); and when in doubt, under-collapse
+  — a reader skims redundancy easily but cannot recover a distinct
+  error, or a hidden mid-run success, that the merge swallowed.
+- **Every elision is labelled; a recoverable one names its retrieval, a
+  deliberate removal names its reason** (`unprobed` — see Provenance).
+  An omission marker names what was dropped, of what kind, and how
+  much, and includes a retrieval step that works exactly as printed —
+  EXCEPT content removed for cause (a secret, personal data, material
+  a retention policy deletes), which is labelled `redacted — <reason>`
+  with no retrieval step: recoverability serves lossy compression, it
+  never undoes deliberate removal. Before relying on a compressed
+  record, spot-check what the compression dropped — a sample can
+  reveal category-level loss, never rule it out, so treat any
   load-bearing hit as reason to re-cut, and never present the sample
   as proof of losslessness — operational-rigor §4's
   labelled-degraded-fallback duty applied to your own summaries, whose
@@ -1048,9 +1055,11 @@ distill a two-repo mining pass over public Apache-2.0 sources (ideas
 only, no text; see README acknowledgements): a session-transcript
 compression tool's decision records — retention keyed on what a reader
 can reconstruct rather than on success/failure; same-failure-only
-merging, whose first version lacked that condition and could hide a
-distinct earlier error behind the last one until an adversarial review
-caught it pre-release; honest, executable omission markers; and an
+merging (that tool's own decision record notes its first shipped
+version lacked the condition and could hide a distinct earlier error
+behind the last one, caught by an adversarial review before release —
+the incident is theirs, adopted here as the rule's motivation); honest,
+executable omission markers; and an
 audit mode that samples what compression dropped — and an agentic
 security-scanning product's completion rules — the named fake-success
 shapes a blocked run must refuse (schema-satisfying output included),

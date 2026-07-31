@@ -66,17 +66,23 @@ only when the ledger reflects every touched finding's current state —
 a round that surfaced anything never closes on an unchanged ledger.
 
 **Absence is not resolution** (`unprobed` — carried by the skill's
-2026-07-31 Provenance entry). An OPEN or UNRESOLVED entry that this
-round's report simply does not mention stays exactly where it is: an
-entry moves only on evidence addressed to it — a re-examination of its
-locus, provably inside the round's covered set, showing the claimed
-defect no longer holds there (→ PRIOR FIXES, with that evidence); a
-counterexample refuting the claim (→ REFUTED FINDING-CLASSES); or an
-identity match establishing it duplicates another tracked entry. A
-changed locus alone is none of these — changed code can still carry
-the defect. A round whose coverage never reached the entry's location
-has said nothing about it; silence downgrades nothing, however many
-rounds it repeats across.
+2026-07-31 Provenance entry). An OPEN FINDINGS or UNRESOLVED entry
+that this round's report simply does not mention stays exactly where
+it is: an entry moves only on evidence addressed to it, and each state
+has its own exits. An OPEN FINDINGS entry (a confirmed defect) moves
+to PRIOR FIXES only on re-examination of its locus, provably inside
+the round's covered set, showing the confirmed defect no longer holds
+there — with that evidence recorded. An UNRESOLVED entry (never
+confirmed) can never become a prior fix — there is no confirmed defect
+to have fixed; a counterexample addressing its original claim moves it
+to REFUTED FINDING-CLASSES, and anything less leaves it UNRESOLVED.
+Either kind, shown to duplicate another tracked entry by an identity
+match (claim + location + judged-against set), folds under the
+canonical entry as a pointer-annotated line per the supersession rule
+above. A changed locus alone is none of these — changed code can
+still carry the defect. A round whose coverage never reached the
+entry's location has said nothing about it; silence downgrades
+nothing, however many rounds it repeats across.
 Write-backs of one campaign serialize: a round's
 write-back completes before the next round dispatches; concurrent
 writers over one ledger follow §4's edit-conflict rule (re-read,
