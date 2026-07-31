@@ -70,19 +70,24 @@ a round that surfaced anything never closes on an unchanged ledger.
 that this round's report simply does not mention stays exactly where
 it is: an entry moves only on evidence addressed to it, and each state
 has its own exits. An OPEN FINDINGS entry (a confirmed defect) moves
-to PRIOR FIXES only on re-examination of its locus, provably inside
-the round's covered set, showing the confirmed defect no longer holds
-there — with that evidence recorded. An UNRESOLVED entry (never
+to PRIOR FIXES only on re-examination of its locus showing the
+confirmed defect no longer holds there — with the covering evidence
+(which round, which check) named in the entry. An UNRESOLVED entry
+(never
 confirmed) can never become a prior fix — there is no confirmed defect
 to have fixed; a counterexample addressing its original claim moves it
 to REFUTED FINDING-CLASSES, and anything less leaves it UNRESOLVED.
 Either kind, shown to duplicate another tracked entry by an identity
 match (claim + location + judged-against set), folds under the
 canonical entry as a pointer-annotated line per the supersession rule
-above. A changed locus alone is none of these — changed code can
+above. An entry whose locus no longer exists — the code removed, the
+feature deleted — closes as OBSOLETE with the removal evidence
+recorded: the one exit that examines an absence rather than a living
+locus. A changed locus alone is none of these — changed code can
 still carry the defect. A round whose coverage never reached the
 entry's location has said nothing about it; silence downgrades
 nothing, however many rounds it repeats across.
+
 Write-backs of one campaign serialize: a round's
 write-back completes before the next round dispatches; concurrent
 writers over one ledger follow §4's edit-conflict rule (re-read,

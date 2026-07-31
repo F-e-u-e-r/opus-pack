@@ -442,12 +442,14 @@ When rigor conflicts with finishing sooner, rigor wins.
 - **Verify delivery from the consumer's position** (`unprobed` — see
   Provenance). A check that passes while you hold the producer's
   credentials, caches, or working state proves the producer's view, not
-  what a consumer receives: drop the producer's privileges, leave your
-  own state aside, and re-read the artifact from its destination with
-  the CONSUMER'S credentials and state — for a public artifact, none of
-  yours. The same asymmetry covers configuration: a limit or
-  flag you WROTE is evidence of intent — what actually ran is
-  established by observing execution, never by reading the setting back.
+  what a consumer receives: re-read the artifact from its destination
+  from a context that never held those privileges — a fresh
+  unauthenticated client for a public artifact, a test principal in
+  the consumer's role otherwise; never by logging out of or revoking
+  your own live credentials, and never with a real user's. The same
+  asymmetry covers configuration: a limit or flag you WROTE is
+  evidence of intent — reading it back proves the write landed, while
+  only observed execution proves anything ran.
   ❌ "the registry shows the package because I pushed it" — checked while
   still logged in as the publisher.
 - **Tool output can itself be forged — verify a material mutation with a
