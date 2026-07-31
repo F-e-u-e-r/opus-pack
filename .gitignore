@@ -4,5 +4,17 @@ guideline *.txt
 .claude/
 evals/
 internal/
-skills-staging/
+# Staging zone: local material is ignored by default; a delivered library is
+# whitelisted per directory once it ships via a reviewed PR (policy: #98).
+skills-staging/*
+!skills-staging/2026-07-30-starledger-retro/
+!skills-staging/2026-07-30-campaign-ops/
+!skills-staging/2026-07-30-security-enhancement/
 pack-eval-artifacts/
+# Private session transcripts are never tracked (#100). Convention for future
+# transcript drops: put them under transcripts/ (ignored wholesale), or name
+# a root-level one-off *.transcript.md. The two named files predate the rule.
+/chat-history.md
+/security-enhancement.md
+/transcripts/
+/*.transcript.md
