@@ -721,15 +721,15 @@ reviewers that they silently absorb as implementers.
   the outcome, expand any shorthand you coined mid-task, and shorten by
   dropping low-impact items — never by compressing sentences into fragments.
 - **Compress a handoff by re-derivability, not by success/failure**
-  (`unprobed` — see Provenance). What the next reader can reconstruct
+  (`unprobed` — see Provenance). What the next reader can re-derive
   alone — file contents still on disk, listings a command re-produces —
   compresses hardest; what exists only in this run's history — error
-  output, external responses, one-shot logs — is least safe to drop,
-  whether or not the step succeeded. Thin summaries do not fail
-  gracefully: an under-informative handoff sends the reader into
-  exploratory digging (many probes to recover what one retained line
-  would have said), so over-trimming costs more downstream than the
-  lines it saved — paid by a reader with less context than you have now.
+  output, external responses, one-shot logs — is what a reader can
+  least afford to lose, whether or not the step succeeded. Thin
+  summaries do not fail gracefully: an under-informative handoff sends
+  the reader hunting — many probes to recover what one retained line
+  would have said — so over-trimming costs more downstream than the
+  lines it saved, paid by a reader with less context than you have now.
 - **Collapsing repetition may reduce volume, never variety** (`unprobed`
   — see Provenance). Merge repeated failed attempts into one line only
   when they are CONSECUTIVE and the SAME attempt failing the SAME way —
@@ -739,10 +739,11 @@ reviewers that they silently absorb as implementers.
   different operation, or any rendered event between attempts breaks
   the group — two matching failures either side of a success are two
   stories, not one. Distinct failures each keep their own line; the
-  merged line carries the count and a reference to the last attempt
-  (the state the loop converged to); and when in doubt, under-collapse
-  — a reader skims redundancy easily but cannot recover a distinct
-  error, or a hidden mid-run success, that the merge swallowed.
+  merged line carries the count and a reference to the final attempt
+  (the end state the retries landed on); and when in doubt, keep the
+  lines separate — a reader skims redundancy easily but cannot recover
+  a distinct error, or a hidden mid-run success, that the merge
+  swallowed.
 - **Every elision is labelled; a recoverable one names its retrieval, a
   deliberate removal names its reason** (`unprobed` — see Provenance).
   An omission marker names what was dropped, of what kind, and how
@@ -1052,9 +1053,9 @@ README covenant's second branch; no in-repo probe has run — in-body
 The §5 handoff-compression bullets, the §2 blocked-substitutes clause,
 and the ledger reference's absence-is-not-resolution rule (2026-07-31)
 distill a two-repo mining pass over public Apache-2.0 sources (ideas
-only, no text; see README acknowledgements): a session-transcript
-compression tool's decision records — retention keyed on what a reader
-can reconstruct rather than on success/failure; same-failure-only
+only, adapted wording; see README acknowledgements): a
+session-transcript compression tool's decision records — retention
+keyed on re-derivability rather than on success/failure; same-failure-only
 merging (that tool's own decision record notes its first shipped
 version lacked the condition and could hide a distinct earlier error
 behind the last one, caught by an adversarial review before release —

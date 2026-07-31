@@ -604,9 +604,9 @@ This pack distills and adapts ideas from:
   (both Apache-2.0; ideas only, no text — the same pass's
   `security-architect` batch carries its own entry). From the
   compression tool's decision records:
-  retention keyed on what a reader can reconstruct, same-attempt/
-  same-failure-only merging, labelled elisions with working retrieval
-  steps, and the spot-check-what-was-dropped audit duty
+  retention keyed on re-derivability, same-attempt/same-failure-only
+  merging, labelled elisions with working retrieval steps, and the
+  spot-check-what-was-dropped audit duty
   (`delegation-and-review` §5). From the security product's completion,
   comparison, and release-pipeline rules: the costumed-as-completion
   shapes a blocked run refuses (`delegation-and-review` §2),
