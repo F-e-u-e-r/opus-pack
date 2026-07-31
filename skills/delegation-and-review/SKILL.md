@@ -421,7 +421,13 @@ Every packet names:
   work and the persisted record — a write-capable worker still self-fixes and
   reports, it does not persist to shared history), nor weaken gates or revert
   unrelated work; report
-  blockers and failures plainly. Plausible success is worse than honest failure.
+  blockers and failures plainly. Plausible success is worse than honest failure —
+  and when blocked, the polished substitutes are refused BY SHAPE: a
+  plausible final report, an output that merely satisfies the required
+  schema, a fabricated empty/"no findings" result, plausible-looking
+  metrics — each reads as completion downstream; a blocked task returns
+  recorded progress plus the blocker, and nothing shaped like success
+  (`unprobed` — see Provenance).
   For an implementation task, after bounded discovery (interfaces read, ambiguity
   resolved), require a concrete artifact by an early checkpoint — a reproduced
   failing test or an evidence-backed implementation note counts; production edits
@@ -712,6 +718,31 @@ reviewers that they silently absorb as implementers.
 - The final summary is for a reader who watched none of the work: lead with
   the outcome, expand any shorthand you coined mid-task, and shorten by
   dropping low-impact items — never by compressing sentences into fragments.
+- **Compress a handoff by re-derivability, not by success/failure**
+  (`unprobed` — see Provenance). What the next reader can reconstruct
+  alone — file contents still on disk, listings a command re-produces —
+  compresses hardest; what exists only in this run's history — error
+  output, external responses, one-shot logs — is least safe to drop,
+  whether or not the step succeeded. Thin summaries do not fail
+  gracefully: an under-informative handoff sends the reader into
+  exploratory digging (many probes to recover what one retained line
+  would have said), so over-trimming costs more downstream than the
+  lines it saved — paid by a reader with less context than you have now.
+- **Collapsing repetition may reduce volume, never variety** (`unprobed`
+  — see Provenance). Merge repeated failed attempts into one line only
+  when they failed the SAME way — same error, not merely the same
+  command. Distinct failures each keep their own line; the merged line
+  keeps a reference to the last attempt (the state the loop converged
+  to); and when in doubt, under-collapse — a reader skims redundancy
+  easily but cannot recover a distinct error the merge hid.
+- **Every elision is labelled and recoverable; a lossy record carries an
+  audit path** (`unprobed` — see Provenance). An omission marker names
+  what was dropped, of what kind, and how much, and includes a
+  retrieval step that works exactly as printed. Before relying on a
+  compressed record, sample what the compression dropped and check
+  nothing load-bearing was lost — operational-rigor §4's
+  labelled-degraded-fallback duty applied to your own summaries, whose
+  reader cannot distrust a removal it was never shown.
 - Unattended loops need written stop conditions first: touch scope, turn/spend
   cap, done command, required record, and human-pull condition. End at a
   deterministic boundary, never because the model feels finished.
@@ -1004,6 +1035,24 @@ above (empty input → confident synthesis) and the settled-tree bullet
 non-empty, confidently wrong leads. Private evidence, cited as shape per the
 README covenant's second branch; no in-repo probe has run — in-body
 `unprobed` marker.
+The §5 handoff-compression bullets, the §2 blocked-substitutes clause,
+and the ledger reference's absence-is-not-resolution rule (2026-07-31)
+distill a two-repo mining pass over public Apache-2.0 sources (ideas
+only, no text; see README acknowledgements): a session-transcript
+compression tool's decision records — retention keyed on what a reader
+can reconstruct rather than on success/failure; same-failure-only
+merging, whose first version lacked that condition and could hide a
+distinct earlier error behind the last one until an adversarial review
+caught it pre-release; honest, executable omission markers; and an
+audit mode that samples what compression dropped — and an agentic
+security-scanning product's completion rules — the named fake-success
+shapes a blocked run must refuse (schema-satisfying output included),
+and differential-comparison semantics where a finding absent from an
+incomplete re-review stays unknown rather than resolved. The evaluation
+behind the batch ran a ten-agent verbatim scan across two model
+families plus a third-family cross-check, every load-bearing citation
+re-verified against the source. All ship `unprobed` per the covenant;
+their probes join the private round-5 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
