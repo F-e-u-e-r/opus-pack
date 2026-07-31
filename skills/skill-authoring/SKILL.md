@@ -767,6 +767,39 @@ default; an AI rewrite does not launder a derivative).
   baseline-vs-leakage, and arms'-reasoning — ship `unprobed`; see
   Provenance.)
   ❌ "the rule is correct and clearly written, so it earns a line."
+- **The probe scenario must not do the candidate rule's work.** A second
+  controls failure, distinct from contamination: contamination is
+  finding-content reaching an arm, while this is the shared task prompt
+  instructing the behavior the candidate prescribes, so both arms reach the
+  intended outcome from the prompt alone. A scenario can be perfectly
+  generic and carry no phrasing from the finding — satisfying the
+  generic-scenario clause above — and still hand over the method. The
+  existing guards do not catch it either: the arm DID meet the rule's
+  trigger, so the not-armed discipline does not exclude it, and re-running
+  a surprising call on the same scenario reproduces the same result. Nor
+  does it announce itself as a broken probe; its symptom is a both-arms
+  pass, which the reading above scores as non-discriminating — demoting to
+  a reference file, or dropping, a rule that was never tested. Before
+  running, re-read the scenario and ask whether an arm that follows its
+  literal instructions, without applying the candidate rule, already
+  reaches the intended outcome. If so the round measured the prompt:
+  discard it, rewrite, and re-run both arms — a discarded round is not a
+  verdict and licenses no fold, demotion, or drop. Name the situation and
+  the task the executor is asked to perform, never the outcome the rule
+  exists to produce (for a preventive rule that outcome is the abstention,
+  so a task written as "avoid X" has already handed it over). This strips
+  the method from the SCENARIO, not from the world: whatever the
+  executor's baseline already carries stays, and is recorded per the
+  baseline clause above. Record the check where baseline and tier are
+  recorded — the probe record carries the scenario verbatim and the line
+  "scenario names situation and task only; method absent", because a
+  skipped re-read is otherwise invisible. Done when that line sits beside
+  the verdict and a reader holding no rule cannot tell from the scenario
+  what the rule prescribes. (`unprobed` — see Provenance.)
+  ❌ "the scenario only scopes the task — naming what counts as
+  out-of-scope isn't handing over the method" — scoping that names the
+  operation the rule prescribes IS the method; scope by naming the
+  situation, not the move.
 - **A file's content contradicts reality and you are about to correct it —
   first establish whether anything generates that file, or serves as a
   source it is maintained from** (trigger repaired
@@ -1253,3 +1286,22 @@ record-the-retargets half exists because the retargeted copy would otherwise
 read as drift on the consumer's next diff against upstream, inviting a
 re-sync to restore the broken numbers. Both ship `unprobed` per the covenant;
 their probes join the private round-5 queue.
+
+The 2026-07-30 scenario-does-the-rule's-work rule rests on one attested round
+with an ambiguous in-repo precursor. The attested round is a downstream
+consumer's probe of a different rule — the §2 push-verification recipe — whose
+scenario asked the arm to "report whether it carries anything beyond that
+intended work", which performs a read-every-outgoing-commit rule outright;
+both arms passed 3/3 at the weaker tier. Contributor-run and not linkable.
+This repo's own 2026-07-27 entry, recording a first round discarded because
+"its scenarios leaked the taught distinction", is cited as a precursor only:
+that record does not distinguish a scenario carrying finding content
+(leakage, already addressed by the generic-scenario clause) from one
+instructing the behavior, so it is not counted as a second instance. The
+attested round also did not change an outcome — re-running with the method
+removed returned both arms passing again, so that fold verdict did not move;
+what the rewrite bought was the standing to report it. The harm the rule
+guards against — a round spent demoting or dropping a rule the probe never
+tested — is therefore reasoned from the verdict list, not observed. Ships
+`unprobed`: the failure mode is attested once, the fix is not probed; its
+probe joins the private round-5 queue.
