@@ -65,10 +65,12 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   by an ordinary authenticated user is in scope; "admin can do admin
   things" is not. The non-negotiables
   above stay discovery floors — an injection reachable from user input
-  is always surfaced, never argued away by "who would attack us"; this
-  rule then sets the FINAL rating, and only a path genuinely gated on
-  privileges that already include the impact may land below Critical,
-  with that precondition stated. Write your impact/reachability
+  is always surfaced, never argued away by "who would attack us" — and
+  this rule then sets the FINAL rating: a finding a non-negotiable
+  marks Critical drops below Critical only when its path is genuinely
+  gated on privileges that already include the impact, with that
+  precondition stated; every other finding rates freely on the
+  ladder. Write your impact/reachability
   mapping down before triage (confidence tracked separately, never
   folded into likelihood) and apply it mechanically after —
   per-finding re-argument is how inflation and deflation both creep
