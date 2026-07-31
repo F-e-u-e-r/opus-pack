@@ -30,8 +30,9 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
 - **The threat model is scoped to the system, not to today's task**
   (`unprobed` — see Provenance). When building or refreshing one, do
   not let the current diff, the module you happen to be editing, or the
-  file under review become the model's anchor: a sound model still
-  makes sense for an unrelated change in the same system, and
+  file under review become the model's anchor: a sound model outlives
+  the task that prompted it — it should read correctly to someone
+  working on a different corner of the codebase tomorrow — and
   test/demo/example paths stay peripheral unless evidence shows they
   are live attack surface — deployed, or part of a privileged workflow
   (build, release, CI) whose compromise reaches users, credentials, or
@@ -59,9 +60,10 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   finding is downgraded, not dropped. A finding whose exploitation
   requires privileges that already include the claimed impact is
   recorded as ignore/informational with that precondition stated —
-  never silently discarded — unless the privilege DELTA is itself the
-  finding: an authz bug reachable by an ordinary authenticated user is
-  in scope; "admin can do admin things" is not. The non-negotiables
+  never silently discarded — unless what the finding demonstrates is
+  precisely a crossing of that privilege line: an authz bug reachable
+  by an ordinary authenticated user is in scope; "admin can do admin
+  things" is not. The non-negotiables
   above stay discovery floors — an injection reachable from user input
   is always surfaced, never argued away by "who would attack us"; this
   rule then sets the FINAL rating, and only a path genuinely gated on
@@ -76,9 +78,9 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   into any external surface — a tracker, a channel, a shared doc —
   confirm the people who can READ that surface are cleared for the
   content; permission to create the entry says nothing about who sees
-  it. One confirmation covers one reviewed batch to one destination; a
-  new destination, a widened audience, or a changed payload re-opens
-  the question. Surfacing to your own user is never gated by this
+  it. A single approval extends exactly as far as what the user saw,
+  to that destination alone; a new destination, a widened audience, or
+  a changed payload re-opens the question. Surfacing to your own user is never gated by this
   rule — it governs external destinations: a Critical still reaches
   the user immediately (ladder above) while the external filing waits
   for its audience check.
