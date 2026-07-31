@@ -780,11 +780,15 @@ default; an AI rewrite does not launder a derivative).
   does it announce itself as a broken probe; its symptom is a both-arms
   pass, which the reading above scores as non-discriminating — demoting to
   a reference file, or dropping, a rule that was never tested. Before
-  running, re-read the scenario and ask whether an arm that follows its
-  literal instructions, without applying the candidate rule, already
-  reaches the intended outcome. If so the round measured the prompt:
-  discard it, rewrite, and re-run both arms — a discarded round is not a
-  verdict and licenses no fold, demotion, or drop. Name the situation and
+  running, re-read the scenario and ask whether its instructions BY
+  THEMSELVES prescribe the intended outcome — whether a reader holding no
+  rule could tell from the scenario text alone what move to make. If so a
+  run would measure the prompt, not the rule: discard the scenario,
+  rewrite, and re-run both arms — a discarded round is not a verdict and
+  licenses no fold, demotion, or drop. (Distinct from a bare arm reaching
+  the outcome unaided on a scenario whose text hands nothing over: that is
+  real non-discrimination, scored by the reading above, never a reason to
+  discard.) Name the situation and
   the task the executor is asked to perform, never the outcome the rule
   exists to produce (for a preventive rule that outcome is the abstention,
   so a task written as "avoid X" has already handed it over). This strips

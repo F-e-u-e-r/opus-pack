@@ -377,8 +377,8 @@ A generic green test is not proof. A gate is real only if:
    never runs) nor item 2's failed load (that one throws before the subject
    ever runs, and the inverted signature or the reuse-time record-diff
    catches its normal-looking scorecard): here the code runs to completion
-   and the scorecard is real, so the green is evidence — about whatever the
-   edit did not touch. Assert subject identity in the form the subject can
+   and the scorecard is real, so the green is evidence — about the copy
+   resolution chose, not the one you changed. Assert subject identity in the form the subject can
    witness. Exercising the edited file itself: the location the running
    subject reports (`__file__`, the loaded module's path, the running
    process's own resolved path) equals the path you changed, both sides
@@ -489,14 +489,18 @@ enforces one at runtime — and has its own failure design:
   labeled-synthetic discipline — labeled, and never a row in the captured
   corpus), not written from the shape you pictured. Before enabling, confirm
   it fires on that positive — and
-  where the guard scores rather than matches, confirm the score clears the
-  threshold, since a real positive scoring a tenth of the threshold is a
-  failure wearing the look of a margin — then confirm a captured clean sample
-  does not fire. Done when both directions are shown against captured
-  material and that positive is kept as the guard's regression case — as a
-  redacted or shape-preserving derivative when the positive is itself a
-  secret or sensitive (security-architect's minimize-by-type; a live
-  credential never lands in fixtures).
+  where the guard scores rather than matches, confirm the score lands on
+  the FIRING side of the decision boundary, in whichever direction the
+  guard fires (the incident's 0.078 against a fire-at-0.30 threshold sat
+  deep on the non-firing side while reading like a margin) — then confirm
+  captured clean samples, the hard negatives above included, do not fire.
+  Done when both directions are shown — fire on the validation positive (a
+  captured row, or the labeled plant where the corpus held none), no fire
+  on captured clean samples including hard negatives — and that positive
+  is kept as the guard's regression case — as a redacted or
+  shape-preserving derivative when the positive is itself a secret or
+  sensitive (security-architect's minimize-by-type; a live credential
+  never lands in fixtures).
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.
