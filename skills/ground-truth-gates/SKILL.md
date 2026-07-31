@@ -368,25 +368,36 @@ A generic green test is not proof. A gate is real only if:
    copy other than the one you edited: a file left behind at a previous
    location, an installed version shadowing the working tree, a build output
    stale by one step. Every assertion then passes honestly, about an artifact
-   nobody chose. This is operational-rigor §4's run-attribution rule made a
-   standing property of the suite: there, a cited run is traced to the change
-   once, when it is cited; here the suite re-establishes its own subject on
+   nobody chose. This is the attribution half of operational-rigor §4's
+   check-name rule ("a check's name is not its coverage") made a standing
+   property of the suite: there, a cited run is traced to the change once,
+   when it is cited; here the suite re-establishes its own subject on
    every run, because a shadowing copy can reappear after any later move,
    install, or sync. It is neither item 3's never-registered test (that one
    never runs) nor item 2's failed load (that one throws before the subject
-   ever runs, and the record-diff catches its normal-looking scorecard):
-   here the code runs to completion and the scorecard is real,
-   so the green is evidence — about whatever the edit did not touch. Assert
-   that the location the running subject reports for itself (`__file__`, the
-   loaded module's path, the running process's own resolved path) equals the
-   path you changed. That match already proves nothing shadowed it in THIS
-   resolution — a shadow would have won and the paths would differ — so what
+   ever runs, and the inverted signature or the reuse-time record-diff
+   catches its normal-looking scorecard): here the code runs to completion
+   and the scorecard is real, so the green is evidence — about whatever the
+   edit did not touch. Assert subject identity in the form the subject can
+   witness. Exercising the edited file itself: the location the running
+   subject reports (`__file__`, the loaded module's path, the running
+   process's own resolved path) equals the path you changed, both sides
+   canonicalized — a symlink alias fails a raw string compare while naming
+   the same file. Exercising a BUILT or installed product of the edit: a
+   path match alone passes on yesterday's build sitting at the same path,
+   so pair the expected artifact path with a revision witness tying the
+   artifact to the source you edited (rebuild into the asserted path
+   before the run, or assert an embedded stamp or digest). That identity
+   check proves nothing shadowed the subject in THIS resolution — so what
    it leaves open is the contexts that resolve differently: a suite that
-   prepends the repo root to the search path finds your copy while production
-   resolves the installed one. Assert the shadow's absence where the
-   production lookup would reach it, and prefer running the suite through
-   that same lookup. Done when pointing the suite at the wrong copy fails it,
-   demonstrated once by execution.
+   prepends the repo root to the search path finds your copy while
+   production resolves the installed one. For any claim about the deployed
+   path, run the suite through the production lookup or assert the
+   shadow's absence where that lookup would land; doing neither narrows
+   the green to "my copy, my resolution" — then say so where the result is
+   reported. Done when pointing the suite at the wrong copy fails it,
+   demonstrated once by execution, and the production-resolution half has
+   run or the claim is explicitly narrowed.
    ❌ "all 30 checks pass after the move" — they would have passed identically
    against the pre-move copy still sitting in the old directory, which is why
    the count says nothing about the move.
@@ -464,21 +475,28 @@ enforces one at runtime — and has its own failure design:
   roughly one third watermark junk scored 0.078 against a 0.30 threshold, and
   summaries of it shipped for weeks. Granularity is the harder shape, and not
   simply a mistuned threshold: the author's synthetic single-token repetition
-  clears any threshold easily, which is what made the check look sound; the
-  phrase also moves the statistic, so its score is not zero, but it lands
-  inside the band ordinary prose already produces — one common token is a few
-  percent of ordinary text — so no threshold separates the real positive from
-  clean material and tuning cannot rescue it. The golden-gate rules above on
-  how cases are captured — drawn from the real corpus, provenance recorded,
-  hard negatives included, never a hand-written "plausible" row — govern a
-  guard's validation samples the same way: the positive comes from the corpus
-  the guard will face, never written by hand. Before enabling, confirm it
-  fires on that positive — and
+  can be constructed to clear whatever threshold is set, which is what made
+  the check look sound; the phrase also moves the statistic, so its score is
+  not zero, but it lands inside the band ordinary prose already produces —
+  one common token is a few percent of ordinary text — so no threshold
+  cleanly separates the real positive from clean material and tuning cannot
+  rescue it. The golden-gate rules above on how cases are captured — drawn
+  from the real corpus, provenance recorded, hard negatives included, never
+  a hand-written "plausible" row — govern a guard's validation samples the
+  same way: the positive comes from the corpus the guard will face, never
+  from the author's imagination; where the corpus genuinely holds no
+  positive, plant one whose form is copied from a real instance (item 2's
+  labeled-synthetic discipline — labeled, and never a row in the captured
+  corpus), not written from the shape you pictured. Before enabling, confirm
+  it fires on that positive — and
   where the guard scores rather than matches, confirm the score clears the
   threshold, since a real positive scoring a tenth of the threshold is a
   failure wearing the look of a margin — then confirm a captured clean sample
-  does not fire. Done when both directions are shown against captured material
-  and that positive is kept as the guard's regression case.
+  does not fire. Done when both directions are shown against captured
+  material and that positive is kept as the guard's regression case — as a
+  redacted or shape-preserving derivative when the positive is itself a
+  secret or sensitive (security-architect's minimize-by-type; a live
+  credential never lands in fixtures).
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.

@@ -795,7 +795,8 @@ default; an AI rewrite does not launder a derivative).
   "scenario names situation and task only; method absent", because a
   skipped re-read is otherwise invisible. Done when that line sits beside
   the verdict and a reader holding no rule cannot tell from the scenario
-  what the rule prescribes. (`unprobed` — see Provenance.)
+  what the rule prescribes. (`unprobed` — attested round as shape; see
+  Provenance.)
   ❌ "the scenario only scopes the task — naming what counts as
   out-of-scope isn't handing over the method" — scoping that names the
   operation the rule prescribes IS the method; scope by naming the
@@ -1298,8 +1299,10 @@ This repo's own 2026-07-27 entry, recording a first round discarded because
 that record does not distinguish a scenario carrying finding content
 (leakage, already addressed by the generic-scenario clause) from one
 instructing the behavior, so it is not counted as a second instance. The
-attested round also did not change an outcome — re-running with the method
-removed returned both arms passing again, so that fold verdict did not move;
+attested round also did not change an outcome — the discarded round licensed
+no verdict (per the rule it motivates), and the clean re-run returned both
+arms passing again, so the recorded disposition rests on the valid round and
+landed where the discarded one had pointed;
 what the rewrite bought was the standing to report it. The harm the rule
 guards against — a round spent demoting or dropping a rule the probe never
 tested — is therefore reasoned from the verdict list, not observed. Ships
