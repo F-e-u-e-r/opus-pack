@@ -780,27 +780,28 @@ default; an AI rewrite does not launder a derivative).
   does it announce itself as a broken probe; its symptom is a both-arms
   pass, which the reading above scores as non-discriminating — demoting to
   a reference file, or dropping, a rule that was never tested. Before
-  running, re-read the scenario and ask whether its instructions BY
-  THEMSELVES prescribe the intended outcome — whether a reader holding no
-  rule could tell from the scenario text alone what move to make. If so a
-  run would measure the prompt, not the rule: discard the scenario,
-  rewrite, and re-run both arms — a discarded round is not a verdict and
-  licenses no fold, demotion, or drop. (Distinct from a bare arm reaching
-  the outcome unaided on a scenario whose text hands nothing over: that is
-  real non-discrimination, scored by the reading above, never a reason to
-  discard.) Name the situation and
+  running, re-read the scenario and ask whether its text STATES OR
+  DIRECTS the move the rule prescribes — names the operation, instructs
+  it, or makes acceptance contingent on it. If so a run would measure
+  the prompt, not the rule: discard the scenario, rewrite, and run (or
+  re-run) both arms — a discarded round is not a verdict and licenses no
+  fold, demotion, or drop. (Inferability is not the bar: a bare arm
+  INFERRING the move unaided on a scenario whose text nowhere directs it
+  is real non-discrimination, scored by the reading above, never a
+  reason to discard.) Name the situation and
   the task the executor is asked to perform, never the outcome the rule
-  exists to produce (for a preventive rule that outcome is the abstention,
-  so a task written as "avoid X" has already handed it over). This strips
+  exists to produce (where a preventive rule's intended response is the
+  abstention or refusal, a task written as "avoid X" has already handed
+  it over). This strips
   the method from the SCENARIO, not from the world: whatever the
   executor's baseline already carries stays, and is recorded per the
   baseline clause above. Record the check where baseline and tier are
   recorded — the probe record carries the scenario verbatim and the line
   "scenario names situation and task only; method absent", because a
   skipped re-read is otherwise invisible. Done when that line sits beside
-  the verdict and a reader holding no rule cannot tell from the scenario
-  what the rule prescribes. (`unprobed` — attested round as shape; see
-  Provenance.)
+  the verdict and the scenario text nowhere states, directs, or
+  conditions acceptance on the move the rule prescribes. (`unprobed` —
+  attested round as shape; see Provenance.)
   ❌ "the scenario only scopes the task — naming what counts as
   out-of-scope isn't handing over the method" — scoping that names the
   operation the rule prescribes IS the method; scope by naming the

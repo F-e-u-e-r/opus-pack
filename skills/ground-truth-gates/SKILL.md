@@ -378,26 +378,36 @@ A generic green test is not proof. A gate is real only if:
    ever runs, and the inverted signature or the reuse-time record-diff
    catches its normal-looking scorecard): here the code runs to completion
    and the scorecard is real, so the green is evidence — about the copy
-   resolution chose, not the one you changed. Assert subject identity in the form the subject can
-   witness. Exercising the edited file itself: the location the running
-   subject reports (`__file__`, the loaded module's path, the running
-   process's own resolved path) equals the path you changed, both sides
-   canonicalized — a symlink alias fails a raw string compare while naming
-   the same file. Exercising a BUILT or installed product of the edit: a
-   path match alone passes on yesterday's build sitting at the same path,
-   so pair the expected artifact path with a revision witness tying the
+   resolution chose, not the one you changed. Assert subject identity in
+   the form the subject can witness. Exercising the edited file itself:
+   the location the running subject reports (`__file__`, the loaded
+   module's path, the running process's own resolved path) equals the
+   path you changed, both sides canonicalized — a symlink alias fails a
+   raw string compare while naming the same file — and the load is fresh
+   for this run: a module imported before the edit landed, a persistent
+   runner, or stale compiled bytecode reports the expected path while
+   executing pre-edit bytes, so restart or reload the subject, or assert
+   a content witness your edit introduced. Exercising a BUILT or
+   installed product of the edit: a path match alone passes on
+   yesterday's build sitting at the same path, so pair the expected
+   artifact path with a revision witness tying the
    artifact to the source you edited (rebuild into the asserted path
    before the run, or assert an embedded stamp or digest). That identity
    check proves nothing shadowed the subject in THIS resolution — so what
    it leaves open is the contexts that resolve differently: a suite that
    prepends the repo root to the search path finds your copy while
    production resolves the installed one. For any claim about the deployed
-   path, run the suite through the production lookup or assert the
-   shadow's absence where that lookup would land; doing neither narrows
-   the green to "my copy, my resolution" — then say so where the result is
-   reported. Done when pointing the suite at the wrong copy fails it,
-   demonstrated once by execution, and the production-resolution half has
-   run or the claim is explicitly narrowed.
+   path, run the suite through the production lookup, or resolve that
+   lookup yourself and identity-check what it returns — the absence of
+   the one shadow you suspected is not that; another entry in the chain
+   can still win. Doing neither narrows the green to "my copy, my
+   resolution" — then say so where the result is reported. Done when the
+   subject-identity check ITSELF fails against a wrong copy — a
+   behaviorally equivalent one is the clean demonstration, an unrelated
+   assertion failing proves nothing about the guard; for a built subject
+   a wrong revision at the right path must fail it too — demonstrated
+   once by execution, and the production-resolution half has run or the
+   claim is explicitly narrowed.
    ❌ "all 30 checks pass after the move" — they would have passed identically
    against the pre-move copy still sitting in the old directory, which is why
    the count says nothing about the move.
@@ -494,13 +504,16 @@ enforces one at runtime — and has its own failure design:
   guard fires (the incident's 0.078 against a fire-at-0.30 threshold sat
   deep on the non-firing side while reading like a margin) — then confirm
   captured clean samples, the hard negatives above included, do not fire.
-  Done when both directions are shown — fire on the validation positive (a
-  captured row, or the labeled plant where the corpus held none), no fire
-  on captured clean samples including hard negatives — and that positive
-  is kept as the guard's regression case — as a redacted or
-  shape-preserving derivative when the positive is itself a secret or
-  sensitive (security-architect's minimize-by-type; a live credential
-  never lands in fixtures).
+  Done when both directions are shown — fire on validation positives
+  representative of each form the corpus holds (captured rows, or the
+  labeled plant where the corpus held none; plants stay supplemental and
+  labeled), no fire on captured clean samples including hard negatives —
+  and those positives are kept as the guard's regression cases — as
+  shape-preserving, non-sensitive derivatives when a positive is itself
+  a secret or sensitive (security-architect's minimize-by-type;
+  `REDACTED`-style blanking destroys the very shape the guard keys on,
+  so re-run the guard on each derivative and keep it only once shown
+  still firing; a live credential never lands in fixtures).
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.
