@@ -422,12 +422,14 @@ Every packet names:
   reports, it does not persist to shared history), nor weaken gates or revert
   unrelated work; report
   blockers and failures plainly. Plausible success is worse than honest failure —
-  and when blocked, the polished substitutes are refused BY SHAPE: a
-  plausible final report, an output that merely satisfies the required
-  schema, a fabricated empty/"no findings" result, plausible-looking
-  metrics — each reads as completion downstream; a blocked task returns
-  recorded progress plus the blocker, and nothing shaped like success
-  (`unprobed` — see Provenance).
+  and when blocked, what is refused is anything COSTUMED AS COMPLETION:
+  a plausible final report standing in for the missing result, an
+  output that satisfies the required schema while the work behind it
+  never ran, a fabricated empty/"no findings" answer, invented metrics
+  — each reads as done downstream. A blocked task returns recorded
+  progress plus the blocker; a LABELLED partial result carried beside
+  an explicit failure signal is the sanctioned degraded mode
+  (operational-rigor §4), not a costume (`unprobed` — see Provenance).
   For an implementation task, after bounded discovery (interfaces read, ambiguity
   resolved), require a concrete artifact by an early checkpoint — a reproduced
   failing test or an evidence-backed implementation note counts; production edits
@@ -730,17 +732,22 @@ reviewers that they silently absorb as implementers.
   lines it saved — paid by a reader with less context than you have now.
 - **Collapsing repetition may reduce volume, never variety** (`unprobed`
   — see Provenance). Merge repeated failed attempts into one line only
-  when they failed the SAME way — same error, not merely the same
-  command. Distinct failures each keep their own line; the merged line
-  keeps a reference to the last attempt (the state the loop converged
-  to); and when in doubt, under-collapse — a reader skims redundancy
-  easily but cannot recover a distinct error the merge hid.
+  when they are the SAME attempt failing the SAME way — same operation
+  and target AND same error: identical error text on different
+  operations is coincidence, not repetition, and distinct errors under
+  one repeated command never merge. Distinct failures each keep their
+  own line; the merged line keeps a reference to the last attempt (the
+  state the loop converged to); and when in doubt, under-collapse — a
+  reader skims redundancy easily but cannot recover a distinct error
+  the merge hid.
 - **Every elision is labelled and recoverable; a lossy record carries an
   audit path** (`unprobed` — see Provenance). An omission marker names
   what was dropped, of what kind, and how much, and includes a
   retrieval step that works exactly as printed. Before relying on a
-  compressed record, sample what the compression dropped and check
-  nothing load-bearing was lost — operational-rigor §4's
+  compressed record, spot-check what the compression dropped — a
+  sample catches category-level loss, never everything, so treat any
+  load-bearing hit as reason to re-cut, and never present the sample
+  as proof of losslessness — operational-rigor §4's
   labelled-degraded-fallback duty applied to your own summaries, whose
   reader cannot distrust a removal it was never shown.
 - Unattended loops need written stop conditions first: touch scope, turn/spend

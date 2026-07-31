@@ -598,6 +598,21 @@ This pack distills and adapts ideas from:
   from those was adopted, and the finding itself became doctrine
   (`operational-rigor` §2: self-described security tools earn stricter
   scrutiny, not less).
+- **Two-repo mining pass, review/handoff batch (2026-07-31)** — from
+  [`openai/codex-security`](https://github.com/openai/codex-security) and
+  [`Mapleeeeeeeeeee/cc-session-reader`](https://github.com/Mapleeeeeeeeeee/cc-session-reader)
+  (both Apache-2.0; ideas only, no text — the same pass's
+  `security-architect` batch carries its own entry). From the
+  compression tool's decision records:
+  retention keyed on what a reader can reconstruct, same-attempt/
+  same-failure-only merging, labelled elisions with working retrieval
+  steps, and the spot-check-what-was-dropped audit duty
+  (`delegation-and-review` §5). From the security product's completion
+  and comparison rules: the costumed-as-completion shapes a blocked run
+  refuses (`delegation-and-review` §2), absence-is-not-resolution for
+  recurring review campaigns (`references/recurring-sweep-ledgers.md`),
+  convergence-raises-priority-not-status (`cross-model-review` §3), and
+  consumer-position verification (`operational-rigor` §4).
 - **Sahir619** —
   [`Sahir619/fable-method`](https://github.com/Sahir619/fable-method),
   MIT License; a parallel Fable-sunset distillation with a published

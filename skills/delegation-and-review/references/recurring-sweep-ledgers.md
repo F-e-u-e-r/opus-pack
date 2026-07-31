@@ -65,14 +65,18 @@ pointer-annotated historical line under the new one. A round closes
 only when the ledger reflects every touched finding's current state —
 a round that surfaced anything never closes on an unchanged ledger.
 
-**Absence is not resolution.** An OPEN or UNRESOLVED entry that this
-round's report simply does not mention stays exactly where it is: a
-finding moves to fixed/closed only on location-level evidence — the
-round's coverage provably re-examined the entry's locus (its file,
-path, or surface inside the round's covered set) and found the state
-changed, with the evidence §3 requires. A round whose coverage never
-reached the entry's location has said nothing about it; silence
-downgrades nothing, however many rounds it repeats across.
+**Absence is not resolution** (`unprobed` — carried by the skill's
+2026-07-31 Provenance entry). An OPEN or UNRESOLVED entry that this
+round's report simply does not mention stays exactly where it is: an
+entry moves only on evidence addressed to it — a re-examination of its
+locus, provably inside the round's covered set, showing the claimed
+defect no longer holds there (→ PRIOR FIXES, with that evidence); a
+counterexample refuting the claim (→ REFUTED FINDING-CLASSES); or an
+identity match establishing it duplicates another tracked entry. A
+changed locus alone is none of these — changed code can still carry
+the defect. A round whose coverage never reached the entry's location
+has said nothing about it; silence downgrades nothing, however many
+rounds it repeats across.
 Write-backs of one campaign serialize: a round's
 write-back completes before the next round dispatches; concurrent
 writers over one ledger follow §4's edit-conflict rule (re-read,
