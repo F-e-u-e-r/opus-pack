@@ -384,10 +384,10 @@ A generic green test is not proof. A gate is real only if:
    module's path, the running process's own resolved path) equals the
    path you changed, both sides canonicalized — a symlink alias fails a
    raw string compare while naming the same file — and the load is fresh
-   for this run: a module imported before the edit landed, a persistent
+   for this run (a module imported before the edit landed, a persistent
    runner, or stale compiled bytecode reports the expected path while
-   executing pre-edit bytes, so restart or reload the subject, or assert
-   a content witness your edit introduced. Exercising a BUILT or
+   executing pre-edit bytes): restart or reload the subject, or assert a
+   content witness your edit introduced. Exercising a BUILT or
    installed product of the edit: a path match alone passes on
    yesterday's build sitting at the same path, so pair the expected
    artifact path with a revision witness tying the
@@ -404,8 +404,8 @@ A generic green test is not proof. A gate is real only if:
    resolution" — then say so where the result is reported. Done when the
    subject-identity check ITSELF fails against a wrong copy — a
    behaviorally equivalent one is the clean demonstration, an unrelated
-   assertion failing proves nothing about the guard; for a built subject
-   a wrong revision at the right path must fail it too — demonstrated
+   assertion failing proves nothing about the identity check; for a built
+   subject a wrong revision at the right path must fail it too — demonstrated
    once by execution, and the production-resolution half has run or the
    claim is explicitly narrowed.
    ❌ "all 30 checks pass after the move" — they would have passed identically
@@ -506,8 +506,10 @@ enforces one at runtime — and has its own failure design:
   captured clean samples, the hard negatives above included, do not fire.
   Done when both directions are shown — fire on validation positives
   representative of each form the corpus holds (captured rows, or the
-  labeled plant where the corpus held none; plants stay supplemental and
-  labeled), no fire on captured clean samples including hard negatives —
+  labeled plant where the corpus held none; a plant stays labeled,
+  supplements captured rows where the corpus holds the form, and stands
+  alone only where it held none), no fire on captured clean samples
+  including hard negatives —
   and those positives are kept as the guard's regression cases — as
   shape-preserving, non-sensitive derivatives when a positive is itself
   a secret or sensitive (security-architect's minimize-by-type;
