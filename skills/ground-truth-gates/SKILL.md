@@ -373,8 +373,9 @@ A generic green test is not proof. A gate is real only if:
    once, when it is cited; here the suite re-establishes its own subject on
    every run, because a shadowing copy can reappear after any later move,
    install, or sync. It is neither item 3's never-registered test (that one
-   never runs) nor item 2's failed load (that one throws, and the scorecard
-   looks wrong): here the code runs to completion and the scorecard is real,
+   never runs) nor item 2's failed load (that one throws before the subject
+   ever runs, and the record-diff catches its normal-looking scorecard):
+   here the code runs to completion and the scorecard is real,
    so the green is evidence — about whatever the edit did not touch. Assert
    that the location the running subject reports for itself (`__file__`, the
    loaded module's path, the running process's own resolved path) equals the
