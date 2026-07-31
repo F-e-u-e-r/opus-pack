@@ -592,12 +592,12 @@ This pack distills and adapts ideas from:
   scan across two model families plus a third-family cross-check; every
   adopted claim citation-verified against the source). Ideas only, no
   text. This entry covers the pass's `security-architect` batch, all
-  from the security product's threat model and bundled review doctrine:
-  subprocess-environment minimization, the policy-shaped-data tier,
-  severity-binds-to-evidence-and-method, system-scoped threat models,
-  and the audience-check-on-disclosure rule. (The same pass's
-  review/handoff batch carries its own acknowledgements entry, landed
-  with that batch.)
+  from the security product's threat model, runtime security notes, and
+  bundled review doctrine: subprocess-environment minimization, the
+  policy-shaped-data tier, the severity/confidence split, system-scoped
+  threat models, and the audience-check-on-disclosure rule. (The same
+  pass's review/handoff batch carries its own acknowledgements entry,
+  landed with that batch.)
 - **2026-07 security-skill audit** — a 12-source sweep of community
   "security" skills preceding the 2026-07-12 doctrine batch. Idea-level
   adoptions only, no code: **eddygk/skill-vetting** (anti-override rule →
