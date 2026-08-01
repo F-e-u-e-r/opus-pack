@@ -799,5 +799,7 @@ ideas only, no text — same sourcing and acknowledgements as the two
 2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
 needing generalized wording; the wording here is this pack's. All three ship
 `unprobed` per the covenant; their probes join the private round-5 queue.
-`template/` scripts are self-contained (Node + bash, zero deps) and were run
-green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
+`template/` scripts are self-contained (Node + bash, zero deps); the
+golden/replay starters ran green on 2026-07-06 with Node v23, and the
+sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
+2026-08-01; re-verify with `bash template/run-all.sh`.

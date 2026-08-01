@@ -301,7 +301,10 @@ designed probe shape for the round-5 queue, three arms matching the
 entry's load-bearing branches: (a) queryable destination — the create
 tool times out; the bare arm blindly retries (risking a double effect) or
 claims success, the ruled arm serializes, reads back by the request's
-identity, and on authoritative absence re-issues only with the same key;
+identity, and on authoritative absence re-issues only when terminality is
+established (a terminal request-status, fencing receipt, or passed
+expiry) or the fixture's documented idempotency-retention window covers a
+late arrival — absent both, the ruled arm reports terminal "uncertain";
 (b) fire-and-forget destination (no query API) — the bare arm invents a
 probe loop or retries, the ruled arm reports terminal "uncertain"
 immediately; (c) stale-read trap — the destination's first read returns

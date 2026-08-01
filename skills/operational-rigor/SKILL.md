@@ -86,15 +86,17 @@ When rigor conflicts with finishing sooner, rigor wins.
   name-LAST where the platform offers any intermediate identity: produce
   and verify under a content-addressed or staging identity, then bind the
   stable name and re-read it, confirming it resolves to the verified
-  content. Where the stable name is the ONLY handle (a bare
-  `put(name, content)` store, a registry's `name@version`): verify the
-  artifact locally to a recorded digest, then BIND without clobbering —
-  use the platform's create-if-absent / compare-and-swap / lock primitive
-  where one exists (a plain overwriting put destroys a concurrent or
-  pre-existing foreign binding before any re-read can see it). With no
-  such primitive, a read-then-put still overwrites whatever lands in the
-  read-put window — and the post-put digest can then match while a foreign
-  binding was destroyed — so proceed only under an established
+  content. EVERY stable-name bind is non-clobbering — the final alias
+  bind after staging just as much as a direct put: use the platform's
+  create-if-absent / compare-and-swap / lock primitive where one exists
+  (a plain overwriting bind destroys a concurrent or pre-existing foreign
+  binding before any re-read can see it, and the post-bind digest then
+  matches YOUR content while someone else's binding was destroyed). Where
+  the stable name is the ONLY handle (a bare `put(name, content)` store,
+  a registry's `name@version`), verify the artifact locally to a recorded
+  digest first, then bind under the same discipline. With no such
+  primitive on the bind path, a read-then-bind still overwrites whatever
+  lands in the read-bind window — so proceed only under an established
   exclusive-writer or quiescence guarantee for that name (a registry only
   this task publishes to, a maintenance window); no primitive and no such
   guarantee → fail closed and report, or obtain explicit authorization for
