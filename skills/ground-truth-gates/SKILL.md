@@ -155,15 +155,21 @@ pre-change implementation (the parity rule above), or the spec — never the
 delivering system's own producer, whose bugs reproduce on re-run and
 self-confirm. Two sound forms: full-state comparison
 `apply_independent(baseline) == delivered` over a DECLARED projection —
-the surface X affects, with ambient fields the system mutates on its own
-(ids, timestamps, server defaults) on a declared allow-list, exactly as
-the parity gate above allow-lists intended diffs; raw whole-state equality
-false-fails on every non-pure deliver, and a false-failing gate gets
-weakened or dropped. Or a true inversion `apply⁻¹(delivered) == baseline`
-ONLY where the inverse is a proven bijection — a lossy "undo"
-(reset-to-default) maps an under-applied state back to baseline too and
-passes exactly the case the check exists to catch. Within the projection,
-extra keys and wrong values still expose over-application. Both forms
+and the projection must cover the complete mutation boundary: every field
+X touches AND the fields expected to stay unchanged, with only the ambient
+fields the system legitimately mutates on its own (ids, timestamps, server
+defaults) on a declared allow-list, exactly as the parity gate above
+allow-lists intended diffs. A projection cut down to "what X touches"
+passes a delivery that also mutated state outside it — the nearest
+over-application variant; where the full boundary genuinely cannot be
+enumerated, the conclusion narrows to "exact within this projection" and
+every out-of-projection surface is reported unverified, never implied
+proven. (Raw whole-state equality with no allow-list false-fails on every
+non-pure deliver, and a false-failing gate gets weakened or dropped.) Or a
+true inversion `apply⁻¹(delivered) == baseline` ONLY where the inverse is
+a proven bijection — a lossy "undo" (reset-to-default) maps an
+under-applied state back to baseline too and passes exactly the case the
+check exists to catch. Both forms
 prove STATE, not history: repeated idempotent application and duplicate
 side effects that leave identical state are invisible to them — where
 those matter, add an operation/event witness (an application count, an
@@ -438,17 +444,24 @@ A generic green test is not proof. A gate is real only if:
    — see Provenance). Where a tool measures its own benefit — a compression
    ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
    guards against systematic overstatement from both directions: the
-   no-benefit case must read zero/neutral (the floor — run it); at least
-   one known-benefit calibration anchor per supported input class must read
-   within a PREDECLARED tolerance of its independently computed expected
-   value (anchors calibrate — they bound systematic inflation, they do not
-   prove correctness on untested inputs; a formula/property bound does
-   more where one is derivable); and any comparison whose baseline is not
-   the exact immutable identity of the treated input (same bytes/version,
-   not "a similar run") is refused, not reported — a mismatched baseline
-   manufactures benefit on every input. Without these this is item 3's
-   fake-pass family wearing a dashboard: the flattering number can never
-   fail.
+   no-benefit case must read its independently expected value, which is
+   `<= 0` — an incompressible input EXPANDS under framing overhead, a
+   cache can cost more than it saves, and a metric whose domain clamps
+   negatives to zero is itself flattering (run it, and preserve the
+   negative unless the declared domain genuinely cannot represent one); at
+   least one known-benefit calibration anchor per supported input class
+   must read within a PREDECLARED tolerance of its independently computed
+   expected value (anchors calibrate — they bound systematic inflation,
+   they do not prove correctness on untested inputs; a formula/property
+   bound does more where one is derivable); and a comparison is admitted
+   only when the baseline matches the treated input's exact immutable
+   identity (same bytes/version) AND every declared benefit-affecting
+   non-treatment variable — pricing, configuration, workload, observation
+   window — or carries a predeclared, justified normalization; anything
+   short is refused, not reported, because a shifted non-treatment
+   variable manufactures benefit on identical input. Without these this is
+   item 3's fake-pass family wearing a dashboard: the flattering number
+   can never fail.
    ❌ "the tool reports 40% savings on every run" — including on input it
    provably cannot compress; nothing asserted the zero-savings case, and
    nothing calibrated the 40%.
@@ -561,22 +574,29 @@ enforces one at runtime — and has its own failure design:
   you already had in mind; the question is whether it flags the ones that are
   actually there.
 - **Sentinel-tag every synthetic fixture, so "never leaked verbatim" is one
-  grep** (`unprobed` — see Provenance). Embed one shared greppable marker in
-  every planted credential and fixture value, collision-checked once against
-  the clean corpus (grep it where nothing was planted — zero hits there
-  means the marker is safe to plant for THIS suite; it is a corpus check,
-  not a proof about all possible content), so the leak check is executable
-  instead of per-fixture recall. Worked shape: plant `SNTL7Q-`-prefixed values; the
-  done-check is `grep -r 'SNTL7Q-' <logs> <db-dump> <captured-requests>`
-  with expected zero hits. State the claim's bound honestly: a byte-level
-  grep proves no VERBATIM leak; encoded, escaped, truncated, or transformed
-  copies need a representation-aware sweep (search the encodings the
-  pipeline actually applies — base64, URL-encoding, JSON-escaping), or the
-  record says "verbatim only". The marker does not weaken fixture realism
-  (the shape rules above still govern the rest of the value). Distinct from
-  security-architect's minimize-by-type sentinel: that one proves a
-  sensitive FIELD never appears past a parse boundary; this one proves
-  planted test material never ESCAPES the test boundary.
+  scan** (`unprobed` — see Provenance). Embed one shared greppable marker in
+  every free-form fixture value, collision-checked once against the clean
+  corpus (grep it where nothing was planted — zero hits there means the
+  marker is safe to plant for THIS suite; a corpus check, not a proof about
+  all possible content), so the leak check is executable instead of
+  per-fixture recall. A shape-CONSTRAINED class — a hex credential, a UUID,
+  a checksummed or enum identifier — cannot carry the free-text marker
+  without leaving its grammar and silently stopping short of the production
+  parser it exists to exercise (the shape rules above): give each such
+  class a grammar-VALID sentinel (a fixed hex stem, a reserved UUID
+  prefix), keep the full sentinel list in one manifest so the scan stays
+  one command over all of them, and keep a regression proving each
+  constrained fixture still reaches its intended production path. Runnable
+  worked example: `template/sentinel/run.mjs` (collision check + leak scan
+  + the constrained-class manifest; its `--demo-leak` mode shows the
+  failing side). State the claim's bound honestly: the scan proves no
+  VERBATIM leak; encoded, escaped, truncated, or transformed copies need a
+  representation-aware sweep (search the encodings the pipeline actually
+  applies — base64, URL-encoding, JSON-escaping), or the record says
+  "verbatim only". Distinct from security-architect's minimize-by-type
+  sentinel: that one proves a sensitive FIELD never appears past a parse
+  boundary; this one proves planted test material never ESCAPES the test
+  boundary.
 - **A relief valve is a pre-existing, owner-designed, friction-plus-log override
   — never one an agent invents to unblock itself**, and never added to a control
   the owner designated non-bypassable (an immutable policy-checker). Security /

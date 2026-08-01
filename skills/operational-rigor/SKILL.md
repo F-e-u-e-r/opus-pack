@@ -91,11 +91,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   artifact locally to a recorded digest, then BIND without clobbering —
   use the platform's create-if-absent / compare-and-swap / lock primitive
   where one exists (a plain overwriting put destroys a concurrent or
-  pre-existing foreign binding before any re-read can see it); with no
-  such primitive, read the name first — absent, or holding this task's
-  own prior bytes → put; holding foreign content → fail closed and
-  report, never overwrite — accepting the residual read-then-put race as
-  the platform's named floor. Then
+  pre-existing foreign binding before any re-read can see it). With no
+  such primitive, a read-then-put still overwrites whatever lands in the
+  read-put window — and the post-put digest can then match while a foreign
+  binding was destroyed — so proceed only under an established
+  exclusive-writer or quiescence guarantee for that name (a registry only
+  this task publishes to, a maintenance window); no primitive and no such
+  guarantee → fail closed and report, or obtain explicit authorization for
+  a labelled best-effort overwrite that names this exact risk. A name
+  found holding foreign content is never overwritten. Then
   re-read AUTHORITATIVELY and compare against that digest — an
   eventually-consistent read can return stale bytes, so a non-authoritative
   mismatch is "uncertain", not a verdict. An authoritative mismatch is a
@@ -387,8 +391,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   session cannot clean its own earlier debris), and the recorded path must
   still hold the recorded content (check a hash — plus the platform's
   object/generation identity where it has one, since byte-identical
-  content re-created by the user is still the user's; no such identity →
-  content match is the best available witness, and doubt preserves).
+  content re-created by the user is still the user's). Where no
+  generation identity exists, a content match alone cannot rule that
+  re-creation out — so deletion on record+content alone is licensed only
+  inside a namespace reserved to this run (your own scratch directory, a
+  run-tagged path no human edits); outside such a namespace,
+  content-only attribution is non-probative and the state is retained
+  and reported, not removed.
   Never attribute by pattern-match on what LOOKS like automation
   output: a matching-looking file may be the user's. State failing either
   check defaults to human-owned and stays — reported, not removed.

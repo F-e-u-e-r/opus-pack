@@ -136,10 +136,17 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   eventually-consistent "not found" does not authorize a retry, because
   the original can still land after it. The read-back has exactly three
   exits: an authoritative positive identity match → success; an
-  authoritative absence under the request's identity → failed-not-applied,
-  and a re-issue is permitted ONLY carrying the same idempotency key (or
-  an equivalently documented safe re-issue contract) — a resolved failure,
-  never a blind retry; at the cap, or on any non-authoritative ambiguity →
+  authoritative absence under the request's identity → failed-not-applied
+  ONLY when the original request provably can no longer apply — a terminal
+  request-status from the provider, a cancellation/fencing receipt, or a
+  documented expiry that has passed — because absence-now does not rule
+  out a timed-out original still arriving later from a queue, proxy, or
+  executing server; with that in-flight window still open, a re-issue is
+  safe only under a documented idempotency guarantee whose retention
+  window covers concurrent and late arrivals (the same key deduplicates
+  the straggler), and the read is never described as proof the original
+  failed; at the cap, on any non-authoritative ambiguity, or where
+  neither terminality nor an idempotency guarantee can be established →
   terminal "uncertain" — a report value the caller decides on, never a
   retry trigger.
 
