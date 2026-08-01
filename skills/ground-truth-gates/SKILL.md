@@ -444,11 +444,15 @@ A generic green test is not proof. A gate is real only if:
    — see Provenance). Where a tool measures its own benefit — a compression
    ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
    guards against systematic overstatement from both directions: the
-   no-benefit case must read its independently expected value, which is
-   `<= 0` — an incompressible input EXPANDS under framing overhead, a
-   cache can cost more than it saves, and a metric whose domain clamps
-   negatives to zero is itself flattering (run it, and preserve the
-   negative unless the declared domain genuinely cannot represent one); at
+   no-benefit case must read its independently expected value on the
+   metric's OWN scale, at or beyond the metric's declared no-benefit point
+   in the harm direction — a signed delta reads `<= 0`, a compression
+   RATIO reads `>= 1` on expansion — so the suite names each metric's
+   no-benefit point (or normalizes to signed benefit) first; an
+   incompressible input EXPANDS under framing overhead, a cache can cost
+   more than it saves, and a metric whose scale clamps at the no-benefit
+   point is itself flattering (run it, and preserve the harm-side reading
+   unless the declared domain genuinely cannot represent one); at
    least one known-benefit calibration anchor per supported input class
    must read within a PREDECLARED tolerance of its independently computed
    expected value (anchors calibrate — they bound systematic inflation,
