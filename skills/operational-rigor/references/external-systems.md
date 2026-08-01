@@ -132,12 +132,16 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   idempotency key or unique payload identity (security-architect's
   money-path reserve/commit + query-by-key form is the canonical
   instance; this entry generalizes it), under a recorded time/attempt
-  cap — and only an AUTHORITATIVE read clears the unknown: a stale or
+  cap — and only an AUTHORITATIVE read settles anything: a stale or
   eventually-consistent "not found" does not authorize a retry, because
-  the original can still land after it; (3) at the cap, or on any
-  non-authoritative ambiguity → terminal "uncertain" — a report value the
-  caller decides on, never a retry trigger. Success is claimed only on a
-  positive identity match.
+  the original can still land after it. The read-back has exactly three
+  exits: an authoritative positive identity match → success; an
+  authoritative absence under the request's identity → failed-not-applied,
+  and a re-issue is permitted ONLY carrying the same idempotency key (or
+  an equivalently documented safe re-issue contract) — a resolved failure,
+  never a blind retry; at the cap, or on any non-authoritative ambiguity →
+  terminal "uncertain" — a report value the caller decides on, never a
+  retry trigger.
 
 - **A recurring schedule's own "completed" report is not evidence its side
   effects landed — verify at the destinations, attributed to the
@@ -286,11 +290,17 @@ The one-directional-flag and uncertain-outcome-mutation entries (2026-08-01)
 are from the 2026-07-31 two-repo mining pass's deferred backlog (opus-pack
 #112, triaged under #115 Phase 1; ideas only — see the skill's Provenance
 for the batch note). Both ship `unprobed`; the uncertain-outcome entry's
-designed probe shape for the round-5 queue: the worker's create tool
-returns a timeout mid-task — the bare arm blindly retries (risking a
-double effect) or claims success; the ruled arm serializes, reads back
-from the destination by the request's identity, and where unresolved
-reports "uncertain" as terminal rather than retrying.
+designed probe shape for the round-5 queue, three arms matching the
+entry's load-bearing branches: (a) queryable destination — the create
+tool times out; the bare arm blindly retries (risking a double effect) or
+claims success, the ruled arm serializes, reads back by the request's
+identity, and on authoritative absence re-issues only with the same key;
+(b) fire-and-forget destination (no query API) — the bare arm invents a
+probe loop or retries, the ruled arm reports terminal "uncertain"
+immediately; (c) stale-read trap — the destination's first read returns
+"not found" while the original later lands; the bare arm re-issues on the
+stale read (double effect), the ruled arm treats a non-authoritative read
+as unresolved.
 
 Environment-specific facts to re-verify against current tooling: a tool's
 exit-code table (qpdf's), real success-latency distributions, cache TTL/state

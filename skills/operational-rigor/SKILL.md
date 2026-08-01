@@ -89,10 +89,16 @@ When rigor conflicts with finishing sooner, rigor wins.
   content. Where the stable name is the ONLY handle (a bare
   `put(name, content)` store, a registry's `name@version`): verify the
   artifact locally to a recorded digest, publish under the name, then
-  immediately re-read and compare against that digest — a mismatch is a
-  failed publish to re-drive, and a name-first write with no post-publish
-  comparison never satisfies this. A name bound first with no comparison
-  points consumers at an artifact whose verification can still fail.
+  re-read AUTHORITATIVELY and compare against that digest — an
+  eventually-consistent read can return stale bytes, so a non-authoritative
+  mismatch is "uncertain", not a verdict. An authoritative mismatch is a
+  FAILED PUBLISH to report with the observed digest — re-drive only when
+  an authoritative re-read shows the name absent/empty or still holding
+  this task's own prior bytes; a name that now holds foreign content
+  (a concurrent publisher, the user's own write) is never overwritten to
+  make the check pass. A name-first write with no post-publish comparison
+  never satisfies this; a name bound first with no comparison points
+  consumers at an artifact whose verification can still fail.
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -372,9 +378,11 @@ When rigor conflicts with finishing sooner, rigor wins.
   own write log or a run-scoped name/tag (spanning this authorized task's
   turns and resumptions, not one wall-clock invocation — else a resumed
   session cannot clean its own earlier debris), and the recorded path must
-  still hold the recorded content (check a hash or equivalent witness —
-  the user may have replaced your file with their own under the same
-  name). Never attribute by pattern-match on what LOOKS like automation
+  still hold the recorded content (check a hash — plus the platform's
+  object/generation identity where it has one, since byte-identical
+  content re-created by the user is still the user's; no such identity →
+  content match is the best available witness, and doubt preserves).
+  Never attribute by pattern-match on what LOOKS like automation
   output: a matching-looking file may be the user's. State failing either
   check defaults to human-owned and stays — reported, not removed.
 

@@ -153,15 +153,23 @@ to prove "exactly X was applied" to a delivered state, reconstruct across the
 boundary with an INDEPENDENT prescription of X — a pinned oracle, the
 pre-change implementation (the parity rule above), or the spec — never the
 delivering system's own producer, whose bugs reproduce on re-run and
-self-confirm. Two sound forms: exact full-state comparison
-`apply_independent(baseline) == delivered`, or a true inversion
-`apply⁻¹(delivered) == baseline` ONLY where the inverse is a proven
-bijection — a lossy "undo" (reset-to-default) maps an under-applied state
-back to baseline too and passes exactly the case the check exists to catch.
-Forward inspection of the result confirms what IS there; only the
-independent reconstruction catches both under-application and
-over-application. No independent prescription available → the re-run is a
-consistency check, labelled so — never a proof.
+self-confirm. Two sound forms: full-state comparison
+`apply_independent(baseline) == delivered` over a DECLARED projection —
+the surface X affects, with ambient fields the system mutates on its own
+(ids, timestamps, server defaults) on a declared allow-list, exactly as
+the parity gate above allow-lists intended diffs; raw whole-state equality
+false-fails on every non-pure deliver, and a false-failing gate gets
+weakened or dropped. Or a true inversion `apply⁻¹(delivered) == baseline`
+ONLY where the inverse is a proven bijection — a lossy "undo"
+(reset-to-default) maps an under-applied state back to baseline too and
+passes exactly the case the check exists to catch. Within the projection,
+extra keys and wrong values still expose over-application. Both forms
+prove STATE, not history: repeated idempotent application and duplicate
+side effects that leave identical state are invisible to them — where
+those matter, add an operation/event witness (an application count, an
+audit log), or the claim stays state-only, said so. No independent
+prescription available → the re-run is a consistency check, labelled so —
+never a proof.
 
 **Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
 be removed wholesale (inline locale ternaries, stray global listeners), pin its
@@ -429,18 +437,21 @@ A generic green test is not proof. A gate is real only if:
 11. **A self-benefit metric ships the tests that keep it honest** (`unprobed`
    — see Provenance). Where a tool measures its own benefit — a compression
    ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
-   bounds the metric from BOTH sides: the no-benefit case must read
-   zero/neutral (the floor — run it), at least one known-benefit anchor case
-   must read within a bound of its independently computed expected value
-   (the ceiling — a null-only gate lets the formula overstate every genuine
-   case), and any comparison whose baseline is not the exact immutable
-   identity of the treated input (same bytes/version, not "a similar run")
-   is refused, not reported — a mismatched baseline manufactures benefit on
-   every input. Without these this is item 3's fake-pass family wearing a
-   dashboard: the flattering number can never fail.
+   guards against systematic overstatement from both directions: the
+   no-benefit case must read zero/neutral (the floor — run it); at least
+   one known-benefit calibration anchor per supported input class must read
+   within a PREDECLARED tolerance of its independently computed expected
+   value (anchors calibrate — they bound systematic inflation, they do not
+   prove correctness on untested inputs; a formula/property bound does
+   more where one is derivable); and any comparison whose baseline is not
+   the exact immutable identity of the treated input (same bytes/version,
+   not "a similar run") is refused, not reported — a mismatched baseline
+   manufactures benefit on every input. Without these this is item 3's
+   fake-pass family wearing a dashboard: the flattering number can never
+   fail.
    ❌ "the tool reports 40% savings on every run" — including on input it
    provably cannot compress; nothing asserted the zero-savings case, and
-   nothing bounded the 40%.
+   nothing calibrated the 40%.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -552,9 +563,10 @@ enforces one at runtime — and has its own failure design:
 - **Sentinel-tag every synthetic fixture, so "never leaked verbatim" is one
   grep** (`unprobed` — see Provenance). Embed one shared greppable marker in
   every planted credential and fixture value, collision-checked once against
-  the clean corpus (grep it where nothing was planted — zero hits proves it
-  cannot occur naturally there), so the leak check is executable instead of
-  per-fixture recall. Worked shape: plant `SNTL7Q-`-prefixed values; the
+  the clean corpus (grep it where nothing was planted — zero hits there
+  means the marker is safe to plant for THIS suite; it is a corpus check,
+  not a proof about all possible content), so the leak check is executable
+  instead of per-fixture recall. Worked shape: plant `SNTL7Q-`-prefixed values; the
   done-check is `grep -r 'SNTL7Q-' <logs> <db-dump> <captured-requests>`
   with expected zero hits. State the claim's bound honestly: a byte-level
   grep proves no VERBATIM leak; encoded, escaped, truncated, or transformed
