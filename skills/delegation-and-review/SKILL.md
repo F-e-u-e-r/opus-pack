@@ -740,7 +740,8 @@ reviewers that they silently absorb as implementers.
   less context than you have now.
 - **Collapsing repetition may reduce volume, never variety** (`unprobed`
   — see Provenance). Merge repeated failed attempts into one line only
-  when they are CONSECUTIVE and the SAME attempt failing the SAME way —
+  when they are CONSECUTIVE repeats of the SAME operation failing the
+  SAME way —
   same operation and target AND same error: identical error text on
   different operations is coincidence, not repetition; distinct errors
   under one repeated command never merge; and an intervening success, a
