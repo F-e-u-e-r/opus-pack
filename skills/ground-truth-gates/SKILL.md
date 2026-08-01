@@ -149,14 +149,19 @@ logged. (Freezing the old source *text* as a string is not a parity test — it
 never runs the old code.)
 
 **Replay's inverse — verify-by-reconstruction** (`unprobed` — see Provenance):
-to prove "exactly X was applied" to a delivered state, run X's inverse against
-that state and require arrival at the recorded baseline. Forward inspection of
-the result confirms what IS there; only the inversion catches both
-under-application (prescribed input left unapplied) and over-application
-(changes X never prescribed). Recipe: an executable
-`apply⁻¹(delivered) == baseline` check beside the replay gate; where X has no
-clean inverse, diff `apply(baseline)` against the delivered state instead —
-the same two-sided coverage from the other end.
+to prove "exactly X was applied" to a delivered state, reconstruct across the
+boundary with an INDEPENDENT prescription of X — a pinned oracle, the
+pre-change implementation (the parity rule above), or the spec — never the
+delivering system's own producer, whose bugs reproduce on re-run and
+self-confirm. Two sound forms: exact full-state comparison
+`apply_independent(baseline) == delivered`, or a true inversion
+`apply⁻¹(delivered) == baseline` ONLY where the inverse is a proven
+bijection — a lossy "undo" (reset-to-default) maps an under-applied state
+back to baseline too and passes exactly the case the check exists to catch.
+Forward inspection of the result confirms what IS there; only the
+independent reconstruction catches both under-application and
+over-application. No independent prescription available → the re-run is a
+consistency check, labelled so — never a proof.
 
 **Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
 be removed wholesale (inline locale ternaries, stray global listeners), pin its
@@ -424,14 +429,18 @@ A generic green test is not proof. A gate is real only if:
 11. **A self-benefit metric ships the tests that keep it honest** (`unprobed`
    — see Provenance). Where a tool measures its own benefit — a compression
    ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
-   proves the metric cannot overstate it: run the no-benefit case and assert
-   the metric reads zero/neutral there, and refuse (not report) any
-   comparison whose baseline does not match the treated input's provenance —
-   a mismatched baseline manufactures benefit on every input. Without the
-   null case this is item 3's fake-pass family wearing a dashboard: the
-   flattering number can never fail.
+   bounds the metric from BOTH sides: the no-benefit case must read
+   zero/neutral (the floor — run it), at least one known-benefit anchor case
+   must read within a bound of its independently computed expected value
+   (the ceiling — a null-only gate lets the formula overstate every genuine
+   case), and any comparison whose baseline is not the exact immutable
+   identity of the treated input (same bytes/version, not "a similar run")
+   is refused, not reported — a mismatched baseline manufactures benefit on
+   every input. Without these this is item 3's fake-pass family wearing a
+   dashboard: the flattering number can never fail.
    ❌ "the tool reports 40% savings on every run" — including on input it
-   provably cannot compress; nothing asserted the zero-savings case.
+   provably cannot compress; nothing asserted the zero-savings case, and
+   nothing bounded the 40%.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -540,13 +549,18 @@ enforces one at runtime — and has its own failure design:
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.
-- **Sentinel-tag every synthetic fixture, so "never leaked" is one grep**
-  (`unprobed` — see Provenance). Embed one shared greppable marker that
-  cannot occur naturally (a fixed prefix on every planted credential and
-  fixture value), so "the fixture never leaked" is provable by a single
-  byte-level search over any downstream artifact — logs, databases, captured
-  requests — instead of by per-fixture recall of what was planted where. The
-  marker makes the leak check executable without weakening fixture realism
+- **Sentinel-tag every synthetic fixture, so "never leaked verbatim" is one
+  grep** (`unprobed` — see Provenance). Embed one shared greppable marker in
+  every planted credential and fixture value, collision-checked once against
+  the clean corpus (grep it where nothing was planted — zero hits proves it
+  cannot occur naturally there), so the leak check is executable instead of
+  per-fixture recall. Worked shape: plant `SNTL7Q-`-prefixed values; the
+  done-check is `grep -r 'SNTL7Q-' <logs> <db-dump> <captured-requests>`
+  with expected zero hits. State the claim's bound honestly: a byte-level
+  grep proves no VERBATIM leak; encoded, escaped, truncated, or transformed
+  copies need a representation-aware sweep (search the encodings the
+  pipeline actually applies — base64, URL-encoding, JSON-escaping), or the
+  record says "verbatim only". The marker does not weaken fixture realism
   (the shape rules above still govern the rest of the value). Distinct from
   security-architect's minimize-by-type sentinel: that one proves a
   sensitive FIELD never appears past a parse boundary; this one proves

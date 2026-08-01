@@ -73,17 +73,26 @@ When rigor conflicts with finishing sooner, rigor wins.
   the contract or the user's message, enumerate what actually exists
   (list the directory, glob the relevant subtree) before reading
   specific files — which files matter is not recallable from what
-  projects usually contain. (`unprobed` — see Provenance.)
-- **Two boundary refinements on the ordering above** (`unprobed` — see
+  projects usually contain. (`unprobed` — see Provenance.) Two
+  at-the-boundary refinements of this ordering (`unprobed` — see
   Provenance): (1) a mutable precondition is re-validated immediately
   before the side effect it guards — plan-time validation goes stale while
-  the plan executes (the name free at planning is taken at write time; the
-  file unchanged at read time has changed by commit time); (2) a publish
-  that assigns a stable human-visible name runs name-LAST — produce and
-  verify the artifact under a content-addressed or temporary identity
-  first, then bind the stable name and re-read it, confirming it resolves
-  to the verified content. A name bound first points consumers at an
-  artifact whose verification can still fail.
+  the plan executes (the name free at planning is taken at write time).
+  The recheck NARROWS the race window, it does not close it: where a
+  concurrent writer can interleave between recheck and effect, closing it
+  takes the platform's atomicity (a lock, transaction, compare-and-swap,
+  or detect-conflict-and-retry) — a recheck alone is never cited as
+  exclusion. (2) A publish that assigns a stable human-visible name runs
+  name-LAST where the platform offers any intermediate identity: produce
+  and verify under a content-addressed or staging identity, then bind the
+  stable name and re-read it, confirming it resolves to the verified
+  content. Where the stable name is the ONLY handle (a bare
+  `put(name, content)` store, a registry's `name@version`): verify the
+  artifact locally to a recorded digest, publish under the name, then
+  immediately re-read and compare against that digest — a mismatch is a
+  failed publish to re-drive, and a name-first write with no post-publish
+  comparison never satisfies this. A name bound first with no comparison
+  points consumers at an artifact whose verification can still fail.
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -357,12 +366,17 @@ When rigor conflicts with finishing sooner, rigor wins.
   reads as abandoned work to the next agent and as a fraud signal to an
   auditor. (`unprobed` — see Provenance.)
 - **"You created it" is a provenance claim — reverse only state you can
-  prove this run created** (`unprobed` — see Provenance). The cleanup
+  prove your task created** (`unprobed` — see Provenance). The cleanup
   above — and any retry sweeping up a failed prior attempt, or a rollback
-  — attributes by record (this run's write log, a run-scoped name or tag),
-  never by pattern-match on what LOOKS like automation output: a
-  matching-looking file may be the user's. State you cannot attribute
-  defaults to human-owned and stays — reported, not removed.
+  — attributes by record AND by current identity: the record is the task's
+  own write log or a run-scoped name/tag (spanning this authorized task's
+  turns and resumptions, not one wall-clock invocation — else a resumed
+  session cannot clean its own earlier debris), and the recorded path must
+  still hold the recorded content (check a hash or equivalent witness —
+  the user may have replaced your file with their own under the same
+  name). Never attribute by pattern-match on what LOOKS like automation
+  output: a matching-looking file may be the user's. State failing either
+  check defaults to human-owned and stays — reported, not removed.
 
 ## 4. Verify by observation
 
@@ -615,16 +629,18 @@ When rigor conflicts with finishing sooner, rigor wins.
   report. ❌ the choice explained only in the final chat message.
   (`unprobed` — see Provenance.)
 - **A deliberate "not now" on measured work records the evidence, not just
-  the choice** (`unprobed` — see Provenance). The decisions-note above
-  stays the ≤5-line default; deferring work that was measured, tuned, or
-  adversarially reviewed escalates to a defer-record carrying: the
-  evidence gathered, each claim's review verdict, every rejected
-  alternative WITH the measurement that killed it, what remains unproven,
-  and pre-registered revisit triggers — so the next attempt starts from
-  evidence instead of re-deriving it. Companion gate: instrument before
-  you tune — never ship a change whose target metric is not yet
-  observable; its defer-record states how the metric becomes observable
-  first.
+  the choice** (`unprobed` — see Provenance). One record, two forms: the
+  decisions-note above stays the ≤5-line default, and deferring work that
+  was measured, tuned, or adversarially reviewed escalates that SAME
+  record — same home (the repo's decision record, else project memory),
+  reported through the same "Decisions note: <path>" line — to a
+  defer-record carrying: the evidence gathered, each claim's review
+  verdict, every rejected alternative WITH the measurement that killed it,
+  what remains unproven, and pre-registered revisit triggers — so the next
+  attempt starts from evidence instead of re-deriving it. Companion gate:
+  instrument before you tune — never ship a change whose target metric is
+  not yet observable; its defer-record states how the metric becomes
+  observable first.
 - Honest partial results beat complete-looking results with hidden gaps.
 - **Artifact gate — one owed-disclosure sweep before the report goes out.**
   Re-derive from the actions this run actually took which forced report

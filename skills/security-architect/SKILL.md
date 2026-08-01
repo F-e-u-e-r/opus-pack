@@ -121,12 +121,14 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
    stack traces to the client. Log the token's *id/prefix*, not the token.
    A diagnostic that CROSSES a trust boundary — an API error response, a
    user-facing message, a shared or exported log — gets the stricter form
-   (`unprobed` — see Provenance): name the defect's category and location,
-   never echo the triggering value, key name, or path (echoing the input
-   is how injection payloads and secret-bearing inputs propagate into
-   logs), and drop upstream `caused-by` chains at the boundary — they leak
-   internal structure. Inner-boundary debug logging may carry values under
-   rule 6's constraints; the stricter form binds what crosses.
+   (`unprobed` — see Provenance): name the defect's category, and its
+   location by the component's OWN stable identifiers (component or stage
+   name, error code, the schema's declared field name) — never by echoing
+   the triggering VALUE or any input-derived name or path, which is how
+   injection payloads and secret-bearing input propagate into logs — and
+   drop upstream `caused-by` chains at the boundary; they leak internal
+   structure. Inner-boundary debug logging may carry values under rule 6's
+   constraints; the stricter form binds what crosses.
 
 ## Where secrets and tokens live (per platform, verified 2026-07)
 

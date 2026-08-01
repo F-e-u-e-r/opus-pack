@@ -124,14 +124,20 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   retried** (`unprobed` — see the skill's Provenance). A timeout, dropped
   connection, or ambiguous response after a create/send/charge leaves the
   effect UNKNOWN — a retry can double it, and "it probably failed" is not
-  evidence. Run such mutations serially (one in flight); resolve the
-  unknown by exact read-back from the DESTINATION — query by the request's
+  evidence. Run such mutations serially (one in flight), then resolve in
+  this order: (1) no destination query API, or no request identity to
+  query by (fire-and-forget email/SMS/webhook) → report "uncertain" as a
+  TERMINAL state immediately — never invent a probe loop, never retry;
+  (2) otherwise read back from the DESTINATION by the request's
   idempotency key or unique payload identity (security-architect's
   money-path reserve/commit + query-by-key form is the canonical
-  instance; this entry generalizes it to any side-effecting create) —
-  before claiming success or retrying; and where the read-back cannot
-  resolve it, report "uncertain" as a TERMINAL state — a report value the
-  caller decides on, never a retry trigger.
+  instance; this entry generalizes it), under a recorded time/attempt
+  cap — and only an AUTHORITATIVE read clears the unknown: a stale or
+  eventually-consistent "not found" does not authorize a retry, because
+  the original can still land after it; (3) at the cap, or on any
+  non-authoritative ambiguity → terminal "uncertain" — a report value the
+  caller decides on, never a retry trigger. Success is claimed only on a
+  positive identity match.
 
 - **A recurring schedule's own "completed" report is not evidence its side
   effects landed — verify at the destinations, attributed to the
