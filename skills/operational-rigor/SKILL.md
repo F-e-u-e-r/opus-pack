@@ -74,6 +74,16 @@ When rigor conflicts with finishing sooner, rigor wins.
   (list the directory, glob the relevant subtree) before reading
   specific files — which files matter is not recallable from what
   projects usually contain. (`unprobed` — see Provenance.)
+- **Two boundary refinements on the ordering above** (`unprobed` — see
+  Provenance): (1) a mutable precondition is re-validated immediately
+  before the side effect it guards — plan-time validation goes stale while
+  the plan executes (the name free at planning is taken at write time; the
+  file unchanged at read time has changed by commit time); (2) a publish
+  that assigns a stable human-visible name runs name-LAST — produce and
+  verify the artifact under a content-addressed or temporary identity
+  first, then bind the stable name and re-read it, confirming it resolves
+  to the verified content. A name bound first points consumers at an
+  artifact whose verification can still fail.
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -346,6 +356,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   deleting (§2's gates apply to your own litter too). Leftover debris
   reads as abandoned work to the next agent and as a fraud signal to an
   auditor. (`unprobed` — see Provenance.)
+- **"You created it" is a provenance claim — reverse only state you can
+  prove this run created** (`unprobed` — see Provenance). The cleanup
+  above — and any retry sweeping up a failed prior attempt, or a rollback
+  — attributes by record (this run's write log, a run-scoped name or tag),
+  never by pattern-match on what LOOKS like automation output: a
+  matching-looking file may be the user's. State you cannot attribute
+  defaults to human-owned and stays — reported, not removed.
 
 ## 4. Verify by observation
 
@@ -597,6 +614,17 @@ When rigor conflicts with finishing sooner, rigor wins.
   acceptable" → appended to the project's decision log, path cited in the
   report. ❌ the choice explained only in the final chat message.
   (`unprobed` — see Provenance.)
+- **A deliberate "not now" on measured work records the evidence, not just
+  the choice** (`unprobed` — see Provenance). The decisions-note above
+  stays the ≤5-line default; deferring work that was measured, tuned, or
+  adversarially reviewed escalates to a defer-record carrying: the
+  evidence gathered, each claim's review verdict, every rejected
+  alternative WITH the measurement that killed it, what remains unproven,
+  and pre-registered revisit triggers — so the next attempt starts from
+  evidence instead of re-deriving it. Companion gate: instrument before
+  you tune — never ship a change whose target metric is not yet
+  observable; its defer-record states how the metric becomes observable
+  first.
 - Honest partial results beat complete-looking results with hidden gaps.
 - **Artifact gate — one owed-disclosure sweep before the report goes out.**
   Re-derive from the actions this run actually took which forced report
@@ -842,6 +870,18 @@ receive, and its shipped docs warn against reading a concurrency
 setting back as proof that execution happened — the
 config-readback-as-result fake-pass shape. Ships `unprobed` per the
 covenant; its probe joins the private round-5 queue.
+The §2 boundary-refinements bullet (at-mutation recheck + name-last
+publishing), the §3 provenance-attributed-cleanup bullet, the §5
+defer-with-evidence bullet, and the two external-systems entries dated the
+same day (2026-08-01) are the operational-rigor slice of the
+deferred-candidate backlog from the 2026-07-31 two-repo mining pass
+(opus-pack #112, triaged under #115 Phase 1; ideas only, no text — same
+sourcing and acknowledgements as the two 2026-07-31 PRs). Each was deferred
+at the original gate as needing reconciliation with existing gates or a
+crisp trigger; the reconciled wording here is this pack's. All ship
+`unprobed` per the covenant; their probes join the private round-5 queue —
+the uncertain-outcome entry's probe shape is recorded in
+`references/external-systems.md`'s provenance.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

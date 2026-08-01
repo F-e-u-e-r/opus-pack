@@ -111,6 +111,27 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   fully-broken deploy); the truthful repro is building the production artifact
   and importing it — dev-mode resolvers prove nothing about production module
   loading.
+- **A one-directional flag is meaningful in only one direction — never read
+  the meaningless direction as evidence** (`unprobed` — see the skill's
+  Provenance). Some external status fields carry signal only when SET
+  (set ⇒ a failure was recorded; unset ⇒ nothing — not success, not
+  health): type them that way, make absence representable (`unknown`,
+  never a defaulted `false`), and reject any inference from the direction
+  the producer never writes. Absent ≠ false. Operational-rigor §4's
+  field-semantics rule (a field's name is not its contract) names the
+  general trap; this is its named one-directional shape.
+- **A side-effecting create whose outcome is unknown is never blindly
+  retried** (`unprobed` — see the skill's Provenance). A timeout, dropped
+  connection, or ambiguous response after a create/send/charge leaves the
+  effect UNKNOWN — a retry can double it, and "it probably failed" is not
+  evidence. Run such mutations serially (one in flight); resolve the
+  unknown by exact read-back from the DESTINATION — query by the request's
+  idempotency key or unique payload identity (security-architect's
+  money-path reserve/commit + query-by-key form is the canonical
+  instance; this entry generalizes it to any side-effecting create) —
+  before claiming success or retrying; and where the read-back cannot
+  resolve it, report "uncertain" as a TERMINAL state — a report value the
+  caller decides on, never a retry trigger.
 
 - **A recurring schedule's own "completed" report is not evidence its side
   effects landed — verify at the destinations, attributed to the
@@ -254,6 +275,16 @@ scheduled-process rule added in opus-pack #49 — placed here per the
 2026-07-14 split precedent (boundary-specific protocols out of the lean
 core); its incident provenance and `unprobed` marker live with that rule in
 the skill's Provenance.
+
+The one-directional-flag and uncertain-outcome-mutation entries (2026-08-01)
+are from the 2026-07-31 two-repo mining pass's deferred backlog (opus-pack
+#112, triaged under #115 Phase 1; ideas only — see the skill's Provenance
+for the batch note). Both ship `unprobed`; the uncertain-outcome entry's
+designed probe shape for the round-5 queue: the worker's create tool
+returns a timeout mid-task — the bare arm blindly retries (risking a
+double effect) or claims success; the ruled arm serializes, reads back
+from the destination by the request's identity, and where unresolved
+reports "uncertain" as terminal rather than retrying.
 
 Environment-specific facts to re-verify against current tooling: a tool's
 exit-code table (qpdf's), real success-latency distributions, cache TTL/state

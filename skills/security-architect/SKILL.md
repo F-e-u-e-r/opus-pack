@@ -119,6 +119,14 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
    any suspicion.
 7. **Logs and error responses** never contain tokens, passwords, PII, or
    stack traces to the client. Log the token's *id/prefix*, not the token.
+   A diagnostic that CROSSES a trust boundary — an API error response, a
+   user-facing message, a shared or exported log — gets the stricter form
+   (`unprobed` — see Provenance): name the defect's category and location,
+   never echo the triggering value, key name, or path (echoing the input
+   is how injection payloads and secret-bearing inputs propagate into
+   logs), and drop upstream `caused-by` chains at the boundary — they leak
+   internal structure. Inner-boundary debug logging may carry values under
+   rule 6's constraints; the stricter form binds what crosses.
 
 ## Where secrets and tokens live (per platform, verified 2026-07)
 
@@ -515,4 +523,11 @@ third-family cross-check, with every load-bearing citation re-verified
 against the source; it kept only concepts the adjudication found no
 existing-skill equivalent for. All five ship `unprobed` per the covenant; their
 probes join the private round-5 queue.
+The rule-7 boundary-crossing-diagnostic clause (2026-08-01) is the
+security-architect slice of the same pass's deferred backlog (opus-pack
+#112, triaged under #115 Phase 1; ideas only, no text — sourcing as above).
+It was deferred at the original gate for wording that would not outlaw
+legitimate inner-boundary debug logging; the crossing/inner split here is
+that wording. Ships `unprobed` per the covenant; its probe joins the
+private round-5 queue.
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.

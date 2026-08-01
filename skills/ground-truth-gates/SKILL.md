@@ -148,6 +148,16 @@ diffs). It is the replay gate for code you are refactoring when you have nothing
 logged. (Freezing the old source *text* as a string is not a parity test — it
 never runs the old code.)
 
+**Replay's inverse — verify-by-reconstruction** (`unprobed` — see Provenance):
+to prove "exactly X was applied" to a delivered state, run X's inverse against
+that state and require arrival at the recorded baseline. Forward inspection of
+the result confirms what IS there; only the inversion catches both
+under-application (prescribed input left unapplied) and over-application
+(changes X never prescribed). Recipe: an executable
+`apply⁻¹(delivered) == baseline` check beside the replay gate; where X has no
+clean inverse, diff `apply(baseline)` against the delivered state instead —
+the same two-sided coverage from the other end.
+
 **Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
 be removed wholesale (inline locale ternaries, stray global listeners), pin its
 current grep count as a dated baseline with the hits enumerated; the executable
@@ -411,6 +421,17 @@ A generic green test is not proof. A gate is real only if:
    ❌ "all 30 checks pass after the move" — they would have passed identically
    against the pre-move copy still sitting in the old directory, which is why
    the count says nothing about the move.
+11. **A self-benefit metric ships the tests that keep it honest** (`unprobed`
+   — see Provenance). Where a tool measures its own benefit — a compression
+   ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
+   proves the metric cannot overstate it: run the no-benefit case and assert
+   the metric reads zero/neutral there, and refuse (not report) any
+   comparison whose baseline does not match the treated input's provenance —
+   a mismatched baseline manufactures benefit on every input. Without the
+   null case this is item 3's fake-pass family wearing a dashboard: the
+   flattering number can never fail.
+   ❌ "the tool reports 40% savings on every run" — including on input it
+   provably cannot compress; nothing asserted the zero-savings case.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -519,6 +540,17 @@ enforces one at runtime — and has its own failure design:
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.
+- **Sentinel-tag every synthetic fixture, so "never leaked" is one grep**
+  (`unprobed` — see Provenance). Embed one shared greppable marker that
+  cannot occur naturally (a fixed prefix on every planted credential and
+  fixture value), so "the fixture never leaked" is provable by a single
+  byte-level search over any downstream artifact — logs, databases, captured
+  requests — instead of by per-fixture recall of what was planted where. The
+  marker makes the leak check executable without weakening fixture realism
+  (the shape rules above still govern the rest of the value). Distinct from
+  security-architect's minimize-by-type sentinel: that one proves a
+  sensitive FIELD never appears past a parse boundary; this one proves
+  planted test material never ESCAPES the test boundary.
 - **A relief valve is a pre-existing, owner-designed, friction-plus-log override
   — never one an agent invents to unblock itself**, and never added to a control
   the owner designated non-bypassable (an immutable policy-checker). Security /
@@ -709,5 +741,13 @@ the pair. A cross-family review of this addition corrected its first draft,
 which claimed a token statistic "can never fire" on a phrase: the statistic
 does respond, and the real barrier is separability, not response. Ships
 `unprobed` per the covenant; its probe joins the private round-5 queue.
+The verify-by-reconstruction recipe, the item-11 self-benefit-metric rule,
+and the sentinel-tagged-fixtures bullet (2026-08-01) are the
+ground-truth-gates slice of the deferred-candidate backlog from the
+2026-07-31 two-repo mining pass (opus-pack #112, triaged under #115 Phase 1;
+ideas only, no text — same sourcing and acknowledgements as the two
+2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
+needing generalized wording; the wording here is this pack's. All three ship
+`unprobed` per the covenant; their probes join the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps) and were run
 green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
