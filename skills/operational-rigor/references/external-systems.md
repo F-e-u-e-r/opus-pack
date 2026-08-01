@@ -137,18 +137,21 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   the original can still land after it. The read-back has exactly three
   exits: an authoritative positive identity match → success; an
   authoritative absence under the request's identity → failed-not-applied
-  ONLY when the original request provably can no longer apply — a terminal
-  request-status from the provider, a cancellation/fencing receipt, or a
-  documented expiry that has passed — because absence-now does not rule
-  out a timed-out original still arriving later from a queue, proxy, or
-  executing server; with that in-flight window still open, a re-issue is
-  safe only under a documented idempotency guarantee whose retention
-  window covers concurrent and late arrivals (the same key deduplicates
-  the straggler), and the read is never described as proof the original
-  failed; at the cap, on any non-authoritative ambiguity, or where
-  neither terminality nor an idempotency guarantee can be established →
-  terminal "uncertain" — a report value the caller decides on, never a
-  retry trigger.
+  ONLY on evidence that covers BOTH axes — the future (the original
+  provably can no longer apply: a terminal request-status, a
+  cancellation/fencing receipt, a documented passed expiry) AND the past
+  (it never applied: a durable application-history query, or a terminal
+  receipt explicitly attesting never-applied) — because absence-now on a
+  non-monotonic store also matches applied-then-deleted/consumed/expired,
+  and a "failed" verdict there resurrects or duplicates a consumed
+  effect; with either axis open, a re-issue is safe only under a
+  documented idempotency guarantee whose retention window covers
+  concurrent and late arrivals (the same key deduplicates the straggler),
+  and the read is never described as proof the original failed; at the
+  cap, on any non-authoritative ambiguity, or where neither both-axis
+  evidence nor an idempotency guarantee can be established → terminal
+  "uncertain" — a report value the caller decides on, never a retry
+  trigger.
 
 - **A recurring schedule's own "completed" report is not evidence its side
   effects landed — verify at the destinations, attributed to the
@@ -301,10 +304,13 @@ designed probe shape for the round-5 queue, three arms matching the
 entry's load-bearing branches: (a) queryable destination — the create
 tool times out; the bare arm blindly retries (risking a double effect) or
 claims success, the ruled arm serializes, reads back by the request's
-identity, and on authoritative absence re-issues only when terminality is
-established (a terminal request-status, fencing receipt, or passed
-expiry) or the fixture's documented idempotency-retention window covers a
-late arrival — absent both, the ruled arm reports terminal "uncertain";
+identity, and on authoritative absence re-issues only when both axes are
+established (future: terminal status/fencing/passed expiry; past: an
+application-history or never-applied receipt) or the fixture's documented
+idempotency-retention window covers a late arrival — absent these, the
+ruled arm reports terminal "uncertain"; an applied-then-removed variant
+(the effect landed, then was consumed/deleted before the read) checks the
+bare arm resurrects it as "failed" while the ruled arm holds uncertain;
 (b) fire-and-forget destination (no query API) — the bare arm invents a
 probe loop or retries, the ruled arm reports terminal "uncertain"
 immediately; (c) stale-read trap — the destination's first read returns

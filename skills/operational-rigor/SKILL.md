@@ -105,11 +105,16 @@ When rigor conflicts with finishing sooner, rigor wins.
   re-read AUTHORITATIVELY and compare against that digest — an
   eventually-consistent read can return stale bytes, so a non-authoritative
   mismatch is "uncertain", not a verdict. An authoritative mismatch is a
-  FAILED PUBLISH to report with the observed digest — re-drive only when
-  an authoritative re-read shows the name absent/empty or still holding
-  this task's own prior bytes; a name that now holds foreign content
-  (a concurrent publisher, the user's own write) is never overwritten to
-  make the check pass. A name-first write with no post-publish comparison
+  FAILED PUBLISH to report with the observed digest — re-drive only under
+  the same non-clobbering primitive with this task's recorded
+  generation/object identity from its own earlier bind, or a durable
+  idempotent request outcome; an authoritative "absent" alone, or bytes
+  matching this task's prior content alone, licenses NO re-drive — absence
+  on a mutable name is non-monotonic (another actor's bind may have come
+  and gone), and byte equality does not establish ownership (§3's cleanup
+  rule: identical content re-created by another actor is theirs) — either
+  alone → report "uncertain", do not re-drive. A name that holds foreign
+  content is never overwritten to make the check pass. A name-first write with no post-publish comparison
   never satisfies this; a name bound first with no comparison points
   consumers at an artifact whose verification can still fail.
 - Identify one-way doors. Destructive actions need explicit confirmation for that
