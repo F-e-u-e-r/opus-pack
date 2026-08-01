@@ -458,14 +458,18 @@ A generic green test is not proof. A gate is real only if:
    expected value (anchors calibrate — they bound systematic inflation,
    they do not prove correctness on untested inputs; a formula/property
    bound does more where one is derivable); and a comparison is admitted
-   only when the baseline matches the treated input's exact immutable
-   identity (same bytes/version) AND every declared benefit-affecting
-   non-treatment variable — pricing, configuration, workload, observation
-   window — or carries a predeclared, justified normalization; anything
-   short is refused, not reported, because a shifted non-treatment
-   variable manufactures benefit on identical input. Without these this is
-   item 3's fake-pass family wearing a dashboard: the flattering number
-   can never fail.
+   only under two independent conditions: (a) the baseline matches the
+   treated input's exact immutable identity (same bytes/version) — an
+   unconditional equality that no normalization may substitute for; and
+   (b) the benefit-affecting non-treatment variables — pricing,
+   configuration, workload, observation window — are INVENTORIED, and
+   each one individually matches or carries its own predeclared,
+   justified normalization; an omitted variable fails admission rather
+   than escaping comparison. Anything short of both is refused, not
+   reported, because a shifted non-treatment variable manufactures
+   benefit on identical input; the suite exercises both refusal branches.
+   Without these this is item 3's fake-pass family wearing a dashboard:
+   the flattering number can never fail.
    ❌ "the tool reports 40% savings on every run" — including on input it
    provably cannot compress; nothing asserted the zero-savings case, and
    nothing calibrated the 40%.
@@ -593,11 +597,18 @@ enforces one at runtime — and has its own failure design:
   constrained fixture still reaches its intended production path. Runnable
   worked example: `template/sentinel/run.mjs` (collision check + leak scan
   + the constrained-class manifest; its `--demo-leak` mode shows the
-  failing side). State the claim's bound honestly: the scan proves no
-  VERBATIM leak; encoded, escaped, truncated, or transformed copies need a
-  representation-aware sweep (search the encodings the pipeline actually
-  applies — base64, URL-encoding, JSON-escaping), or the record says
-  "verbatim only". Distinct from security-architect's minimize-by-type
+  failing side). State the claim's bound honestly on BOTH dimensions —
+  representation and coverage: the scan proves no VERBATIM occurrence
+  (encoded, escaped, truncated, or transformed copies need a
+  representation-aware sweep over the encodings the pipeline actually
+  applies, or the record says "verbatim only"), and it proves it only over
+  a DECLARED surface-and-window manifest — every downstream sink fixtures
+  can reach, over the retention interval the claim covers; a merely
+  nonempty artifact pile is not coverage, and a declared surface that
+  cannot be queried makes the result INCOMPLETE, never PASS. The tool's
+  own diagnostics never republish what they guard: failure output names
+  class, count, and source ordinal — never the sentinel value or the raw
+  matched record. Distinct from security-architect's minimize-by-type
   sentinel: that one proves a sensitive FIELD never appears past a parse
   boundary; this one proves planted test material never ESCAPES the test
   boundary.
