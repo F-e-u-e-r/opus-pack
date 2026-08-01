@@ -88,7 +88,14 @@ When rigor conflicts with finishing sooner, rigor wins.
   stable name and re-read it, confirming it resolves to the verified
   content. Where the stable name is the ONLY handle (a bare
   `put(name, content)` store, a registry's `name@version`): verify the
-  artifact locally to a recorded digest, publish under the name, then
+  artifact locally to a recorded digest, then BIND without clobbering —
+  use the platform's create-if-absent / compare-and-swap / lock primitive
+  where one exists (a plain overwriting put destroys a concurrent or
+  pre-existing foreign binding before any re-read can see it); with no
+  such primitive, read the name first — absent, or holding this task's
+  own prior bytes → put; holding foreign content → fail closed and
+  report, never overwrite — accepting the residual read-then-put race as
+  the platform's named floor. Then
   re-read AUTHORITATIVELY and compare against that digest — an
   eventually-consistent read can return stale bytes, so a non-authoritative
   mismatch is "uncertain", not a verdict. An authoritative mismatch is a
