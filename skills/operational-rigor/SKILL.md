@@ -73,7 +73,50 @@ When rigor conflicts with finishing sooner, rigor wins.
   the contract or the user's message, enumerate what actually exists
   (list the directory, glob the relevant subtree) before reading
   specific files — which files matter is not recallable from what
-  projects usually contain. (`unprobed` — see Provenance.)
+  projects usually contain. (`unprobed` — see Provenance.) Two
+  at-the-boundary refinements of this ordering (`unprobed` — see
+  Provenance): (1) a mutable precondition is re-validated immediately
+  before the side effect it guards — plan-time validation goes stale while
+  the plan executes (the name free at planning is taken at write time).
+  The recheck NARROWS the race window, it does not close it: where a
+  concurrent writer can interleave between recheck and effect, closing it
+  takes the platform's atomicity (a lock, transaction, compare-and-swap,
+  or detect-conflict-and-retry) — a recheck alone is never cited as
+  exclusion. (2) A publish that assigns a stable human-visible name runs
+  name-LAST where the platform offers any intermediate identity: produce
+  and verify under a content-addressed or staging identity, then bind the
+  stable name and re-read it, confirming it resolves to the verified
+  content. EVERY stable-name bind is non-clobbering — the final alias
+  bind after staging just as much as a direct put: use the platform's
+  create-if-absent / compare-and-swap / lock primitive where one exists
+  (a plain overwriting bind destroys a concurrent or pre-existing foreign
+  binding before any re-read can see it, and the post-bind digest then
+  matches YOUR content while someone else's binding was destroyed). Where
+  the stable name is the ONLY handle (a bare `put(name, content)` store,
+  a registry's `name@version`), verify the artifact locally to a recorded
+  digest first, then bind under the same discipline. With no such
+  primitive on the bind path, a read-then-bind still overwrites whatever
+  lands in the read-bind window — so proceed only under an established
+  exclusive-writer or quiescence guarantee for that name (a registry only
+  this task publishes to, a maintenance window); no primitive and no such
+  guarantee → fail closed and report, or obtain explicit authorization for
+  a labelled best-effort overwrite that names this exact risk. A name
+  found holding foreign content is never overwritten. Then
+  re-read AUTHORITATIVELY and compare against that digest — an
+  eventually-consistent read can return stale bytes, so a non-authoritative
+  mismatch is "uncertain", not a verdict. An authoritative mismatch is a
+  FAILED PUBLISH to report with the observed digest — re-drive only under
+  the same non-clobbering primitive with this task's recorded
+  generation/object identity from its own earlier bind, or a durable
+  idempotent request outcome; an authoritative "absent" alone, or bytes
+  matching this task's prior content alone, licenses NO re-drive — absence
+  on a mutable name is non-monotonic (another actor's bind may have come
+  and gone), and byte equality does not establish ownership (§3's cleanup
+  rule: identical content re-created by another actor is theirs) — either
+  alone → report "uncertain", do not re-drive. A name that holds foreign
+  content is never overwritten to make the check pass. A name-first write with no post-publish comparison
+  never satisfies this; a name bound first with no comparison points
+  consumers at an artifact whose verification can still fail.
 - Identify one-way doors. Destructive actions need explicit confirmation for that
   action or a recoverable checkpoint (backup, branch, dry run reviewed first).
 - Run destructive operations one at a time; never batch deletions, force-pushes,
@@ -346,6 +389,25 @@ When rigor conflicts with finishing sooner, rigor wins.
   deleting (§2's gates apply to your own litter too). Leftover debris
   reads as abandoned work to the next agent and as a fraud signal to an
   auditor. (`unprobed` — see Provenance.)
+- **"You created it" is a provenance claim — reverse only state you can
+  prove your task created** (`unprobed` — see Provenance). The cleanup
+  above — and any retry sweeping up a failed prior attempt, or a rollback
+  — attributes by record AND by current identity: the record is the task's
+  own write log or a run-scoped name/tag (spanning this authorized task's
+  turns and resumptions, not one wall-clock invocation — else a resumed
+  session cannot clean its own earlier debris), and the recorded path must
+  still hold the recorded content (check a hash — plus the platform's
+  object/generation identity where it has one, since byte-identical
+  content re-created by the user is still the user's). Where no
+  generation identity exists, a content match alone cannot rule that
+  re-creation out — so deletion on record+content alone is licensed only
+  inside a namespace reserved to this run (your own scratch directory, a
+  run-tagged path no human edits); outside such a namespace,
+  content-only attribution is non-probative and the state is retained
+  and reported, not removed.
+  Never attribute by pattern-match on what LOOKS like automation
+  output: a matching-looking file may be the user's. State failing either
+  check defaults to human-owned and stays — reported, not removed.
 
 ## 4. Verify by observation
 
@@ -597,6 +659,19 @@ When rigor conflicts with finishing sooner, rigor wins.
   acceptable" → appended to the project's decision log, path cited in the
   report. ❌ the choice explained only in the final chat message.
   (`unprobed` — see Provenance.)
+- **A deliberate "not now" on measured work records the evidence, not just
+  the choice** (`unprobed` — see Provenance). One record, two forms: the
+  decisions-note above stays the ≤5-line default, and deferring work that
+  was measured, tuned, or adversarially reviewed escalates that SAME
+  record — same home (the repo's decision record, else project memory),
+  reported through the same "Decisions note: <path>" line — to a
+  defer-record carrying: the evidence gathered, each claim's review
+  verdict, every rejected alternative WITH the measurement that killed it,
+  what remains unproven, and pre-registered revisit triggers — so the next
+  attempt starts from evidence instead of re-deriving it. Companion gate:
+  instrument before you tune — never ship a change whose target metric is
+  not yet observable; its defer-record states how the metric becomes
+  observable first.
 - Honest partial results beat complete-looking results with hidden gaps.
 - **Artifact gate — one owed-disclosure sweep before the report goes out.**
   Re-derive from the actions this run actually took which forced report
@@ -842,6 +917,18 @@ receive, and its shipped docs warn against reading a concurrency
 setting back as proof that execution happened — the
 config-readback-as-result fake-pass shape. Ships `unprobed` per the
 covenant; its probe joins the private round-5 queue.
+The §2 boundary-refinements bullet (at-mutation recheck + name-last
+publishing), the §3 provenance-attributed-cleanup bullet, the §5
+defer-with-evidence bullet, and the two external-systems entries dated the
+same day (2026-08-01) are the operational-rigor slice of the
+deferred-candidate backlog from the 2026-07-31 two-repo mining pass
+(opus-pack #112, triaged under #115 Phase 1; ideas only, no text — same
+sourcing and acknowledgements as the two 2026-07-31 PRs). Each was deferred
+at the original gate as needing reconciliation with existing gates or a
+crisp trigger; the reconciled wording here is this pack's. All ship
+`unprobed` per the covenant; their probes join the private round-5 queue —
+the uncertain-outcome entry's probe shape is recorded in
+`references/external-systems.md`'s provenance.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

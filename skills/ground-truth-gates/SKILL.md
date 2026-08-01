@@ -148,6 +148,35 @@ diffs). It is the replay gate for code you are refactoring when you have nothing
 logged. (Freezing the old source *text* as a string is not a parity test — it
 never runs the old code.)
 
+**Replay's inverse — verify-by-reconstruction** (`unprobed` — see Provenance):
+to prove "exactly X was applied" to a delivered state, reconstruct across the
+boundary with an INDEPENDENT prescription of X — a pinned oracle, the
+pre-change implementation (the parity rule above), or the spec — never the
+delivering system's own producer, whose bugs reproduce on re-run and
+self-confirm. Two sound forms: full-state comparison
+`apply_independent(baseline) == delivered` over a DECLARED projection —
+and the projection must cover the complete mutation boundary: every field
+X touches AND the fields expected to stay unchanged, with only the ambient
+fields the system legitimately mutates on its own (ids, timestamps, server
+defaults) on a declared allow-list, exactly as the parity gate above
+allow-lists intended diffs. A projection cut down to "what X touches"
+passes a delivery that also mutated state outside it — the nearest
+over-application variant; where the full boundary genuinely cannot be
+enumerated, the conclusion narrows to "exact within this projection" and
+every out-of-projection surface is reported unverified, never implied
+proven. (Raw whole-state equality with no allow-list false-fails on every
+non-pure deliver, and a false-failing gate gets weakened or dropped.) Or a
+true inversion `apply⁻¹(delivered) == baseline` ONLY where the inverse is
+a proven bijection — a lossy "undo" (reset-to-default) maps an
+under-applied state back to baseline too and passes exactly the case the
+check exists to catch. Both forms
+prove STATE, not history: repeated idempotent application and duplicate
+side effects that leave identical state are invisible to them — where
+those matter, add an operation/event witness (an application count, an
+audit log), or the claim stays state-only, said so. No independent
+prescription available → the re-run is a consistency check, labelled so —
+never a proof.
+
 **Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
 be removed wholesale (inline locale ternaries, stray global listeners), pin its
 current grep count as a dated baseline with the hits enumerated; the executable
@@ -411,6 +440,39 @@ A generic green test is not proof. A gate is real only if:
    ❌ "all 30 checks pass after the move" — they would have passed identically
    against the pre-move copy still sitting in the old directory, which is why
    the count says nothing about the move.
+11. **A self-benefit metric ships the tests that keep it honest** (`unprobed`
+   — see Provenance). Where a tool measures its own benefit — a compression
+   ratio, cost savings, a cache-hit gain, "N duplicates removed" — the suite
+   guards against systematic overstatement from both directions: the
+   no-benefit case must read its independently expected value on the
+   metric's OWN scale, at or beyond the metric's declared no-benefit point
+   in the harm direction — a signed delta reads `<= 0`, a compression
+   RATIO reads `>= 1` on expansion — so the suite names each metric's
+   no-benefit point (or normalizes to signed benefit) first; an
+   incompressible input EXPANDS under framing overhead, a cache can cost
+   more than it saves, and a metric whose scale clamps at the no-benefit
+   point is itself flattering (run it, and preserve the harm-side reading
+   unless the declared domain genuinely cannot represent one); at
+   least one known-benefit calibration anchor per supported input class
+   must read within a PREDECLARED tolerance of its independently computed
+   expected value (anchors calibrate — they bound systematic inflation,
+   they do not prove correctness on untested inputs; a formula/property
+   bound does more where one is derivable); and a comparison is admitted
+   only under two independent conditions: (a) the baseline matches the
+   treated input's exact immutable identity (same bytes/version) — an
+   unconditional equality that no normalization may substitute for; and
+   (b) the benefit-affecting non-treatment variables — pricing,
+   configuration, workload, observation window — are INVENTORIED, and
+   each one individually matches or carries its own predeclared,
+   justified normalization; an omitted variable fails admission rather
+   than escaping comparison. Anything short of both is refused, not
+   reported, because a shifted non-treatment variable manufactures
+   benefit on identical input; the suite exercises both refusal branches.
+   Without these this is item 3's fake-pass family wearing a dashboard:
+   the flattering number can never fail.
+   ❌ "the tool reports 40% savings on every run" — including on input it
+   provably cannot compress; nothing asserted the zero-savings case, and
+   nothing calibrated the 40%.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -519,6 +581,37 @@ enforces one at runtime — and has its own failure design:
   ❌ "it flags my test key, so the scanner works" — the test key is the shape
   you already had in mind; the question is whether it flags the ones that are
   actually there.
+- **Sentinel-tag every synthetic fixture, so "never leaked verbatim" is one
+  scan** (`unprobed` — see Provenance). Embed one shared greppable marker in
+  every free-form fixture value, collision-checked once against the clean
+  corpus (grep it where nothing was planted — zero hits there means the
+  marker is safe to plant for THIS suite; a corpus check, not a proof about
+  all possible content), so the leak check is executable instead of
+  per-fixture recall. A shape-CONSTRAINED class — a hex credential, a UUID,
+  a checksummed or enum identifier — cannot carry the free-text marker
+  without leaving its grammar and silently stopping short of the production
+  parser it exists to exercise (the shape rules above): give each such
+  class a grammar-VALID sentinel (a fixed hex stem, a reserved UUID
+  prefix), keep the full sentinel list in one manifest so the scan stays
+  one command over all of them, and keep a regression proving each
+  constrained fixture still reaches its intended production path. Runnable
+  worked example: `template/sentinel/run.mjs` (collision check + leak scan
+  + the constrained-class manifest; its `--demo-leak` mode shows the
+  failing side). State the claim's bound honestly on BOTH dimensions —
+  representation and coverage: the scan proves no VERBATIM occurrence
+  (encoded, escaped, truncated, or transformed copies need a
+  representation-aware sweep over the encodings the pipeline actually
+  applies, or the record says "verbatim only"), and it proves it only over
+  a DECLARED surface-and-window manifest — every downstream sink fixtures
+  can reach, over the retention interval the claim covers; a merely
+  nonempty artifact pile is not coverage, and a declared surface that
+  cannot be queried makes the result INCOMPLETE, never PASS. The tool's
+  own diagnostics never republish what they guard: failure output names
+  class, count, and source ordinal — never the sentinel value or the raw
+  matched record. Distinct from security-architect's minimize-by-type
+  sentinel: that one proves a sensitive FIELD never appears past a parse
+  boundary; this one proves planted test material never ESCAPES the test
+  boundary.
 - **A relief valve is a pre-existing, owner-designed, friction-plus-log override
   — never one an agent invents to unblock itself**, and never added to a control
   the owner designated non-bypassable (an immutable policy-checker). Security /
@@ -709,5 +802,15 @@ the pair. A cross-family review of this addition corrected its first draft,
 which claimed a token statistic "can never fire" on a phrase: the statistic
 does respond, and the real barrier is separability, not response. Ships
 `unprobed` per the covenant; its probe joins the private round-5 queue.
-`template/` scripts are self-contained (Node + bash, zero deps) and were run
-green on 2026-07-06 with Node v23; re-verify with `bash template/run-all.sh`.
+The verify-by-reconstruction recipe, the item-11 self-benefit-metric rule,
+and the sentinel-tagged-fixtures bullet (2026-08-01) are the
+ground-truth-gates slice of the deferred-candidate backlog from the
+2026-07-31 two-repo mining pass (opus-pack #112, triaged under #115 Phase 1;
+ideas only, no text — same sourcing and acknowledgements as the two
+2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
+needing generalized wording; the wording here is this pack's. All three ship
+`unprobed` per the covenant; their probes join the private round-5 queue.
+`template/` scripts are self-contained (Node + bash, zero deps); the
+golden/replay starters ran green on 2026-07-06 with Node v23, and the
+sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
+2026-08-01; re-verify with `bash template/run-all.sh`.
