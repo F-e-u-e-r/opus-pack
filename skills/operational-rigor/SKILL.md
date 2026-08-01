@@ -439,6 +439,19 @@ When rigor conflicts with finishing sooner, rigor wins.
   "disclosed as unverified" when a dev server was one command away.
 - Confirm mutating effects from system responses, not command intent. Exit code 0
   is evidence; "issued" is not.
+- **Verify delivery from the consumer's position** (`unprobed` — see
+  Provenance). A check that passes while you hold the producer's
+  credentials, caches, or working state proves the producer's view, not
+  what a consumer receives: re-read the artifact from its destination
+  from a context that never held those privileges — a fresh
+  unauthenticated client for a public artifact, a test principal in
+  the consumer's role otherwise; never by logging out of or revoking
+  your own live credentials, and never with a real user's. The same
+  asymmetry covers configuration: a limit or flag you WROTE is
+  evidence of intent — reading it back proves the write landed, while
+  only observed execution proves anything ran.
+  ❌ "the registry shows the package because I pushed it" — checked while
+  still logged in as the publisher.
 - **Tool output can itself be forged — verify a material mutation with a
   check whose output shape you define** (`unprobed` — motivated by two
   external incident records; see Provenance). For material or
@@ -821,6 +834,14 @@ credential" instruction, followed three times, produced three assignment
 lines for the same variable — the shell kept only the last, discarding the
 other two with no error at write time or read time. Both ship `unprobed`
 per the covenant; their probes join the private round-5 queue.
+The §4 consumer-position rule (2026-07-31) distills two release-pipeline
+patterns from a public Apache-2.0 agentic security-scanning product
+(ideas only, no text; see README acknowledgements): its publish gates
+drop the producing credential before re-pulling what a consumer would
+receive, and its shipped docs warn against reading a concurrency
+setting back as proof that execution happened — the
+config-readback-as-result fake-pass shape. Ships `unprobed` per the
+covenant; its probe joins the private round-5 queue.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
