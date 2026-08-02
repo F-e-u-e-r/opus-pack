@@ -45,7 +45,7 @@ Run in order; do not skip to a verdict.
 2. **Take the opening digest** (§3's command). The read window starts here.
    §3 explains what `--expect-digest` does and does not bind: it refuses only if
    the tree changed since a digest RUN, so two matching digests - this one and
-   the one at step 5 - are what bracket your read. One digest does not.
+   the one at step 6 - are what bracket your read. One digest does not.
    Done: an opening digest recorded.
 3. **Read the FULL source** - every SKILL.md, command file, hook, script, and
    referenced doc, not a sample. A trojan hides in the file you skipped: read
@@ -138,11 +138,12 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   the directory, `.` IS the resolved target and no syscall can say which name
   reached it, so `PWD` is the only evidence of arrival there is. Since round 8
   both verbs REFUSE every dot spelling that carries no such evidence — `PWD`
-  unset, `PWD` not resolving to the path you gave (which is every `..` spelling,
-  including `<dir>/sub/../.`), or `PWD` itself a symlink. That refusal does not
-  depend on the candidate being hostile, so an ordinary directory reached
-  through `<dir>/sub/..` is refused too: after the kernel resolves it, the name
-  you wrote is gone. The rule in one line: **a dot spelling is resolved only
+  unset, `PWD` not resolving to the path you gave (a `..` spelling such as
+  `<dir>/sub/../.` lands here unless it resolves back to `$PWD`), or `PWD`
+  itself a symlink. That refusal does not depend on the candidate being
+  hostile, so an ordinary directory reached through `<dir>/sub/..` is refused
+  too unless `$PWD` is already standing in it — once the kernel resolves the
+  `..` the name you wrote is gone, and `$PWD` is then the only proof of arrival. The rule in one line: **a dot spelling is resolved only
   when `$PWD` proves the process is standing in the candidate itself and did not
   arrive through a link; otherwise it is refused.** A deleted or unresolvable
   working directory is one of the refusals, not an exception to them.
@@ -212,11 +213,12 @@ Write one of: **SAFE-TO-PROPOSE / SUSPECT / BLOCK**, with the evidence behind it
   (fail closed). Record the verdict against the digest you actually reviewed
   (the `--reviewer` note carries the reviewing model/tool identities and date).
   **`--expect-digest` refuses only if the tree changed since the `digest` RUN
-  whose output you are passing — NOT since you read the source.** The steps
-  above put the read first and the digest last, so a change made during your
-  read is invisible to it. Until D4's export-then-review lands, run `digest`
-  BEFORE the full read as well, and re-run it after: two matching digests
-  bracket the read window, one does not:
+  whose output you are passing — NOT since you read the source.** A lone digest
+  taken after the read would leave a change made during your read invisible to
+  it, which is why the steps above take a digest on BOTH sides of the read — the
+  opening one at step 2, the closing one at step 6. Until D4's export-then-review
+  lands you run that pair by hand: `digest` before the full read and again after;
+  two matching digests bracket the read window, one does not:
 
   ```bash
   python3 "$TOOL" record --scope "<global|proj:PATH>" --name "<dir-name>" \

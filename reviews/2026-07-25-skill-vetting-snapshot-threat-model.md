@@ -293,7 +293,8 @@ observable, advisable event, never a silent state.
   `os.replace`; the parent directory is created 0700 and must be a real,
   caller-owned, non-group/world-writable directory; a symlinked baseline path
   or untrusted directory is an anomaly and the write is refused. A refused or
-  failed write is logged and leaves the previous state (G5 makes that safe).
+  failed write is logged best-effort (the log write may itself fail silently)
+  and leaves the previous state (G5 makes that safe).
 - **I7 — status lifecycle.** `baseline` (first-run bootstrap; when it has anything
   to baseline it announces itself with one line naming that count, emitted
   BEFORE the write — see

@@ -1155,7 +1155,7 @@ class HookE2E(unittest.TestCase):
         # how this test got here twice.
         # round-6 (sol): load/store are a read-modify-write with no lock, so a
         # slower hook wrote its STALE merge over a faster one's and the delta the
-        # faster one advised was un-recorded and never re-advised.
+        # faster one advised was un-recorded.
         import threading
         for n in ("g", "h"):
             self.mkskill(self.G, n)

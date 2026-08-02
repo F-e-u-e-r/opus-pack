@@ -265,7 +265,7 @@ bash hooks/test-skill_snapshot.sh
 ]
 ```
 
-三個 gating hook 把稽核事件寫入 `~/.claude/hooks/hooks.log`,advisory vetting hook 寫入 `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`(預設 `~/.claude/skill-vetting/advisory.log`)——閘門活動與 vetting hook 的提示都變成可稽核,而不是看不見。
+三個 gating hook 把稽核事件寫入 `~/.claude/hooks/hooks.log`,advisory vetting hook 寫入 `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`(預設 `~/.claude/skill-vetting/advisory.log`)——閘門活動與 vetting hook 的提示都變成可稽核,而不是看不見(這些寫入都是盡力而為 best-effort:寫入失敗會被靜默丟棄,絕不阻擋 hook 本身)。
 
 **兩個注意事項。** Hook 以你的權限執行任意 shell:啟用前先讀過腳本,且建議把 hook commit 進 repo、像程式碼一樣被審查。另外 Claude Code 在啟動時快照 hook 設定:改完後要用 `/hooks` 選單確認或重啟 session 才生效。
 

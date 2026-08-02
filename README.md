@@ -429,7 +429,8 @@ substitute for it. Wire it with:
 The three gating hooks append audit events to `~/.claude/hooks/hooks.log` and the
 advisory vetting hook to `<CLAUDE_CONFIG_DIR>/skill-vetting/advisory.log`
 (default `~/.claude/skill-vetting/advisory.log`), so gate activity — and the
-vetting hook's advisories — is auditable instead of invisible.
+vetting hook's advisories — is auditable instead of invisible (these log writes
+are best-effort: a failed write is silently dropped and never blocks the hook).
 
 **Two cautions.** Hooks run arbitrary shell with your permissions: read any
 hook script before enabling it, and prefer committing hooks so they are
