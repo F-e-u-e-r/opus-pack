@@ -929,7 +929,8 @@ def _cli_digest(argv):
         if base is _REFUSE:
             print("REFUSED: a dot path does not name the candidate, and nothing "
                   "here proves which name reached it - $PWD is unset, or does "
-                  "not resolve to this path (every `..` spelling lands here), "
+                  "not resolve to this path (a `..` spelling that does not "
+                  "resolve back to $PWD lands here), "
                   "or is itself a symlink. Resolving anyway would gate the "
                   "TARGET's name and drop the symlink anomaly. Address the "
                   "candidate by a path whose last component is its own name.",
@@ -1013,8 +1014,9 @@ def _cli_record(argv):
         if dir_base is _REFUSE:
             print("REFUSED: --dir is a dot path, which does not name the "
                   "candidate, and nothing here proves which name reached it - "
-                  "$PWD is unset, or does not resolve to --dir (every `..` "
-                  "spelling lands here), or is itself a symlink. The verdict "
+                  "$PWD is unset, or does not resolve to --dir (a `..` spelling "
+                  "that does not resolve back to $PWD lands here), or is itself "
+                  "a symlink. The verdict "
                   "would bind the TARGET's name, leaving the candidate itself "
                   "unjudged. Address it by a path whose last component is its "
                   "own name.", file=sys.stderr)

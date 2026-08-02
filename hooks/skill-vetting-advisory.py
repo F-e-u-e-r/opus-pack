@@ -206,7 +206,7 @@ def _acquire(lockpath):
     generation or compare-and-swap, so two SessionStart hooks racing (two
     sessions started at once — ordinary, not adversarial) LOSE an update: the
     slower one writes its stale merge over the faster one's, and the delta the
-    faster one advised is un-recorded and never re-advises (round 6). Atomic
+    faster one advised is un-recorded (round 6). Atomic
     replace prevents a torn file; it does not prevent a lost update.
 
     O_EXCL create, bounded wait, and takeover of a stale lock so a process that
