@@ -7,6 +7,7 @@ A checker never shown able to fail is not a gate. Run: python3 .github/test-deri
 """
 import os
 import sys
+import json
 import tempfile
 import unittest
 
@@ -54,6 +55,41 @@ TIERS_ROWS_OK = "| Core | `alpha` |\n| Domain adapter | `beta` |\n"
 DEP_LINE_OK = "`design-pack` is `recommended-with opus-pack`."
 
 
+ROUTING_INTENT_OK = (
+    '{"schema_version":1,"skills":{'
+    '"alpha":{"intent":"Selected for alpha work.","neighbors":["beta"]},'
+    '"beta":{"intent":"Selected for beta work.","neighbors":["alpha"]}}}'
+)
+
+
+def _ok_cases():
+    return [
+        {"id": "alpha.positive.one.001", "for": "alpha", "kind": "positive",
+         "prompt": "please do the first alpha thing", "expected": "alpha", "rationale": "alpha"},
+        {"id": "alpha.positive.two.002", "for": "alpha", "kind": "positive",
+         "prompt": "please do the second alpha thing", "expected": "alpha", "rationale": "alpha"},
+        {"id": "alpha.out-of-scope.chat.001", "for": "alpha", "kind": "out-of-scope",
+         "prompt": "unrelated alpha small talk", "expected": "none", "rationale": "none"},
+        {"id": "alpha.neighbor-negative.beta.001", "for": "alpha", "kind": "neighbor-negative",
+         "prompt": "really a beta request phrased near alpha", "expected": "beta", "rationale": "beta"},
+        {"id": "alpha.ambiguous.beta.001", "for": "alpha", "kind": "ambiguous",
+         "prompt": "could be alpha or beta", "acceptable_any_of": ["alpha", "beta"], "rationale": "both"},
+        {"id": "beta.positive.one.001", "for": "beta", "kind": "positive",
+         "prompt": "please do the first beta thing", "expected": "beta", "rationale": "beta"},
+        {"id": "beta.positive.two.002", "for": "beta", "kind": "positive",
+         "prompt": "please do the second beta thing", "expected": "beta", "rationale": "beta"},
+        {"id": "beta.out-of-scope.chat.001", "for": "beta", "kind": "out-of-scope",
+         "prompt": "unrelated beta small talk", "expected": "none", "rationale": "none"},
+        {"id": "beta.neighbor-negative.alpha.001", "for": "beta", "kind": "neighbor-negative",
+         "prompt": "really an alpha request phrased near beta", "expected": "alpha", "rationale": "alpha"},
+    ]
+
+
+def _corpus(cases, meta='{"kind":"meta","schema_version":1,"expectation_source":"human-adjudication"}'):
+    lines = ([meta] if meta else []) + [json.dumps(c) for c in cases]
+    return "\n".join(lines) + "\n"
+
+
 class Base(unittest.TestCase):
     def valid(self):
         root = tempfile.mkdtemp()
@@ -66,6 +102,8 @@ class Base(unittest.TestCase):
         _w(root, "metadata/plugin-dependencies.json", DEPS_OK)
         _w(root, "README.md", _readme(TIERS_ROWS_OK, DEP_LINE_OK))
         _w(root, "README.zh-Hant.md", _readme(TIERS_ROWS_OK, DEP_LINE_OK, zh=True))
+        _w(root, "metadata/routing-intent.json", ROUTING_INTENT_OK)
+        _w(root, "metadata/routing-corpus.jsonl", _corpus(_ok_cases()))
         return root
 
     def hard(self, fn, root):
@@ -76,7 +114,7 @@ class GreenBaseline(Base):
     def test_valid_tree_passes_every_gate(self):
         root = self.valid()
         for fn in (d.check_tier_canon, d.check_plugin_dependencies, d.check_inventory,
-                   d.check_readme_projection, d.check_reference_gate):
+                   d.check_readme_projection, d.check_reference_gate, d.check_routing_corpus):
             self.assertEqual([], self.hard(fn, root), f"{fn.__name__} should pass clean")
 
 
@@ -466,6 +504,145 @@ class ReferenceGate(Base):
         _w(root, "skills/beta/SKILL.md",
            _skill("beta", extra="```\n## 9. Fake heading inside a fence\n```\n"))
         self.assertTrue(any("§9" in r and "not found" in r for r in d.check_reference_gate(root)))
+
+
+class RoutingCorpus(Base):
+    def _cw(self, root, cases, **kw):
+        _w(root, "metadata/routing-corpus.jsonl", _corpus(cases, **kw))
+
+    def _fail(self, root, needle):
+        return any(needle in r for r in d.check_routing_corpus(root))
+
+    def test_valid_passes(self):
+        self.assertEqual([], d.check_routing_corpus(self.valid()))
+
+    def test_duplicate_id(self):
+        root = self.valid(); c = _ok_cases(); c[1]["id"] = c[0]["id"]
+        self._cw(root, c); self.assertTrue(self._fail(root, "duplicate case id"))
+
+    def test_malformed_id(self):
+        root = self.valid(); c = _ok_cases(); c[0]["id"] = "NotAnId"
+        self._cw(root, c); self.assertTrue(self._fail(root, "missing or malformed"))
+
+    def test_id_subject_mismatch(self):
+        root = self.valid(); c = _ok_cases(); c[0]["id"] = "zzz.positive.one.001"
+        self._cw(root, c); self.assertTrue(self._fail(root, "id subject"))
+
+    def test_id_kind_mismatch(self):
+        root = self.valid(); c = _ok_cases()
+        c[0]["kind"] = "out-of-scope"; c[0]["expected"] = "none"
+        self._cw(root, c); self.assertTrue(self._fail(root, "id kind"))
+
+    def test_unknown_for(self):
+        root = self.valid(); c = _ok_cases() + [
+            {"id": "zeta.positive.x.001", "for": "zeta", "kind": "positive",
+             "prompt": "zeta thing", "expected": "zeta", "rationale": "z"}]
+        self._cw(root, c); self.assertTrue(self._fail(root, "'for' 'zeta' is not a published"))
+
+    def test_unknown_expected(self):
+        root = self.valid(); c = _ok_cases(); c[0]["expected"] = "zeta"
+        self._cw(root, c); self.assertTrue(self._fail(root, "is not a published opus-pack skill"))
+
+    def test_positive_wrong_expected(self):
+        root = self.valid(); c = _ok_cases(); c[0]["expected"] = "beta"
+        self._cw(root, c); self.assertTrue(self._fail(root, "must expect 'alpha'"))
+
+    def test_out_of_scope_expects_neighbor(self):
+        root = self.valid(); c = _ok_cases()
+        for x in c:
+            if x["kind"] == "out-of-scope" and x["for"] == "alpha":
+                x["expected"] = "beta"
+        self._cw(root, c); self.assertTrue(self._fail(root, "must be 'none' or an UNRELATED"))
+
+    def test_ambiguous_uses_expected_array(self):
+        root = self.valid(); c = _ok_cases()
+        for x in c:
+            if x["kind"] == "ambiguous":
+                x.pop("acceptable_any_of"); x["expected"] = ["alpha", "beta"]
+        self._cw(root, c); self.assertTrue(self._fail(root, "must NOT use 'expected'"))
+
+    def test_duplicate_prompt(self):
+        root = self.valid(); c = _ok_cases(); c[1]["prompt"] = c[0]["prompt"]
+        self._cw(root, c); self.assertTrue(self._fail(root, "duplicate prompt"))
+
+    def test_missing_rationale(self):
+        root = self.valid(); c = _ok_cases(); del c[0]["rationale"]
+        self._cw(root, c); self.assertTrue(self._fail(root, "missing 'rationale'"))
+
+    def test_meta_probe_status_rejected(self):
+        root = self.valid()
+        self._cw(root, _ok_cases(),
+                 meta='{"kind":"meta","schema_version":1,"expectation_source":"h","probe_status":"unprobed"}')
+        self.assertTrue(self._fail(root, "must not carry a hand-written aggregate 'probe_status'"))
+
+    def test_missing_meta(self):
+        root = self.valid(); self._cw(root, _ok_cases(), meta=None)
+        self.assertTrue(self._fail(root, "no meta line"))
+
+    def test_self_neighbor(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":1,"skills":{"alpha":{"intent":"a","neighbors":["alpha","beta"]},'
+           '"beta":{"intent":"b","neighbors":["alpha"]}}}')
+        self.assertTrue(self._fail(root, "lists itself as a neighbor"))
+
+    def test_unknown_neighbor(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":1,"skills":{"alpha":{"intent":"a","neighbors":["beta","zeta"]},'
+           '"beta":{"intent":"b","neighbors":["alpha"]}}}')
+        self.assertTrue(self._fail(root, "neighbor 'zeta' is not a published"))
+
+    def test_asymmetric_neighbors(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":1,"skills":{"alpha":{"intent":"a","neighbors":["beta"]},'
+           '"beta":{"intent":"b","neighbors":[]}}}')
+        self.assertTrue(self._fail(root, "not symmetric"))
+
+    def test_intent_missing_published_skill(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":1,"skills":{"alpha":{"intent":"a","neighbors":[]}}}')
+        self.assertTrue(self._fail(root, "has no routing-intent entry"))
+
+    def test_intent_extra_skill(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":1,"skills":{"alpha":{"intent":"a","neighbors":["beta"]},'
+           '"beta":{"intent":"b","neighbors":["alpha"]},"zeta":{"intent":"z","neighbors":[]}}}')
+        self.assertTrue(self._fail(root, "not a published opus-pack skill"))
+
+    def test_missing_neighbor_negative(self):
+        root = self.valid()
+        c = [x for x in _ok_cases() if not (x["for"] == "alpha" and x["kind"] == "neighbor-negative")]
+        self._cw(root, c)
+        self.assertTrue(self._fail(root, "needs a neighbor-negative expecting neighbor 'beta'"))
+
+    def test_missing_ambiguous_edge(self):
+        root = self.valid()
+        c = [x for x in _ok_cases() if x["kind"] != "ambiguous"]
+        self._cw(root, c)
+        self.assertTrue(self._fail(root, "needs >=1 ambiguous case covering both"))
+
+    def test_skill_missing_coverage(self):
+        root = self.valid()
+        c = [x for x in _ok_cases() if x["for"] != "beta"]
+        self._cw(root, c)
+        self.assertTrue(self._fail(root, "skill 'beta' needs >=2 positive"))
+
+    def test_malformed_corpus_json(self):
+        root = self.valid()
+        _w(root, "metadata/routing-corpus.jsonl",
+           '{"kind":"meta","schema_version":1,"expectation_source":"h"}\n{ not json\n')
+        self.assertTrue(self._fail(root, "invalid JSON"))
+
+    def test_unsupported_intent_schema(self):
+        root = self.valid()
+        _w(root, "metadata/routing-intent.json",
+           '{"schema_version":2,"skills":{"alpha":{"intent":"a","neighbors":["beta"]},'
+           '"beta":{"intent":"b","neighbors":["alpha"]}}}')
+        self.assertTrue(self._fail(root, "schema_version"))
 
 
 if __name__ == "__main__":

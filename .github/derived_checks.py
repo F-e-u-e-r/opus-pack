@@ -570,3 +570,209 @@ def check_reference_gate(root):
                         else:
                             f.append(msg)
     return f
+
+
+# --- gate 6: routing-contract corpus (ARCHITECTURE.md §6) ---
+#
+# STRUCTURAL only. Verifies the routing regression corpus is well-formed and
+# covers every published opus-pack skill on an EDGE basis. It does NOT run the
+# model or verify that a description actually routes as authored: per
+# ARCHITECTURE.md §8 that is the manual routing-contract review, not a mechanical
+# check. Green means the corpus is complete and self-consistent, nothing about
+# routing being correct or unchanged.
+
+_CASE_KINDS = ("positive", "neighbor-negative", "out-of-scope", "ambiguous")
+_ID_RE = re.compile(r"^[a-z0-9-]+\.[a-z-]+\.[a-z0-9-]+\.[0-9]{3}$")
+
+
+def check_routing_corpus(root):
+    P = "routing intent (metadata/routing-intent.json)"
+    C = "routing corpus (metadata/routing-corpus.jsonl)"
+    f = []
+    published = set(opus_pack_skill_ids(root))
+
+    # --- intent map + symmetric neighbor graph ---
+    intent, err = _load_json(root, "metadata/routing-intent.json", ordered=True)
+    if err:
+        return [f"{P}: {err.split(': ', 1)[-1]}"]
+    if not isinstance(intent, dict):
+        return [f"{P}: top level is not an object"]
+    if not _schema_ok(intent):
+        f.append(f"{P}: schema_version {intent.get('schema_version')!r} is not a supported "
+                 f"integer version ({SUPPORTED_SCHEMA})")
+    skills = intent.get("skills")
+    neighbors = {}
+    if not isinstance(skills, dict):
+        f.append(f"{P}: 'skills' is missing or not an object")
+        skills = {}
+    intent_ids = set(skills)
+    for missing in sorted(published - intent_ids):
+        f.append(f"{P}: published opus-pack skill {missing!r} has no routing-intent entry")
+    for extra in sorted(intent_ids - published):
+        f.append(f"{P}: lists {extra!r}, which is not a published opus-pack skill")
+    for sid, entry in skills.items():
+        if not isinstance(entry, dict):
+            f.append(f"{P}: entry for {sid!r} is not an object")
+            neighbors[sid] = set()
+            continue
+        if not str(entry.get("intent", "")).strip():
+            f.append(f"{P}: skill {sid!r} has an empty 'intent'")
+        nbrs = entry.get("neighbors")
+        if not isinstance(nbrs, list):
+            f.append(f"{P}: skill {sid!r} 'neighbors' is missing or not a list")
+            nbrs = []
+        seen_n, clean = set(), set()
+        for n in nbrs:
+            if n == sid:
+                f.append(f"{P}: skill {sid!r} lists itself as a neighbor")
+            elif n not in published:
+                f.append(f"{P}: skill {sid!r} neighbor {n!r} is not a published opus-pack skill")
+            else:
+                clean.add(n)
+            if n in seen_n:
+                f.append(f"{P}: skill {sid!r} lists neighbor {n!r} twice")
+            seen_n.add(n)
+        neighbors[sid] = clean
+    # symmetry: A lists B iff B lists A
+    for a in sorted(neighbors):
+        for b in sorted(neighbors[a]):
+            if a not in neighbors.get(b, set()):
+                f.append(f"{P}: neighbor graph not symmetric: {a!r} lists {b!r} but "
+                         f"{b!r} does not list {a!r}")
+    # undirected edges over confirmed-symmetric entries
+    edges = set()
+    for a in neighbors:
+        for b in neighbors[a]:
+            if a in neighbors.get(b, set()):
+                edges.add(tuple(sorted((a, b))))
+
+    # --- corpus lines ---
+    try:
+        text = _read(root, "metadata/routing-corpus.jsonl")
+    except OSError as e:
+        return f + [f"{C}: unreadable ({e})"]
+    positives, oos = {}, {}          # sid -> count
+    neg_edges = set()                # (for, neighbor) ordered pairs seen
+    ambig_edges = set()              # (a, b) sorted, covered by an ambiguous case
+    ids_seen, prompts_seen = {}, {}
+    saw_meta = False
+    for lineno, raw in enumerate(text.splitlines(), 1):
+        if not raw.strip():
+            continue
+        try:
+            obj = json.loads(raw)
+        except ValueError as e:
+            f.append(f"{C}:{lineno}: invalid JSON ({e})")
+            continue
+        if not isinstance(obj, dict):
+            f.append(f"{C}:{lineno}: line is not an object")
+            continue
+        kind = obj.get("kind")
+        if kind == "meta":
+            saw_meta = True
+            if not _schema_ok(obj):
+                f.append(f"{C}:{lineno}: meta schema_version {obj.get('schema_version')!r} is not "
+                         f"a supported integer version ({SUPPORTED_SCHEMA})")
+            if "probe_status" in obj:
+                f.append(f"{C}:{lineno}: meta must not carry a hand-written aggregate 'probe_status' "
+                         f"(status derives per-case from run artifacts, never authored here)")
+            if not str(obj.get("expectation_source", "")).strip():
+                f.append(f"{C}:{lineno}: meta must record a non-empty 'expectation_source'")
+            continue
+        if kind not in _CASE_KINDS:
+            f.append(f"{C}:{lineno}: invalid kind {kind!r} (allowed: meta, {', '.join(_CASE_KINDS)})")
+            continue
+        cid = obj.get("id")
+        if not isinstance(cid, str) or not _ID_RE.match(cid):
+            f.append(f"{C}:{lineno}: 'id' {cid!r} missing or malformed "
+                     f"(expected <for>.<kind>.<slug>.NNN, lowercase)")
+            cid = None
+        elif cid in ids_seen:
+            f.append(f"{C}:{lineno}: duplicate case id {cid!r} (also line {ids_seen[cid]})")
+        if cid:
+            ids_seen[cid] = lineno
+        anchor = obj.get("for")
+        if anchor not in published:
+            f.append(f"{C}:{lineno}: 'for' {anchor!r} is not a published opus-pack skill")
+            anchor = None
+        if cid and anchor:
+            parts = cid.split(".")
+            if parts[0] != anchor:
+                f.append(f"{C}:{lineno}: id subject {parts[0]!r} != 'for' {anchor!r}")
+            if parts[1] != kind:
+                f.append(f"{C}:{lineno}: id kind {parts[1]!r} != 'kind' {kind!r}")
+        prompt = obj.get("prompt")
+        if not isinstance(prompt, str) or not prompt.strip():
+            f.append(f"{C}:{lineno}: empty or non-string 'prompt'")
+        else:
+            key = prompt.strip()
+            if key in prompts_seen:
+                f.append(f"{C}:{lineno}: duplicate prompt text (also line {prompts_seen[key]})")
+            prompts_seen[key] = lineno
+        if not str(obj.get("rationale", "")).strip():
+            f.append(f"{C}:{lineno}: missing 'rationale' (one sentence of adjudication basis required)")
+        has_exp, has_any = "expected" in obj, "acceptable_any_of" in obj
+        if kind == "ambiguous":
+            if has_exp:
+                f.append(f"{C}:{lineno}: ambiguous case must NOT use 'expected' (use 'acceptable_any_of')")
+            aoa = obj.get("acceptable_any_of")
+            if not isinstance(aoa, list) or len(aoa) < 2 or len(set(aoa)) != len(aoa):
+                f.append(f"{C}:{lineno}: ambiguous 'acceptable_any_of' must be a list of >=2 distinct skill ids")
+                aoa = []
+            for e in aoa:
+                if e not in published:
+                    f.append(f"{C}:{lineno}: acceptable_any_of {e!r} is not a published opus-pack skill")
+            if anchor is not None and anchor not in aoa:
+                f.append(f"{C}:{lineno}: ambiguous case for {anchor!r} must include {anchor!r} in acceptable_any_of")
+            if anchor is not None:
+                for other in aoa:
+                    if other != anchor and tuple(sorted((anchor, other))) in edges:
+                        ambig_edges.add(tuple(sorted((anchor, other))))
+        else:
+            if has_any:
+                f.append(f"{C}:{lineno}: only ambiguous cases may use 'acceptable_any_of'")
+            exp = obj.get("expected")
+            if kind == "out-of-scope":
+                if exp == "none":
+                    pass
+                elif isinstance(exp, str) and exp in published:
+                    if anchor is not None and (exp == anchor or exp in neighbors.get(anchor, set())):
+                        f.append(f"{C}:{lineno}: out-of-scope 'expected' {exp!r} must be 'none' or an "
+                                 f"UNRELATED skill (not {anchor!r} or a declared neighbor)")
+                else:
+                    f.append(f"{C}:{lineno}: out-of-scope 'expected' must be 'none' or a published skill")
+                if anchor is not None:
+                    oos[anchor] = oos.get(anchor, 0) + 1
+            elif kind == "positive":
+                if not isinstance(exp, str) or exp not in published:
+                    f.append(f"{C}:{lineno}: positive 'expected' {exp!r} is not a published opus-pack skill")
+                elif anchor is not None and exp != anchor:
+                    f.append(f"{C}:{lineno}: positive for {anchor!r} must expect {anchor!r}, not {exp!r}")
+                elif anchor is not None:
+                    positives[anchor] = positives.get(anchor, 0) + 1
+            else:  # neighbor-negative
+                if not isinstance(exp, str) or exp not in published:
+                    f.append(f"{C}:{lineno}: neighbor-negative 'expected' {exp!r} is not a published skill")
+                elif anchor is not None:
+                    if exp not in neighbors.get(anchor, set()):
+                        f.append(f"{C}:{lineno}: neighbor-negative for {anchor!r} expects {exp!r}, "
+                                 f"not a declared neighbor")
+                    else:
+                        neg_edges.add((anchor, exp))
+
+    if not saw_meta:
+        f.append(f"{C}: no meta line (first record must be kind 'meta' with schema_version + expectation_source)")
+
+    # --- edge-based coverage minimum ---
+    for sid in sorted(published):
+        if positives.get(sid, 0) < 2:
+            f.append(f"{C}: skill {sid!r} needs >=2 positive cases (has {positives.get(sid, 0)})")
+        if oos.get(sid, 0) < 1:
+            f.append(f"{C}: skill {sid!r} needs >=1 out-of-scope case")
+        for n in sorted(neighbors.get(sid, set())):
+            if (sid, n) not in neg_edges:
+                f.append(f"{C}: skill {sid!r} needs a neighbor-negative expecting neighbor {n!r}")
+    for (a, b) in sorted(edges):
+        if (a, b) not in ambig_edges:
+            f.append(f"{C}: neighbor edge {a!r}<->{b!r} needs >=1 ambiguous case covering both")
+    return f

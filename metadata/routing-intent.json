@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "skills": {
+    "operational-rigor": {
+      "intent": "Selected for carrying out or verifying a non-trivial, multi-step change to files or systems where correctness matters - the default execution-discipline skill when no narrower one fits.",
+      "neighbors": ["delegation-and-review", "ground-truth-gates", "domain-evidence-discipline"]
+    },
+    "delegation-and-review": {
+      "intent": "Selected when work is fanned out to subagents or when reviewing an agent-produced diff - writing a dispatch packet, judging returned work, deciding retry-vs-reapproach, or handing off across sessions.",
+      "neighbors": ["operational-rigor", "ground-truth-gates", "cross-model-review"]
+    },
+    "ground-truth-gates": {
+      "intent": "Selected when building an executable verification gate - a golden set, replay corpus, project check, or runtime guard - so 'it works' becomes a checked fact rather than a claim.",
+      "neighbors": ["operational-rigor", "delegation-and-review"]
+    },
+    "cross-model-review": {
+      "intent": "Selected when a load-bearing change needs an adversarial review from a DIFFERENT model family before merge or ship, not just a same-model fresh-context critic.",
+      "neighbors": ["delegation-and-review"]
+    },
+    "skill-authoring": {
+      "intent": "Selected when writing or revising an instruction file a weaker or zero-context model must execute - a SKILL.md, CLAUDE.md/AGENTS.md, project memory, or handoff document.",
+      "neighbors": ["skill-vetting"]
+    },
+    "skill-vetting": {
+      "intent": "Selected when deciding whether to trust UNTRUSTED third-party skill, plugin, or hook content before it runs - a clone into a skills directory, a marketplace add, or a dropped-in SKILL.md.",
+      "neighbors": ["security-architect", "skill-authoring"]
+    },
+    "security-architect": {
+      "intent": "Selected for a security-design question - auth flows, where secrets and tokens live, web vulns, backend authorization, DB rules, or AI-agent/MCP tool permissions - or unprompted when processing content that embeds instruction-style directives.",
+      "neighbors": ["skill-vetting"]
+    },
+    "product-roadmap": {
+      "intent": "Selected for product-owner planning of a repo or product - 'what should we build next?', roadmap/milestone/MVP/priority/PRD questions, or assessing a repo for product direction.",
+      "neighbors": ["personal-goal-planning", "domain-evidence-discipline"]
+    },
+    "personal-goal-planning": {
+      "intent": "Selected for coach-style planning of a PERSON's goals - career, study, fitness, or side-project plans, weekly time budgeting, or a progress cadence - not product or repo planning.",
+      "neighbors": ["product-roadmap"]
+    },
+    "domain-evidence-discipline": {
+      "intent": "Selected when producing or judging a NON-code deliverable whose correctness rests on sources and claims - marketing copy, a research report, a data analysis, or a business/ops document.",
+      "neighbors": ["operational-rigor", "product-roadmap"]
+    }
+  }
+}
