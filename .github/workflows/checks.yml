@@ -22,6 +22,8 @@ jobs:
           persist-credentials: false
       - name: Repo consistency checks
         run: python3 .github/checks.py
+      - name: Derived-checks two-sided tests (each contract gate can pass AND fail)
+        run: python3 .github/test-derived-checks.py
 
   hook-suites:
     runs-on: ubuntu-latest

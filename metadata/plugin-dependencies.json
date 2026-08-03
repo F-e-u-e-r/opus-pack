@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "plugins": {
+    "design-pack": {
+      "dependency_class": "recommended_with",
+      "companion_plugin": "opus-pack"
+    }
+  }
+}

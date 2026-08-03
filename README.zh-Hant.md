@@ -139,18 +139,22 @@ opus-pack 的 cross-reference 在 opus-pack 未安裝時退化為純脈絡。與
 **Skill tiers**(`opus-pack`;canonical map 在
 [`metadata/skill-tiers.json`](metadata/skill-tiers.json)):
 
+<!-- BEGIN GENERATED SKILL TIERS -->
 | Tier | Skills |
 |------|--------|
 | Core(7) | `operational-rigor`、`delegation-and-review`、`ground-truth-gates`、`cross-model-review`、`skill-authoring`、`skill-vetting`、`security-architect` |
 | Domain adapter(3) | `product-roadmap`、`personal-goal-planning`、`domain-evidence-discipline` |
+<!-- END GENERATED SKILL TIERS -->
 
 Core skill 是共用的 agent 執行 doctrine;domain adapter 把該紀律套到更窄的領域。
 skill tier 與 plugin dependency class 是兩條獨立的軸。
 
+<!-- BEGIN GENERATED PLUGIN DEPENDENCIES -->
 **Plugin dependency class。** `design-pack` 是 **`recommended-with opus-pack`**:
 其 skill 各自能獨立完成主要 workflow(`motion-craft` 完全無跨包依賴;兩條
 load-bearing 的跨包條款以逐字方式內載、能獨立成立),而 `opus-pack` 補上其指標
 所指的額外 rigor。見 `ARCHITECTURE.md` §4。
+<!-- END GENERATED PLUGIN DEPENDENCIES -->
 
 **穩定性一句話:** published skill 是穩定介面、預設**加法演進**(additive by
 default)——新能力以新 skill 或新 plugin 出現,而非移除、改名、搬移或收窄既有者的

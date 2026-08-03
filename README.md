@@ -157,20 +157,24 @@ grammar. This section is a summary projection; **on any inconsistency,
 **Skill tiers** (`opus-pack`; canonical map in
 [`metadata/skill-tiers.json`](metadata/skill-tiers.json)):
 
+<!-- BEGIN GENERATED SKILL TIERS -->
 | Tier | Skills |
 |------|--------|
 | Core (7) | `operational-rigor`, `delegation-and-review`, `ground-truth-gates`, `cross-model-review`, `skill-authoring`, `skill-vetting`, `security-architect` |
 | Domain adapter (3) | `product-roadmap`, `personal-goal-planning`, `domain-evidence-discipline` |
+<!-- END GENERATED SKILL TIERS -->
 
 Core skills are the shared agent-execution doctrine; a domain adapter applies
 that discipline to a narrower domain. Skill tier and plugin dependency class are
 separate axes.
 
+<!-- BEGIN GENERATED PLUGIN DEPENDENCIES -->
 **Plugin dependency class.** `design-pack` is **`recommended-with opus-pack`**:
 its skills complete their primary workflows on their own (`motion-craft` has no
 cross-pack dependency; the two load-bearing cross-pack clauses are carried
 verbatim and bind on their own), while `opus-pack` adds the extra rigor its
 pointers name. See `ARCHITECTURE.md` §4.
+<!-- END GENERATED PLUGIN DEPENDENCIES -->
 
 **Stability, in one line:** published skills are stable interfaces and evolve
 **additively by default** — new capability arrives as new skills or plugins, not

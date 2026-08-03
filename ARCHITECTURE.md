@@ -199,24 +199,36 @@ the canonical form rather than free-form natural-language pointers.
 ## 8. Mechanical enforcement — capability boundary
 
 `.github/checks.py` is the designated mechanical gate for the parts of this
-contract that are mechanically decidable. Its checks are implemented
-incrementally — the tier-canon and README-projection checks land with the tier
-work, the reference-grammar check follows — so a green run guarantees only the
-checks already implemented, never more. This section states what the gate is
-**designed** to guarantee and, as importantly, what it **cannot** — so no reader
-mistakes a green run for more than it is.
+contract that are mechanically decidable; the gate logic lives in
+`.github/derived_checks.py` (pure functions) with a two-sided proof for each
+gate — a passing case and a failing case — in `.github/test-derived-checks.py`.
+This section states what the gate guarantees and, as importantly, what it
+**cannot** — so no reader mistakes a green run for more than it is.
 
-What the gate is designed to guarantee (each once its check is implemented):
+What the gate guarantees:
 
 - tier-canon integrity: `metadata/skill-tiers.json` parses, its
   `schema_version` is supported, every value is a valid tier, and its skill set
   matches the published `opus-pack` skills exactly (each published skill classed
   once; nothing missing; no non-existent or unpublished skill listed);
-- README projection parity: the EN and zh-Hant tier tables, the design-pack
-  dependency-class line, the policy-summary link, and the canonical-source
-  notice are present and mutually consistent with the canon;
-- reference non-dangling: a normative reference written in the §7 grammar names
-  a skill and section that exist.
+- extension dependency contract: `metadata/plugin-dependencies.json` parses and
+  is supported, each extension plugin is classed exactly once with a valid
+  class, a `standalone` plugin names no companion, and a `requires` /
+  `recommended-with` plugin names a companion that is an existing marketplace
+  plugin;
+- derived inventory: published skills are enumerated from the manifests (never a
+  repo-wide file scan), their IDs are marketplace-wide unique, every declared
+  skills root exists, and a directory under a root with no `SKILL.md` is
+  surfaced as an orphan rather than silently ignored;
+- README projection parity: the EN and zh-Hant tier tables and the design-pack
+  dependency-class line sit inside stable non-rendering markers and are mutually
+  consistent with the canon — compared over canonical IDs, tiers, and dependency
+  class + companion (not translated prose); the policy-summary link to
+  ARCHITECTURE.md and the canonical-source notice are checked as present outside
+  code (not marker-bound);
+- reference non-dangling: a §7 `<skill> §<section>` reference to a KNOWN
+  published skill names a section that exists in that skill — a local reference
+  fails on a missing section; a cross-plugin reference is reported, not failed.
 
 What the gate cannot guarantee, even fully implemented (and must not be read as
 guaranteeing):
@@ -225,6 +237,13 @@ guaranteeing):
   destination — a renumber or retitle can leave a reference dangling in meaning
   while passing the non-dangling check (closing this needs stable section IDs or
   heading-title pinning, not shipped);
+- that a reference names an EXISTING skill: `<name> §<section>` is also how
+  external sources are cited (e.g. `agent-standard-oss §8`), so an unknown name
+  is read as a citation, not a dangling skill — the gate verifies the section
+  only for references to KNOWN skills, and does not police `§§N–M` ranges
+  (silently outside the single-`§` grammar — not parsed as references and never
+  failed; no advisory is emitted), non-`§` reference forms, or bare skill
+  mentions (all outside the §7 grammar);
 - that the zh-Hant summary is *semantically equivalent* to this English policy —
   parity checks confirm the projected fields are present and consistent, not
   that a translation carries the same normative meaning; on any such
