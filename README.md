@@ -146,6 +146,41 @@ Notes that keep this honest:
   are the fastest-decaying facts in the pack: they track model training
   data, so re-verify them each model generation.
 
+## Architecture & stability
+
+Full normative contract: **[`ARCHITECTURE.md`](ARCHITECTURE.md)** — the
+canonical source for tiers, stability, pre-1.0 migration, plugin dependency
+classes, adjacent-skill rules, routing-contract changes, and the reference
+grammar. This section is a summary projection; **on any inconsistency,
+`ARCHITECTURE.md` (English) is authoritative.**
+
+**Skill tiers** (`opus-pack`; canonical map in
+[`metadata/skill-tiers.json`](metadata/skill-tiers.json)):
+
+| Tier | Skills |
+|------|--------|
+| Core (7) | `operational-rigor`, `delegation-and-review`, `ground-truth-gates`, `cross-model-review`, `skill-authoring`, `skill-vetting`, `security-architect` |
+| Domain adapter (3) | `product-roadmap`, `personal-goal-planning`, `domain-evidence-discipline` |
+
+Core skills are the shared agent-execution doctrine; a domain adapter applies
+that discipline to a narrower domain. Skill tier and plugin dependency class are
+separate axes.
+
+**Plugin dependency class.** `design-pack` is **`recommended-with opus-pack`**:
+its skills complete their primary workflows on their own (`motion-craft` has no
+cross-pack dependency; the two load-bearing cross-pack clauses are carried
+verbatim and bind on their own), while `opus-pack` adds the extra rigor its
+pointers name. See `ARCHITECTURE.md` §4.
+
+**Stability, in one line:** published skills are stable interfaces and evolve
+**additively by default** — new capability arrives as new skills or plugins, not
+by removing, renaming, relocating, or narrowing the trigger scope of an existing
+one; the only breaking-migration window (deprecation notice + transition window +
+compatibility coverage, completed not merely announced) is strictly before the
+source plugin's 1.0 (plugins version independently), and after that 1.0 published
+skills stay indefinitely with no pre-authorized break path. Details in
+`ARCHITECTURE.md` §§2–3.
+
 ## The ten highest-leverage principles kept
 
 *The doctrine sections that follow — principles, deliberately-dropped,

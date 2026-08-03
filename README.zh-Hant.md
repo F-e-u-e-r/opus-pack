@@ -129,6 +129,36 @@ opus-pack 的 cross-reference 在 opus-pack 未安裝時退化為純脈絡。與
   與 PR trail。hex 與字體時尚禁令是本包衰變最快的事實:它們追蹤模型訓練
   資料,每個模型世代都要重驗。
 
+## 架構與穩定性
+
+完整 normative 契約:**[`ARCHITECTURE.md`](ARCHITECTURE.md)**——tiers、穩定性、
+1.0 前 migration、plugin dependency class、adjacent-skill 規則、routing-contract
+變更與 reference grammar 的 canonical source。本節只是摘要投影;**任何不一致以
+`ARCHITECTURE.md`(英文)為準。**
+
+**Skill tiers**(`opus-pack`;canonical map 在
+[`metadata/skill-tiers.json`](metadata/skill-tiers.json)):
+
+| Tier | Skills |
+|------|--------|
+| Core(7) | `operational-rigor`、`delegation-and-review`、`ground-truth-gates`、`cross-model-review`、`skill-authoring`、`skill-vetting`、`security-architect` |
+| Domain adapter(3) | `product-roadmap`、`personal-goal-planning`、`domain-evidence-discipline` |
+
+Core skill 是共用的 agent 執行 doctrine;domain adapter 把該紀律套到更窄的領域。
+skill tier 與 plugin dependency class 是兩條獨立的軸。
+
+**Plugin dependency class。** `design-pack` 是 **`recommended-with opus-pack`**:
+其 skill 各自能獨立完成主要 workflow(`motion-craft` 完全無跨包依賴;兩條
+load-bearing 的跨包條款以逐字方式內載、能獨立成立),而 `opus-pack` 補上其指標
+所指的額外 rigor。見 `ARCHITECTURE.md` §4。
+
+**穩定性一句話:** published skill 是穩定介面、預設**加法演進**(additive by
+default)——新能力以新 skill 或新 plugin 出現,而非移除、改名、搬移或收窄既有者的
+trigger scope;唯一的 breaking-migration 窗口(deprecation notice + transition
+window + 相容涵蓋,且須完成而非僅宣告)只在該 skill 所屬 source plugin 的 1.0
+之前(各 plugin 版本獨立);該 1.0 之後 published skill 無限期保留、不預先授權任何
+破壞性路徑。細節見 `ARCHITECTURE.md` §§2–3。
+
 ## 萃取時保留的核心原則(最高槓桿的十條)
 
 *以下的 doctrine 區塊——原則、刻意捨棄、強制層、evals、退化——是 `opus-pack`
