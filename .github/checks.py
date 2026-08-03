@@ -480,6 +480,33 @@ if os.path.isfile(_matrix):
         ok("mutation_matrix.py takes no env/config input, so the authoritative "
            "gate covers every measurement-changing option")
 
+# Derived contract checks (PR 3): the gates that enforce ARCHITECTURE.md. Logic
+# lives in .github/derived_checks.py as pure functions so it is unit-testable on
+# fixture trees (test-derived-checks.py); here each runs against the real ROOT.
+# A 'report:' line from the reference gate is a cross-plugin advisory, not a
+# failure - it prints as a note and never sets the exit code.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import derived_checks as _dc  # noqa: E402
+for _label, _fn in [
+    ("tier canon (metadata/skill-tiers.json) integrity", _dc.check_tier_canon),
+    ("extension dependency contract (metadata/plugin-dependencies.json)",
+     _dc.check_plugin_dependencies),
+    ("derived skill inventory + marketplace-wide unique IDs", _dc.check_inventory),
+    ("README tier/dependency projection parity (EN + zh-Hant)",
+     _dc.check_readme_projection),
+    ("normative references non-dangling (ARCHITECTURE.md §7 grammar)",
+     _dc.check_reference_gate),
+]:
+    _res = _fn(ROOT)
+    _hard = [r for r in _res if not r.startswith("report:")]
+    for _r in _res:
+        if _r.startswith("report:"):
+            print("note  " + _r[len("report: "):])
+    for _r in _hard:
+        fail(_r)
+    if not _hard:
+        ok(_label)
+
 print()
 if failures:
     print(f"{len(failures)} check(s) failed")
