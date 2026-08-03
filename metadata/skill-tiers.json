@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "tiers": {
+    "operational-rigor": "core",
+    "delegation-and-review": "core",
+    "ground-truth-gates": "core",
+    "cross-model-review": "core",
+    "skill-authoring": "core",
+    "skill-vetting": "core",
+    "security-architect": "core",
+    "product-roadmap": "domain_adapter",
+    "personal-goal-planning": "domain_adapter",
+    "domain-evidence-discipline": "domain_adapter"
+  }
+}
