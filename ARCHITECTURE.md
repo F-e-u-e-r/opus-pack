@@ -181,6 +181,14 @@ Description compression is therefore **out of scope for the tier/policy work**
 and belongs to its own routing-contract change with the regression evidence
 above.
 
+The regression corpus for this contract lives in `metadata/routing-corpus.jsonl`
+(one human-adjudicated expected route per prompt) and `metadata/routing-intent.json`
+(per-skill routing intent plus the symmetric neighbour graph). The procedure for
+running a routing regression when a description changes — and the honest limit of
+what it proves — is in `reviews/2026-08-03-routing-contract-design.md`. A
+structural gate (§8) keeps the corpus complete and self-consistent; it does not
+run the model.
+
 ## 7. Normative references
 
 Normative references between skills must use the repository's **canonical
@@ -228,7 +236,15 @@ What the gate guarantees:
   code (not marker-bound);
 - reference non-dangling: a §7 `<skill> §<section>` reference to a KNOWN
   published skill names a section that exists in that skill — a local reference
-  fails on a missing section; a cross-plugin reference is reported, not failed.
+  fails on a missing section; a cross-plugin reference is reported, not failed;
+- routing-corpus completeness (§6, structural only): `metadata/routing-intent.json`
+  and `metadata/routing-corpus.jsonl` parse and are supported; the intent skill set
+  equals the published `opus-pack` skills; the neighbour graph is symmetric; every
+  case carries a unique well-formed id, a rationale, and either a single `expected`
+  (positive / neighbour-negative / out-of-scope) or `acceptable_any_of` of ≥2
+  (ambiguous) naming published skills; and coverage is met on an edge basis — each
+  skill has ≥2 positive and ≥1 out-of-scope case, a neighbour-negative for every
+  declared neighbour, and every neighbour edge has an ambiguous case.
 
 What the gate cannot guarantee, even fully implemented (and must not be read as
 guaranteeing):
@@ -250,7 +266,14 @@ guaranteeing):
   discrepancy this English file is authoritative (see the header);
 - that a change described as an editorial "clarification" genuinely preserves
   routing behavior (§6) — that judgment is a routing-contract review, not a
-  mechanical check.
+  mechanical check;
+- that a skill's description actually routes as the corpus expects: the
+  routing-corpus gate is **structural only** — it never runs the model or a skill
+  selector, so a green corpus means every intended case is written and
+  self-consistent, not that selection is correct or unchanged. Confirming real
+  selection is the manual regression procedure of §6, whose baseline is
+  human-adjudicated (`metadata/routing-corpus.jsonl` carries no probe status; a
+  live selection baseline is deferred).
 
 This boundary is about mechanical checkability only. Other contract judgments —
 whether a dependency-class audit (§4) was correct, whether two skills' triggers

@@ -496,6 +496,8 @@ for _label, _fn in [
      _dc.check_readme_projection),
     ("normative references non-dangling (ARCHITECTURE.md §7 grammar)",
      _dc.check_reference_gate),
+    ("routing-contract corpus completeness (ARCHITECTURE.md §6, structural only)",
+     _dc.check_routing_corpus),
 ]:
     _res = _fn(ROOT)
     _hard = [r for r in _res if not r.startswith("report:")]
