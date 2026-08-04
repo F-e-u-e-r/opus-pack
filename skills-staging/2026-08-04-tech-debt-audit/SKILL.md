@@ -108,24 +108,56 @@ still burned — check history separately with `git log -S` on the names it
 DID flag), does not decode encoded or derived copies, cannot rate
 reachability or exploitability (that is a security review), and its
 PII-SHAPE class cannot distinguish real from synthetic — by design, that
-judgment is the owner's. `DEP-UNUSED`'s corpus covers source AND common
-config files, but not every consumption route (dynamic string-built
-imports, a build tool's own config format the tool doesn't recognize) —
-its finding line says so and asks for one targeted confirm before
-removing. The `password-assignment` secret pattern is suppressed under
+judgment is the owner's. `DEP-UNUSED`'s corpus covers source, common
+config file extensions, AND extension-less build/CI filenames (Makefile,
+makefile, GNUmakefile, Dockerfile and its suffixed forms like
+Dockerfile.dev, Jenkinsfile, Rakefile, Procfile, Vagrantfile, matched by
+basename) — measured: a dependency invoked only from a Makefile recipe
+was false-flagged unused before the basename match existed, confirmed
+fixed and now covered by a self-test regression fixture. A follow-up
+adversarial pass found the first fix's match was case- and
+suffix-exact only (missed GNU Make's own lowercase `makefile` and
+`Dockerfile.dev`-style names); also fixed and covered by regression
+fixtures. Consumption routes still outside the corpus (dynamic
+string-built imports, a build tool's own config format not on either
+list) remain a real gap; the finding line asks for one targeted confirm
+before removing regardless. Widening the corpus to Makefile-shaped files
+also opens a narrow false-negative surface the same pass surfaced but
+did not fix: a declared dependency whose npm name collides with the
+build tool's own recipe syntax (e.g. a package named `make`, referenced
+only via ordinary `$(MAKE)`/`make -C sub` recursion) now reads as "used"
+even when genuinely unused — see UNCERTAINTY.md.
+The `password-assignment` secret pattern is suppressed under
 test/spec/fixture paths (real false-positive rate there); the other five
-secret patterns are not suppressed anywhere, because they match a fixed
-high-entropy format ordinary code is unlikely to reproduce by accident —
-that asymmetry is a judgment call, not a proof, and a real credential
-pasted into a test fixture would be missed by this one suppression. The
+secret patterns are not suppressed anywhere. This was measured, not just
+argued: a fixture of hand-written, format-valid-but-fake test constants
+(a fake AWS key, GitHub token, `sk-` key, and bearer token) fired 4 of 5
+patterns under a test path — cheap because the output is masked, not
+free, since it still costs a human a read. A real credential pasted into
+a test fixture would likewise be caught (that is the five patterns
+working as designed) but so would an unlucky fake one; narrow a specific
+pattern's suppression if a real false positive shows up, per
+UNCERTAINTY.md, rather than widening `TEST_PATH` to all six. The
 fingerprint in a `SECRET-CONTENT`/`SECRET-NAME` finding is a plain,
 unsalted sha256 of the matched value: for the five high-entropy patterns
 this discloses nothing practical, but for a low-entropy or common
 guessable value under `password-assignment`, a reader who already
 suspects a candidate can hash their guess and compare — the fingerprint
 is one-way, not immune to a confirmation attack against a small guess
-space. A clean exit 0 means "none of these classes, in this tree, at this
-revision, within these bounds", never "no debt".
+space. `SCAN-INCOMPLETE` fires on THREE independent causes — the no-git walk's
+file-count cap, a directory it could not read, and (added this round) an
+individual FILE it could not read (permission denied or removed between
+listing and reading) — the last one applying regardless of whether the
+tree has git, since a tracked file's permissions can change after `git
+ls-files` lists it. All three were measured directly: an unreadable
+subtree, and separately an unreadable file, were each silently dropped
+with zero signal before their respective fixes, so the scan reported
+"clean" coverage while having read nothing from them; both confirmed
+fixed with mutation tests (reverting either fix independently makes the
+self-test fail) and the directory-cap path additionally verified against
+a 30,000-file/60-level-deep no-git tree (no crash, no slowdown, correct
+SCAN-INCOMPLETE). A clean exit 0 means "none of these classes, in this
+tree, at this revision, within these bounds", never "no debt".
 
 ## Sources
 
@@ -193,4 +225,24 @@ verified against both the false-positive shape (two large directories,
 exactly at the cap, fully covered — does not fire) and a genuine
 truncation shape (many small directories, cap hit mid-walk — fires).
 Round 2 verdict: SHIP-AFTER-FIXES; all findings applied and re-verified.
-See UNCERTAINTY.md for what remains outside what either round tested.
+
+**Round 3** ran after the author closed UNCERTAINTY.md's three open
+measurement items (test-path false-positive rate, DEP-UNUSED config-format
+coverage, no-git walk at scale) and added two fixes of their own (the
+unreadable-directory silent-swallow, and the Makefile-basename corpus
+gap). The round found four IMPORTANT gaps in that same-session work: the
+Makefile-basename fix missed GNU Make's own lowercase `makefile` variant
+and Dockerfile's suffixed forms (`Dockerfile.dev`); the corpus widening
+opened a narrow false-negative surface for a dependency literally named
+`make`; and the unreadable-directory fix's silent-swallow logic had not
+been extended to per-file read failures in `scanRepo`. Three of the four
+fixed and covered by new regression fixtures (case/suffix matching,
+per-file unreadable signal — both mutation-tested, reverting either
+independently fails `--self-test`); the `make`-name collision is
+documented in UNCERTAINTY.md rather than special-cased, since excluding
+one dependency name by string match would be its own fragile carve-out
+for a vanishingly narrow real-world case. Two MINOR items (a message
+ternary that dropped one reason when SCAN-INCOMPLETE fired for two causes
+at once, and this section's own logging gap) also fixed. Round 3 verdict:
+SHIP-AFTER-FIXES; re-verified `--self-test` green (8 checks) after fixes.
+See UNCERTAINTY.md for what remains outside what any round tested.

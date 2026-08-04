@@ -22,7 +22,8 @@
 //   BIG-BINARY      med   file over size threshold (tracked, or on-disk w/o git)
 //   DEP-UNUSED      low   package.json dependency with zero hits in source+config
 //   DRIFT           info  uncommitted changes in the working tree
-//   SCAN-INCOMPLETE med   no-git fallback walk hit its file cap — not a full scan
+//   SCAN-INCOMPLETE med   no-git fallback walk hit its file cap, OR a directory
+//                         or file could not be read — any cause, not a full scan
 //
 // Declared bounds (state them when relaying results): content scans are
 // verbatim-pattern only (no decoding of encoded/derived copies); PII-SHAPE is
@@ -118,25 +119,30 @@ function scanRepo(root) {
   // bounded walk). Values are matched in memory and reported MASKED.
   const WALK_CAP = 2000;
   let files = tracked;
+  let dirUnreadable = 0, capHit = false;
   if (!hasGit) {
     const w = walk(root, WALK_CAP);
     files = w.out;
-    if (w.truncated)
-      add("SCAN-INCOMPLETE", "med", ".",
-        `no-git fallback walk hit its ${WALK_CAP}-file cap with directories ` +
-        `still unexplored — this scan did NOT cover the whole tree; git init ` +
-        `and re-scan for full coverage`);
+    dirUnreadable = w.unreadable;
+    capHit = w.capHit;
   }
+  // A per-file read failure (permission revoked after listing, race with a
+  // delete) is coverage loss exactly like an unreadable directory — folded
+  // into the same SCAN-INCOMPLETE signal below rather than silently
+  // continuing, which previously left a "clean" scan that had read nothing
+  // from that file (measured: the same silent-swallow shape walk()'s
+  // directory case was fixed for, just not yet extended to files).
+  let fileUnreadable = 0;
   for (const rel of files) {
     const abs = path.join(root, rel);
     const ext = path.extname(rel).toLowerCase();
-    let st; try { st = fs.statSync(abs); } catch { continue; }
+    let st; try { st = fs.statSync(abs); } catch { fileUnreadable++; continue; }
     if (!st.isFile()) continue;
     if (st.size > SIZE_LIMIT)
       add("BIG-BINARY", "med", rel,
         `${(st.size / 1048576).toFixed(1)} MB ${hasGit ? "tracked" : "on disk (no .git — see VCS-MISSING)"}`);
     if (!TEXT_EXT.has(ext) || st.size > 2 * 1024 * 1024) continue;
-    let text; try { text = fs.readFileSync(abs, "utf8"); } catch { continue; }
+    let text; try { text = fs.readFileSync(abs, "utf8"); } catch { fileUnreadable++; continue; }
 
     if (!CRED_NAME.test(path.basename(rel))) { // named files already flagged whole
       const lines = text.split("\n");
@@ -168,6 +174,21 @@ function scanRepo(root) {
     }
   }
 
+  // SCAN-INCOMPLETE fires on any of three independent causes — the no-git
+  // walk's file cap, a directory it could not read, or a FILE it could not
+  // read (permission revoked after listing, race with a delete) — reported
+  // together so a reader sees every reason coverage is partial, not just
+  // whichever one a message ternary happened to pick.
+  if (capHit || dirUnreadable > 0 || fileUnreadable > 0) {
+    const reasons = [];
+    if (dirUnreadable > 0) reasons.push(`${dirUnreadable} directory(ies) unreadable`);
+    if (fileUnreadable > 0) reasons.push(`${fileUnreadable} file(s) unreadable`);
+    if (capHit) reasons.push(`hit its ${WALK_CAP}-file cap with directories still unexplored`);
+    add("SCAN-INCOMPLETE", "med", ".",
+      `scan did not cover the whole tree (${reasons.join(", ")}) — ` +
+      `${hasGit ? "re-scan after fixing permissions for full coverage" : "git init and re-scan for full coverage"}`);
+  }
+
   // DEP-UNUSED: declared dependencies with zero import/require hits.
   const pkgPath = path.join(root, "package.json");
   if (fs.existsSync(pkgPath)) {
@@ -178,10 +199,23 @@ function scanRepo(root) {
       // etc.), not just source — a dep referenced only from a plugin/extends
       // list in config, never imported from code, is still used. package.json
       // itself is excluded (the dependency's own declaration would trivially
-      // "find" it).
-      const srcs = files.filter(f =>
-        (/\.(m?[jt]sx?|cjs)$/.test(f) || (TEXT_EXT.has(path.extname(f).toLowerCase()) && path.extname(f) !== "" && !/\.(md|txt)$/.test(f)))
-        && f !== "package.json" && f !== "package-lock.json");
+      // "find" it). Extension-LESS build/CI filenames (Makefile, Dockerfile,
+      // Jenkinsfile, ...) are matched by basename, not extension — a plain
+      // `path.extname` filter drops them entirely (measured: a dep invoked
+      // only from a Makefile recipe was missed and false-flagged unused
+      // before this line existed). Covers GNU Make's own lowercase
+      // `makefile` variant (Make's default search order is GNUmakefile,
+      // makefile, Makefile — a plain `Makefile`-only match missed it,
+      // measured the same way) and Dockerfile's common suffixed forms
+      // (`Dockerfile.dev`, `Dockerfile.prod`).
+      const EXTLESS_CONFIG = /^(Makefile|makefile|GNUmakefile|Dockerfile(\.[\w.-]+)?|Jenkinsfile|Rakefile|Procfile|Vagrantfile)$/;
+      const srcs = files.filter(f => {
+        const base = path.basename(f);
+        if (base === "package.json" || base === "package-lock.json") return false;
+        if (EXTLESS_CONFIG.test(base)) return true;
+        const ext = path.extname(f).toLowerCase();
+        return /\.(m?[jt]sx?|cjs)$/.test(f) || (TEXT_EXT.has(ext) && ext !== "" && !/\.(md|txt)$/.test(f));
+      });
       const corpus = srcs.map(f => {
         try { return fs.readFileSync(path.join(root, f), "utf8"); } catch { return ""; }
       }).join("\n");
@@ -223,22 +257,29 @@ function collectPII(obj, classes, depth) {
   }
 }
 
-// Returns { out, truncated }. `truncated` means the cap actually cut the
-// walk short — NOT "out.length happens to equal cap", which a tree with
-// exactly `cap` files, fully covered, would also satisfy. Distinguish by
-// whether unexplored directories remain on the stack when the loop exits,
-// not by comparing the output length to the cap. Note this makes `cap` a
-// coverage bound, not a strict output-size bound: the cap check runs only
-// between directories, so one very large directory can push `out` well
-// past `cap` in a single step while still leaving the stack empty (nothing
-// was actually skipped) — `truncated` stays false, correctly, because
-// coverage IS complete even though `out.length` overshot the number.
+// Returns { out, truncated }. `truncated` means coverage is NOT complete —
+// either the cap cut the walk short (unexplored directories remain on the
+// stack when the loop exits — NOT "out.length happens to equal cap", which
+// a tree with exactly `cap` files, fully covered, would also satisfy: `cap`
+// is a coverage bound, not a strict output-size bound, since the cap check
+// runs only between directories and one very large directory can push `out`
+// well past `cap` in a single atomic step while still completing full
+// coverage) — OR a directory could not be read at all (permission denied,
+// race with a delete). A silently-skipped unreadable directory is coverage
+// loss exactly like a cap cutoff: measured directly — a `chmod 000` subtree
+// was dropped with zero signal before this counter existed, so the scan
+// reported "complete" while having read nothing under it. Both causes fold
+// into the same `truncated` flag; the report line does not need to
+// distinguish cap-cutoff from read-error to tell the caller "not complete".
 function walk(root, cap) {
   const out = [];
   const stack = ["."];
+  let unreadable = 0;
   while (stack.length && out.length < cap) {
     const d = stack.pop();
-    let entries; try { entries = fs.readdirSync(path.join(root, d), { withFileTypes: true }); } catch { continue; }
+    let entries;
+    try { entries = fs.readdirSync(path.join(root, d), { withFileTypes: true }); }
+    catch { unreadable++; continue; }
     for (const e of entries) {
       if (e.name === "node_modules" || e.name === ".git" || e.name.startsWith(".DS_")) continue;
       const rel = d === "." ? e.name : path.join(d, e.name);
@@ -246,7 +287,8 @@ function walk(root, cap) {
       else out.push(rel);
     }
   }
-  return { out, truncated: stack.length > 0 };
+  const capHit = stack.length > 0;
+  return { out, truncated: capHit || unreadable > 0, unreadable, capHit };
 }
 
 function report(findings) {
@@ -274,12 +316,25 @@ function selfTest() {
       GIT_COMMITTER_EMAIL: "t@t" } });
 
   // CLEAN tree: git repo, env.example with placeholders, synthetic-tagged
-  // fixture, used dependency, committed state.
+  // fixture, two "used" dependencies — one imported from source, one
+  // referenced ONLY from an extension-less Makefile recipe (regression
+  // fixture: a real repro found this dep false-flagged DEP-UNUSED before
+  // extension-less basenames were added to the corpus) — plus committed
+  // state.
   const clean = path.join(tmp, "clean");
   fs.mkdirSync(clean); git(clean, "init", "-q");
   mk(clean, ".env.example", "API_KEY=your-key-here\n");
   mk(clean, "src/index.js", "const dayjs = require('dayjs');\nmodule.exports = dayjs;\n");
-  mk(clean, "package.json", JSON.stringify({ name: "clean", dependencies: { dayjs: "^1" } }));
+  // Regression fixtures for two naming-convention gaps round-3 review found
+  // in the extension-less corpus match: GNU Make's own lowercase `makefile`
+  // variant (used here instead of `Makefile` — the two names collide on a
+  // case-insensitive filesystem like the default macOS one, so only one can
+  // exist in this fixture tree; the regex covers both spellings, this just
+  // exercises the lowercase one directly), and Dockerfile's suffixed forms.
+  mk(clean, "makefile", "build:\n\tesbuild src/index.js --bundle\n\nlint:\n\twrangler lint\n");
+  mk(clean, "Dockerfile.dev", "RUN npx nodemon --version\n");
+  mk(clean, "package.json", JSON.stringify({ name: "clean", dependencies: {
+    dayjs: "^1", esbuild: "^1", wrangler: "^1", nodemon: "^1" } }));
   mk(clean, "fixtures/case.json", JSON.stringify([{ name: "SNTL7Q-Jordan Lee", note: "synthetic" }]));
   git(clean, "add", "-A"); git(clean, "commit", "-qm", "init");
   const cleanFindings = scanRepo(clean).filter(f => f.sev !== "info");
@@ -300,6 +355,41 @@ function selfTest() {
   mk(noGit, "credentials.json", "{}");
   const plantedFindings = scanRepo(planted);
   const noGitFindings = scanRepo(noGit);
+
+  // UNREADABLE-DIR regression fixture: a no-git tree with a directory
+  // chmod'd unreadable. Real repro found this silently swallowed by
+  // walk()'s `catch { continue }` — the scan reported clean coverage while
+  // having read nothing under that subtree. Root ignores permission bits,
+  // so this check is skipped (not failed) when running as root — that is
+  // an environment limit of the check, not evidence the fix works there.
+  let unreadableOK = "skipped (running as root — permission bits are not enforced)";
+  if (typeof process.getuid !== "function" || process.getuid() !== 0) {
+    const permTree = path.join(tmp, "permtree");
+    mk(permTree, "open/a.txt", "hi\n");
+    mk(permTree, "locked/b.txt", "blocked\n");
+    fs.chmodSync(path.join(permTree, "locked"), 0o000);
+    const permFindings = scanRepo(permTree);
+    fs.chmodSync(path.join(permTree, "locked"), 0o755); // restorable before cleanup
+    const fired = permFindings.some(f => f.cls === "SCAN-INCOMPLETE" && /unreadable/.test(f.note));
+    unreadableOK = fired ? "PASS (SCAN-INCOMPLETE fired on the unreadable dir)"
+      : "FAIL — unreadable directory was silently swallowed: " + JSON.stringify(permFindings);
+  }
+
+  // UNREADABLE-FILE regression fixture: same silent-swallow shape as the
+  // directory case, but on a file's own statSync/readFileSync — round-3
+  // review found this still unfixed after the directory case was closed.
+  let unreadableFileOK = "skipped (running as root — permission bits are not enforced)";
+  if (typeof process.getuid !== "function" || process.getuid() !== 0) {
+    const fileTree = path.join(tmp, "filetree");
+    mk(fileTree, "open.txt", "hi\n");
+    mk(fileTree, "locked.txt", "password = 'SNTL7Q-shouldnotmatter'\n");
+    fs.chmodSync(path.join(fileTree, "locked.txt"), 0o000);
+    const fileFindings = scanRepo(fileTree);
+    fs.chmodSync(path.join(fileTree, "locked.txt"), 0o644); // restorable before cleanup
+    const fired = fileFindings.some(f => f.cls === "SCAN-INCOMPLETE" && /file\(s\) unreadable/.test(f.note));
+    unreadableFileOK = fired ? "PASS (SCAN-INCOMPLETE fired on the unreadable file)"
+      : "FAIL — unreadable file was silently swallowed: " + JSON.stringify(fileFindings);
+  }
 
   const got = new Set(plantedFindings.map(f => f.cls));
   const expect = ["SECRET-NAME", "SECRET-CONTENT", "PII-SHAPE", "BIG-BINARY", "DEP-UNUSED", "DRIFT"];
@@ -329,11 +419,16 @@ function selfTest() {
   console.log(`clean tree: ${cleanOK ? "PASS (0 actionable)" : "FAIL — " + JSON.stringify(cleanFindings)}`);
   console.log(`planted tree: ${missed.length === 0 ? "all 6 classes fired" : "MISSED " + missed.join(",")}`);
   console.log(`no-git tree: ${noGitOK ? "VCS-MISSING fired" : "FAIL"}`);
+  console.log(`extension-less config dep (Makefile/makefile/Dockerfile.dev): ${cleanOK ? "PASS (esbuild/wrangler/nodemon not false-flagged unused)" : "see clean-tree FAIL above"}`);
+  console.log(`unreadable directory: ${unreadableOK}`);
+  console.log(`unreadable file: ${unreadableFileOK}`);
   console.log(`value containment: ${leak
     ? "FAIL — leaked runs " + JSON.stringify([...new Set(leakedRun)])
     : "PASS (no 6+ char run of either planted secret appears in output)"}`);
   fs.rmSync(tmp, { recursive: true, force: true });
-  const ok = cleanOK && missed.length === 0 && noGitOK && !leak;
+  const unreadableFailed = typeof unreadableOK === "string" && unreadableOK.startsWith("FAIL");
+  const unreadableFileFailed = typeof unreadableFileOK === "string" && unreadableFileOK.startsWith("FAIL");
+  const ok = cleanOK && missed.length === 0 && noGitOK && !leak && !unreadableFailed && !unreadableFileFailed;
   console.log(`self-test: ${ok ? "PASS (two-sided + containment)" : "FAIL"}`);
   return ok ? 0 : 1;
 }
