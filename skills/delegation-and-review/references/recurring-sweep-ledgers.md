@@ -65,8 +65,14 @@ pointer-annotated historical line under the new one. A round closes
 only when the ledger reflects every touched finding's current state —
 a round that surfaced anything never closes on an unchanged ledger.
 
-**Absence is not resolution** (`unprobed` — carried by the skill's
-2026-07-31 Provenance entry). An OPEN FINDINGS or UNRESOLVED entry
+**Absence is not resolution** (probed in part — the covenant's queued
+Round-5 weak-tier probe has since run and discriminated cleanly (bare 0/3
+vs ruled 3/3, n=3) on the pre-registered haiku fixture; scoped to that
+Round-5 fixture and sample budget, not universal correctness and not
+cross-model; evidence `reviews/2026-08-04-round5-results/` at `e6581e18`,
+MANIFEST.sha256
+`372823c43f165fa2e906de50e536601e9b50a12ec1792aa77f9793418a672615`;
+carried by the skill's 2026-07-31 Provenance entry). An OPEN FINDINGS or UNRESOLVED entry
 that this round's report simply does not mention stays exactly where
 it is: an entry moves only on evidence addressed to it, and each state
 has its own exits. An OPEN FINDINGS entry (a confirmed defect) moves
