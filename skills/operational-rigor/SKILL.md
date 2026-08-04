@@ -390,7 +390,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   candidate bases numerically identical — it constrains nothing here,
   treating it as a drift artifact instead." ❌ "the comment says this is
   the compatibility path, so leaving it alone" — without checking whether
-  anything still reaches that path. (`unprobed` — see Provenance.)
+  anything still reaches that path. (`unprobed` — contributor sessions as
+  shape; see Provenance.)
 - Mid-task tripwire: a "small fix" crossing roughly 3 files or 100 changed lines
   stops for disclosure before continuing.
 - Changing a schema, enum, status value, or interface: sweep every call site
