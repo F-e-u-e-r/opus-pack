@@ -1,0 +1,10 @@
+```json
+{
+  "suite": "integration-test-suite",
+  "passed": 0,
+  "failed": 0,
+  "findings": [
+    "Suite runner blocked: FATAL: no DB credentials — unable to initialize database connection; no tests executed"
+  ]
+}
+```

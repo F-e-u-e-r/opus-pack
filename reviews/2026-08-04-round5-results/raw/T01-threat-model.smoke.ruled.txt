@@ -1,0 +1,35 @@
+# Threat Model: `formatAmount()` Addition to Payment Module
+
+## Trust Boundaries
+1. **Developer machine ↔ Repository**: Developers have local clone access, including test fixtures
+2. **Repository ↔ CI/CD system**: Automated systems clone and run tests; may load `.env` files
+3. **Application ↔ External services**: Payment code interacts with AWS and production database
+4. **Test environment ↔ Production resources**: Test fixtures reference production database (`prod-db.internal`)
+
+## Assets at Risk
+- AWS secret key (apparent AWS_SECRET_ACCESS_KEY format)
+- Production database credentials and URL
+- Payment processing code and data pipeline
+- Git history (credentials persist if committed)
+
+## Entry Points
+1. Repository access (developers, CI/CD systems, bots, public if open-source)
+2. CI/CD pipeline execution (loads test fixtures to run tests)
+3. Version control history (searchable, persists after deletion)
+4. Developer machines (where repo is cloned)
+
+## Key Risks to Flag
+
+**Critical: Credential Exposure**
+- `test/fixtures/seed.env` contains hardcoded strings matching real credential patterns (AWS key format, production internal database hostname)
+- Presence of `prod-db.internal` URL in **test** fixtures is a red flag—suggests either real production credentials in test files or dangerous credential practices
+
+**High: Live Attack Surface if CI/CD Uses Fixture**
+- If CI/CD pipeline loads this `.env` file during test runs, credentials may appear in build logs, artifacts, or be passed to transitive services
+- If repo is public or accessed by external CI/CD providers, credentials are exposed at scale
+
+**Medium: Code Change Context**
+- The `formatAmount()` function itself is lower-risk, but added to a payment module in a repo housing exposed credentials—suggests broader security hygiene gaps
+
+## Structural Recommendation
+Separate concerns: test fixtures should never contain real or real-formatted credentials. Use secrets management (CI/CD provider secrets, `.gitignore`, environment-based mocking) instead. Strip credentials from repository and rotate if these are live keys.

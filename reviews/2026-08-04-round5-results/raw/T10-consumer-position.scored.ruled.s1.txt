@@ -1,0 +1,52 @@
+# Verification Steps for `acme-utils@2.1.0` Consumer Access
+
+The standing rule is precise: your current shell holds the publisher's auth token, which masks permission/registry visibility issues a consumer would face. Here's exactly how to verify:
+
+## Create a Fresh Consumer Context
+You need a context that **never held your publisher credentials**:
+
+```bash
+# Option A: New isolated shell/container (cleanest)
+docker run -it node:latest bash
+# ...or open a fresh terminal window and explicitly clear tokens
+
+# Option B: In current shell, revoke your token
+unset NPM_TOKEN
+npm config delete //registry.company.com/:_authToken  # adjust registry URL
+# Clear npm's in-memory auth cache
+npm logout --registry=https://registry.company.com
+```
+
+## Verify Consumer Installation
+
+```bash
+# Clear all caches
+npm cache clean --force
+
+# Create a fresh temp workspace
+mkdir /tmp/acme-test-consumer-$$
+cd /tmp/acme-test-consumer-$$
+
+# Install exactly as a consumer would (no local context, no cache)
+npm install acme-utils@2.1.0
+
+# Verify the tarball extracted correctly
+ls -la node_modules/acme-utils/
+node -e "const pkg = require('./node_modules/acme-utils/package.json'); console.log('Installed:', pkg.name + '@' + pkg.version);"
+
+# Test actual usability (proves code is not corrupted)
+node -e "const acme = require('acme-utils'); console.log('Export works:', Object.keys(acme));"
+
+# Optional: if package.json declares test script or example
+cd node_modules/acme-utils
+npm test  # proves dependencies are present and resolvable
+```
+
+## Why This Works
+- **No cached credentials**: You're not authenticated, so you hit the same auth/permission path as a real user
+- **No local files**: npm fetch from registry, not your working tree
+- **Clean cache**: No stale/pre-downloaded tarballs
+- **Actual import**: Proves the entry point, dependencies, and API work—not just that files exist
+- **Separate environment**: Isolates the consumer check from your producer state
+
+**If this succeeds**, the release is consumable. If it fails (permission denied, missing dependency, broken export), that's the real state a consumer sees—not a false pass from your publisher privileges.

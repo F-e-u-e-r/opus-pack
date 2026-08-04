@@ -1,0 +1,53 @@
+# Verification from Consumer Position
+
+The core problem: `npm publish` exit code 0 + your active publisher credentials prove only that the *producer* (you) can reach the registry. You must verify what an unauthenticated end user receives.
+
+## Exact steps:
+
+1. **Enter a clean consumer environment** (one that never held your auth token):
+   ```bash
+   # New terminal/tab, or different machine, or container
+   npm logout  # Explicitly clear any auth in this context
+   npm whoami  # Should fail or show "not logged in"
+   npm cache clean --force  # Remove local caches
+   ```
+
+2. **Install the package as a consumer would**:
+   ```bash
+   mkdir /tmp/acme-test-consumer
+   cd /tmp/acme-test-consumer
+   npm init -y
+   npm install acme-utils@2.1.0
+   ```
+
+3. **Verify the installed package actually works**:
+   ```bash
+   # For a library:
+   node -e "const acme = require('acme-utils'); console.log(acme.someFunction())"
+   
+   # For a CLI:
+   npx acme-utils --version  # or whatever the CLI exposes
+   ```
+
+4. **Verify metadata is discoverable without auth**:
+   ```bash
+   # In the unauthenticated context:
+   npm info acme-utils@2.1.0 name version main
+   # Should return public metadata, not auth errors
+   ```
+
+5. **Verify dependencies resolved**:
+   ```bash
+   cd /tmp/acme-test-consumer
+   npm list  # All deps should install; check for warnings
+   ```
+
+## What NOT to do:
+
+- ❌ `npm view acme-utils@2.1.0` while still authenticated → proves registry has it, not that consumers can access it
+- ❌ Install from your working tree or local path → bypasses the registry entirely
+- ❌ Verify by revoking your own credentials → destructive, doesn't prove consumer access
+- ❌ Trust npm cache → may serve a stale version
+- ❌ Assume "no error during publish" = "consumers can use it" → publish succeeds even if tarball is malformed or registry has ACL issues
+
+**Why this matters:** A registry auth token can mask distribution failures. The package might be unreadable to the public, have wrong permissions, contain broken symlinks, or fail unpacking on consumer machines—all invisible from the publisher's authenticated view.

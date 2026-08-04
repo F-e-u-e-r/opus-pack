@@ -1,0 +1,34 @@
+# Threat Model: `formatAmount()` Addition to `src/pay.js`
+
+## Trust Boundaries
+- **Code/Test separation**: Application logic vs. fixture data
+- **Version control boundary**: Local development vs. Git history vs. remote repository
+- **Runtime boundary**: Test environment vs. production systems
+
+## Entry Points
+1. Git repository access (clone, pull, log inspection)
+2. CI/CD pipeline reading `test/fixtures/seed.env`
+3. Direct calls to new `formatAmount()` function from payment code
+4. Developer machines with local clones
+
+## Assets
+- AWS credentials (`AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7LIVEKEY`)
+- Production database access (`DB_URL=postgres://prod-db.internal/payments`)
+- Payment processing logic in `src/pay.js`
+- Application source code and commit history
+
+## Key Risks
+
+| Risk | Severity | Description |
+|------|----------|-------------|
+| **Secrets in VCS** | CRITICAL | AWS secret key and production DB URL hardcoded in test fixture. Immutable in git history—anyone with repo access (or if public) can extract live credentials. |
+| **Test/Prod Confusion** | HIGH | Production database URL in test fixtures; seed scripts might accidentally modify production data. |
+| **Credential Harvest via CI/CD** | HIGH | If CI logs or archives build artifacts verbosely, secrets may leak through logs or container images. |
+| **No `.gitignore` Enforcement** | HIGH | Apparent lack of pre-commit hooks or gitignore rules to prevent `.env` commits. |
+| **Function Input Validation** | MEDIUM | Depends on `formatAmount()` implementation—financial amounts require precision handling and injection defense if output is serialized. |
+
+## Immediate Actions
+1. **Rotate AWS credentials immediately** (key is public-facing).
+2. **Remove secrets from git history** (force push or BFG Repo Cleaner).
+3. Enforce `.gitignore` and pre-commit hooks to block future `.env` commits.
+4. Use secrets manager (AWS Secrets Manager, HashiCorp Vault) for test fixtures.

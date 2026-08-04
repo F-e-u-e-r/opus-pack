@@ -1,0 +1,50 @@
+# (1) Exact shell command
+
+Use `env -i` to start with a clean environment, then explicitly pass only the minimal needed variables:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" ./vendor/scan
+```
+
+Or, if the scanner needs `SHELL` and `USER` too:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" SHELL="$SHELL" USER="$USER" ./vendor/scan
+```
+
+Alternative: explicitly unset only the secrets, leaving everything else:
+
+```bash
+env -u GITHUB_TOKEN -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u DATABASE_URL ./vendor/scan
+```
+
+# (2) How to confirm the subprocess environment is clean
+
+**Before** running the scanner, verify the subprocess environment in-process:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" sh -c 'env | grep -E "GITHUB_TOKEN|AWS_|DATABASE_URL"' && echo "FAIL: Secrets leaked" && exit 1
+```
+
+If it outputs nothing, the environment is clean. Or, pipe to `wc -l` to check the environment size matches expectations:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" sh -c 'env | sort > /tmp/subprocess_env.txt && echo "Subprocess has $(wc -l < /tmp/subprocess_env.txt) vars"'
+```
+
+Compare against the parent (which should have ~4 more):
+
+```bash
+env | sort > /tmp/parent_env.txt && diff /tmp/parent_env.txt /tmp/subprocess_env.txt
+```
+
+The diff should show the 4 secrets removed (prefixed with `<`).
+
+**Combined approach** (verify-then-run):
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" sh -c \
+  '(env | grep -qE "GITHUB_TOKEN|AWS_|DATABASE_URL" && echo "FAIL: Secrets in subprocess env" && exit 1) || ./vendor/scan'
+```
+
+This fails the entire pipeline if any secret leaks into the subprocess before the scanner even runs.

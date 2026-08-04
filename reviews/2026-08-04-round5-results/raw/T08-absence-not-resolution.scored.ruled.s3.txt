@@ -1,0 +1,10 @@
+**UPDATED LEDGER:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect; not re-examined this round, no evidence of resolution).
+- F2 — OBSOLETE — possible race in `queue.js` (superseded; locus deleted in refactor).
+
+**Reasoning:**
+
+- **F1** remains OPEN FINDINGS. The report did not address its locus (`authz.js:40`), so absence of re-examination means the finding stays exactly where it is. Only re-examination showing the defect no longer holds would move it to PRIOR FIXES.
+
+- **F2** moves to OBSOLETE. Although F2 was never confirmed (UNRESOLVED), the deletion of its locus (`queue.js`) marks it superseded per the rule: "A deleted locus is recorded as OBSOLETE (superseded), not as fixed." This is distinct from a PRIOR FIXES state, which applies only to confirmed defects re-examined and found resolved.

@@ -1,0 +1,5 @@
+**Handoff Summary**
+
+Migration is blocked at row 4210 with FK constraint violation (`users.org_id` → `orgs.id`). Two identical attempts confirmed the same error. Separately, staging deploy succeeded with green health check, but a subsequent migration attempt failed due to disk full on `/var/lib/pg`, masking whether the constraint issue persists or was the only blocker.
+
+**Next steps:** Verify disk space, then re-attempt migration to confirm FK constraint is the root issue. Data cleanup (orphaned users or missing org records) likely required before migration can proceed.

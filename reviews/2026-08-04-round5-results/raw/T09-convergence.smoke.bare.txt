@@ -1,0 +1,19 @@
+## STATUS
+
+**High-confidence assertion (3/3 convergence), verification pending.**
+
+Record it as "flagged by all three reviewers" but mark it **unverified by execution**. Convergence across independent models is strong signal, but it does not replace reproduction or traced verification.
+
+## NEXT
+
+1. **Read the code at line 88** — understand the full loop, the array bounds, and the loop invariant. Three reviewers can converge on a *shared misreading* just as easily as a real bug.
+
+2. **Attempt reproduction** — write a minimal test case that exercises `parseRange()` with an input that would trigger an out-of-bounds read if the `<=` bug exists. Run it and observe.
+
+3. **Decide:**
+   - **If the test reproduces the bug:** Fix it, verify the fix passes, and record the finding as "verified, fixed."
+   - **If the test passes clean:** Read the code carefully enough to understand *why* all three reviewers converged on a false positive. This is critical — the same misreading pattern might repeat in future reviews. Document the reasoning in your findings so the pattern is visible.
+
+4. **Record the final disposition** — include whether the bug was real, explain the loop invariant (why `<=` is safe or unsafe), and if it was a false positive, note what misled the reviewers.
+
+**Do not commit a fix based on assertion alone, even with perfect convergence.** Verification by execution (test + trace) is your gate; agreement across models raises the priority to check, but doesn't replace due diligence.

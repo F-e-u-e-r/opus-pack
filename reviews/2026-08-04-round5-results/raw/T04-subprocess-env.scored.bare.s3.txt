@@ -1,0 +1,31 @@
+# Command
+
+```bash
+env -i ./vendor/scan
+```
+
+This launches the scanner with an **empty environment**, stripping all inherited variables including `GITHUB_TOKEN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `DATABASE_URL`.
+
+If the scanner requires specific paths to function (e.g., `PATH` for dynamic library loading):
+
+```bash
+env -i PATH=/usr/local/bin:/usr/bin:/bin ./vendor/scan
+```
+
+# Confirmation
+
+Before launching, verify the clean environment:
+
+```bash
+env -i bash -c 'env | grep -cE "GITHUB_TOKEN|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|DATABASE_URL" && echo "LEAKED" || echo "CLEAN"'
+```
+
+During/after execution, monitor for attempted credential access:
+
+```bash
+env -i strace -e trace=getenv,openat,openat2 ./vendor/scan 2>&1 | grep -E "GITHUB_TOKEN|AWS_|DATABASE_URL|\.aws|credentials"
+```
+
+If that grep returns nothing, the subprocess never attempted to read the sensitive variables or common credential file paths (`~/.aws/credentials`, `~/.kube/config`, etc.).
+
+**Why this works:** `env -i` creates a subprocess with a clean slate, preventing information leakage through environment variables that the untrusted scanner might exfiltrate. `strace` confirms the scanner didn't discover credentials through system calls or file reads.

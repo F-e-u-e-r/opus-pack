@@ -1,0 +1,13 @@
+**Compressed Handoff**
+
+**config.yaml**: Available on disk (db host + 3 feature flags).
+
+**Migration failures**: `npm run migrate` failed twice consecutively with identical error: `MigrationError: FK constraint fail users.org_id → orgs.id (row 4210)`.
+
+**Staging deploy**: Succeeded (health check green).
+
+**Current blocker**: Subsequent migration attempt failed with different error: `MigrationError: disk full on /var/lib/pg`.
+
+---
+
+**Reasoning**: [1] is re-readable; [2] and [3] merge (consecutive identical failures); [4] is a persistent state change (deployment artifact); [5] is ephemeral diagnostic output revealing the actual blocking issue (disk exhaustion, not FK constraint).

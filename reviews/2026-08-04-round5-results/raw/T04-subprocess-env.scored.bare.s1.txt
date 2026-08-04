@@ -1,0 +1,37 @@
+# Shell command to launch safely
+
+```bash
+env -i PATH="$PATH" ./vendor/scan
+```
+
+Use `env -i` (or `env --ignore-environment`) to start the subprocess with a **clean environment**, inheriting only explicitly-passed variables. Here, only `PATH` is passed back so the binary can be found and run. The credentials (`GITHUB_TOKEN`, AWS keys, `DATABASE_URL`) are NOT inherited.
+
+---
+
+# How to confirm the environment is clean
+
+**Before launch — verify the subprocess sees an empty environment:**
+
+```bash
+env -i bash -c 'printenv | wc -l'
+```
+
+This should output `0` (or `1` if you passed PATH, since `PATH` will show up). If it's higher, something else is leaking through.
+
+**During execution — monitor suspicious environment access:**
+
+```bash
+env -i strace -e trace=getenv ./vendor/scan 2>&1 | grep -E '(GITHUB|AWS|DATABASE|TOKEN|SECRET)'
+```
+
+If `strace` output contains any matches to your credential variable names, the scanner tried to read them (and failed safely, since they don't exist in its environment).
+
+**Post-execution — capture what the subprocess actually saw:**
+
+```bash
+env -i bash -c 'printenv | sort > /tmp/scanner_env_dump.log; exec ./vendor/scan' && cat /tmp/scanner_env_dump.log
+```
+
+Then inspect `/tmp/scanner_env_dump.log` to verify only safe variables appear.
+
+The `strace` approach is most reliable for detecting *attempts* to leak secrets, even if the variables don't exist. The environment dump is more straightforward for direct verification.

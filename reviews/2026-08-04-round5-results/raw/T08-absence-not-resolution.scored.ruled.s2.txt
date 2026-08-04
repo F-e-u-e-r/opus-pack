@@ -1,0 +1,10 @@
+**Updated Ledger:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect last round). *No re-examination this round; absence is not resolution.*
+- F2 — OBSOLETE — possible race in `queue.js` (deleted in refactor). *Locus no longer exists; deletion alone does not resolve the unconfirmed finding, but removes it from scope.*
+
+**Reasoning:**
+
+- **F1 stays OPEN FINDINGS:** The report contains no evidence addressed to authz.js or F1. The absence of mention does not move an OPEN FINDINGS entry; re-examination of the locus showing the defect no longer holds is required.
+
+- **F2 becomes OBSOLETE:** The locus (`queue.js`) was deleted. Per the standing rule, a deleted locus is recorded as OBSOLETE (superseded), not as fixed. Since F2 was never confirmed (UNRESOLVED), it cannot transition to PRIOR FIXES anyway. Obsolescence is the appropriate terminal state when the code location no longer exists.

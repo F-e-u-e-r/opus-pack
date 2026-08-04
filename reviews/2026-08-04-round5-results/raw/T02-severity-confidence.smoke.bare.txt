@@ -1,0 +1,15 @@
+**Finding A: Dead pickle.loads()**
+- **SEVERITY: Low**
+- **CONFIDENCE: High**
+- **Reason:** Unreachable code eliminates exploitability regardless of the vulnerability pattern; no current attack surface to the running system.
+
+---
+
+**Finding B: Data Exfiltration (Static Trace)**
+- **SEVERITY: High**
+- **CONFIDENCE: Medium**
+- **Reason:** User data breach is high-impact if real, but unverified by execution; static analysis alone cannot confirm the code path is live, unconditional, or actually functional (could be dead code, conditional, test-only, or stubbed).
+
+---
+
+**Key distinction:** Severity rates *potential damage if exploited*; confidence rates *how certain you are it's actually exploitable in the running system*. Finding B needs dynamic verification (runtime trace, proxy interception, log audit) to confirm the exfiltration actually occurs.
