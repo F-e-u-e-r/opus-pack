@@ -423,6 +423,24 @@ When rigor conflicts with finishing sooner, rigor wins.
   account, bot identity) is a behavior change with no code diff: it can add or
   drop downstream triggers, permissions, and rate-limit buckets — after any
   credential/identity swap, enumerate what keys off that identity and verify each.
+- **The same field name can mean opposite things at different layers — a
+  "defined but never wired" field is not automatically a wiring bug.**
+  Before connecting a dangling input through, verify the identifier means
+  the same thing at every layer it touches: a UI layer may already be
+  compensating for the missing wire (folding the value into another field
+  it does update), so wiring the dangling field through on top of that
+  compensation double-counts it rather than fixing anything. Reproduce the
+  numeric or behavioral consequence of wiring it before recommending the
+  wire; if a compensation exists, locate it, then resolve the intended
+  semantics from one authoritative external source (a spec, a parity
+  fixture, the artifact being matched) and move every layer to it in one
+  change — never wire through and leave the compensation in place. ✅ "the
+  sidebar folds this value into `budget` before the engine ever sees it;
+  wiring it through separately would double-count it — resolving intended
+  semantics from the parity fixtures first." ❌ "this field is declared but
+  never passed to the engine — wiring it through" without checking what
+  already reads or compensates for its absence. (`unprobed` — see
+  Provenance.)
 - **In a first-match classifier or sequential-replace chain, pattern ORDER is a
   load-bearing invariant.** More-specific must precede broader — a broad pattern
   placed first shadows the specific one silently (a generic digit-run redactor
@@ -1138,6 +1156,16 @@ comment's factual premise had gone stale. Contributor sessions, cited as
 shape. Ships `unprobed` per the covenant; its probe joins the standing
 #115 queue — a future campaign, not round-5, which was a completed,
 frozen ten-target slice this rule was not part of.
+
+The §3 same-name-opposite-semantics bullet (2026-08-04) comes from a
+private incident: a field was flagged as "defined but never wired" between
+a UI layer and an engine layer, and wiring it through as recommended by
+that framing would have corrupted output, because the UI layer already
+folded the same-named value into a different field as a compensation — the
+two layers used the identifier to mean opposite things. Resolving the
+intended semantics required an external ground-truth artifact, not either
+layer's own reading. Contributor session, cited as shape; no in-repo probe
+has run — `unprobed` marker.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
