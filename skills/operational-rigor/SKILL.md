@@ -499,6 +499,26 @@ When rigor conflicts with finishing sooner, rigor wins.
   handler read the current value, not a captured one."
   ❌ "diff's clean and unit tests pass, so the interaction works" — or
   "disclosed as unverified" when a dev server was one command away.
+- **A live probe that shows no failure has two suspects — the wiring, and
+  whether the input actually reached it** (`unprobed` — private incident as
+  shape; see Provenance). A UI field can be staged well before it reaches
+  the code path a live probe drives — committed on blur, gated behind an
+  apply button, debounced — and a probe that shows nothing is silence from
+  the CHEAPER suspect (the input never left the staging layer), not proof
+  the checker-to-app wiring is broken. Check delivery first — read the
+  state-management code the field feeds, or drive the exact user action
+  that commits it — before recording an integration defect; only a
+  delivered-input silence is an integration finding. Distinct from the
+  interactive/client-path bullet above (a gate that never drives a live
+  transition at all): here the live transition genuinely ran and its
+  result was read, then misread because an intermediate staging layer sat
+  between the input and the code the probe exercised.
+  ✅ "banner didn't fire for a value my tests say must block — traced the
+  field to its state hook: staged, committed only on an explicit action.
+  Not a defect; the value never reached the checker."
+  ❌ "the live banner didn't fire for an input my unit tests flag — filing
+  an integration bug" without reading how that field reaches the checked
+  code path.
 - Confirm mutating effects from system responses, not command intent. Exit code 0
   is evidence; "issued" is not.
 - **Verify delivery from the consumer's position** (`unprobed` — see
@@ -929,6 +949,17 @@ crisp trigger; the reconciled wording here is this pack's. All ship
 `unprobed` per the covenant; their probes join the private round-5 queue —
 the uncertain-outcome entry's probe shape is recorded in
 `references/external-systems.md`'s provenance.
+The §4 staged-input rule (2026-08-04) generalizes a private incident: a live
+banner failed to fire for a value the contributor's own tests said must
+block, read at first as an integration gap between the checker and the app —
+two tool calls later, tracing the field to its state hook showed it was
+staged and committed only on an explicit action, not wired wrong at all.
+This is the second recorded incident of the same shape — the first is a
+prior click-target-vs-state-theory finding already held in the contributor's
+own memory, not in any skill until now — which strengthens rather than
+dedups the generalization. Private incident, cited as shape; the underlying
+session is verifiable by the contributor, not linkable here. Ships
+`unprobed` per the covenant; its probe joins the private round-5 queue.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands
