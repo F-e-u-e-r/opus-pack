@@ -438,6 +438,31 @@ axes, treat it as load-bearing — the pass fails closed.
   new order."
   ❌ "updated the current-state summary; the old benchmark write-up down
   below is just history, nobody reads that far" (a weaker executor does).
+- **A contradiction between two verified results is not automatically a
+  supersession — diff their run conditions before either claim wins**
+  (`unprobed` — private incident as shape; see Provenance). Two results
+  that disagree can both be true, each on its own scope (task difficulty,
+  version, environment, input shape); the global R7 recency heuristic
+  ("pick one — more recent / more tested — say why, flag the other") is
+  the right move only once you've confirmed the results are actually
+  measuring the same thing. Before applying it: name the candidate
+  explanation for the disagreement, then verify it — don't assume the
+  first plausible story. A recorded finding said a model scored 0/20 on
+  headless file-edits; a fresh bench on what looked like the same task
+  scored 2/2 clean. The first guess was "version drift" — checked, and
+  the binary build was identical between both benches, which killed that
+  explanation; the real difference was task complexity (the old bench
+  drove harder multi-file edits, the new one a single-file edit). Both
+  scores stayed true, on different task shapes. The fix is to
+  scope-annotate BOTH findings with the condition that actually differs,
+  not to overwrite the older one — a naive recency pick would have
+  retired the 0/20 finding and mis-taught every future reader that the
+  model handles complex edits.
+  ✅ "0/20 (harder multi-file dir-mode edits, frontier bench) vs. 2/2
+  (simple single-file edit, this bench) — same binary build, different
+  task shape; both stand, scoped."
+  ❌ "the new bench says 2/2, so the model actually works now" — recency
+  applied without checking whether the two benches tested the same thing.
 - **Two-strike promotion trigger:** the second time a lesson's trigger
   fires, that event promotes it — into a standing rule, or a hook where
   machine-checkable — and the entry gets a `promoted-to:` line. One
@@ -1357,3 +1382,16 @@ reaching review. The pass is itself normative, so it Ships `unprobed` per the
 covenant; its probe joins the standing #115 queue — a future campaign, not
 round-5, which was a completed, frozen ten-target slice this rule was not part
 of.
+The §4 condition-diff-before-supersession rule (2026-08-04) comes from a
+private incident: a recorded finding said a model scored 0/20 on headless
+file-edits with 14 fabrications; a fresh re-bench on what looked like the
+same task scored 2/2 clean. First explanation was version drift — checked
+and killed (same binary build both times); the real difference was task
+complexity, harder multi-file edits in the old bench versus a single-file
+edit in the new one. Both findings were scope-annotated rather than one
+overwriting the other, which a bare application of global R7's recency
+heuristic would have done, mis-teaching future sessions that the model
+handles complex edits it does not. Private incident, cited as shape; the
+underlying session is verifiable by the contributor, not linkable here.
+Ships `unprobed` per the covenant; its probe joins the private round-5
+queue.
