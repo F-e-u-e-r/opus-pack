@@ -50,13 +50,13 @@ behavior, not proposed changes — do not encode them as fixed.
    step-6 verdict. This is the D4 problem; two of its three sub-defects are still
    live in HEAD (the third, the read-window, is partly mitigated by the opening and
    closing digests at procedure steps 2 and **6**). Design D4 (export-then-review)
-   is unimplemented. (Known-doc-defect, outside this staged scope, TWO stale spots
-   in the live `skills/skill-vetting/SKILL.md`: `:48` step-2 text says "the one at
-   step 5" — an off-by-one, the closing digest is step 6; and `:216` says the
-   steps "put the read first and the digest last", which predates the inserted
-   step-2 opening digest. The authoritative sequence is numbered steps 2/3/6 with
-   the two-matching-digests bracket; flag both for an upstream fix, do not edit
-   here.)
+   is unimplemented. (Doc-numbering note — RESOLVED by PR #118 (`c7951bc`): the live
+   `skills/skill-vetting/SKILL.md` used to carry two stale spots — a step-2 "the
+   one at step 5" off-by-one (the closing digest is step 6) and a "read first …
+   digest last" line that predated the inserted step-2 opening digest. PR #118
+   reworded both to the numbered steps 2/3/6 + two-matching-digests bracket. This
+   is the (a) item below; the §1 procedure-boundary GAP itself — read-then-execute
+   before a verdict — stays OPEN.)
    **Safe default:** do not execute an unvetted candidate on the host; treat an
    executable candidate as BLOCK unless a named isolation boundary (separate
    machine/container, no host secrets, no network) is available, and read a
@@ -78,13 +78,15 @@ behavior, not proposed changes — do not encode them as fixed.
    carrying the SAME digest keeps the old status (`:474`), silently dropping an
    acknowledged BLOCK. So assume concurrency can permanently erase a verdict/audit
    record until D2 lands; avoid concurrent hook/`record` operations, and
-   re-audit / re-vet after any suspected concurrency. (Known doc defect: the live
-   DOCSTRING `advisory.py:205-210` says the delta is "un-recorded and never
-   re-advises" (`:209`) — that overstates the current-content case against the
-   executable `is_changed` path; the CODE is authoritative. Threat-model I11
-   `:279-283` says only "un-recorded / a lost update", which is correct — the
-   defect is the docstring wording, not the threat model. Flag for an upstream
-   fix.) Do not weaken G5, and do not read it as concurrency recovery.
+   re-audit / re-vet after any suspected concurrency. (Doc-wording note — RESOLVED by
+   PR #118 (`c7951bc`): the live `advisory.py` `_acquire` DOCSTRING used to say the
+   delta is "un-recorded and never re-advises" — overstating the current-content
+   case against the executable `is_changed` path; PR #118 trimmed it to
+   "un-recorded". The threat-model I11 said only "un-recorded / a lost update",
+   already correct — the defect was the docstring wording, not the threat model.
+   This is the (b) item below; the I11 concurrency GAP itself — the hand-rolled
+   `O_EXCL` lock, `fcntl.flock`/D2 not landed — stays OPEN.) Do not weaken G5, and
+   do not read it as concurrency recovery.
 5. **I2 mid-scan swap window and I10 partial-with-prior half — no failing test.**
    Documented as verification obligations without a mutation-anchored test.
    **Safe default:** do not cite these as covered; if you touch them, add the
@@ -94,26 +96,28 @@ The authoritative list is the threat model's own `NOT MET`/OPEN markers; no
 separate tracking issue was opened for them because they are already documented in
 PR #83's body and the threat model (see the PR description).
 
-**Known live-doc defects (documented here, NOT fixed in this staged scope — the
-CODE is authoritative; flag upstream).** Four, all verified this session:
-(a) `skills/skill-vetting/SKILL.md:48` ("the one at step 5") and `:216` ("read
-first … digest last") — stale step numbering; the closing digest is step 6
-(item 3 above). (b) the `hooks/skill-vetting-advisory.py:205-210` DOCSTRING says a
-concurrent lost delta is "un-recorded and never re-advises" (`:209`), which
-overstates the current-content case against the executable `is_changed` path
-(item 4) — this is an in-code docstring only; the threat model I11 `:279-283` says
-"un-recorded / a lost update", which is CORRECT, so it is NOT part of this defect.
-(c) **advisory logging presented as guaranteed/auditable** — threat-model I6 `:296`
-("is logged") and both READMEs (`README.md:429`, `README.zh-Hant.md:268`) — while
-`_log` swallows all exceptions (`advisory.py:149-150`, def `:120`), so it is
-best-effort (INV-5). (d) the live prose/CLI overstate dot-path rejection —
-`skills/skill-vetting/SKILL.md:140` and the CLI error at
-`hooks/skill_snapshot.py:930` imply "every `..` spelling" refuses, but a `..` that
-resolves to the current non-symlink `$PWD` passes (INV-4; arrival evidence, not
-spelling). **A consolidated GitHub issue is warranted for (a), (c), and (d)**
-(doc-vs-code contradictions across PUBLISHED files); (b) is an in-code docstring
-fix, lower priority;
-it is queued for the delivery step, not opened here.
+**Known live-doc defects — RESOLVED by PR #118 (`c7951bc`), filed as #104.**
+History preserved below; the CODE was always authoritative and is unchanged, and
+PR #118 brought the docs into line. All four were verified fixed on `main`
+(`1e38fa8`); original line anchors have since drifted, so each entry names a
+semantic anchor. (a) `skills/skill-vetting/SKILL.md` step numbering ("the one at
+step 5" / "read first … digest last") — the closing digest is step 6 (item 3
+above); PR #118 reworded to the numbered steps 2/3/6 + two-matching-digests
+bracket. (b) the `hooks/skill-vetting-advisory.py` `_acquire` DOCSTRING said a
+concurrent lost delta is "un-recorded and never re-advises", overstating the
+current-content case against the executable `is_changed` path (item 4); PR #118
+trimmed it to "un-recorded". (The threat model I11 said "un-recorded / a lost
+update", already CORRECT — never part of the defect.) (c) **advisory logging
+presented as guaranteed/auditable** — threat-model I6 ("is logged") and both
+READMEs ("auditable") while `_log` swallows all exceptions, so it is best-effort
+(INV-5); PR #118 added the best-effort qualifier to I6 and both READMEs (README
+line anchors drifted `429/268 → 471/302`). (d) the live prose/CLI overstated
+dot-path rejection — `skills/skill-vetting/SKILL.md` and the
+`hooks/skill_snapshot.py` `digest` CLI error implied "every `..` spelling"
+refuses, but a `..` that resolves to the current non-symlink `$PWD` passes (INV-4;
+arrival evidence, not spelling); PR #118 reworded both to the arrival-evidence
+framing. **These were consolidated as #104 and closed by PR #118**; the
+staging-side reconciliation is tracked by #120.
 
 ## Not yours to decide — maintainer decisions
 

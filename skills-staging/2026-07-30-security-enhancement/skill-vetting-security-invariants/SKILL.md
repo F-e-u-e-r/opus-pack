@@ -143,11 +143,15 @@ subprocess split.
   GUARANTEED baseline-state failure marker; `_log` may leave a best-effort warning
   in `advisory.log` (`hooks/skill-vetting-advisory.py:120-150`, called at
   `:701-704`), but that is a forensic trace, not the safety mechanism — safety
-  comes from advise-and-don't-advance. (Known doc-defect: the repo's canonical
-  docs OVERSTATE this — threat-model I6 `:296` says a failed write "is logged" and
-  both READMEs call advisory logging "auditable" — while `_log` swallows all
-  exceptions (`advisory.py:149-150`, def at `:120`). The CODE is authoritative;
-  the docs are an upstream fix — see UNCERTAINTY.md.)
+  comes from advise-and-don't-advance. (Doc-vs-code note — RESOLVED by PR #118
+  (`c7951bc`, the #104 fix): the canonical docs USED TO overstate this —
+  threat-model I6 said a failed write "is logged" and both READMEs called advisory
+  logging "auditable" — while `_log` swallows all exceptions (`advisory.py`, the
+  bare `except Exception` around the log write). PR #118 added the best-effort
+  qualifier to I6 and both READMEs, so the docs now match the code; the CODE stays
+  authoritative. Threat-model I6 is still at `:296` (content updated in place); the
+  README anchors moved (`429/268` → ~`471/302`) — prefer the I6 goal / the READMEs'
+  logging note over a line number. See UNCERTAINTY.md.)
 - **Done-check:** run the regression — `python3 hooks/test-skill-vetting-advisory.py
   HookE2E.test_failed_first_write_does_not_silently_bootstrap_a_change` prints `OK`
   (it lives at `hooks/test-skill-vetting-advisory.py:132` and asserts the advisory

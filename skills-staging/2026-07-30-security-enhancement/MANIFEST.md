@@ -1,5 +1,12 @@
 # Manifest — skill-vetting hardening library (2026-07-30)
 
+> **Internal-maintainer-reference — NOT FOR PUBLICATION.** Graduation audit
+> result: **DECLINED — not publishable** (see `DISPOSITION.md`). The four
+> `SKILL.md` files are campaign-shaped maintenance artifacts about opus-pack's
+> own security hooks — internal engineering reference, **not** marketplace-
+> candidate skills and **not** a plugin source. This trio (START-HERE / MANIFEST
+> / UNCERTAINTY) is review-only and is not installed.
+
 Extracted from the `security-enhancement.md` session transcript by a five-screener
 + three-reviewer + final-gate orchestration, and verified against the repository
 at HEAD `79ca49c`. The session is the Workstream-B skill-vetting hardening
@@ -10,15 +17,16 @@ default branch; no local drift in `hooks/` or `.github/`).
 
 By DEFAULT `skills-staging/` is gitignored local working material (repo
 `.gitignore`; policy tracked by a GitHub issue — filed as #98 per this session,
-confirm with `gh issue view 98`). For THIS PR delivery the seven files
-were **force-added** (`git add -f`), so they are now tracked and WILL be published
-by the delivery commit — that is the intent. Because they are tracked, `.gitignore`
-no longer excludes them; stage only by explicit pathspec under this directory and
+confirm with `gh issue view 98`). These files were **force-added** (`git add -f`)
+and are tracked in the repo as **internal-maintainer reference** — NOT as a
+published plugin. The 2026-08-04 graduation audit **declined** publication (see
+`DISPOSITION.md`), so they are deliberately **not** copied into `.claude/skills/`
+and carry no install step; being tracked is only so the reference and its
+reconciliation live in version control. Because they are tracked, `.gitignore` no
+longer excludes them; stage only by explicit pathspec under this directory and
 never `git add -A` (a GitHub issue — filed as #100 per this session; confirm with
 `gh issue view 100` — tracks the untracked session transcripts a stage-everything
-command could sweep in). Before install, review through the pack's three-lens +
-cross-family ladder, then copy the four skill directories into `.claude/skills/`
-by the repo's documented convention (NOT the START-HERE/MANIFEST/UNCERTAINTY files).
+command could sweep in).
 
 **The trio (START-HERE / MANIFEST / UNCERTAINTY) is REVIEW-ONLY and is NOT
 installed; no installed skill hard-depends on it.** Each skill carries its own
