@@ -51,6 +51,39 @@ all" — by Stage 4 the adapter exists and the check reads as waste.
 artifact-producing step.
 (`unprobed` in-house; external evidence — see Provenance.)
 
+**Before a rule earns its place — the author-time pruning pass** (`unprobed`
+— see Provenance). The format above says how to write a rule; this is the
+cheap pre-filter for whether to, and where. Ask five questions — each hands
+off to the section that owns the deep or empirical resolution; the pass
+screens, it does not re-run those sections:
+- **No-op** — would the weaker, zero-context reader this pack is written for
+  behave any differently with the rule than without it? Judge at that target
+  tier, not a strong model's; the empirical form is §7's bare-vs-ruled probe.
+- **Default-delta** — is the behavior already the base default, or already
+  compelled by a standing higher rule? A rule earns its line only in the delta
+  over that default, measured at a stated tier, never assumed (§7).
+- **Placement** — where does this rule belong, and is the always-loaded body
+  really it? Decide with §4's Placement test. (Frontmatter/trigger metadata
+  carries routing conditions, never rule content.)
+- **Retrieval-cost** — does a clause only a minority of loads needs sit in the
+  always-loaded body? Move the rare case on-demand (§4's earn-the-line).
+- **Contradiction-pressure** — does it obviously collide with an existing
+  authority, a stated exception, or an adjacent skill's rule? A detected
+  collision escalates to §6's rule-by-rule doctrine walk — the screen here is
+  that walk's trigger, not the walk itself.
+Disposition: a rule earns its place only when all five questions pass. One it
+fails sends the rule back — drop, re-home, or rewrite — before it lands; a
+detected contradiction blocks it pending §6. Nothing here overrides §6's review
+or §7's probe, which stay the empirical backstop.
+Guardrail: this pass never deletes, weakens, or relocates a load-bearing
+clause — a **safety, verification, fail-closed, or authorization-boundary**
+rule, the eligibility/refusal/scope hard-exit gates §1 keeps before the first
+artifact-producing step, or the user-confirmation gates §7 keeps for
+destructive, spending, or publishing actions. Such a clause, however rarely it
+fires, stays at the executor's decision point; that retrieval-cost is paid on
+purpose. When you cannot tell whether a clause is load-bearing on one of these
+axes, treat it as load-bearing — the pass fails closed.
+
 ## 2. Ground truth only
 
 - Verify every command, flag, path, and claim against the actual repo/system
@@ -1313,3 +1346,14 @@ guards against — a round spent demoting or dropping a rule the probe never
 tested — is therefore reasoned from the verdict list, not observed. Ships
 `unprobed`: the failure mode is attested once, the fix is not probed; its
 probe joins the private round-5 queue.
+The §1 author-time pruning pass (2026-08-04) consolidates the file's own
+pruning discipline — already spread across §4's short-router earn-the-line
+and Placement-test rules, §6's doctrine-contradiction lens, and §7's
+bare-vs-ruled "buys nothing" probe — into one cheap author-time pre-filter, so
+the include-and-place decision is gated before the expensive review and probe
+rather than only after them. Motivated by a growth in queued doctrine
+additions, where an up-front weight check lowers the rate of dead-weight rules
+reaching review. The pass is itself normative, so it Ships `unprobed` per the
+covenant; its probe joins the standing #115 queue — a future campaign, not
+round-5, which was a completed, frozen ten-target slice this rule was not part
+of.
