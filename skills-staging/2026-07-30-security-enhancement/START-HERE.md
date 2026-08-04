@@ -1,5 +1,12 @@
 # START HERE — skill-vetting hardening library (2026-07-30)
 
+> **Internal-maintainer-reference — NOT FOR PUBLICATION.** This batch was audited
+> for graduation into a `security-pack` marketplace plugin and formally **declined
+> as not publishable** (see `DISPOSITION.md`). The four `SKILL.md` files are
+> campaign-shaped maintenance artifacts about opus-pack's OWN security hooks, not
+> marketplace-candidate skills; this file and MANIFEST / UNCERTAINTY are
+> review-only.
+
 A focused, project-specific skill library extracted from the
 `security-enhancement.md` session transcript and **verified against the current
 repository**. It captures the durable engineering lessons of the **skill-vetting
@@ -29,7 +36,7 @@ reached. This library exists so the next session does not re-walk those.
 | SessionStart hook | `hooks/skill-vetting-advisory.py` | thin; in-code comments ARE the round-by-round archaeology |
 | Vetting procedure | `skills/skill-vetting/SKILL.md` | §3 binds a verdict to an exit-0 digest |
 | Evidence harness | `hooks/mutation_matrix.py` + `hooks/mutations.json` | authoritative-mode gate is code-enforced |
-| Threat model + invariants I1–I11 | `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md` | the `NOT MET`/OPEN list is the risk map; I12–I17 are the round-8 DESIGN's, unimplemented; a couple of doc claims overstate the code — the I6 `:296` "guaranteed logging" line and the advisory.py docstring's "never re-advises" — see UNCERTAINTY "Known live-doc defects" |
+| Threat model + invariants I1–I11 | `reviews/2026-07-25-skill-vetting-snapshot-threat-model.md` | the `NOT MET`/OPEN list is the risk map; I12–I17 are the round-8 DESIGN's, unimplemented; two doc claims that used to overstate the code — the I6 "guaranteed logging" line and the advisory.py docstring's "never re-advises" — were RESOLVED by PR #118 (`c7951bc`); see UNCERTAINTY "Known live-doc defects" |
 | Round-8 design D1–D5 | `reviews/2026-07-25-skill-vetting-round8-design.md` | **DESIGN, explicitly unimplemented** — do not read as shipped |
 | Consistency gate | `.github/checks.py` | enforces duplicate-test + mutation_matrix env-read invariants |
 
