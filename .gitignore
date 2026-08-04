@@ -10,6 +10,7 @@ skills-staging/*
 !skills-staging/2026-07-30-starledger-retro/
 !skills-staging/2026-07-30-campaign-ops/
 !skills-staging/2026-07-30-security-enhancement/
+!skills-staging/2026-08-04-tech-debt-audit/
 pack-eval-artifacts/
 # Private session transcripts are never tracked (#100). Convention for future
 # transcript drops: put them under transcripts/ (ignored wholesale), or name
