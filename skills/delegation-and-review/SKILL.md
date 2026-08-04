@@ -526,7 +526,7 @@ reviewers that they silently absorb as implementers.
   The delivered tree stays untouched — no edits, no new files; findings
   go in the reply, not the tree.
 - **"That failure is pre-existing" is a checkable attribution claim, not a
-  free pass** (`unprobed` — contributor incident as shape; see Provenance).
+  free pass** (`unprobed` — private incident as shape; see Provenance).
   Blame-shifting a self-caused regression onto prior state belongs in the
   fraud-class hunt above alongside weakened checks and false completion —
   it just wears a more plausible face. It is refutable in one comparison
@@ -541,16 +541,18 @@ reviewers that they silently absorb as implementers.
   it) is more work to prove.
 - **On a shared dirty tree, a plain `git diff` after a subordinate returns
   is not its diff — it is the union of your uncommitted work and its
-  edits** (`unprobed` — contributor incident as shape; see Provenance).
+  edits** (`unprobed` — private incident as shape; see Provenance).
   Misattribution runs both directions: charging the subordinate with an
   out-of-scope edit that is actually your own pre-dispatch work, or
   crediting/blaming a change to the wrong author entirely. Before
   dispatching a write-capable subordinate onto a tree you hold uncommitted
-  edits in, take a restorable backup of the files in your own scope; diff
-  its return against THAT backup, never against bare HEAD. Distinct from
-  the worktree-base-skew trap above (uncommitted work invisible to a
-  forked child): this is the inverse failure on the SAME kind of dirty
-  state — not absent from the diff, but silently co-mingled into it.
+  edits in, take a restorable backup of the files in your own scope (`git
+  stash` if you can spare the working tree, or a plain file copy if you
+  can't); diff its return against THAT backup, never against bare HEAD.
+  A sibling failure runs the opposite direction — uncommitted work invisible
+  to a forked child rather than silently co-mingled into a diff — but both
+  share the same root cause: a dirty tree the subordinate didn't create and
+  can't see the boundaries of.
   ✅ "diffed the 31 `cumulativeNetGain` deletions against my pre-dispatch
   backup — they're my own earlier work against HEAD, not the subordinate's."
   ❌ "`git diff` shows it touched a file the spec forbade" without checking
