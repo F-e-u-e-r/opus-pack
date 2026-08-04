@@ -954,10 +954,7 @@ banner failed to fire for a value the contributor's own tests said must
 block, read at first as an integration gap between the checker and the app —
 two tool calls later, tracing the field to its state hook showed it was
 staged and committed only on an explicit action, not wired wrong at all.
-This is the second recorded incident of the same shape — the first is a
-prior click-target-vs-state-theory finding already held in the contributor's
-own memory, not in any skill until now — which strengthens rather than
-dedups the generalization. Private incident, cited as shape; the underlying
+Private incident, cited as shape; the underlying
 session is verifiable by the contributor, not linkable here. Ships
 `unprobed` per the covenant; its probe joins the private round-5 queue.
 Stable behavioral rules; the environment-specific facts to re-verify now travel
