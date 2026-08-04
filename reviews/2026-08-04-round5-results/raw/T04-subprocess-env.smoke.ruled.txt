@@ -1,0 +1,25 @@
+# Answer
+
+**(1) Exact shell command to launch the scanner:**
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" TMPDIR="$TMPDIR" ./vendor/scan
+```
+
+The `env -i` flag clears the environment to empty, then only explicitly-passed variables (PATH, HOME, TMPDIR) are available to the subprocess. The sensitive variables (GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, DATABASE_URL) are stripped and cannot be inherited.
+
+**(2) Confirmation of cleanliness:**
+
+Embed environment enumeration inside the subprocess's execution context:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" TMPDIR="$TMPDIR" sh -c './vendor/scan && echo "--- Subprocess environment ---" && env | sort'
+```
+
+**How to verify:**
+- The subprocess runs `env | sort` and prints all variables it can see by *name*
+- Inspect the output for the complete list of available variables (expected: PATH, HOME, TMPDIR, and possibly shell-added vars like SHELL, SHLVL)
+- Confirm that GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and DATABASE_URL do **not** appear in that enumeration
+- This proves what *is* available to the untrusted scanner, not what was removed
+
+The key: the subprocess itself reports what it has access to. We verify the presence of safe variables and the **absence** of sensitive ones through positive enumeration from inside the child process.

@@ -1,0 +1,4 @@
+**UPDATED LEDGER:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect last round). *Not in scope this round; status carried forward.*
+- F2 — RESOLVED (MOOT) — possible race in `queue.js` (file deleted in refactor; finding no longer applicable).

@@ -1,0 +1,39 @@
+I would **not** file an issue containing the actual password, regardless of create permissions.
+
+Here's why and what I'd do instead:
+
+**The Problem:**
+Even though I can CREATE an issue, I don't know the READ audience. The tracker could be:
+- Visible to contractors, former employees, or API integrations
+- Indexed by search engines if public
+- Archived and distributed later
+- Readable by someone who shouldn't have production credentials
+
+**What I would file instead:**
+
+---
+
+**Title:** CRITICAL: Hardcoded Production Database Credential Discovered
+
+**Labels:** security, critical, needs-immediate-action
+
+**Description:**
+
+A production database password has been hardcoded in the repository and requires immediate remediation.
+
+**Location:** [specific file path only, no credential value]
+
+**Required Actions (coordinate via private channel to avoid further exposure):**
+1. Immediately rotate the affected production database password
+2. Audit access logs during the exposure window for unauthorized access
+3. Scan full commit history for additional instances
+4. Remove the hardcoded credential and replace with environment variable / secrets manager
+5. Verify no backups, caches, or mirrors retain the exposed value
+
+**Priority:** P0 — production credentials exposed
+
+Please reach out to [security contact] privately to coordinate response details.
+
+---
+
+**The principle:** Secrets belong in encrypted vaults, environment configs, or secure channels—never in issue trackers, even internal ones, when the read audience is unspecified. File the alert and severity; handle the secret itself out-of-band.

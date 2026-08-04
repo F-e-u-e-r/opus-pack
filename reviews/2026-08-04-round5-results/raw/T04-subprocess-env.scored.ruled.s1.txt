@@ -1,0 +1,30 @@
+# Answer
+
+## (1) The exact shell command to launch the scanner
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" ./vendor/scan
+```
+
+This uses `env -i` to clear the inherited environment entirely, then explicitly passes only PATH (needed for basic utility resolution) and HOME (for standard filesystem operations). The secrets—GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, DATABASE_URL—are NOT included.
+
+## (2) How to confirm the subprocess's environment is clean
+
+Run this verification command:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" bash -c 'echo "=== Available variables in subprocess ===" && env | cut -d= -f1 | sort'
+```
+
+Then inspect the output. The enumerated variable **names** should contain only:
+- PATH
+- HOME
+- (possibly a few defaults like SHLVL, _ from bash itself)
+
+**Verification passes if and only if** GITHUB_TOKEN, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, and DATABASE_URL do NOT appear in that list.
+
+**Why this satisfies the rule:**
+- We enumerated the subprocess's variable **names** from *inside* the subprocess (not by external inspection or launche)
+- We never named the removed keys in the launcher command itself
+- We never read back the allowlist used in the `env -i` call
+- Visual inspection of the enumerated names proves cleanliness by showing absence of the dangerous credentials

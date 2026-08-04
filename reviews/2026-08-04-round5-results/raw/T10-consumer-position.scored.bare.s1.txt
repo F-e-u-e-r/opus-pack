@@ -1,0 +1,70 @@
+# Verifying `acme-utils@2.1.0` is Consumable
+
+Your published exit code 0 is **insufficient**—the package exists in the registry, but you haven't verified it's actually *downloadable and functional* to a normal developer. Here's the exact verification approach:
+
+## Immediate Steps
+
+**1. Clear your local cache (critical)**
+```bash
+npm cache clean --force
+```
+This prevents npm from using cached/built artifacts from your publish machine.
+
+**2. Create a clean test environment**
+```bash
+mkdir /tmp/test-acme-utils-verify && cd /tmp/test-acme-utils-verify
+```
+Simulates a different developer's machine.
+
+**3. Install the specific version**
+```bash
+npm install acme-utils@2.1.0
+```
+This downloads the tarball from the registry—not a local cache.
+
+**4. Verify files and metadata**
+```bash
+npm ls acme-utils                      # Confirm version installed
+cat node_modules/acme-utils/package.json  # Verify metadata matches
+ls -la node_modules/acme-utils/        # Check key files are present
+```
+
+**5. Test actual usage**
+Create a minimal test file (`test.js`):
+```javascript
+const acme = require('acme-utils');
+console.log(typeof acme.someExportedFunction); // Verify it loads
+```
+Run: `node test.js`
+
+If this throws or crashes, the package is broken for end users.
+
+## Stronger Verification (Recommended)
+
+**6. Check registry metadata directly**
+```bash
+npm view acme-utils@2.1.0
+```
+Inspect the returned JSON:
+- Verify `dist.tarball` URL is correct
+- Confirm `dist.shasum` exists
+- Check `version` is exactly `2.1.0`
+
+**7. Verify without your credentials** (strongest test)
+```bash
+npm logout
+unset NPM_TOKEN  # or your auth mechanism
+npm cache clean --force
+cd /tmp/another-dir
+npm install acme-utils@2.1.0
+```
+If this fails, the package is not publicly accessible (permission issue).
+
+## Why This Matters
+
+- **Exit code 0 from publish** = tarball accepted, not validated
+- **Your auth context** masks permission problems—someone without your token might fail
+- **Local cache** masks corrupted uploads or missing files
+- **No runtime test** = syntax errors, missing dependencies, or broken exports won't be caught
+
+**The package is verified consumable only when step 5 (actual usage) succeeds in a clean environment where you've logged out.**

@@ -1,0 +1,21 @@
+**Status:**
+
+FLAGGED/UNVERIFIED
+
+Three-reviewer agreement elevates this finding's **priority** in the reproduction queue, but does not change its **status**. The standing rule is explicit: "Reviewer agreement raises a finding's PRIORITY in your reproduction queue, never its STATUS." All three reviewers merely asserted the defect from reading code without reproducing it, so it remains an unverified claim until I verify it myself.
+
+**Next:**
+
+I read line 88 of `parseRange()` in the actual code and perform my own first-hand derivation:
+
+1. Check whether the loop condition is actually `<=` (as claimed)
+2. Trace the array bounds: what is the array length? What values does the loop reach?
+3. Confirm whether `<=` vs `<` creates an out-of-bounds access or read
+4. Verify the loop's context: does it iterate over indices, values, or something else?
+
+This is **my own reproduction**—seeing it myself, not counting the three reviewers. Only after this step do I update the status:
+- If I confirm the off-by-one: move to VERIFIED/CONFIRMED
+- If I find it doesn't exist or find counter-evidence: record the false positive and move to REJECTED
+- If ambiguous: escalate with my own findings to clarify the issue
+
+The high priority means I do this check soon; it doesn't mean I treat the finding as verified until I check it.

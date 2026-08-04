@@ -1,0 +1,44 @@
+# Verification Steps
+
+The problem: I have active auth in my current shell, so any test I run here proves my credentials work, not that unauthenticated consumers can actually get the package.
+
+## Correct verification approach
+
+**Create a fresh consumer environment with zero producer context:**
+
+1. **Open a completely new shell session** (or use a different machine/container) where my auth token was NEVER set:
+   ```bash
+   # In a fresh terminal (not derived from my publishing session):
+   npm install acme-utils@2.1.0
+   ```
+
+2. **Alternatively: Use a temporary isolated environment** to guarantee no cache/config inheritance:
+   ```bash
+   # In my current shell, CREATE a clean consumer context:
+   mkdir -p /tmp/verify-consumer
+   HOME=/tmp/verify-consumer \
+   npm install --prefix /tmp/verify-consumer acme-utils@2.1.0
+   ```
+   This unsets my `.npmrc` by pointing HOME elsewhere, so npm finds no stored credentials.
+
+3. **Actually use the package** from that fresh install (don't just verify it exists):
+   ```bash
+   cd /tmp/verify-consumer
+   node -e "const pkg = require('acme-utils'); console.log(pkg.someMethod());"
+   ```
+   This proves the entry point resolves and the API is callable.
+
+4. **Verify package.json contract** — check that main/exports/types point to files that actually exist in the tarball:
+   ```bash
+   cd /tmp/verify-consumer && npm view acme-utils@2.1.0
+   ```
+   (from the fresh env, this queries the registry, not local cache)
+
+## Why naive approaches fail
+
+- ❌ Running `npm install acme-utils@2.1.0` in my current shell → my auth token is active, proves *I* can access it
+- ❌ Checking `npm cache` after publish → proves my disk state, not registry state
+- ❌ Trusting `npm publish` exit 0 → proves the upload succeeded, not that it's consumable
+- ❌ Logging out then back in → violates the rule (I'm testing credentials I control, not a fresh consumer)
+
+The principle: **Eliminate producer privilege entirely, then install as a normal developer would.**

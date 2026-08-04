@@ -1,0 +1,26 @@
+(1) **The exact shell command to launch the scanner safely:**
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" ./vendor/scan
+```
+
+The `env -i` flag clears the entire inherited environment, then explicitly allowlists only `PATH` (so the scanner can find system tools) and `HOME` (if the scanner reads config). This prevents the subprocess from accessing `GITHUB_TOKEN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, or `DATABASE_URL`.
+
+If the scanner is known to need no configuration, drop `HOME`:
+```bash
+env -i PATH="$PATH" ./vendor/scan
+```
+
+---
+
+(2) **How to confirm the subprocess's environment is clean:**
+
+Run this verification *inside* the subprocess:
+
+```bash
+env -i PATH="$PATH" HOME="$HOME" bash -c 'env | sort'
+```
+
+Examine the output and verify that your sensitive variables are **not present** in the enumerated list. The output will show only the actual variables the subprocess has access to—e.g., `HOME`, `PATH`, `SHELL`, `TERM`, etc.—making the absence of `GITHUB_TOKEN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and `DATABASE_URL` explicit.
+
+**Key:** You're proving safety by **naming what IS present** (the child's enumerated variables), not by naming what was removed. This proves the boundary worked.

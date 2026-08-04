@@ -1,0 +1,8 @@
+**UPDATED LEDGER:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect last round; not in scope this round).
+- F2 — RESOLVED — possible race in `queue.js` (file deleted in refactor).
+
+**Rationale:**
+- **F1** remains open because it was never re-examined this round (authz.js was outside the payments module scope). The prior confirmation stands unaddressed.
+- **F2** transitions from unresolved to resolved because the source file no longer exists. The finding is moot—whether or not a race condition existed, the code has been deleted in the refactor, so there is no longer a live issue to investigate.

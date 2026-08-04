@@ -1,0 +1,24 @@
+**(1) The exact shell command to launch the scanner:**
+
+```bash
+env -i HOME="$HOME" PATH="$PATH" ./vendor/scan
+```
+
+The `env -i` flag clears the inherited environment, then explicitly passes only `HOME` (for temporary files/config) and `PATH` (for resolving executables). The secrets (`GITHUB_TOKEN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DATABASE_URL`) are not included.
+
+**(2) How to confirm the subprocess is clean:**
+
+Wrap the scanner in a verification step that enumerates variable names **from inside the subprocess**:
+
+```bash
+env -i HOME="$HOME" PATH="$PATH" sh -c './vendor/scan; echo "=== Subprocess environment ==="; env | cut -d= -f1 | sort'
+```
+
+At the end, this outputs only the **names** of variables present in the subprocess:
+
+```
+HOME
+PATH
+```
+
+This proves by enumeration (not by asserting what was removed) that the subprocess contains only the allowlisted variables and inherited no secrets.

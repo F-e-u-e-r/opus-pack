@@ -1,0 +1,10 @@
+UPDATED LEDGER:
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect, not re-examined this round)
+- F2 — OBSOLETE — possible race in `queue.js` (locus deleted in refactor, never confirmed)
+
+**Reasoning:**
+
+**F1** remains OPEN FINDINGS because the rule states that an OPEN FINDINGS entry stays exactly where it is when the report does not mention it—absence is not resolution. The locus (`authz.js:40`) was never re-examined this round, so no state change applies.
+
+**F2** moves to OBSOLETE because although it is UNRESOLVED (never confirmed), the rule explicitly states: "a deleted locus is recorded as OBSOLETE (superseded), not as fixed." The deletion of `queue.js` in the refactor makes the locus obsolete, even though the underlying claim was never confirmed. (Note: an UNRESOLVED entry can never move to PRIOR FIXES; OBSOLETE is the appropriate terminal state when the locus is removed.)

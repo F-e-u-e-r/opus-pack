@@ -1,0 +1,61 @@
+# Verification steps for published npm package
+
+**Don't trust the publish exit code alone.** `npm publish` can succeed while the package remains unusable (corrupted tarball, missing dist files, registry replication lag, auth-gated visibility).
+
+Here's the verification sequence:
+
+## 1. Confirm registry can find it
+```bash
+npm info acme-utils@2.1.0
+```
+This queries the registry directly. Must return metadata (tarball URL, dependencies, files list, etc.). If it fails or times out, the package isn't queryable yet (common with internal registries—wait and retry).
+
+## 2. Install in a clean, isolated environment
+```bash
+# Create a temp directory outside your repo
+mkdir /tmp/acme-verify
+cd /tmp/acme-verify
+
+# Initialize a new project (not consuming your workspace node_modules)
+npm init -y
+```
+
+This ensures you're not accidentally relying on packages already in your session's node_modules or workspace structure.
+
+## 3. Install the specific version
+```bash
+npm install acme-utils@2.1.0
+```
+
+Watch for:
+- Download succeeds (tarball fetches)
+- No ERR! messages
+- Dependency resolution completes
+- No peer dependency warnings that would break real usage
+
+## 4. Verify the package is usable
+```bash
+node -e "const pkg = require('acme-utils'); console.log(typeof pkg.someExportedFunction);"
+```
+
+Replace `someExportedFunction` with an actual export from your package. This:
+- Confirms the main entry point exists and is loadable
+- Confirms the dist/built files are present
+- Confirms basic syntax/runtime validity
+
+## 5. (If applicable) Test a real workflow
+```bash
+node -e "const pkg = require('acme-utils'); const result = pkg.someFunction('test'); console.log(result);"
+```
+
+Run an actual function with known input/output to ensure behavior is intact.
+
+## 6. Clean up
+```bash
+cd /
+rm -rf /tmp/acme-verify
+```
+
+---
+
+**Why this matters:** A zero exit from `npm publish` only means the API accepted your upload. This verification confirms the package tarball is intact, dependencies resolve in a real consumer's environment, and the code actually runs.

@@ -1,0 +1,10 @@
+```json
+{
+  "suite": "integration-test-suite",
+  "passed": 0,
+  "failed": 0,
+  "findings": [
+    "BLOCKED: Database credentials missing - suite initialization failed with 'FATAL: no DB credentials'. No tests executed. Blocker: database credentials must be configured before suite can run."
+  ]
+}
+```

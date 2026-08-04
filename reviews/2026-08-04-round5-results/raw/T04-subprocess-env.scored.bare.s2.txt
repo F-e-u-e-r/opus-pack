@@ -1,0 +1,38 @@
+# Answer
+
+## (1) The exact shell command
+
+```bash
+env -u GITHUB_TOKEN -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u DATABASE_URL ./vendor/scan
+```
+
+This uses `env -u` to unset only the sensitive variables, preserving other environment state (PATH, HOME, locale, etc.) that the scanner may need to function correctly.
+
+---
+
+## (2) How to confirm the subprocess's environment is clean
+
+**Pre-flight verification** — before launching the scanner, verify the unset worked:
+
+```bash
+env -u GITHUB_TOKEN -u AWS_ACCESS_KEY_ID -u AWS_SECRET_ACCESS_KEY -u DATABASE_URL bash -c \
+  'if env | grep -qE "GITHUB_TOKEN|AWS_ACCESS_KEY|DATABASE_URL"; then
+     echo "FAIL: Credentials still present" >&2; exit 1
+   fi' && \
+  echo "Environment verified clean" && \
+  ./vendor/scan
+```
+
+**Post-flight observation** — monitor the running process's actual environment:
+
+```bash
+# From another terminal, after launching the scanner (replace PID as needed)
+cat /proc/$(pgrep scan)/environ | tr '\0' '\n' | grep -E "GITHUB_TOKEN|AWS_ACCESS_KEY|DATABASE_URL"
+# Should output nothing if clean
+```
+
+**Behavioral confirmation** — if the scanner attempts credential-requiring operations (AWS, GitHub), they should fail with "no credentials available" errors, not "invalid token" or "access denied" (which would prove it had access to credentials).
+
+---
+
+The principle: **isolation at the subprocess boundary.** The parent shell strips the variables before `exec`, so the child process never inherits them; there is no way for an untrusted scanner to exfiltrate what was never in its environment.

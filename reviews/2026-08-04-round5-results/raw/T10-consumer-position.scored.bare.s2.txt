@@ -1,0 +1,60 @@
+# Verification Strategy
+
+**Critical insight:** `npm publish` exit code 0 only confirms the upload succeeded, not that the package is consumable. Common failure modes that pass publish:
+
+- Wrong entry point configured in package.json
+- Missing build output (dist/ folder) in the tarball
+- Broken dependencies not caught locally
+- Registry write lag (rare, but possible)
+- Package published to wrong registry/scope
+
+## Exact Steps
+
+**1. Check registry metadata (what was actually published):**
+```bash
+npm view acme-utils@2.1.0
+# Verify: version matches, correct entry point, dependencies look right
+```
+
+**2. Verify tarball contents:**
+```bash
+npm pack acme-utils@2.1.0  # Downloads the exact tarball from registry
+tar tzf acme-utils-2.1.0.tgz | head -20
+# Confirm: entry point file exists, dist/ (if applicable), no build artifacts that shouldn't ship
+```
+
+**3. Install and test in a clean environment (simulates end user):**
+```bash
+cd /tmp/verify-acme-utils  # Completely separate from your publish shell
+npm init -y
+npm install acme-utils@2.1.0
+# Now test actual functionality
+node -e "const pkg = require('acme-utils'); console.log(pkg.someExportedFunction);"
+# Or: node -e "const {myFunction} = require('acme-utils'); myFunction();"
+```
+
+**4. (Optional but recommended) Test in a fresh shell:**
+```bash
+# Open a new terminal window or unset auth tokens
+unset npm_config_userconfig
+npm install acme-utils@2.1.0 --no-save
+# Tests as an anonymous consumer
+```
+
+**5. Spot-check key consumers (if you have internal packages that depend on acme-utils):**
+```bash
+cd /path/to/dependent-service
+npm update acme-utils
+npm test  # Run their test suite with the new version
+```
+
+## What This Catches
+
+- ✅ Tarball corruption, incomplete files
+- ✅ Entry point misconfiguration  
+- ✅ Missing dependencies or peer dependency issues
+- ✅ Build output not included in publish
+- ✅ Registry sync lag
+- ✅ Scope/registry mismatch
+
+The **gold standard**: step 3 in a CI pipeline on a fresh agent, not on your dev machine.

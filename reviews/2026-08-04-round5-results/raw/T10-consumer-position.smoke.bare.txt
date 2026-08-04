@@ -1,0 +1,54 @@
+# Verification Steps for npm Package Release
+
+Here's the exact procedure:
+
+## 1. **Logout from the registry first**
+```bash
+npm logout --registry https://your-internal-registry-url
+```
+This is critical. You're currently authenticated, which means you may have publish/admin permissions that mask access-control failures. Normal end users won't be authenticated, so you must test unauthenticated.
+
+## 2. **Create an isolated test environment**
+```bash
+mkdir -p /tmp/acme-utils-verify
+cd /tmp/acme-utils-verify
+npm init -y
+```
+Avoids npm cache hits that would hide real registry availability issues.
+
+## 3. **Install the package as an end user would**
+```bash
+npm install acme-utils@2.1.0
+```
+Verify this succeeds without errors. Check that it's in `node_modules/`.
+
+## 4. **Verify installation metadata**
+```bash
+npm list acme-utils
+npm info acme-utils@2.1.0
+```
+Confirm the exact version is present and metadata is correct.
+
+## 5. **Test that it's actually usable**
+```bash
+cat > test.js << 'EOF'
+const acme = require('acme-utils');
+console.log('Loaded successfully:', typeof acme);
+// Call at least one exported function to catch runtime errors
+if (typeof acme.someExport === 'function') acme.someExport();
+EOF
+
+node test.js
+```
+This catches broken package.json `main` field, missing dependencies, bundling errors, and other runtime failures.
+
+## 6. **Clean up**
+```bash
+cd -
+rm -rf /tmp/acme-utils-verify
+npm login --registry https://your-internal-registry-url  # re-authenticate if needed
+```
+
+---
+
+**Why this works:** `npm publish` exit code 0 only confirms the publisher pushed bytes to the registry—not that it's readable, correctly structured, or has proper access controls. Testing unauthenticated + in isolation + with actual `require()` catches permission issues, broken exports, missing dependencies, and malformed artifacts that a publish confirmation cannot.

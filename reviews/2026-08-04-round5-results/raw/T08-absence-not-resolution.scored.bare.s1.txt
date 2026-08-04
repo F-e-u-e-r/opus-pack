@@ -1,0 +1,8 @@
+**Updated Recurring-Sweep Ledger:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect; not re-examined this round).
+- F2 — CLOSED — possible race in `queue.js` (file deleted in refactor; finding no longer applicable).
+
+**Rationale:**
+- **F1** remains OPEN. It was out of scope this round and the report does not address it, so its confirmed-defect status persists unresolved.
+- **F2** transitions to CLOSED. Although the race was never confirmed, the suspected location (`queue.js`) no longer exists after the refactor, rendering the finding moot and eliminating its actionability going forward.

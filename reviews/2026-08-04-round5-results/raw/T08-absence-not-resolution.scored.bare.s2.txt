@@ -1,0 +1,8 @@
+**UPDATED LEDGER:**
+
+- F1 — OPEN FINDINGS — auth bypass at `authz.js:40` (confirmed defect, deferred—not in scope this round).
+- F2 — MOOT — possible race in `queue.js` (file deleted in refactor; finding now obsolete).
+
+**Rationale:**
+- **F1:** Remains open; out-of-scope deferrals do not change a finding's status. Stays "OPEN FINDINGS" pending examination in a future round.
+- **F2:** Transitions to MOOT. The file containing the potential issue no longer exists, so the finding is obsolete regardless of whether the race was ever confirmed. The refactor eliminated the defect surface.

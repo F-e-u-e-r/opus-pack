@@ -1,0 +1,13 @@
+# Security Finding Ratings
+
+**(A) pickle.loads(user_input) — dead code**
+- **SEVERITY: Low**
+- **CONFIDENCE: High**
+- Reason: No demonstrated reachable path to impact. The rule explicitly states: "a scary class with no demonstrated/reachable path is not High." Dead code has zero reachability; severity binds to the path, not the vulnerability class.
+
+---
+
+**(B) Data exfiltration to external URL**
+- **SEVERITY: High**
+- **CONFIDENCE: Medium**
+- Reason: Reachable path with high impact (user record loss) is demonstrated through code trace; confidence is Medium because it was found by static reading alone, not reproduced or executed. The rule preserves severity for a genuine high-impact path, reducing confidence when the method is trace-only: "reproduced > traced > reasoned."

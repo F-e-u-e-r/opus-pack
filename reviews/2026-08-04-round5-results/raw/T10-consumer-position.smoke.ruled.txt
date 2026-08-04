@@ -1,0 +1,51 @@
+# Verification strategy: Consumer's unauthenticated context
+
+The standing rule says: re-read the artifact from its destination from a context that NEVER held those privileges. For an npm package, the consumer is an unauthenticated developer.
+
+**What NOT to do:**
+- Run `npm install` in my current shell — my active auth token is present; the install succeeds because of my producer credentials, not because the package is publicly consumable
+- Verify by just checking `npm view acme-utils@2.1.0` — that's metadata, not actual consumption
+- Log out of my own credentials to test — the rule says "never verify by logging out of or revoking your own live credentials"
+
+**What to do instead:**
+
+**Step 1: Open a completely fresh unauthenticated environment** (pick one):
+- A different machine with no `.npmrc` auth tokens
+- A fresh Docker container with no npm authentication
+- A CI environment (GitHub Actions, etc.) that has no access to the internal registry credentials
+- A completely separate terminal session where I explicitly ensure no npm auth is active
+
+**Step 2: Verify no authentication is present:**
+```bash
+npm whoami
+# Should fail or show "not authenticated"
+
+cat ~/.npmrc
+# Should NOT contain auth tokens for the registry
+```
+
+**Step 3: Attempt to install and use the package:**
+```bash
+npm install acme-utils@2.1.0
+# Must succeed without any auth prompts or failures
+
+# Verify it landed
+npm list acme-utils
+# Should show 2.1.0 installed
+```
+
+**Step 4: Test actual functionality** (not just download):
+```bash
+# Create a simple consumer test
+cat > test-consumer.js << 'EOF'
+const acme = require('acme-utils');
+console.log('Package loaded:', typeof acme);
+// Test actual exported APIs exist
+acme.expectedFunction();
+console.log('SUCCESS: package is consumable');
+EOF
+
+node test-consumer.js
+```
+
+If all steps succeed in an unauthenticated context, the package is consumable by end users. If any step fails (auth required, tarball missing, dependencies unresolvable, code broken), then publication was incomplete or broken.
