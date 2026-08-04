@@ -419,6 +419,44 @@ When rigor conflicts with finishing sooner, rigor wins.
   Never attribute by pattern-match on what LOOKS like automation
   output: a matching-looking file may be the user's. State failing either
   check defaults to human-owned and stays — reported, not removed.
+- **A rollback ORDER is authority; the causal claim attached to it is
+  still a report** (`unprobed` — contributor incident as shape; see
+  Provenance). "It broke after your change" carries an instruction and an
+  attribution. The instruction stands on the user's authority: your own
+  diagnostic scopes the reversal, it never decides WHETHER to perform
+  one — investigating first to settle whether they were right inverts the
+  grant. (Contrast delegation-and-review §3, where a SUBORDINATE's
+  unreproduced RED licenses no revert at all: there the claim is the whole
+  basis for acting, here it rides along with a grant that stands without
+  it. §2 is untouched either way — a reversal still owes, among the rest,
+  its checkpoint, its one-at-a-time handling, and its `AUTH:` line; what
+  may not gate the rollback is the diagnostic, never the safety gate.)
+  The attribution is evidence of sequence, not of cause, so scope the
+  reversal by what can actually reach the reported symptom rather than by
+  everything the task touched, and run the diagnostic alongside. Proof of
+  non-reachability is an observation an auditor can re-run — no byte the
+  runtime reads changed, no call site reaches it — never an argument from
+  timing or plausibility. Both filters apply to a rollback and neither
+  substitutes: provenance (the bullet above) bounds what you MAY reverse,
+  reachability what you SHOULD. Separately and sufficiently on its own:
+  hold and NAME any component whose reversal destroys state the reversal
+  itself cannot restore, or re-opens a risk the change closed — whether or
+  not it reaches the symptom, since a component that DOES reach it and
+  whose reversal re-exposes a secret is the case that most needs the
+  user's call. Any component the order covered that you did not reverse is
+  named, on whichever ground excluded it; retaining silently is the same
+  failure as reverting silently, and both end in a report line (§5's
+  artifact gate). Reverse forward — a revert commit, not a history edit —
+  unless the change existed to remove content from history, where a
+  forward revert restores precisely what it destroyed. And when the true
+  cause later surfaces elsewhere, say so: an unnecessary reversal nobody
+  names leaves the change wearing the blame in the next session's record.
+  ✅ "Reverted on your order under a checkpoint (AUTH line recorded). Held
+  back the history scrub and naming it here: reverting it would re-publish
+  the secrets, and it changed no byte any script reads. Diagnostic ran
+  alongside — it clears the two files you'd expect."
+  ❌ "the user said revert, so I reverted the whole batch" — including
+  the secret scrub, which put the secrets back in history.
 
 ## 4. Verify by observation
 
@@ -700,7 +738,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   line; the skipped-prescribed-follow-up naming; the `Decisions note:`
   line; the compaction word-diff record (skill-authoring §7); the
   dup-check result line (skill-authoring §5); the target-runtime line
-  of a skill review record (skill-authoring §6); the
+  of a skill review record (skill-authoring §6); the held-out-reversal
+  naming (§3's rollback-order rule); the
   residual-risk statement. For each
   owed line that is missing, first confirm the underlying work actually
   happened — if it did, add the line; if it did not, do the work now or
@@ -1017,6 +1056,23 @@ Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills), each
 candidate re-verified against this pack's actual text and cross-model reviewed
 (grok-4.5 high + gpt-5.6-luna); wording defects a post-merge cross-family review
 caught were fixed in a follow-up PR.
+
+The §3 rollback-order bullet (2026-08-04) comes from a contributor incident
+(contributor-reported, not linkable): a user reported an automation broken
+after a multi-repo fix batch and ordered a revert. The batch was reverted on
+the order; the diagnostic running alongside showed the reverted edits could
+not reach the symptom, and the true cause — a platform change that withdrew a
+tool from that automation's scheduled runs — surfaced afterwards from an
+upstream issue. One component, a secret-scrubbing history rewrite, was held
+out of the reversal and named to the user with the evidence that no
+working-tree file the runtime reads had changed. The scoping and
+hold-and-name clauses are what that incident evidences directly; the
+order-stands-without-the-diagnostic, reverse-forward, and later-disclosure
+clauses are this pack's reading of the authorization rules it defers to —
+the reverse-forward exception in particular rests on the counterfactual
+that forward-reverting that scrub would have restored the secrets it
+existed to remove, which the incident did not run. Ships `unprobed`
+per the covenant; its probe joins the private round-5 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
