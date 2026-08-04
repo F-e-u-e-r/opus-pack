@@ -177,6 +177,43 @@ audit log), or the claim stays state-only, said so. No independent
 prescription available → the re-run is a consistency check, labelled so —
 never a proof.
 
+**In parity work, the artifact settles disputes — reading it beats
+adjudicating between reviewers or picking the plausible option**
+(`unprobed` — contributor incident as shape; see Provenance). When the
+contract is parity with an external artifact (a spreadsheet, a workbook,
+a prior implementation), a reviewer blocker or a spec ambiguity is a
+question the artifact already answers, not a judgment call — open it and
+read the cells. And a defensive addition your own spec invents that the
+artifact does not contain (a clamp, a guard, a floor the source formula
+lacks) silently forks the parity target the moment it ships: it enters
+the spec only as an explicitly flagged deviation, never as an unstated
+improvement.
+✅ "two independent reviewers flagged the same clamp as suspect; opened
+the workbook — `B6 = B3*B4-B5`, no MAX anywhere. My spec's clamp was an
+invention; fixing to match, no clamp." ❌ picking whichever reviewer's
+suggested fix sounds more defensible and moving on, with the artifact
+never opened.
+
+**A ground-truth artifact is authoritative for behavior, not for every
+embedded constant it hand-types — derive the derivable before porting a
+magic number, and flag rows no scenario ever exercises**
+(`unprobed` — contributor incident as shape; see Provenance). Hand-maintained
+oracles carry hand-typed values that should be *computed* from other
+cells; a stale hand-update hides exactly in the rows no realistic
+scenario drives, so a clean replay proves nothing about whether the
+constant is still correct. Two failure shapes to check for before
+porting: (a) a constant that should derive from other cells but was
+typed in by hand — recompute it and compare; (b) two DIFFERENT
+quantities that happen to share a value (a coincidence, not an identity)
+each hand-typed under one shared name — rename them apart, because "same
+number, different bases" invites conflation the moment either changes.
+✅ "the `144445` in rows 8–10 is `ROUNDUP(130000/0.9)` — but the sheet
+was updated by hand from row 11 downward after a minimum changed, and
+rows 8–10 are policy years that never draw, so nothing ever surfaced the
+staleness. Recomputing and flagging every unexercised row." ❌ porting a
+spreadsheet's constants verbatim because the sheet is "ground truth" and
+the replay gate is green.
+
 **Cheapest gate shape — the grep-count ratchet:** when an anti-pattern cannot
 be removed wholesale (inline locale ternaries, stray global listeners), pin its
 current grep count as a dated baseline with the hits enumerated; the executable
@@ -810,6 +847,19 @@ ideas only, no text — same sourcing and acknowledgements as the two
 2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
 needing generalized wording; the wording here is this pack's. All three ship
 `unprobed` per the covenant; their probes join the private round-5 queue.
+The artifact-settles-disputes and derive-the-derivable-constant bullets
+(2026-08-04) come from one contributor session's parity-implementation
+work against a financial workbook: two independent reviewers flagged a
+spec-invented clamp as suspect, and opening the workbook's actual formula
+(no clamp) settled the dispute the reviewers themselves had only guessed
+at — contributor-reported, not linkable here. The derive-the-derivable
+half comes from a separate check in the same session: a stale hand-typed
+constant, only ever wrong in policy-year rows no test scenario exercised,
+was caught by recomputing it from other cells rather than trusting the
+sheet; a second, distinct case in the same pass found two unrelated
+quantities sharing one hand-typed value by coincidence, renamed apart to
+stop future conflation. Ships `unprobed` per the covenant; their probes
+join the private round-5 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
