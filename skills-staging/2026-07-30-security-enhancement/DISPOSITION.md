@@ -72,7 +72,36 @@ procedure boundary, I11 full concurrency serialization, and the I2/I10 halves �
 remain **OPEN** and were deliberately not altered by this reconciliation. The
 round-8 design D1–D5 stays unimplemented.
 
-## Out of scope for this PR
+## #105 item 2 — probe/decline decision for the six OPS markers (2026-08-04)
+
+`security-hardening-review-ops/SKILL.md` ships exactly six in-body
+`(unprobed — project observation, no probe)` markers — OPS-2/6/8/9/10/11 (issue
+#105 item 2). Per that issue each owes **either** a bare-vs-ruled probe (only if
+the rule is ever promoted toward *installed* pack doctrine, per the covenant /
+skill-authoring §3) **or** a recorded decision to keep it campaign-scoped and
+unprobed.
+
+**Decision: keep all six campaign-scoped; do NOT probe.** This batch was declined
+for publication (above), so none of these rules is being promoted toward installed
+pack doctrine — the sole trigger the covenant attaches the bare-vs-ruled probe to.
+They remain honest n=1 project observations of the Workstream-B campaign, each
+already carrying its `unprobed` label. OPS-1/3/4/5/7/12 are not in this set: they
+cite and defer to a canonical rule and owe no separate probe. If a future decision
+ever promotes these markers **as-is** toward installed doctrine — which would first
+require reversing the publication decline above — each promoted marker owes the
+bare-vs-ruled probe at that point. (The separate, owner-gated path noted above,
+where a distilled lesson from one of these observations feeds an *existing-skill
+enhancement*, does not reverse this decline; any such enhancement owes the
+covenant's probe-or-`unprobed` obligation on its own terms, as a new claim in the
+target skill — not via these campaign-scoped markers.) This mirrors the closed
+installed-pack tracker #92's closure semantics (a probe result **or** a recorded
+campaign-scoped decision).
+
+This resolves **#105 item 2**; item 1 (the MANIFEST covenant-summary sentence)
+already landed in `93e2479`, so #105 can close.
+
+## Out of scope
 
 No marketplace manifest, no move into a plugin root, no change to the published
-opus-pack skills, and none of #105 item 2 / #117 / round-5 probes / #123.
+opus-pack skills, and none of #117 / round-5 probes / #123. (#105 item 2 is
+resolved above; item 1 landed in `93e2479`.)
