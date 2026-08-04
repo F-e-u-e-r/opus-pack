@@ -44,6 +44,33 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   asks for, never a default you drift into — and the reverse holds: a
   scoped review USES the system model and notes its gaps; it does not
   balloon into whole-system modelling nobody asked for.
+  For the unknown-provenance case the peripheral/inspection split
+  leaves open — whenever you inspect committed data files, fixtures, or
+  examples, during modelling or any review (`unprobed` — contributor
+  incident as shape; see Provenance) — an untagged example VALUE is
+  treated as real until something shows it synthetic. A name is not
+  provenance — `examples/`, `sample`, `demo`, a field called
+  `placeholder`, a README describing one, all record what the author
+  INTENDED a value to be, never what it is, and real personal data
+  lands there by the ordinary route, because someone needed a case that
+  worked end to end. Classify by field shape and co-occurrence: any
+  field whose shape matches a sensitive class — contact details,
+  government or account identifiers, dates of birth, health or
+  financial free text — with a name field beside an ID-pattern field
+  beside a date as the clearest case; work from a scan reporting field,
+  match class, and count, never the matched value, so the
+  never-read-the-contents rule at the top of this list still governs
+  anything credential-shaped. A scan hit on an untagged fixture is not
+  itself the verdict — it is the ESCALATION: report field, class, and
+  count to the user and let them confirm provenance, or have the
+  fixture tagged — retroactively for one that already exists, at mint
+  for the rest. The presumption is discharged by a tag or by the
+  owner's word, never by the scan, which sees shape and not
+  provenance; until then it sets triage order, not severity, and
+  findings rate on the ladder below once examined. Minting synthetic
+  values with a tag (ground-truth-gates' sentinel-tagged fixtures)
+  makes provenance one grep WHERE a suite was tagged — outside one, a
+  missing tag proves nothing and the presumption stands.
 - Severity ladder — use these words consistently:
   - **Critical** — exploitable now with data loss/account takeover; stop and fix.
   - **High** — must fix before production exposure.
@@ -567,4 +594,18 @@ per the covenant; its probe joins the standing #115 queue — a future
 campaign, not round-5, which was a completed, frozen ten-target slice
 this rule was not part of.
 
+The threat-model bullet's untagged-example clause (2026-08-04) comes from a
+contributor incident (contributor-reported, not linkable): a PII sweep over a
+private automation repo cleared an `examples/*.json` fixture on the strength
+of its path and a README calling it a placeholder; it held a real family —
+names, national ID numbers, dates of birth — used once because a working
+end-to-end case was needed, and a path-based skip would have shipped it. The
+incident evidences the default direction only; the non-ingesting
+classification method, the escalation exit that discharges the
+presumption, and the tag-at-mint pointer are this pack's reconciliation
+with the never-read-contents rule and with ground-truth-gates' sentinel
+bound, not incident findings — the contributor in fact established
+provenance by reading the values, which is the route this clause routes
+to the owner instead. Ships `unprobed`
+per the covenant; its probe joins the private round-5 queue.
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
