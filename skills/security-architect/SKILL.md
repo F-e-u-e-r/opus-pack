@@ -47,29 +47,34 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   For the unknown-provenance case the peripheral/inspection split
   leaves open — whenever you inspect committed data files, fixtures, or
   examples, during modelling or any review (`unprobed` — contributor
-  incident as shape; see Provenance) — an untagged example VALUE is
-  treated as real until something shows it synthetic. A name is not
-  provenance — `examples/`, `sample`, `demo`, a field called
-  `placeholder`, a README describing one, all record what the author
-  INTENDED a value to be, never what it is, and real personal data
-  lands there by the ordinary route, because someone needed a case that
-  worked end to end. Classify by field shape and co-occurrence: any
-  field whose shape matches a sensitive class — contact details,
-  government or account identifiers, dates of birth, health or
-  financial free text — with a name field beside an ID-pattern field
-  beside a date as the clearest case; work from a scan reporting field,
-  match class, and count, never the matched value, so the
-  never-read-the-contents rule at the top of this list still governs
-  anything credential-shaped. A scan hit on an untagged fixture is not
-  itself the verdict — it is the ESCALATION: report field, class, and
-  count to the user and let them confirm provenance, or have the
-  fixture tagged — retroactively for one that already exists, at mint
-  for the rest. The presumption is discharged by a tag or by the
-  owner's word, never by the scan, which sees shape and not
-  provenance; until then it sets triage order, not severity, and
-  findings rate on the ladder below once examined. Minting synthetic
-  values with a tag (ground-truth-gates' sentinel-tagged fixtures)
-  makes provenance one grep WHERE a suite was tagged — outside one, a
+  incident as shape; see Provenance) — an untagged sample, demo, or
+  fixture VALUE is treated as real until a value-level
+  synthetic-provenance tag or the owner's word shows it synthetic. A
+  name is not provenance — `examples/`, `sample`, `demo`, a field
+  called `placeholder`, a README describing one, all record what the
+  author INTENDED a value to be, never what it is, and real personal
+  data lands there by the ordinary route, because someone needed a case
+  that worked end to end. Classify by field shape: a single field whose
+  shape matches a sensitive class — contact details, government or
+  account identifiers, dates of birth, health or financial free text —
+  counts; co-occurrence (a name field beside an ID-pattern field beside
+  a date of birth) strengthens the signal, it is not a required
+  conjunction. Work from a scan whose only agent-visible output is
+  field, match class, and count — never a matched value or line — so
+  the never-read-the-contents rule at the top of this list still
+  governs anything credential-shaped. A scan hit on an untagged fixture
+  is not itself the verdict — it is the ESCALATION: report field,
+  class, and count to the user, who may confirm provenance; a
+  retroactive tag RECORDS provenance the owner has confirmed, it never
+  substitutes for that confirmation — at mint, tag as you synthesize.
+  The presumption is discharged by that tag or by the owner's word,
+  never by the scan, which sees shape and not provenance, and never by
+  a no-hit or an unanswered escalation — those leave the presumption
+  standing and the escalation open. Until discharged it sets triage
+  order, not severity: findings rate on the ladder below from the
+  evidenced path, under the presumption. Minting synthetic values with
+  an in-value tag (ground-truth-gates' sentinel-tagged fixtures) makes
+  provenance one grep WHERE a suite was so minted — outside one, a
   missing tag proves nothing and the presumption stands.
 - Severity ladder — use these words consistently:
   - **Critical** — exploitable now with data loss/account takeover; stop and fix.
