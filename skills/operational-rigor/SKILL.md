@@ -995,8 +995,10 @@ yet taught nothing (§4 verifies a known claim; the search for an unknown cause
 was missing); it reconciles with — rather than duplicates — §2's two-failure
 rediagnose rule. Both ship `unprobed` per the covenant: no bare-executor probe
 (skill-authoring §7) has run — the debugging rule's probe (does a weak-tier arm
-design a discriminating probe, or shotgun-patch?) joins the private round-5
-queue. Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills),
+design a discriminating probe, or shotgun-patch?) joins the standing #115
+queue — a future campaign, not round-5, which was a completed, frozen
+ten-target slice these rules were not part of.
+Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills),
 each candidate re-verified against this pack's actual text and gated
 cross-family (grok-4.5 high + gpt-5.6-luna max/ultra + gpt-5.6-sol max).
 
