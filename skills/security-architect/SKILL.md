@@ -62,17 +62,18 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   conjunction. Work from a scan whose only agent-visible output is
   field, match class, and count — never a matched value or line — so
   the never-read-the-contents rule at the top of this list still
-  governs anything credential-shaped. A scan hit on an untagged fixture
+  governs anything credential-shaped. A scan hit on an untagged value
   is not itself the verdict — it is the ESCALATION: report field,
-  class, and count to the user, who may confirm provenance; a
-  retroactive tag RECORDS provenance the owner has confirmed, it never
+  class, and count to the user, who may confirm provenance. A
+  retroactive tag RECORDS provenance the owner has confirmed; it never
   substitutes for that confirmation — at mint, tag as you synthesize.
-  The presumption is discharged by that tag or by the owner's word,
-  never by the scan, which sees shape and not provenance, and never by
-  a no-hit or an unanswered escalation — those leave the presumption
-  standing and the escalation open. Until discharged it sets triage
-  order, not severity: findings rate on the ladder below from the
-  evidenced path, under the presumption. Minting synthetic values with
+  The presumption is discharged by a value-level synthetic-provenance
+  tag or by the owner's word, never by the scan, which sees shape and
+  not provenance. A no-hit leaves the presumption standing with
+  nothing to escalate; an unanswered escalation stays open, the
+  presumption with it. Until discharged it sets triage order, not
+  severity: findings rate on the ladder below from the evidenced path,
+  under the presumption. Minting synthetic values with
   an in-value tag (ground-truth-gates' sentinel-tagged fixtures) makes
   provenance one grep WHERE a suite was so minted — outside one, a
   missing tag proves nothing and the presumption stands.
@@ -606,8 +607,8 @@ of its path and a README calling it a placeholder; it held a real family —
 names, national ID numbers, dates of birth — used once because a working
 end-to-end case was needed, and a path-based skip would have shipped it. The
 incident evidences the default direction only; the non-ingesting
-classification method, the escalation exit that discharges the
-presumption, and the tag-at-mint pointer are this pack's reconciliation
+classification method, the escalation exit that routes discharge to
+the owner, and the tag-at-mint pointer are this pack's reconciliation
 with the never-read-contents rule and with ground-truth-gates' sentinel
 bound, not incident findings — the contributor in fact established
 provenance by reading the values, which is the route this clause routes
