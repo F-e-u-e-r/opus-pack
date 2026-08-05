@@ -442,7 +442,7 @@ axes, treat it as load-bearing — the pass fails closed.
   supersession — diff their run conditions before either claim wins**
   (`unprobed` — private incident as shape; see Provenance). Two results
   that disagree can both be true, each on its own scope (task difficulty,
-  version, environment, input shape); the global R7 recency heuristic
+  version, environment, input shape); a bare recency heuristic
   ("pick one — more recent / more tested — say why, flag the other") is
   the right move only once you've confirmed the results are actually
   measuring the same thing. Before applying it: name the candidate
@@ -1389,9 +1389,10 @@ same task scored 2/2 clean. First explanation was version drift — checked
 and killed (same binary build both times); the real difference was task
 complexity, harder multi-file edits in the old bench versus a single-file
 edit in the new one. Both findings were scope-annotated rather than one
-overwriting the other, which a bare application of global R7's recency
+overwriting the other, which a bare application of a recency
 heuristic would have done, mis-teaching future sessions that the model
 handles complex edits it does not. Private incident, cited as shape; the
 underlying session is verifiable by the contributor, not linkable here.
-Ships `unprobed` per the covenant; its probe joins the private round-5
-queue.
+Ships `unprobed` per the covenant; its probe joins the standing #115
+queue — a future campaign, not round-5, which was a completed, frozen
+ten-target slice this rule was not part of.
