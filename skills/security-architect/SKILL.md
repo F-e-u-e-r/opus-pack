@@ -342,9 +342,8 @@ trail. Risk ladder for granting tools:
   it had also made the tool auditable. A "fail closed on an unknown reading"
   check (operational-rigor §4) fires only after the effect; this keeps the effect
   from being admitted unseen in the first place.
-  ❌ "the token is read-scoped and least-privilege, so its calls don't need
-  logging" — least privilege is not observability; an unlogged permitted write is
-  invisible.
+  ❌ "the token can only write to bucket X, so we don't log its writes" — least
+  privilege is not observability; a permitted-but-unlogged write is invisible.
 - **The capability triangle — break one side per trust boundary**
   (`unprobed` — adapted external design; see Provenance). Three
   capabilities that combine into an exfiltration pipeline when one agent

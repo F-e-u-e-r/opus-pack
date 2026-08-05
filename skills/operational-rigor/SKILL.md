@@ -344,9 +344,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   to fit a favored option is the bias alarm.
 - **Before building an element, name the evidence that it earns its place —
   absent that evidence, don't build it.** An abstraction needs ≥2 real consumers
-  today, not one imagined future one; an optimization needs a measured baseline,
+  today (or one plus a non-reuse reason it must exist — a security/isolation
+  boundary, an interface the platform requires, a test seam), not one imagined
+  future one; an optimization needs a measured baseline,
   not "this could be slow"; a config flag or option needs a named stakeholder who
-  wants a different value. "Might need it later" is not evidence. This is the
+  wants a different value. "Might need it later" is not evidence — but a user or
+  the contract naming the element IS: this gates flexibility you invent, never
+  what was asked for. This is the
   plan-time counterpart of §5's over-engineering slop-pattern, which catches it
   only after the code exists. (`unprobed` — see Provenance.)
 - If a precondition is falsified mid-run, halt, state the observation, and replan.
@@ -716,7 +720,11 @@ When rigor conflicts with finishing sooner, rigor wins.
 
 **When a failure's root cause is not yet named — a bug, a silent failure, an
 unexpected output — search for the cause by elimination before you change
-code; guess-and-patch is the slowest path and it regresses.** §4 verifies a
+code to fix it; guess-and-patch is the slowest path and it regresses.** Probes
+that only OBSERVE — a log line, a trace, a byte count — are part of the
+search, not the fix this defers (an assertion that aborts or a guard that
+changes control flow is not observe-only — isolate it in a diagnostic harness).
+§4 verifies a
 KNOWN claim by running it; this is the upstream act of finding the claim, and
 it extends §2's two-failure rule (which says *when* to stop and rediagnose)
 with *how*. (`unprobed` — see Provenance.)
@@ -729,23 +737,30 @@ with *how*. (`unprobed` — see Provenance.)
   one that can *falsify*. Cheap structural checks precede expensive internal
   ones (§2: log what the action actually resolved to before theorizing about
   internal state).
-- **Predict the probe's result before you run it,** then run it and compare.
-  A probe with no pre-committed prediction rarely eliminates anything — whatever
-  you see gets rationalized to fit. Eliminate every hypothesis the result
-  falsifies; a result that contradicts your favored hypothesis is data, not
-  noise.
+- **Before you run the probe, write what EACH live hypothesis predicts it will
+  show** — an outcome→hypothesis map, not a single guess. Run it, then eliminate
+  every hypothesis whose prediction the result contradicts. Without those
+  pre-committed per-hypothesis predictions an unexpected result just gets
+  rationalized onto whichever cause you favor — the failure this step exists to
+  stop. A result that contradicts your favored hypothesis is data, not noise.
 - **Name a root cause only when a probe has positively confirmed it by
-  execution** — "consistent with" is not "confirmed." Then fix, and verify the
-  fix per §4: the symptom is gone AND the mechanism explains why.
-- **Escalate on stalemate or stagnation.** Stalemate — two or more hypotheses
-  survive your best discriminating probe equally — widen instrumentation or ask;
-  don't guess between them. Stagnation — a full round adds no new information —
-  stop and replan (§2's two-failure rule); don't re-run the same probe louder.
+  execution** — "consistent with" is not "confirmed." Then, if a fix is in scope
+  — a diagnosis-only ask stops at the named cause (§1's question-shaped
+  classification) — fix and verify it per §4: the symptom is gone AND the
+  mechanism explains why.
+- **Escalate on stalemate, stagnation, or an exhausted budget.** Stalemate — two
+  or more hypotheses survive your best discriminating probe equally — widen
+  instrumentation or ask; don't guess between them. Stagnation — a full round
+  adds no new information — stop and replan (§2's two-failure rule); don't re-run
+  the same probe louder. And cap the search up front: after a set number of
+  rounds with no confirmed root cause, stop and escalate with the trail even if
+  each round still yields new information — productive-but-unconverging is its own
+  stop, or the loop never ends.
 - **Anti-patterns:** changing several things at once (you cannot attribute the
   fix), re-running a probe with no new angle, ignoring a contradictory result,
   and not recording each round's hypothesis → probe → outcome.
-- Done: the root cause is confirmed by at least one executed probe, the fix is
-  verified per §4, and the discriminating probes are recorded so the next
+- Done: the root cause is confirmed by at least one executed probe; any in-scope
+  fix is verified per §4; and the discriminating probes are recorded so the next
   failure of this class is cheaper.
   ✅ "empty output only on unicode inputs; hypotheses — encoding, a filter
   dropping them, a truncation. One probe, the byte length logged at each stage,
@@ -998,9 +1013,10 @@ rediagnose rule. Both ship `unprobed` per the covenant: no bare-executor probe
 design a discriminating probe, or shotgun-patch?) joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice these rules were not part of.
-Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills),
-each candidate re-verified against this pack's actual text and gated
-cross-family (grok-4.5 high + gpt-5.6-luna max/ultra + gpt-5.6-sol max).
+Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills), each
+candidate re-verified against this pack's actual text and cross-model reviewed
+(grok-4.5 high + gpt-5.6-luna); wording defects a post-merge cross-family review
+caught were fixed in a follow-up PR.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
