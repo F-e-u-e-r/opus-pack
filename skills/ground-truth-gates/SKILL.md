@@ -859,7 +859,8 @@ was caught by recomputing it from other cells rather than trusting the
 sheet; a second, distinct case in the same pass found two unrelated
 quantities sharing one hand-typed value by coincidence, renamed apart to
 stop future conflation. Ships `unprobed` per the covenant; their probes
-join the private round-5 queue.
+join the standing #115 queue — a future campaign, not round-5, which was
+a completed, frozen ten-target slice these rules were not part of.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
