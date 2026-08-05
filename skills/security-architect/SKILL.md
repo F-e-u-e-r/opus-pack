@@ -607,5 +607,7 @@ with the never-read-contents rule and with ground-truth-gates' sentinel
 bound, not incident findings — the contributor in fact established
 provenance by reading the values, which is the route this clause routes
 to the owner instead. Ships `unprobed`
-per the covenant; its probe joins the private round-5 queue.
+per the covenant; its probe joins the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+this rule was not part of.
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
