@@ -342,6 +342,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   theories while the click selector had simply matched a different element).
 - Write 3-5 verifiable acceptance criteria before options/code. Revising criteria
   to fit a favored option is the bias alarm.
+- **Before building an element, name the evidence that it earns its place —
+  absent that evidence, don't build it.** An abstraction needs ≥2 real consumers
+  today, not one imagined future one; an optimization needs a measured baseline,
+  not "this could be slow"; a config flag or option needs a named stakeholder who
+  wants a different value. "Might need it later" is not evidence. This is the
+  plan-time counterpart of §5's over-engineering slop-pattern, which catches it
+  only after the code exists. (`unprobed` — see Provenance.)
 - If a precondition is falsified mid-run, halt, state the observation, and replan.
 
 ## 3. Scope containment
@@ -705,6 +712,47 @@ When rigor conflicts with finishing sooner, rigor wins.
   the relevant claim. Stop only at external gates: publish/send, money,
   credentials, destructive action, or a genuine blocker.
 
+## 6. Debugging: find the cause before you fix it
+
+**When a failure's root cause is not yet named — a bug, a silent failure, an
+unexpected output — search for the cause by elimination before you change
+code; guess-and-patch is the slowest path and it regresses.** §4 verifies a
+KNOWN claim by running it; this is the upstream act of finding the claim, and
+it extends §2's two-failure rule (which says *when* to stop and rediagnose)
+with *how*. (`unprobed` — see Provenance.)
+
+- **Enumerate the live hypotheses; don't fixate on the first.** List the causes
+  consistent with the symptom before touching anything.
+- **Design the single most-discriminating probe** — the observation whose
+  outcome rules out the largest share of live hypotheses, not the one that only
+  confirms the likeliest. A probe that can only confirm teaches little; prefer
+  one that can *falsify*. Cheap structural checks precede expensive internal
+  ones (§2: log what the action actually resolved to before theorizing about
+  internal state).
+- **Predict the probe's result before you run it,** then run it and compare.
+  A probe with no pre-committed prediction rarely eliminates anything — whatever
+  you see gets rationalized to fit. Eliminate every hypothesis the result
+  falsifies; a result that contradicts your favored hypothesis is data, not
+  noise.
+- **Name a root cause only when a probe has positively confirmed it by
+  execution** — "consistent with" is not "confirmed." Then fix, and verify the
+  fix per §4: the symptom is gone AND the mechanism explains why.
+- **Escalate on stalemate or stagnation.** Stalemate — two or more hypotheses
+  survive your best discriminating probe equally — widen instrumentation or ask;
+  don't guess between them. Stagnation — a full round adds no new information —
+  stop and replan (§2's two-failure rule); don't re-run the same probe louder.
+- **Anti-patterns:** changing several things at once (you cannot attribute the
+  fix), re-running a probe with no new angle, ignoring a contradictory result,
+  and not recording each round's hypothesis → probe → outcome.
+- Done: the root cause is confirmed by at least one executed probe, the fix is
+  verified per §4, and the discriminating probes are recorded so the next
+  failure of this class is cheaper.
+  ✅ "empty output only on unicode inputs; hypotheses — encoding, a filter
+  dropping them, a truncation. One probe, the byte length logged at each stage,
+  discriminates all three at once; ran it — the drop is at the filter."
+  ❌ "added a retry, a null-check, and an encoding cast together and it passes
+  now" — three changes, cause unknown, no probe: it will regress.
+
 ## Priority when rules collide
 
 1. Do not destroy or leak state without a gate.
@@ -937,6 +985,23 @@ crisp trigger; the reconciled wording here is this pack's. All ship
 `unprobed` per the covenant; their probes join the private round-5 queue —
 the uncertain-outcome entry's probe shape is recorded in
 `references/external-systems.md`'s provenance.
+The §6 debugging discipline and the §2 build-only-what-earns-its-place rule
+(2026-08-04) are mined from sd0xdev/sd0x-dev-flow (MIT, ideas only; see README
+acknowledgements) — its `debug` skill's hypothesis-elimination probe protocol
+(design the most-discriminating probe, predict-then-compare, stalemate vs
+stagnation escalation) and its `necessity-audit` skill's per-element evidence
+thresholds. §6 was adopted because "debugging" is a load trigger this file names
+yet taught nothing (§4 verifies a known claim; the search for an unknown cause
+was missing); it reconciles with — rather than duplicates — §2's two-failure
+rediagnose rule. Both ship `unprobed` per the covenant: no bare-executor probe
+(skill-authoring §7) has run — the debugging rule's probe (does a weak-tier arm
+design a discriminating probe, or shotgun-patch?) joins the standing #115
+queue — a future campaign, not round-5, which was a completed, frozen
+ten-target slice these rules were not part of.
+Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills),
+each candidate re-verified against this pack's actual text and gated
+cross-family (grok-4.5 high + gpt-5.6-luna max/ultra + gpt-5.6-sol max).
+
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
 `references/external-systems.md`, plus §2's mount-check commands

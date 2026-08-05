@@ -625,6 +625,15 @@ This pack distills and adapts ideas from:
   the orchestrator's own verify gate rather than a worker's self-report, and
   the intervention marker kept distinct from a passed gate — adapted into
   `delegation-and-review` §4. MIT, ideas only; no code taken.
+- **sd0xdev** —
+  [`sd0xdev/sd0x-dev-flow`](https://github.com/sd0xdev/sd0x-dev-flow)
+  (MIT); a 2026-08-04 whole-repo mining sweep (98 skills) of this dev-flow
+  command plugin. Three disciplines adopted after cross-family review: its
+  `debug` skill's hypothesis-elimination probe protocol and its
+  `necessity-audit` skill's per-element evidence thresholds (`operational-rigor`
+  §6 and §2), and its `orchestrate` skill's deny-by-default admission gate keyed
+  on monitoring coverage (`security-architect`, AI-agent/MCP section). Ideas
+  only; no text taken.
 - **openai/codex-security** —
   [`openai/codex-security`](https://github.com/openai/codex-security)
   (Apache-2.0); the `security-architect` half of a 2026-07-31 two-repo

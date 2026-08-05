@@ -329,6 +329,22 @@ trail. Risk ladder for granting tools:
 | L3 | Destructive / financial / production | explicit human confirmation each time |
 | L4 | Secret management (rotate keys, vault) | no direct agent access |
 
+- **Least privilege bounds what a tool MAY change; it does not tell you whether
+  you can SEE what it changed — gate admission on both** (`unprobed` — see
+  Provenance). Scoping a token (the ladder above) limits a tool's mutation
+  surface; it does not guarantee your audit trail observes every mutation still
+  permitted. Before admitting a class of agent-reachable tool or delegate to the
+  trusted roster, require that its logging/monitoring actually covers what it can
+  mutate. Where a permitted mutation is unobservable — no logged call, an effect
+  you cannot verify after the fact — that unobserved surface IS the exposure:
+  weigh it at admission and deny by default at L3+
+  (destructive/financial/production), rather than treating a scoped token as if
+  it had also made the tool auditable. A "fail closed on an unknown reading"
+  check (operational-rigor §4) fires only after the effect; this keeps the effect
+  from being admitted unseen in the first place.
+  ❌ "the token is read-scoped and least-privilege, so its calls don't need
+  logging" — least privilege is not observability; an unlogged permitted write is
+  invisible.
 - **The capability triangle — break one side per trust boundary**
   (`unprobed` — adapted external design; see Provenance). Three
   capabilities that combine into an exfiltration pipeline when one agent
@@ -539,4 +555,17 @@ It was deferred at the original gate for wording that would not outlaw
 legitimate inner-boundary debug logging; the crossing/inner split here is
 that wording. Ships `unprobed` per the covenant; its probe joins the
 private round-5 queue.
+The AI-agent/MCP admission rule — verification surface must cover the mutation
+surface, deny-by-default when it cannot (2026-08-04) — is mined from
+sd0xdev/sd0x-dev-flow's `orchestrate` skill (MIT, ideas only; see README
+acknowledgements): its deny-by-default admission gate keyed on whether
+monitoring covers what a worker/tool class can mutate. It closes a gap this
+section's least-privilege ladder left open — scoping bounds what a tool MAY
+change, not whether you can observe what it did. Surfaced by a cross-family
+review (gpt-5.6-luna) that caught it where a first pass had wrongly judged it
+already covered by least-privilege plus fail-closed-on-unknown. Ships `unprobed`
+per the covenant; its probe joins the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+this rule was not part of.
+
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
