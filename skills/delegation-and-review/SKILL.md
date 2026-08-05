@@ -714,6 +714,26 @@ reviewers that they silently absorb as implementers.
   keep new edits of your own in a scratch copy outside the tree, and merge
   them in after the worker exits — then run the double-edit audit above.
   (`unprobed` — private incident as shape; see Provenance.)
+- **A spawned worktree forks committed HEAD — your uncommitted work is
+  invisible to it.** `git worktree add` (or an equivalent isolated-copy
+  dispatch) checks out the last commit, not your working tree; any edit you
+  are mid-way through when you dispatch simply does not exist in the
+  child's copy. The child cannot conflict with what it cannot see, so a
+  clean child return proves nothing about interaction with your uncommitted
+  work — record your dirty-file set at dispatch (`git status --porcelain`),
+  and on return diff it against the child's changed-file set; any overlap
+  needs manual reconciliation before you merge, no matter how clean the
+  child's own report reads. And "pick up" a
+  running spawned session means supervise, verify, and integrate its
+  result — not re-implement the same task yourself in parallel: doing so
+  guarantees a double-edit collision on the same files once both land,
+  the exact failure the audit above exists to catch, self-inflicted this
+  time instead of found. Distinct from the same-tree double-edit audit
+  above (concurrent workers sharing one tree) and the silent-clobber bullet
+  (a worker restoring files outside its declared write scope): here the trees
+  never touch, so no conflict signal fires at all — the miss is silent by
+  construction, not by a tool defect. (`unprobed` — private incident as
+  shape; see Provenance.)
 
 ## 5. Long-running work and handoff
 
@@ -1124,6 +1144,18 @@ text — sourcing and acknowledgements as above). Both were deferred at the
 original gate as small/recipe-level items to bundle with the next
 handoff-discipline batch — this batch. Both ship `unprobed` per the
 covenant; their probes join the private round-5 queue.
+The §4 worktree-base-skew bullet (2026-08-04) comes from a private incident,
+a positive case: a parent session had spun two tasks into separate spawned
+worktree sessions and was then told to "pick up" both. It declined to
+re-implement (naming the double-edit collision that would guarantee),
+supervised instead — re-ran each child's suite itself, wrote its own parity
+probe, fixed one integration bug a child had introduced — and flagged at
+pick-up time that both worktrees had branched from HEAD without its own
+still-uncommitted fixes, declaring a conflict audit for integration time.
+The predicted conflict then actually occurred during the merge and was
+resolved cleanly because it had been anticipated. Private evidence, cited as
+shape per the README covenant's second branch; no in-repo probe has run —
+in-body `unprobed` marker.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
