@@ -346,7 +346,9 @@ When rigor conflicts with finishing sooner, rigor wins.
   absent that evidence, don't build it.** An abstraction needs ≥2 real consumers
   today, not one imagined future one; an optimization needs a measured baseline,
   not "this could be slow"; a config flag or option needs a named stakeholder who
-  wants a different value. "Might need it later" is not evidence. This is the
+  wants a different value. "Might need it later" is not evidence — but a user or
+  the contract naming the element IS: this gates flexibility you invent, never
+  what was asked for. This is the
   plan-time counterpart of §5's over-engineering slop-pattern, which catches it
   only after the code exists. (`unprobed` — see Provenance.)
 - If a precondition is falsified mid-run, halt, state the observation, and replan.
@@ -716,7 +718,9 @@ When rigor conflicts with finishing sooner, rigor wins.
 
 **When a failure's root cause is not yet named — a bug, a silent failure, an
 unexpected output — search for the cause by elimination before you change
-code; guess-and-patch is the slowest path and it regresses.** §4 verifies a
+code to fix it; guess-and-patch is the slowest path and it regresses.** Probes
+that only OBSERVE — a log line, a byte count, an assertion — are part of the
+search, not the fix this defers. §4 verifies a
 KNOWN claim by running it; this is the upstream act of finding the claim, and
 it extends §2's two-failure rule (which says *when* to stop and rediagnose)
 with *how*. (`unprobed` — see Provenance.)
@@ -998,9 +1002,10 @@ rediagnose rule. Both ship `unprobed` per the covenant: no bare-executor probe
 design a discriminating probe, or shotgun-patch?) joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice these rules were not part of.
-Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills),
-each candidate re-verified against this pack's actual text and gated
-cross-family (grok-4.5 high + gpt-5.6-luna max/ultra + gpt-5.6-sol max).
+Adopted after a whole-repo mining sweep of sd0x-dev-flow (98 skills), each
+candidate re-verified against this pack's actual text and cross-model reviewed
+(grok-4.5 high + gpt-5.6-luna); wording defects a post-merge cross-family review
+caught were fixed in a follow-up PR.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
