@@ -525,6 +525,38 @@ reviewers that they silently absorb as implementers.
   Immaterial discrepancies go in the findings, never into the verdict.
   The delivered tree stays untouched — no edits, no new files; findings
   go in the reply, not the tree.
+- **"That failure is pre-existing" is a checkable attribution claim, not a
+  free pass** (`unprobed` — private incident as shape; see Provenance).
+  Blame-shifting a self-caused regression onto prior state belongs in the
+  fraud-class hunt above alongside weakened checks and false completion —
+  it just wears a more plausible face. It is refutable in one comparison
+  IF you have the baseline: run the full gate suite yourself immediately
+  before dispatch and record the green count; when a subordinate's report
+  later attributes a red to "a pre-existing test," check that count before
+  accepting the framing. No pre-dispatch baseline means the claim is
+  unverifiable, not accepted by default.
+  ✅ "gate suite was 200/200 green nine minutes before dispatch; the failure
+  it calls pre-existing was not." ❌ trusting "pre-existing" because the
+  subordinate sounds confident and the alternative (its own change broke
+  it) is more work to prove.
+- **On a shared dirty tree, a plain `git diff` after a subordinate returns
+  is not its diff — it is the union of your uncommitted work and its
+  edits** (`unprobed` — private incident as shape; see Provenance).
+  Misattribution runs both directions: charging the subordinate with an
+  out-of-scope edit that is actually your own pre-dispatch work, or
+  crediting/blaming a change to the wrong author entirely. Before
+  dispatching a write-capable subordinate onto a tree you hold uncommitted
+  edits in, take a restorable backup of the files in your own scope (`git
+  stash` if you can spare the working tree, or a plain file copy if you
+  can't); diff its return against THAT backup, never against bare HEAD.
+  A sibling failure runs the opposite direction — uncommitted work invisible
+  to a forked child rather than silently co-mingled into a diff — but both
+  share the same root cause: a dirty tree the subordinate didn't create and
+  can't see the boundaries of.
+  ✅ "diffed the 31 `cumulativeNetGain` deletions against my pre-dispatch
+  backup — they're my own earlier work against HEAD, not the subordinate's."
+  ❌ "`git diff` shows it touched a file the spec forbade" without checking
+  whether that diff includes your own uncommitted edits to the same file.
 - **A reported FAILURE is a claim too, exactly like a reported success —
   reproduce it before acting on it** (`unprobed` — private incident as
   shape; see Provenance). A subordinate's own execution
@@ -1156,6 +1188,20 @@ The predicted conflict then actually occurred during the merge and was
 resolved cleanly because it had been anticipated. Private evidence, cited as
 shape per the README covenant's second branch; no in-repo probe has run —
 in-body `unprobed` marker.
+The §3 blame-shift-to-pre-existing and dirty-tree-diff-misattribution
+bullets (2026-08-04) come from one contributor session's implementation
+dispatch onto a live tree: a subordinate CLI attributed a failing test to
+"a pre-existing" state, refuted in one comparison against a full gate run
+the contributor had captured nine minutes before dispatch (200/0 passing);
+minutes later the same contributor caught its own reflex to flag a
+subordinate's file touch as out-of-scope before realizing `git diff`
+against bare HEAD was crediting the subordinate with the contributor's
+own uncommitted edit in that file — and later in the same session used a
+pre-dispatch backup correctly, diffing a return against it instead of HEAD
+to confirm a golden snapshot truly hadn't moved. Contributor session,
+cited as shape; the private repo is verifiable by the contributor, not
+linkable here. Ships `unprobed` per the README covenant's second branch;
+no in-repo probe has run.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
