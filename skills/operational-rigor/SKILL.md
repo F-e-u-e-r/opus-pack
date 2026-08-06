@@ -430,11 +430,13 @@ When rigor conflicts with finishing sooner, rigor wins.
   a SUBORDINATE's unreproduced RED licenses no revert at all: there the
   claim is the whole basis for acting, here it rides along with a grant
   that stands without it. §2 is untouched either way — a reversal still
-  owes, among the rest, its checkpoint, its one-at-a-time handling, and
-  its `AUTH:` line: the diagnostic may not gate the rollback; §2's safety
-  gates still do. Nor is an ordered reversal the fix §6 defers behind
-  cause-finding — §6's elimination runs on the residual symptom alongside
-  or after the scoped reverse and never gates whether it proceeds.)
+  owes each §2 gate that applies to it: the recoverable checkpoint or
+  explicit per-action confirmation, one-at-a-time handling where it is
+  destructive, the `AUTH:` line where it is outward or irreversible. The
+  diagnostic may not gate the rollback; §2's safety gates still do. Nor
+  is an ordered reversal the fix §6 defers behind cause-finding — §6's
+  elimination runs on the residual symptom alongside or after the scoped
+  reverse and never gates whether it proceeds.)
   The attribution is evidence of sequence, not of cause, so scope the
   reversal by what can actually reach the reported symptom rather than by
   everything the task touched, and run the diagnostic alongside. Proof of
@@ -442,8 +444,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   runtime reads changed, no call site reaches it — never an argument from
   timing or plausibility; a component whose reachability stays unproven
   stays inside the ordered scope — exclusion rides on that proof, not on
-  doubt. Both filters apply to a rollback and neither
-  substitutes: provenance (the bullet above) bounds what you MAY reverse,
+  doubt. Both filters apply to a rollback and neither substitutes for the
+  other: provenance (the bullet above) bounds what you MAY reverse,
   reachability what you SHOULD. Separately and sufficiently on its own:
   hold and NAME any component whose reversal destroys state the reversal
   itself cannot restore, or re-opens a risk the change closed — whether or
@@ -462,7 +464,7 @@ When rigor conflicts with finishing sooner, rigor wins.
   unnecessary reversal nobody names leaves the change wearing the blame
   in the next session's record.
   ✅ "Reverted on your order under a checkpoint (AUTH line recorded). Held
-  back the history scrub and naming it here: reverting it would
+  back the history scrub and named it here: reverting it would
   re-publish the secrets, and it changed no byte any script reads.
   Diagnostic ran alongside — no call site in the scheduled path reads the
   two files you flagged."
