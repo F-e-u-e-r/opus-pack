@@ -150,14 +150,15 @@ treatment.
 
 **Exclusions and lost runs follow one rule set across arms** (`unprobed`
 — see Provenance). Eligibility, exclusion, and re-run rules are declared
-once and applied identically to every arm — the NOT-ARMED discipline of
-rule 2 below included. Equal final N is not required; per-arm attrition
-accounting is: started / excluded-with-reason / scored, so an unequal N
-is explainable arm by arm, and an unexplained per-arm gap blocks the
+once, before any arm runs, and applied identically to every arm — the
+NOT-ARMED discipline of rule 2 under "What makes a gate real" below
+included. Equal final N is not required; per-arm attrition accounting
+is: started / excluded-with-reason / scored, so an unequal N is
+explainable arm by arm, and an unexplained per-arm gap blocks the
 comparison. An exclusion mechanism correlated with one arm's treatment —
-the treatment crashing exactly the runs it would have failed — biases
-every surviving score; name that asymmetry in the result rather than
-averaging over it.
+the treatment crashing exactly the runs it would have failed — can bias
+every surviving comparison; name that asymmetry in the result rather
+than averaging over it.
 ❌ "dropped three malformed runs" — all three sat in one arm, and the
 malformation was that arm's own failure signature.
 
@@ -609,6 +610,9 @@ enforces one at runtime — and has its own failure design:
   unparseable command; its malformed-envelope path fails open today — a
   disclosed gap." ❌ "the hook is flaky and blocks my commands, so I'll make
   it fail-open" — that converts a guard into a rationalized bypass.
+  ❌ "the guard denies and writes the reason to its own log" — a direction
+  was chosen, but the finding is parked where no actor who can change the
+  input or stop the run will meet it: no failure route.
 - **A detector's positives come from the corpus it will guard, not from the
   author's examples of them** (`unprobed` — two contributor incidents as shape;
   see Provenance). A guard that classifies real material — a secret scanner, a
@@ -907,11 +911,12 @@ bullet's placement clause (2026-08-06) adapt four disciplines mined from
 gsd-build/get-shit-done (MIT, ideas only, no text; upstream archived —
 successor open-gsd/gsd-core; see README acknowledgements) in the
 2026-08-02 dual-model mining evaluation of owner-named repositories, and
-kept through a 2026-08-06 re-verification pass in which two model
-families converged on all four dispositions against the then-current
-main. All four ship `unprobed` per the covenant; their probes join the
-standing #115 queue — a future campaign, not round-5, which was a
-completed, frozen ten-target slice these rules were not part of.
+kept through a 2026-08-06 re-verification pass — a design-level
+disposition review, not a behavioral probe — in which two model families
+converged on all four dispositions against the then-current main. All
+four ship `unprobed` per the covenant; their probes join the standing
+#115 queue — a future campaign, not round-5, which was a completed,
+frozen ten-target slice these rules were not part of.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
