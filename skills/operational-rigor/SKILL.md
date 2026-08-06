@@ -1079,9 +1079,9 @@ scheduled run's second Bash call — the entire point of the task — issued
 against an unlisted tool, hit an interactive permission prompt with no
 human present, and hung for five hours before the session aborted with
 `AbortError: Tool permission stream closed before response received`. No
-dashboard, no summary, no error surfaced — the task brief's own fail-loud
-instruction was powerless because the abort happened below the layer
-where the agent ever holds a result to report. Private incident, cited as
+dashboard, no summary, no operator-visible error — the task brief's own
+fail-loud instruction was powerless because the abort happened below the
+layer where the agent ever holds a result to report. Private incident, cited as
 shape; the underlying transcript is verifiable by the contributor, not
 linkable here. Ships `unprobed` per the covenant; its probe joins the
 standing #115 queue — a future campaign, not round-5, which was a
