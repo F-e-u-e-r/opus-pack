@@ -890,7 +890,7 @@ reviewers that they silently absorb as implementers.
   operational-rigor §1's stated-assumption discipline — the assumption
   named in the report, reversible, and re-opened the moment the real
   answer lands. The class follows the ACTION, not the phrasing: if the
-  action awaiting the reply is one operational-rigor §2 gates, the
+  action awaiting the reply is one that operational-rigor §2 gates, the
   pending reply is an authorization however the question was worded.
   ❌ "the user is away and approved something similar last week, so I'll
   treat this as approved and note it" — a remembered yes to a different
