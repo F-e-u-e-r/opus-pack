@@ -1076,7 +1076,9 @@ account-scoped "not found for account" — and that difference in kind, not
 the shared status code, was what actually separated "never existed" from
 "listed but unrouted." Private incident, cited as shape; the underlying
 session is verifiable by the contributor, not linkable here. Ships
-`unprobed` per the covenant; its probe joins the private round-5 queue.
+`unprobed` per the covenant; its probe joins the standing #115 queue — a
+future campaign, not round-5, which was a completed, frozen ten-target
+slice this rule was not part of.
 The §4 forged-output rule (2026-07-24) adapts curtischoutw/claude-
 institution's hard-rule #15 (MIT, ideas only; see README acknowledgements),
 motivated by two incidents their lessons file records (a fabricated tool_use
