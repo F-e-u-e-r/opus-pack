@@ -384,16 +384,25 @@ When rigor conflicts with finishing sooner, rigor wins.
   Procedure: enumerate every artifact alleged to pin the behavior, check
   each one's actual inputs or premises against the specific axis in
   dispute, not just its existence, then close three ways per artifact.
-  Discriminates → real pin evidence; honor it under the
-  load-bearing-decision rule above. Does not discriminate → that citation
-  alone loses evidentiary force on that axis, and nothing more: it proves
-  no drift, revokes no recorded decision, and authorizes no change — and
-  any other enumerated artifact that does bind stays load-bearing. Cannot
-  tell → treat the citation as binding for now: preserve the state, then
-  escalate or gather the targeted evidence that would settle it; "could
-  not verify" is never read as "not binding". Companion to the
-  load-bearing-decision rule above: that rule says HONOR a real decision;
-  this one says confirm the cited artifact IS one before you honor it.
+  Discriminates → admissible pin evidence; honoring it is the
+  load-bearing-decision rule above applied under §4's authority order —
+  and discrimination alone is not decision status: an artifact that
+  merely captures current behavior (a generated snapshot, a factual
+  comment) pins drift, not intent. Does not discriminate — inputs make
+  the candidates coincide, or the premise is false or its path
+  unreachable → that citation alone loses evidentiary force on that
+  axis, and only that: it neither proves nor disproves drift, revokes no
+  recorded decision, authorizes no change — the axis stays open on
+  whatever grounds still bind (contract, owner, any other enumerated
+  artifact). Cannot tell → treat the citation as binding for now:
+  preserve the state, then escalate or gather the targeted evidence that
+  would settle it — "could not verify" is never read as "not binding",
+  though a higher authority in §4's order (an explicit user statement,
+  the spec) can still decide the axis while the citation stays
+  unresolved. Companion to the load-bearing-decision rule above: that
+  rule says HONOR a real decision; this one says run the three closes
+  above before treating a citation as one — and never read "could not
+  verify" as free rein.
   ✅ "the brief says the golden snapshot pins this basis choice, but the
   snapshot's inputs make the two candidate bases numerically identical —
   this citation does not bind the choice; deciding it needs contract or
@@ -1122,9 +1131,9 @@ this rule was not part of.
 The §3 pin-discriminates-the-axis bullet (2026-08-04) comes from two
 independent-session incidents of the same shape: a brief cited a golden
 snapshot or a rationale comment as pinning a disputed behavior, and in both
-cases checking what the citation's inputs actually exercised (not just that
-it existed) showed it constrained nothing on the disputed axis — one
-snapshot's inputs made two candidate behaviors numerically coincide, one
+cases checking what the citation's inputs or premises actually bound (not
+just that it existed) showed it constrained nothing on the disputed axis —
+one snapshot's inputs made two candidate behaviors numerically coincide, one
 comment's factual premise had gone stale. Contributor sessions, cited as
 shape. Ships `unprobed` per the covenant; its probe joins the standing
 #115 queue — a future campaign, not round-5, which was a completed,
