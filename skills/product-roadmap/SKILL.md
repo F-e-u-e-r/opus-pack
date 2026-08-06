@@ -136,6 +136,33 @@ Summarize insights with links; never vendor code or copy positioning wholesale.
 - *Needs information* — the question, why it matters, and the safe default
   if unanswered.
 
+Tasks carry their blocking edges (`unprobed` — see Provenance). When
+emitting the tasks above: give each task a stable short reference (an
+id or unique short name); under each task write one compact
+`blocked-by: <refs>` line — `blocked-by: none` when nothing blocks it —
+naming, by those references, the tasks or user/info items that must
+land first (a user/info item gets a short stable label the same way);
+mark `[P]` only where tasks share no blocking edge AND no
+files (technical independence only — dispatch-time wave limits stay
+delegation-and-review §1's bounded fan-out); derive dispatch order from
+the edges, never from list position. Edges stay inline in the task
+list — no graph file, no dependency tooling, no status tracker; deeper
+per-task sequencing belongs to the dispatch packet
+(delegation-and-review §2) at dispatch time, not to the roadmap. Fail
+states are explicit: an edge you cannot name is a discovered unknown —
+park that task in Later with the unknown named (§3's
+parked-with-trigger convention), never dispatch on a guessed order; a
+cycle or a contradictory pair of edges is a plan defect — re-slice the
+tasks to break it, or park every affected task the same way, and
+dispatch none of the affected tasks until the defect is repaired. Done
+when every Now task carries its `blocked-by:` line and every `[P]` is
+verified independent.
+✅ "T1 schema — blocked-by: none. T3 auth API — blocked-by: T1. T4 docs
+page — blocked-by: none [P]".
+❌ five tasks all reading "blocked-by: none" while task 3 edits the
+schema task 1 creates — the missing edge surfaces as a merge conflict
+or a broken dispatch, not as planning.
+
 Keep the whole output one screen where possible; depth goes into linked
 files, not the verdict.
 
@@ -154,4 +181,17 @@ clean-room, code-license ≠
 art/character IP, adopt-mechanism-not-unreproduced-numbers — comes from a
 cross-repo mining pass over seven staged libraries (class-distilled; the pack
 had no IP doctrine before).
+The §7 task-edge rule (2026-08-07) adapts the task-dependency shape of
+github/spec-kit's tasks template (MIT, ideas only, no text — task ids,
+phase/story dependency ordering, and its parallel marker for tasks
+sharing no dependency or files; see README acknowledgements), mined in
+the 2026-08-02 dual-model evaluation and kept through the 2026-08-06
+batch-1 re-verification — a design-level disposition review, not a
+behavioral probe — which also discharges the 2026-08-03 disposition
+folding spec-to-work-items' roadmap half into §7 (its work-package
+half lives in delegation-and-review §2's existing fields). COMPACT by
+adjudicated design: edges stay inline in the task list, never a graph
+system. Ships `unprobed` per the covenant; its probe joins the
+standing #115 queue — a future campaign, not part of any completed
+campaign.
 Method is stable; nothing environment-specific to re-verify.

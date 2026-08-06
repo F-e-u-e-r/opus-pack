@@ -790,6 +790,11 @@ This pack distills and adapts ideas from:
     `ground-truth-gates`; and the checkpoint-batching cost discipline with
     its never-batch authorization carve-outs, plus the never-write-the-
     human's-reply boundary, adapted into `delegation-and-review`.
+  - [`github/spec-kit`](https://github.com/github/spec-kit) (MIT) — the
+    task-dependency shape of its tasks template (task ids, phase/story
+    dependency ordering, the parallel marker for tasks sharing no
+    dependency or files), adapted into `product-roadmap` §7's compact
+    task edges.
   - [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)
     (MIT declared in its README, no LICENSE file — ideas only) — co-source of the
     mechanical-gate-separate-from-model-judgment framing (`ground-truth-gates`).
