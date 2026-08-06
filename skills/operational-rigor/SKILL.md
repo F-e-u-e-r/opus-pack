@@ -380,17 +380,26 @@ When rigor conflicts with finishing sooner, rigor wins.
   behaviors coincide constrains nothing about which one is intended, no
   matter how firmly the brief asserts it. A rationale comment can also be a
   factual claim rather than a decision, and factual claims decay — verify
-  the premise still holds before treating the comment as binding. Procedure:
-  enumerate every artifact alleged to pin the behavior, and check each
-  one's actual inputs or premises against the specific axis in dispute,
-  not just its existence. Companion to the load-bearing-decision rule
-  above: that rule says HONOR a real decision; this one says confirm the
-  cited artifact IS one before you honor it. ✅ "the brief says the golden
-  snapshot pins this basis choice, but the snapshot's inputs make the two
-  candidate bases numerically identical — it constrains nothing here,
-  treating it as a drift artifact instead." ❌ "the comment says this is
-  the compatibility path, so leaving it alone" — without checking whether
-  anything still reaches that path. (`unprobed` — contributor sessions as
+  the premise still holds before treating the comment as binding.
+  Procedure: enumerate every artifact alleged to pin the behavior, check
+  each one's actual inputs or premises against the specific axis in
+  dispute, not just its existence, then close three ways per artifact.
+  Discriminates → real pin evidence; honor it under the
+  load-bearing-decision rule above. Does not discriminate → that citation
+  alone loses evidentiary force on that axis, and nothing more: it proves
+  no drift, revokes no recorded decision, and authorizes no change — and
+  any other enumerated artifact that does bind stays load-bearing. Cannot
+  tell → treat the citation as binding for now: preserve the state, then
+  escalate or gather the targeted evidence that would settle it; "could
+  not verify" is never read as "not binding". Companion to the
+  load-bearing-decision rule above: that rule says HONOR a real decision;
+  this one says confirm the cited artifact IS one before you honor it.
+  ✅ "the brief says the golden snapshot pins this basis choice, but the
+  snapshot's inputs make the two candidate bases numerically identical —
+  this citation does not bind the choice; deciding it needs contract or
+  owner grounds." ❌ "the comment says this is the compatibility path, so
+  leaving it alone" — without checking whether anything still reaches
+  that path. (`unprobed` — contributor sessions as
   shape; see Provenance.)
 - Mid-task tripwire: a "small fix" crossing roughly 3 files or 100 changed lines
   stops for disclosure before continuing.
@@ -1117,7 +1126,9 @@ cases checking what the citation's inputs actually exercised (not just that
 it existed) showed it constrained nothing on the disputed axis — one
 snapshot's inputs made two candidate behaviors numerically coincide, one
 comment's factual premise had gone stale. Contributor sessions, cited as
-shape; no in-repo probe has run — `unprobed` marker.
+shape. Ships `unprobed` per the covenant; its probe joins the standing
+#115 queue — a future campaign, not round-5, which was a completed,
+frozen ten-target slice this rule was not part of.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
