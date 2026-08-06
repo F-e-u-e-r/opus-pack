@@ -342,15 +342,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   theories while the click selector had simply matched a different element).
   The same cheap-before-expensive discipline applies on the input side
   (`unprobed` — private incident as shape; see Provenance): a live probe
-  that ran its transition yet shows no failure can be silence from an
-  input that never left its staging layer — committed on blur, gated
-  behind an apply button, debounced — so before recording an integration
-  defect, verify the input actually reached the exercised path (read the
-  state code the field feeds, or drive the exact action that commits
-  it). Only a delivered-input silence is an integration finding;
-  undelivered input is a staging fact, not a defect; and delivery you
-  cannot establish stays unproven — file nothing, name the trace or
-  committing action that would settle it.
+  that ran its transition yet shows no failure can be explained as
+  silence from an input that never left its staging layer — committed on
+  blur, gated behind an apply button, debounced — so before recording an
+  integration defect, verify the input actually reached the exercised
+  path (read the state code the field feeds, or drive the exact action
+  that commits it). Only a delivered-input silence is an integration
+  finding; undelivered input is a staging fact, not an integration
+  finding; and delivery you cannot establish stays unproven — file
+  nothing, name the trace or committing action that would settle it.
 - Write 3-5 verifiable acceptance criteria before options/code. Revising criteria
   to fit a favored option is the bias alarm.
 - **Before building an element, name the evidence that it earns its place —
