@@ -592,6 +592,43 @@ When rigor conflicts with finishing sooner, rigor wins.
   ❌ "read it — it's a regex pre-filter, but the name says integration,
   so the integration is covered" — a trace read and then overridden by
   the name.
+- **An error is signal only against a comparable known-invalid control —
+  identical in kind means no signal** (`unprobed` — private incident as
+  shape; see Provenance). Before reading an API/CLI error as evidence
+  for a claim ("exists but gated", "throttled", "dead"), probe a
+  known-invalid control — a nonsense name, a known-dead id — alongside
+  it, through the same path, the same credentials and principal, and
+  the same decision surface. Kind means the error's class or shape —
+  status plus code/template/body class — not status alone, and not
+  byte-identical text (the same template with different fill-ins is the
+  same kind); a difference you cannot classify is unknown, not signal.
+  An error identical in kind to the control's carries no signal (the
+  probe cannot distinguish your input from a known-invalid one). An
+  error that DIFFERS in kind is evidence of exactly one thing: the
+  endpoint handled your input differently from the control — a specific
+  story ("exists but gated", "listed but unrouted") needs further
+  probes or provider-documented semantics for that distinctive shape,
+  named as a further reading. And the comparison exists only between
+  two errors from the same decision surface: when no control can be
+  constructed, when the control comes back a non-error (then it was not
+  invalid — replace it), or when either arm's response arises earlier
+  (a network error, an auth wall ahead of routing), the target error is
+  unprobed for the claim — fail closed and say what control is missing
+  or why the arms were incomparable. This is the known-bad-arm proof
+  (ground-truth-gates item 2) turned outward onto a third party's
+  response instead of a gate you built: the control is the known-bad
+  reference, and a real signal is one that discriminates against it.
+  ✅ "a 400 on the real model name could plausibly mean 'exists, not
+  enabled' — ran the same probe against a nonsense name and got the
+  same 400 kind (identical text, in fact), so the real name's 400
+  carries no signal either; two different 404s later, the nonsense
+  control's plain routing 404 vs the real name's account-scoped 'not
+  found for account', differed in KIND — that difference alone
+  established only distinct handling, and the listed-but-unrouted
+  reading came from the account-scoped error's documented meaning, on
+  top of the discrimination."
+  ❌ reading a plausible-sounding error as confirmation without checking
+  whether a nonsense input gets the same one.
 - **A failing check has two suspects: the code and the check itself.** Before
   editing either, open the statement of intended behavior (spec, README,
   docstring, type) and confirm which side it backs; a disagreement is the
@@ -1044,6 +1081,21 @@ Private evidence, cited as shape per the README covenant's second branch;
 the executable probe — sample a repo's named checks and diff name-implied
 vs actual assertion coverage — has not been run; the in-body `unprobed`
 marker records that debt.
+The §4 known-invalid-control rule (2026-08-04) comes from a private
+incident: a coding CLI's `-m gpt-5.6` returned a 400 that could plausibly
+read as "exists but not enabled for this account" — until the same probe
+run against a nonsense model name returned the identical 400 text,
+killing that reading before it was acted on. The inverse use of the same
+discipline appeared later the same session: two different 404s (`K3` vs
+`kimi-k2.6`) turned out to differ in kind — a plain routing 404 versus an
+account-scoped "not found for account" — and that difference in kind,
+read with the account-scoped error's own wording, was what separated
+"never existed" from "listed but unrouted," not the shared status code.
+Private incident, cited as shape; the underlying
+session is verifiable by the contributor, not linkable here. Ships
+`unprobed` per the covenant; its probe joins the standing #115 queue — a
+future campaign, not round-5, which was a completed, frozen ten-target
+slice this rule was not part of.
 The §4 forged-output rule (2026-07-24) adapts curtischoutw/claude-
 institution's hard-rule #15 (MIT, ideas only; see README acknowledgements),
 motivated by two incidents their lessons file records (a fabricated tool_use
