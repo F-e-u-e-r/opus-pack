@@ -597,30 +597,33 @@ When rigor conflicts with finishing sooner, rigor wins.
   shape; see Provenance). Before reading an API/CLI error as evidence
   for a claim ("exists but gated", "throttled", "dead"), probe a
   known-invalid control — a nonsense name, a known-dead id — alongside
-  it, through the same path, auth class, and decision surface. Kind
-  means the error's class or shape — status plus code/template/body
-  class — not status alone, and not byte-identical text (the same
-  template with different fill-ins is the same kind); a difference you
-  cannot classify is unknown, not signal. An error identical in kind to
-  the control's carries no signal (the endpoint is answering "invalid
-  input" the same way regardless of what you asked). An error that
-  DIFFERS in kind is evidence of exactly one thing: the endpoint
-  handled your input differently from the control — a specific story
-  ("exists but gated", "listed but unrouted") needs further probes or
-  provider-documented semantics for that distinctive shape, named as a
-  further reading. And when no control can be constructed, or the
-  control fails before reaching the same decision surface (a network
-  error, an auth wall ahead of routing), the target error is unprobed
-  for the claim — fail closed and say what control is missing. This is
-  the known-bad-arm proof (ground-truth-gates item 2) turned outward
-  onto a third party's response instead of a gate you built: the
-  control is the known-bad reference, and a real signal is one that
-  discriminates against it.
+  it, through the same path, the same credentials and principal, and
+  the same decision surface. Kind means the error's class or shape —
+  status plus code/template/body class — not status alone, and not
+  byte-identical text (the same template with different fill-ins is the
+  same kind); a difference you cannot classify is unknown, not signal.
+  An error identical in kind to the control's carries no signal (the
+  probe cannot distinguish your input from a known-invalid one). An
+  error that DIFFERS in kind is evidence of exactly one thing: the
+  endpoint handled your input differently from the control — a specific
+  story ("exists but gated", "listed but unrouted") needs further
+  probes or provider-documented semantics for that distinctive shape,
+  named as a further reading. And the comparison exists only between
+  two errors from the same decision surface: when no control can be
+  constructed, when the control comes back a non-error (then it was not
+  invalid — replace it), or when either arm's response arises earlier
+  (a network error, an auth wall ahead of routing), the target error is
+  unprobed for the claim — fail closed and say what control is missing
+  or why the arms were incomparable. This is the known-bad-arm proof
+  (ground-truth-gates item 2) turned outward onto a third party's
+  response instead of a gate you built: the control is the known-bad
+  reference, and a real signal is one that discriminates against it.
   ✅ "a 400 on the real model name could plausibly mean 'exists, not
   enabled' — ran the same probe against a nonsense name and got the
-  identical 400 text, so the real name's 400 carries no signal either;
-  two different 404s later (a plain routing 404 vs an account-scoped
-  'not found for account') differed in KIND — that difference alone
+  same 400 kind (identical text, in fact), so the real name's 400
+  carries no signal either; two different 404s later, the nonsense
+  control's plain routing 404 vs the real name's account-scoped 'not
+  found for account', differed in KIND — that difference alone
   established only distinct handling, and the listed-but-unrouted
   reading came from the account-scoped error's documented meaning, on
   top of the discrimination."
