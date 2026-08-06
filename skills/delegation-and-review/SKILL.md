@@ -474,19 +474,21 @@ reviewers that they silently absorb as implementers.
   working agent mid-phase pays a real cold-start cost — its context is
   discarded across the pause and rebuilt on resume — so a
   NON-load-bearing progress checkpoint (a status read, a style pass, a
-  mid-phase look whose outcome cannot change what the worker does next)
-  may batch to the phase boundary. Four classes never batch, and a batch
-  never substitutes for them: an authorization or confirmation gate
-  (operational-rigor §2's per-invocation grant is addressed to the human
-  at the moment of the action — a phase-end batch would defer or replace
-  it, which is self-authorization); §2's early concrete-artifact
-  checkpoint on an implementation task (the anti-stall gate); the
-  dispatcher's own gate re-run after a worker's claimed fix (§4's
-  self-report rule); and reproducing a reported RED before acting on it
-  (this section's reported-failure rule). "Checkpoint" here means a
-  progress interrupt motivated by that cold-start economics; a gate
-  whose outcome decides the next action is not a checkpoint and keeps
-  its place.
+  mid-phase look whose outcome cannot change what the worker or the
+  dispatcher does next) may batch to the phase boundary. Four classes
+  never batch, and a batch never substitutes for them: (a) an
+  authorization or confirmation gate (operational-rigor §2's
+  per-invocation grant is addressed to the human at the moment of the
+  action — a phase-end batch would defer or replace it, which is
+  self-authorization); (b) §2's early concrete-artifact checkpoint on an
+  implementation task (the anti-stall gate); (c) the dispatcher's own
+  gate re-run after a worker's claimed fix (§4's self-report rule); and
+  (d) reproducing a reported RED before acting on it (this section's
+  reported-failure rule). "Checkpoint" here means a progress interrupt
+  motivated by that cold-start economics; a gate whose outcome decides
+  the next action is not a checkpoint and keeps its place.
+  ✅ "status and style checkpoints deferred to the phase boundary; the
+  deploy confirmation stayed at its action."
   ❌ "I'll bundle the deploy confirmation into the phase-end review" — a
   per-invocation grant deferred is a deploy that either ran ungranted or
   blocked everything queued behind it; neither is a checkpoint saving.
@@ -887,7 +889,9 @@ reviewers that they silently absorb as implementers.
   preference with a genuine low-stakes default) may proceed under
   operational-rigor §1's stated-assumption discipline — the assumption
   named in the report, reversible, and re-opened the moment the real
-  answer lands.
+  answer lands. The class follows the ACTION, not the phrasing: if the
+  action awaiting the reply is one operational-rigor §2 gates, the
+  pending reply is an authorization however the question was worded.
   ❌ "the user is away and approved something similar last week, so I'll
   treat this as approved and note it" — a remembered yes to a different
   question is a fabricated yes to this one.
