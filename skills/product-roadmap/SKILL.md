@@ -136,6 +136,20 @@ Summarize insights with links; never vendor code or copy positioning wholesale.
 - *Needs information* — the question, why it matters, and the safe default
   if unanswered.
 
+Tasks carry their blocking edges — a compact `blocked-by:` line per
+task naming the tasks (or user/info items) that must land first, and a
+`[P]` mark on tasks safe to run in parallel (no shared edge, no shared
+files); dispatch order is derived from the edges, never from list
+position alone. Edges are lines in the task list, not a separate
+artifact: no graph file, no dependency tooling, no status tracker —
+sequencing detail beyond the edges belongs to delegation-and-review
+§2's packet fields. An edge you cannot name is a discovered unknown:
+park that task in Later with the unknown named rather than dispatching
+it on a guessed order. (`unprobed` — see Provenance.)
+❌ five tasks all reading "no dependencies" while task 3 edits the
+schema task 1 creates — the missing edge surfaces as a merge conflict
+or a broken dispatch, not as planning.
+
 Keep the whole output one screen where possible; depth goes into linked
 files, not the verdict.
 
@@ -154,4 +168,17 @@ clean-room, code-license ≠
 art/character IP, adopt-mechanism-not-unreproduced-numbers — comes from a
 cross-repo mining pass over seven staged libraries (class-distilled; the pack
 had no IP doctrine before).
+The §7 task-edge rule (2026-08-07) adapts the task-dependency shape of
+github/spec-kit's tasks template (MIT, ideas only, no text — task ids,
+phase/story dependency ordering, and its parallel marker for tasks
+sharing no dependency or files; see README acknowledgements), mined in
+the 2026-08-02 dual-model evaluation and kept through the 2026-08-06
+batch-1 re-verification — a design-level disposition review, not a
+behavioral probe — which also discharges the 2026-08-03 disposition
+folding spec-to-work-items' roadmap half into §7 (its work-package
+half lives in delegation-and-review §2's existing fields). COMPACT by
+adjudicated design: edges stay inline in the task list, never a graph
+system. Ships `unprobed` per the covenant; its probe joins the
+standing #115 queue — a future campaign, not part of any completed
+campaign.
 Method is stable; nothing environment-specific to re-verify.
