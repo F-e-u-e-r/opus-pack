@@ -431,20 +431,22 @@ When rigor conflicts with finishing sooner, rigor wins.
   it does update), so wiring the dangling field through on top of that
   compensation double-counts it rather than fixing anything. Reproduce
   the numeric or behavioral consequence of wiring it before recommending
-  the wire, then close by what you found. Same semantics at every layer
-  and no compensation → the reproduced consequence licenses the wire
-  (the call-site-sweep rule above still governs any shape change). A
-  compensation exists → first check whether it is a recorded decision — a
-  rationale comment, an ADR line, a cited pin: then the
-  documented-decision and pin rules above bind (owner's call, not an
-  engineering tidy). Otherwise resolve the intended semantics under §4's
+  the wire, then close by what you found. Same semantics at every layer,
+  no compensation, and a reproduction showing the intended result → that
+  licenses the wire (the call-site-sweep rule above still governs any
+  shape change). A compensation exists → check whether it is a recorded
+  decision (a rationale comment, an ADR line, a cited pin); if it is,
+  the documented-decision and pin rules above bind — owner's call, not
+  an engineering tidy. Semantics that differ, or a compensation that is
+  not a recorded decision → resolve the intended semantics under §4's
   authority order, from evidence outside either layer's own reading that
   actually discriminates the disputed semantics (an explicit user
   statement, the spec, a parity fixture built against the external
   artifact — not either layer's current behavior), and move every layer
-  to it in one change — never wire through and leave the compensation in
-  place. Semantics you cannot resolve → wire nothing and remove nothing:
-  report both layers' readings and the compensation locus, and escalate.
+  to the resolved semantics in one change — never wire through while a
+  compensation stays in place. Semantics you cannot resolve → wire
+  nothing and remove nothing: report each layer's reading and any
+  compensation locus, and escalate.
   ✅ "the sidebar folds this value into `budget` before the engine ever
   sees it; wiring it through separately would double-count it — resolving
   intended semantics from the parity fixtures first." ❌ "this field is
