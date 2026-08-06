@@ -214,7 +214,18 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   path while the first holds the guard — "impossible" means
   scheduler-enforced non-concurrency, not short runtime. Armed means:
   every inventoried channel emission-positive-verified; no human cleared
-  a prompt mid-run; overlap guarded or scheduler-excluded; the absence
+  a prompt mid-run; the task's tool surface — every tool the run will
+  invoke, derived from the brief or a dry inventory run —
+  pre-allowlisted under a §2 project-policy-scoped standing
+  authorization the owner grants at arming (the agent verifies the
+  allowlist covers that surface and may prepare a draft for the owner —
+  it never grants, activates, or broadens the active authorization; a
+  surface that cannot be fully enumerated leaves the process unarmed),
+  because an interactive permission prompt inside an unattended run can
+  block the pending tool call for hours — a same-day "did it run?"
+  check can still race it — and the unattended session may then abort
+  with zero output, below the layer where any in-task fail-loud
+  instruction could act; overlap guarded or scheduler-excluded; the absence
   alarm below armed, its firing proven once per independently configured
   alarm path (one channel's alert does not prove another's mapping; a
   synthetic destination proves a path only when its routing matches the

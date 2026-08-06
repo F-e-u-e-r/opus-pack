@@ -1072,6 +1072,20 @@ that debt, not an exemption. The protocol body lives in
 2026-07-14 split precedent — boundary-specific protocols out of the lean
 core; the §4 bullet keeps the trigger, the claim, the incident shape, and
 the pointer.
+The pre-allowlist clause folded into that same entry's "Armed means"
+definition (2026-08-04) upgrades a rule this pack already shipped
+unprobed/shape-only to first-party, dated incident evidence: a monthly
+scheduled run's second Bash call — the entire point of the task — issued
+against an unlisted tool, hit an interactive permission prompt with no
+human present, and hung for five hours before the session aborted with
+`AbortError: Tool permission stream closed before response received`. No
+dashboard, no summary, no operator-visible error — the task brief's own
+fail-loud instruction was powerless because the abort happened below the
+layer where the agent ever holds a result to report. Private incident, cited as
+shape; the underlying transcript is verifiable by the contributor, not
+linkable here. Ships `unprobed` per the covenant; its probe joins the
+standing #115 queue — a future campaign, not round-5, which was a
+completed, frozen ten-target slice this rule was not part of.
 The §4 check-name rule (2026-07-22) comes from a private incident: a
 session presented a named CI check as gating a model integration's
 behavior, then read the check's source and found it exercised only a
