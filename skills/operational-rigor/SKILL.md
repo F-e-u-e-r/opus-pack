@@ -1084,7 +1084,8 @@ instruction was powerless because the abort happened below the layer
 where the agent ever holds a result to report. Private incident, cited as
 shape; the underlying transcript is verifiable by the contributor, not
 linkable here. Ships `unprobed` per the covenant; its probe joins the
-private round-5 queue.
+standing #115 queue — a future campaign, not round-5, which was a
+completed, frozen ten-target slice this rule was not part of.
 The §4 check-name rule (2026-07-22) comes from a private incident: a
 session presented a named CI check as gating a model integration's
 behavior, then read the check's source and found it exercised only a
