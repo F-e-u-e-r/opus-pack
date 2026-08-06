@@ -1164,8 +1164,10 @@ that framing would have corrupted output, because the UI layer already
 folded the same-named value into a different field as a compensation — the
 two layers used the identifier to mean opposite things. Resolving the
 intended semantics required an external ground-truth artifact, not either
-layer's own reading. Contributor session, cited as shape; no in-repo probe
-has run — `unprobed` marker.
+layer's own reading. Contributor session, cited as shape. Ships `unprobed`
+per the covenant; its probe joins the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+this rule was not part of.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
