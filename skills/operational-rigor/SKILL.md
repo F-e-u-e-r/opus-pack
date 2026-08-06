@@ -340,6 +340,17 @@ When rigor conflicts with finishing sooner, rigor wins.
   theorizing about internal state. Cheap structural checks precede expensive
   internal ones (five debugging rounds were once spent on framework-state
   theories while the click selector had simply matched a different element).
+  The same cheap-before-expensive discipline applies on the input side
+  (`unprobed` — private incident as shape; see Provenance): a live probe
+  that ran its transition yet shows no failure can be explained as
+  silence from an input that never left its staging layer — committed on
+  blur, gated behind an apply button, debounced — so before recording an
+  integration defect, verify the input actually reached the exercised
+  path (read the state code the field feeds, or drive the exact action
+  that commits it). Only a delivered-input silence is an integration
+  finding; undelivered input is a staging fact, not an integration
+  finding; and delivery you cannot establish stays unproven — file
+  nothing, name the trace or committing action that would settle it.
 - Write 3-5 verifiable acceptance criteria before options/code. Revising criteria
   to fit a favored option is the bias alarm.
 - **Before building an element, name the evidence that it earns its place —
@@ -1250,6 +1261,25 @@ layer's own reading. Contributor session, cited as shape. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue — a future
 campaign, not round-5, which was a completed, frozen ten-target slice
 this rule was not part of.
+
+The §2 input-side clause on the resolved-to-first bullet (2026-08-06) is
+the retained kernel of a fuller §4 bullet proposed in PR #135, folded
+here per that PR's reconciliation disposition: a live banner failed to
+fire for a value the contributor's own tests said must block, read at
+first as an integration gap — two tool calls later, tracing the field to
+its state hook showed it was staged and committed only on an explicit
+action, not wired wrong at all. The original bullet's general
+components were covered by rules landed since (the hypothesis
+discipline by §6; the ordering by this bullet's own
+cheap-before-expensive line), while the delivery-vs-wiring suspect pair
+is what this clause retains — §4's failing-check rule covers a
+different pair (code vs check) and does not reach a silent probe. The
+input-side direction, the staging-layer mechanism class, and the
+delivery terminals ship here. Private incident, cited as shape;
+the underlying session is verifiable by the contributor, not linkable
+here. Ships `unprobed` per the covenant; its probe joins the standing
+#115 queue — a future campaign, not round-5, which was a completed,
+frozen ten-target slice this rule was not part of.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
