@@ -44,6 +44,39 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   asks for, never a default you drift into — and the reverse holds: a
   scoped review USES the system model and notes its gaps; it does not
   balloon into whole-system modelling nobody asked for.
+  For the unknown-provenance case the peripheral/inspection split
+  leaves open — whenever you inspect committed data files, fixtures, or
+  examples, during modelling or any review (`unprobed` — contributor
+  incident as shape; see Provenance) — an untagged sample, demo, or
+  fixture VALUE is treated as real until a value-level
+  synthetic-provenance tag or the owner's word shows it synthetic. A
+  name is not provenance — `examples/`, `sample`, `demo`, a field
+  called `placeholder`, a README describing one, all record what the
+  author INTENDED a value to be, never what it is, and real personal
+  data lands there by the ordinary route, because someone needed a case
+  that worked end to end. Classify by field shape: a single field whose
+  shape matches a sensitive class — contact details, government or
+  account identifiers, dates of birth, health or financial free text —
+  counts; co-occurrence (a name field beside an ID-pattern field beside
+  a date of birth) strengthens the signal, it is not a required
+  conjunction. Work from a scan whose only agent-visible output is
+  field, match class, and count — never a matched value or line — so
+  the never-read-the-contents rule at the top of this list still
+  governs anything credential-shaped. A scan hit on an untagged value
+  is not itself the verdict — it is the ESCALATION: report field,
+  class, and count to the user, who may confirm provenance. A
+  retroactive tag RECORDS provenance the owner has confirmed; it never
+  substitutes for that confirmation — at mint, tag as you synthesize.
+  The presumption is discharged by a value-level synthetic-provenance
+  tag or by the owner's word, never by the scan, which sees shape and
+  not provenance. A no-hit leaves the presumption standing with
+  nothing to escalate; an unanswered escalation stays open, the
+  presumption with it. Until discharged it sets triage order, not
+  severity: findings rate on the ladder below from the evidenced path,
+  under the presumption. Minting synthetic values with
+  an in-value tag (ground-truth-gates' sentinel-tagged fixtures) makes
+  provenance one grep WHERE a suite was so minted — outside one, a
+  missing tag proves nothing and the presumption stands.
 - Severity ladder — use these words consistently:
   - **Critical** — exploitable now with data loss/account takeover; stop and fix.
   - **High** — must fix before production exposure.
@@ -563,6 +596,23 @@ section's least-privilege ladder left open — scoping bounds what a tool MAY
 change, not whether you can observe what it did. Surfaced by a cross-family
 review (gpt-5.6-luna) that caught it where a first pass had wrongly judged it
 already covered by least-privilege plus fail-closed-on-unknown. Ships `unprobed`
+per the covenant; its probe joins the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+this rule was not part of.
+
+The threat-model bullet's untagged-example clause (2026-08-04) comes from a
+contributor incident (contributor-reported, not linkable): a PII sweep over a
+private automation repo cleared an `examples/*.json` fixture on the strength
+of its path and a README calling it a placeholder; it held a real family —
+names, national ID numbers, dates of birth — used once because a working
+end-to-end case was needed, and a path-based skip would have shipped it. The
+incident evidences the default direction only; the non-ingesting
+classification method, the escalation exit that routes discharge to
+the owner, and the tag-at-mint pointer are this pack's reconciliation
+with the never-read-contents rule and with ground-truth-gates' sentinel
+bound, not incident findings — the contributor in fact established
+provenance by reading the values, which is the route this clause routes
+to the owner instead. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue — a future
 campaign, not round-5, which was a completed, frozen ten-target slice
 this rule was not part of.
