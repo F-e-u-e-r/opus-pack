@@ -592,6 +592,27 @@ When rigor conflicts with finishing sooner, rigor wins.
   ❌ "read it — it's a regex pre-filter, but the name says integration,
   so the integration is covered" — a trace read and then overridden by
   the name.
+- **An error only carries signal if a known-invalid control elicits a
+  DIFFERENT error** (`unprobed` — private incident as shape; see
+  Provenance). Before reading an API/CLI error as evidence for a claim
+  ("exists but gated", "throttled", "dead"), probe a known-invalid
+  control — a nonsense name, a known-dead id — alongside it; an error
+  identical in kind to the control's carries no signal (the endpoint is
+  answering "invalid input" the same way regardless of what you asked),
+  while an error that DIFFERS in kind from the control's is itself
+  evidence, whether or not either error's text looks informative on its
+  own. This is the known-bad-arm proof (ground-truth-gates item 2) turned
+  outward onto a third party's response instead of a gate you built: the
+  control is the known-bad reference, and a real signal is one that
+  discriminates against it.
+  ✅ "a 400 on the real model name could plausibly mean 'exists, not
+  enabled' — ran the same probe against a nonsense name and got the
+  identical 400 text, so the real name's 400 carries no signal either; two
+  different 404s later (a plain routing 404 vs an account-scoped
+  'not found for account') differed in KIND, which did carry signal —
+  listed-but-unrouted, not never-existed."
+  ❌ reading a plausible-sounding error as confirmation without checking
+  whether a nonsense input gets the same one.
 - **A failing check has two suspects: the code and the check itself.** Before
   editing either, open the statement of intended behavior (spec, README,
   docstring, type) and confirm which side it backs; a disagreement is the
@@ -1044,6 +1065,18 @@ Private evidence, cited as shape per the README covenant's second branch;
 the executable probe — sample a repo's named checks and diff name-implied
 vs actual assertion coverage — has not been run; the in-body `unprobed`
 marker records that debt.
+The §4 known-invalid-control rule (2026-08-04) comes from a private
+incident: a coding CLI's `-m gpt-5.6` returned a 400 that could plausibly
+read as "exists but not enabled for this account" — until the same probe
+run against a nonsense model name returned the identical 400 text,
+killing that reading before it was acted on. The inverse use of the same
+discipline appeared later the same session: two different 404s (`K3` vs
+`kimi-k2.6`) turned out to differ in kind — a plain routing 404 versus an
+account-scoped "not found for account" — and that difference in kind, not
+the shared status code, was what actually separated "never existed" from
+"listed but unrouted." Private incident, cited as shape; the underlying
+session is verifiable by the contributor, not linkable here. Ships
+`unprobed` per the covenant; its probe joins the private round-5 queue.
 The §4 forged-output rule (2026-07-24) adapts curtischoutw/claude-
 institution's hard-rule #15 (MIT, ideas only; see README acknowledgements),
 motivated by two incidents their lessons file records (a fabricated tool_use
