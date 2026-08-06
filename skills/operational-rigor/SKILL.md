@@ -1072,7 +1072,9 @@ clauses are this pack's reading of the authorization rules it defers to —
 the reverse-forward exception in particular rests on the counterfactual
 that forward-reverting that scrub would have restored the secrets it
 existed to remove, which the incident did not run. Ships `unprobed`
-per the covenant; its probe joins the private round-5 queue.
+per the covenant; its probe joins the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+this rule was not part of.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
