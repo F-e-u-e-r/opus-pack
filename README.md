@@ -782,8 +782,12 @@ This pack distills and adapts ideas from:
     self-severing-command one-way-door (`operational-rigor`) and the
     crowded-catalog trigger-degradation ladder (`skill-authoring`).
   - [`gsd-build/get-shit-done`](https://github.com/gsd-build/get-shit-done)
-    (MIT) — the Unicode Tag Block gap it surfaced in the hidden-directive sweep,
-    fixed in `operational-rigor` §2 and in this repo's own `.github/checks.py`.
+    (MIT; upstream archived — successor `open-gsd/gsd-core`) — the Unicode Tag
+    Block gap it surfaced in the hidden-directive sweep, fixed in
+    `operational-rigor` §2 and in this repo's own `.github/checks.py`; and the
+    experiment-integrity set (arm-environment inventory, cross-arm attrition
+    parity, finding placement, configuration binding) adapted into
+    `ground-truth-gates`.
   - [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)
     (MIT declared in its README, no LICENSE file — ideas only) — co-source of the
     mechanical-gate-separate-from-model-judgment framing (`ground-truth-gates`).

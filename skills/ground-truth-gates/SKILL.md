@@ -109,7 +109,12 @@ discriminating evidence — halt there and report "untestable at this
 tier/difficulty" as a valid outcome instead of publishing a null; between
 those extremes, compare the pre-registered per-arm scores (arms clearing a
 shared gate at different scores is still a result). Grade blind to which
-arm produced each output.
+arm produced each output. And the verdict is bound to the provider, model
+tier, and configuration the arms actually ran on: an effect can shrink,
+vanish, or invert across configurations, so generalizing to another
+provider, tier, or configuration takes its own runs there — same-family
+or similar-name inference is not parity evidence. (`unprobed` — see
+Provenance.)
 
 The same calibration discipline applies within one arm across time
 (`unprobed` — contributor incident as shape; see Provenance). A
@@ -126,6 +131,35 @@ unreplicated result becomes an unfalsifiable one.
 ❌ "30/30, no thinking step — make it the default." Replicated to N=4 the
 same candidate scored 30/30/20/29, failing twice by mechanisms the first run
 never produced.
+
+**Arms share one runner — inventory its environment, or the harness is a
+second treatment** (`unprobed` — see Provenance). The runner's own
+standing environment — always-on hooks, injected rules or instruction
+files, wrapper behavior, permissions, tool availability, harness
+configuration — reaches the arms it runs; anything reaching some arms and
+not others is an untracked treatment riding on the comparison, and "same
+runner" by name establishes nothing (one runner name can load different
+hooks or configuration per invocation). Before scoring: enumerate the
+runner-level surfaces that can act on any arm, then hold each identical
+across arms or record the difference as a condition carried by the
+result.
+❌ "both arms ran in my session, so conditions matched" — the session's
+always-on hook fired inside the baseline arm and not the isolated
+treatment arm, so the comparison measured hook-plus-baseline against
+treatment.
+
+**Exclusions and lost runs follow one rule set across arms** (`unprobed`
+— see Provenance). Eligibility, exclusion, and re-run rules are declared
+once and applied identically to every arm — the NOT-ARMED discipline of
+rule 2 below included. Equal final N is not required; per-arm attrition
+accounting is: started / excluded-with-reason / scored, so an unequal N
+is explainable arm by arm, and an unexplained per-arm gap blocks the
+comparison. An exclusion mechanism correlated with one arm's treatment —
+the treatment crashing exactly the runs it would have failed — biases
+every surviving score; name that asymmetry in the result rather than
+averaging over it.
+❌ "dropped three malformed runs" — all three sat in one arm, and the
+malformation was that arm's own failure signature.
 
 **replay:** replace `replay/corpus.jsonl` with a representative sample of
 real logged inputs. Replace `transform()` with the step being changed. Run
@@ -564,11 +598,17 @@ enforces one at runtime — and has its own failure design:
   unparseable *command*, while a malformed envelope or other internal error still
   fails open — a documented gap to narrow, never a licence to widen. Keep that
   fail-open surface minimal. A purely-advisory guard (telemetry) may fail open
-  freely; when unsure, treat it as fail-closed. ✅ "the credential gate blocks the
-  deletion it detects and raw-scans an unparseable command; its malformed-envelope
-  path fails open today — a disclosed gap." ❌ "the hook is flaky and blocks my
-  commands, so I'll make it fail-open" — that converts a guard into a
-  rationalized bypass.
+  freely; when unsure, treat it as fail-closed. And the direction is only
+  half the design — place the finding too: the guard's block or detection
+  must land on a decision surface that can act on it (an actor who can
+  change the input, stop the run, or authorize — not only a log nobody
+  routes on); a deny nobody receives has a fail direction but no failure
+  route, so placement and route are designed together. (`unprobed` — see
+  Provenance.)
+  ✅ "the credential gate blocks the deletion it detects and raw-scans an
+  unparseable command; its malformed-envelope path fails open today — a
+  disclosed gap." ❌ "the hook is flaky and blocks my commands, so I'll make
+  it fail-open" — that converts a guard into a rationalized bypass.
 - **A detector's positives come from the corpus it will guard, not from the
   author's examples of them** (`unprobed` — two contributor incidents as shape;
   see Provenance). A guard that classifies real material — a secret scanner, a
@@ -861,6 +901,17 @@ quantities sharing one hand-typed value by coincidence, renamed apart to
 stop future conflation. Ships `unprobed` per the covenant; their probes
 join the standing #115 queue — a future campaign, not round-5, which was
 a completed, frozen ten-target slice these rules were not part of.
+The experiment-grader arm-environment and attrition-parity rules, the
+calibration block's configuration-binding clause, and the fail-direction
+bullet's placement clause (2026-08-06) adapt four disciplines mined from
+gsd-build/get-shit-done (MIT, ideas only, no text; upstream archived —
+successor open-gsd/gsd-core; see README acknowledgements) in the
+2026-08-02 dual-model mining evaluation of owner-named repositories, and
+kept through a 2026-08-06 re-verification pass in which two model
+families converged on all four dispositions against the then-current
+main. All four ship `unprobed` per the covenant; their probes join the
+standing #115 queue — a future campaign, not round-5, which was a
+completed, frozen ten-target slice these rules were not part of.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
