@@ -136,17 +136,27 @@ Summarize insights with links; never vendor code or copy positioning wholesale.
 - *Needs information* — the question, why it matters, and the safe default
   if unanswered.
 
-Tasks carry their blocking edges — a compact `blocked-by:` line per
-task naming the tasks (or user/info items) that must land first, and a
-`[P]` mark on tasks safe to run in parallel (no shared edge, no shared
-files); dispatch order is derived from the edges, never from list
-position alone. Edges are lines in the task list, not a separate
-artifact: no graph file, no dependency tooling, no status tracker —
-sequencing detail beyond the edges belongs to delegation-and-review
-§2's packet fields. An edge you cannot name is a discovered unknown:
-park that task in Later with the unknown named rather than dispatching
-it on a guessed order. (`unprobed` — see Provenance.)
-❌ five tasks all reading "no dependencies" while task 3 edits the
+Tasks carry their blocking edges (`unprobed` — see Provenance). When
+emitting the tasks above: give each task a stable short reference (an
+id or unique short name); under each task write one compact
+`blocked-by: <refs>` line — `blocked-by: none` when nothing blocks it —
+naming, by those references, the tasks or user/info items that must
+land first; mark `[P]` only where tasks share no blocking edge AND no
+files (technical independence only — dispatch-time wave limits stay
+delegation-and-review §1's bounded fan-out); derive dispatch order from
+the edges, never from list position. Edges stay inline in the task
+list — no graph file, no dependency tooling, no status tracker; deeper
+per-task sequencing belongs to the dispatch packet
+(delegation-and-review §2) at dispatch time, not to the roadmap. Fail
+states are explicit: an edge you cannot name is a discovered unknown —
+park that task in Later with the unknown named (§3's
+parked-with-trigger convention), never dispatch on a guessed order; a
+cycle or contradictory pair of edges is a plan defect — re-slice the
+tasks to break it, or park the cycle's members the same way. Done when
+every Now task carries its `blocked-by:` line and every `[P]` is
+verified independent.
+✅ "T3 auth API — blocked-by: T1. T4 docs page — blocked-by: none [P]".
+❌ five tasks all reading "blocked-by: none" while task 3 edits the
 schema task 1 creates — the missing edge surfaces as a merge conflict
 or a broken dispatch, not as planning.
 
