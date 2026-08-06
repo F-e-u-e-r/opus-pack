@@ -421,22 +421,28 @@ When rigor conflicts with finishing sooner, rigor wins.
   check defaults to human-owned and stays — reported, not removed.
 - **A rollback ORDER is authority; the causal claim attached to it is
   still a report** (`unprobed` — contributor incident as shape; see
-  Provenance). "It broke after your change" carries an instruction and an
-  attribution. The instruction stands on the user's authority: your own
-  diagnostic scopes the reversal, it never decides WHETHER to perform
-  one — investigating first to settle whether they were right inverts the
-  grant. (Contrast delegation-and-review §3, where a SUBORDINATE's
-  unreproduced RED licenses no revert at all: there the claim is the whole
-  basis for acting, here it rides along with a grant that stands without
-  it. §2 is untouched either way — a reversal still owes, among the rest,
-  its checkpoint, its one-at-a-time handling, and its `AUTH:` line; what
-  may not gate the rollback is the diagnostic, never the safety gate.)
+  Provenance). "It broke after your change — revert it" carries an
+  instruction and an attribution; the attribution alone, with no order
+  attached, authorizes nothing. The instruction stands on the user's
+  authority: your own diagnostic scopes the reversal, it never decides
+  WHETHER to perform one — investigating first to settle whether they
+  were right inverts the grant. (Contrast delegation-and-review §3, where
+  a SUBORDINATE's unreproduced RED licenses no revert at all: there the
+  claim is the whole basis for acting, here it rides along with a grant
+  that stands without it. §2 is untouched either way — a reversal still
+  owes, among the rest, its checkpoint, its one-at-a-time handling, and
+  its `AUTH:` line: the diagnostic may not gate the rollback; §2's safety
+  gates still do. Nor is an ordered reversal the fix §6 defers behind
+  cause-finding — §6's elimination runs on the residual symptom alongside
+  or after the scoped reverse and never gates whether it proceeds.)
   The attribution is evidence of sequence, not of cause, so scope the
   reversal by what can actually reach the reported symptom rather than by
   everything the task touched, and run the diagnostic alongside. Proof of
   non-reachability is an observation an auditor can re-run — no byte the
   runtime reads changed, no call site reaches it — never an argument from
-  timing or plausibility. Both filters apply to a rollback and neither
+  timing or plausibility; a component whose reachability stays unproven
+  stays inside the ordered scope — exclusion rides on that proof, not on
+  doubt. Both filters apply to a rollback and neither
   substitutes: provenance (the bullet above) bounds what you MAY reverse,
   reachability what you SHOULD. Separately and sufficiently on its own:
   hold and NAME any component whose reversal destroys state the reversal
@@ -446,15 +452,20 @@ When rigor conflicts with finishing sooner, rigor wins.
   user's call. Any component the order covered that you did not reverse is
   named, on whichever ground excluded it; retaining silently is the same
   failure as reverting silently, and both end in a report line (§5's
-  artifact gate). Reverse forward — a revert commit, not a history edit —
-  unless the change existed to remove content from history, where a
-  forward revert restores precisely what it destroyed. And when the true
-  cause later surfaces elsewhere, say so: an unnecessary reversal nobody
-  names leaves the change wearing the blame in the next session's record.
+  artifact gate). Reverse forward — a revert commit, or a restore from
+  the §2 checkpoint where the work is still uncommitted, never a history
+  edit. A change that existed to remove content from history gets no
+  automatic reverse on any path — a forward revert would restore
+  precisely what it destroyed — so it stays held and named under the
+  clause above. And when the true cause later surfaces elsewhere, say so
+  in that session's report — an owed line (§5's artifact gate): an
+  unnecessary reversal nobody names leaves the change wearing the blame
+  in the next session's record.
   ✅ "Reverted on your order under a checkpoint (AUTH line recorded). Held
-  back the history scrub and naming it here: reverting it would re-publish
-  the secrets, and it changed no byte any script reads. Diagnostic ran
-  alongside — it clears the two files you'd expect."
+  back the history scrub and naming it here: reverting it would
+  re-publish the secrets, and it changed no byte any script reads.
+  Diagnostic ran alongside — no call site in the scheduled path reads the
+  two files you flagged."
   ❌ "the user said revert, so I reverted the whole batch" — including
   the secret scrub, which put the secrets back in history.
 
@@ -739,7 +750,8 @@ When rigor conflicts with finishing sooner, rigor wins.
   line; the compaction word-diff record (skill-authoring §7); the
   dup-check result line (skill-authoring §5); the target-runtime line
   of a skill review record (skill-authoring §6); the held-out-reversal
-  naming (§3's rollback-order rule); the
+  naming and the unnecessary-reversal disclosure (§3's rollback-order
+  rule); the
   residual-risk statement. For each
   owed line that is missing, first confirm the underlying work actually
   happened — if it did, add the line; if it did not, do the work now or
@@ -1069,7 +1081,7 @@ working-tree file the runtime reads had changed. The scoping and
 hold-and-name clauses are what that incident evidences directly; the
 order-stands-without-the-diagnostic, reverse-forward, and later-disclosure
 clauses are this pack's reading of the authorization rules it defers to —
-the reverse-forward exception in particular rests on the counterfactual
+the history-removal carve-out in particular rests on the counterfactual
 that forward-reverting that scrub would have restored the secrets it
 existed to remove, which the incident did not run. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue — a future
