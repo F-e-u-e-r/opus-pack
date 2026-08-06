@@ -787,7 +787,9 @@ This pack distills and adapts ideas from:
     `operational-rigor` §2 and in this repo's own `.github/checks.py`; and the
     experiment-integrity set (arm-environment inventory, cross-arm attrition
     parity, finding placement, configuration binding) adapted into
-    `ground-truth-gates`.
+    `ground-truth-gates`; and the checkpoint-batching cost discipline with
+    its never-batch authorization carve-outs, plus the never-write-the-
+    human's-reply boundary, adapted into `delegation-and-review`.
   - [`vercel-labs/agent-skills`](https://github.com/vercel-labs/agent-skills)
     (MIT declared in its README, no LICENSE file — ideas only) — co-source of the
     mechanical-gate-separate-from-model-judgment framing (`ground-truth-gates`).
