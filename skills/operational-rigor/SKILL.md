@@ -434,11 +434,15 @@ When rigor conflicts with finishing sooner, rigor wins.
   the wire, then close by what you found. Same semantics at every layer,
   no compensation, and a reproduction showing the intended result → that
   licenses the wire (the call-site-sweep rule above still governs any
-  shape change). A compensation exists → check whether it is a recorded
-  decision (a rationale comment, an ADR line, a cited pin); if it is,
-  the documented-decision and pin rules above bind — owner's call, not
-  an engineering tidy. Semantics that differ, or a compensation that is
-  not a recorded decision → resolve the intended semantics under §4's
+  shape change); a reproduction that does not show the intended result
+  falsifies the claimed same-semantics reading — route it to the differ
+  or cannot-resolve close, and do not wire. A compensation exists →
+  check whether it is a recorded decision (a rationale comment, an ADR
+  line, a cited pin); if it is, the documented-decision and pin rules
+  above bind — owner's call, not an engineering tidy — and that close
+  takes precedence over the rest. Semantics that differ with no recorded
+  compensation, or a compensation that is not a recorded decision →
+  resolve the intended semantics under §4's
   authority order, from evidence outside either layer's own reading that
   actually discriminates the disputed semantics (an explicit user
   statement, the spec, a parity fixture built against the external
