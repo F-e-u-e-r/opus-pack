@@ -423,24 +423,34 @@ When rigor conflicts with finishing sooner, rigor wins.
   account, bot identity) is a behavior change with no code diff: it can add or
   drop downstream triggers, permissions, and rate-limit buckets — after any
   credential/identity swap, enumerate what keys off that identity and verify each.
-- **The same field name can mean opposite things at different layers — a
+- **The same field name can mean different things at different layers — a
   "defined but never wired" field is not automatically a wiring bug.**
   Before connecting a dangling input through, verify the identifier means
   the same thing at every layer it touches: a UI layer may already be
   compensating for the missing wire (folding the value into another field
   it does update), so wiring the dangling field through on top of that
-  compensation double-counts it rather than fixing anything. Reproduce the
-  numeric or behavioral consequence of wiring it before recommending the
-  wire; if a compensation exists, locate it, then resolve the intended
-  semantics from one authoritative external source (a spec, a parity
-  fixture, the artifact being matched) and move every layer to it in one
-  change — never wire through and leave the compensation in place. ✅ "the
-  sidebar folds this value into `budget` before the engine ever sees it;
-  wiring it through separately would double-count it — resolving intended
-  semantics from the parity fixtures first." ❌ "this field is declared but
-  never passed to the engine — wiring it through" without checking what
-  already reads or compensates for its absence. (`unprobed` — see
-  Provenance.)
+  compensation double-counts it rather than fixing anything. Reproduce
+  the numeric or behavioral consequence of wiring it before recommending
+  the wire, then close by what you found. Same semantics at every layer
+  and no compensation → the reproduced consequence licenses the wire
+  (the call-site-sweep rule above still governs any shape change). A
+  compensation exists → first check whether it is a recorded decision — a
+  rationale comment, an ADR line, a cited pin: then the
+  documented-decision and pin rules above bind (owner's call, not an
+  engineering tidy). Otherwise resolve the intended semantics under §4's
+  authority order, from evidence outside either layer's own reading that
+  actually discriminates the disputed semantics (an explicit user
+  statement, the spec, a parity fixture built against the external
+  artifact — not either layer's current behavior), and move every layer
+  to it in one change — never wire through and leave the compensation in
+  place. Semantics you cannot resolve → wire nothing and remove nothing:
+  report both layers' readings and the compensation locus, and escalate.
+  ✅ "the sidebar folds this value into `budget` before the engine ever
+  sees it; wiring it through separately would double-count it — resolving
+  intended semantics from the parity fixtures first." ❌ "this field is
+  declared but never passed to the engine — wiring it through" without
+  checking what already reads or compensates for its absence. (`unprobed`
+  — see Provenance.)
 - **In a first-match classifier or sequential-replace chain, pattern ORDER is a
   load-bearing invariant.** More-specific must precede broader — a broad pattern
   placed first shadows the specific one silently (a generic digit-run redactor
