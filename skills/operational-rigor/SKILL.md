@@ -592,25 +592,38 @@ When rigor conflicts with finishing sooner, rigor wins.
   ❌ "read it — it's a regex pre-filter, but the name says integration,
   so the integration is covered" — a trace read and then overridden by
   the name.
-- **An error only carries signal if a known-invalid control elicits a
-  DIFFERENT error** (`unprobed` — private incident as shape; see
-  Provenance). Before reading an API/CLI error as evidence for a claim
-  ("exists but gated", "throttled", "dead"), probe a known-invalid
-  control — a nonsense name, a known-dead id — alongside it; an error
-  identical in kind to the control's carries no signal (the endpoint is
-  answering "invalid input" the same way regardless of what you asked),
-  while an error that DIFFERS in kind from the control's is itself
-  evidence, whether or not either error's text looks informative on its
-  own. This is the known-bad-arm proof (ground-truth-gates item 2) turned
-  outward onto a third party's response instead of a gate you built: the
+- **An error is signal only against a comparable known-invalid control —
+  identical in kind means no signal** (`unprobed` — private incident as
+  shape; see Provenance). Before reading an API/CLI error as evidence
+  for a claim ("exists but gated", "throttled", "dead"), probe a
+  known-invalid control — a nonsense name, a known-dead id — alongside
+  it, through the same path, auth class, and decision surface. Kind
+  means the error's class or shape — status plus code/template/body
+  class — not status alone, and not byte-identical text (the same
+  template with different fill-ins is the same kind); a difference you
+  cannot classify is unknown, not signal. An error identical in kind to
+  the control's carries no signal (the endpoint is answering "invalid
+  input" the same way regardless of what you asked). An error that
+  DIFFERS in kind is evidence of exactly one thing: the endpoint
+  handled your input differently from the control — a specific story
+  ("exists but gated", "listed but unrouted") needs further probes or
+  provider-documented semantics for that distinctive shape, named as a
+  further reading. And when no control can be constructed, or the
+  control fails before reaching the same decision surface (a network
+  error, an auth wall ahead of routing), the target error is unprobed
+  for the claim — fail closed and say what control is missing. This is
+  the known-bad-arm proof (ground-truth-gates item 2) turned outward
+  onto a third party's response instead of a gate you built: the
   control is the known-bad reference, and a real signal is one that
   discriminates against it.
   ✅ "a 400 on the real model name could plausibly mean 'exists, not
   enabled' — ran the same probe against a nonsense name and got the
-  identical 400 text, so the real name's 400 carries no signal either; two
-  different 404s later (a plain routing 404 vs an account-scoped
-  'not found for account') differed in KIND, which did carry signal —
-  listed-but-unrouted, not never-existed."
+  identical 400 text, so the real name's 400 carries no signal either;
+  two different 404s later (a plain routing 404 vs an account-scoped
+  'not found for account') differed in KIND — that difference alone
+  established only distinct handling, and the listed-but-unrouted
+  reading came from the account-scoped error's documented meaning, on
+  top of the discrimination."
   ❌ reading a plausible-sounding error as confirmation without checking
   whether a nonsense input gets the same one.
 - **A failing check has two suspects: the code and the check itself.** Before
@@ -1072,9 +1085,10 @@ run against a nonsense model name returned the identical 400 text,
 killing that reading before it was acted on. The inverse use of the same
 discipline appeared later the same session: two different 404s (`K3` vs
 `kimi-k2.6`) turned out to differ in kind — a plain routing 404 versus an
-account-scoped "not found for account" — and that difference in kind, not
-the shared status code, was what actually separated "never existed" from
-"listed but unrouted." Private incident, cited as shape; the underlying
+account-scoped "not found for account" — and that difference in kind,
+read with the account-scoped error's own wording, was what separated
+"never existed" from "listed but unrouted," not the shared status code.
+Private incident, cited as shape; the underlying
 session is verifiable by the contributor, not linkable here. Ships
 `unprobed` per the covenant; its probe joins the standing #115 queue — a
 future campaign, not round-5, which was a completed, frozen ten-target
