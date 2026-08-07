@@ -476,6 +476,31 @@ axes, treat it as load-bearing — the pass fails closed.
 
 ## 5. Skill-set design
 
+- **A skill earns existence before it earns content** (`unprobed` — see
+  Provenance). Integrity checks — references resolve, no collisions,
+  adversarial review rounds pass, CI green — verify a candidate is
+  internally sound; none of them verify it should exist. Run a separate
+  existence gate before drafting, on two independent axes, either of
+  which alone is disqualifying: **demand** — at least two mutually
+  independent, non-synthetic, candidate-specific usage scenarios found by
+  an exhaustive read-only sweep of the evidence that would carry them (past
+  incidents, session history, open issues/PRs), not one incident
+  reinterpreted twice; and **routing** — a natural-language prompt a user
+  or agent would actually write reaches this skill over its siblings
+  without stacking multiple qualifiers to rule out everything else. A
+  prompt that only routes correctly once several conditions are named
+  together is evidence the capability already routes elsewhere by its
+  strongest single qualifier, and the candidate is redundant with that
+  sibling rather than a skill in its own right. A residual-value check
+  closes it: once any single-qualifier surface is credited to the sibling
+  that already owns it, does what remains still distinguish the skill's
+  central claim from doing nothing? If the answer is no, the candidate is
+  dead on arrival regardless of how well it is built.
+  ❌ "the demand scenario is our own project's source incident" — one
+  incident interpreted as multiple demand hits is not independent demand.
+  ❌ "it routes correctly when a user asks for hygiene AND audit AND debt
+  AND binary-drift scanning all at once" — the winning prompt is the full
+  qualifier stack, the pre-registered kill signal, not a routing win.
 - One skill, one topic; no duplicate homes for a fact — cross-reference the
   sibling instead. Each skill states **when NOT to use it** and which sibling
   to use.
@@ -1396,3 +1421,19 @@ underlying session is verifiable by the contributor, not linkable here.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
+The §5 demand+routing existence gate (2026-08-07) comes from a
+contributor's own staged skill candidate, closed by the pack's owner
+after a three-axis review: an exhaustive read-only sweep across the
+candidate's PRs/issues, review history, and a private routing corpus
+found exactly one demand hit, and that hit's actual driver was a
+different, already-published sibling's intent — the residual classes
+were incidental findings alongside it, not independent demand; each
+residual class individually routed to an existing sibling by its
+strongest single qualifier, and the only prompt that reached the
+candidate needed all of them stacked at once. The candidate had passed
+every integrity check (references resolved, no collisions, three
+adversarial review rounds green, CI green) and was still correctly
+killed, because none of those checks test existence. Contributor-
+reported, not linkable; the underlying disposition is the owner's own
+public review comment on the closed PR. Ships `unprobed` per the
+covenant; its probe joins the standing #115 queue.
