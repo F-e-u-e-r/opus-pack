@@ -144,6 +144,12 @@ irreproducible-false-positive bucket, which is for findings that do not
 reproduce at all. Non-applicability is severity evidence, not ownership
 evidence: a latent path the branch itself introduces stays its own
 must-fix however empty today's store is — deployment catches up.
+The same applies to the deployment **platform**, not just its data: a
+severity claim can be version-conditional (measured: a reviewer's top P1
+"prints ALL GREEN with zero gates" held only on bash >=4.4 — on the machine
+it described, bash 3.2 crashed instead). Reproduce on the environment the
+code actually runs on before relaying the severity; "reproduced somewhere"
+is not "reproduced where it ships".
 neg: filing a reviewer's "P1, not merge-ready" against a refactor for a quirk
 that reproduces identically on the merge-base — the review still pays off (spin
 the quirk off as its own fix), but the branch is clean and the label was
