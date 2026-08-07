@@ -77,6 +77,22 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   an in-value tag (ground-truth-gates' sentinel-tagged fixtures) makes
   provenance one grep WHERE a suite was so minted — outside one, a
   missing tag proves nothing and the presumption stands.
+- **Scanner and guard design inherits name-is-not-provenance at the value
+  level.** A suppression or allowlist keyed on LINE context re-encodes
+  name-as-provenance as code: a format-valid key is real however much prose
+  sits beside it, so placeholder tests run against the matched value only,
+  never the line (measured 2026-08-07: a secret scanner whose placeholder
+  test ran against the whole line scored a real AKIA-shaped key 0 actionable
+  because a trailing comment said "example" — three adversarial review
+  rounds had passed it). Two corollaries from the same incident cluster:
+  a scanner or test that embeds credential-shaped literals as fixtures will
+  trip every OTHER guard that greps text it passes through (a fail-closed
+  vault-sync guard blocked on exactly this) — source-split the literal
+  (`"SNTL7Q-" + "realpass99"`) so the runtime value survives while the
+  at-rest text no longer matches; and a clean working-tree scan discharges
+  nothing about git history — the burned-secret rule below exists because
+  the one credential verified still live in the incident record existed
+  ONLY in history. Scope claims name what was scanned.
 - Severity ladder — use these words consistently:
   - **Critical** — exploitable now with data loss/account takeover; stop and fix.
   - **High** — must fix before production exposure.
