@@ -801,19 +801,26 @@ When rigor conflicts with finishing sooner, rigor wins.
   minimize-by-type).
 - **A recorded claim about mutable repo/workflow state decays — re-check the
   live source before repeating it, not just before acting on it**
-  (`unprobed` — private incident as shape; see Provenance). A PR's open/
-  merged/closed status, a branch's current head, an issue's state: each is
-  a fact about something that changes on someone else's schedule, and a
-  session that reads it once and carries the reading forward in notes or a
-  report is stating a stale fact as current. This differs from
-  delegation-and-review's pinned-model-string rule — that one covers a
-  hosted endpoint's *behavior* drifting under a fixed identifier; this one
-  covers a repo's *administrative state* drifting under a fixed reference
-  (a PR number, a branch name) — the two decay on different clocks and
-  need separate re-checks. Before repeating a stored state claim in a
-  report or using it to decide a next step, re-query the live source (`gh
-  pr list`, `git ls-remote`, the issue tracker) rather than trusting the
-  last-known reading, however recently it was taken.
+  (`unprobed` — private incident as shape; see Provenance). This is §3's
+  factual-claims-decay principle (a recorded fact, not a decision, expires)
+  applied to repo/workflow administrative state specifically: a PR's open/
+  merged/closed status, a branch's current head, an issue's state each
+  changes on someone else's schedule, and a session that reads it once and
+  carries the reading forward in notes or a report is stating a stale fact
+  as current. This differs from delegation-and-review's pinned-model-string
+  rule not just in domain but in mechanism: that rule requires re-running a
+  measurement (a probe/battery) because the property has no cheaper ground
+  truth, with an explicit adverse-assumption fallback when the probe is
+  unavailable. This rule requires a plain re-query of an authoritative
+  source (`gh pr list`, `git ls-remote`) because the fact IS the ground
+  truth and re-reading it is cheap — no probe, no fallback protocol needed
+  beyond "query again." Before repeating a stored state claim in a report
+  or using it to decide a next step, re-query the live source rather than
+  trusting the last-known reading, however recently it was taken.
+  Re-query fails or the source is unreachable → the state is unknown, not
+  the last-known reading; label it as unconfirmed / last-checked-<date> in
+  the report rather than repeating it as current, per this section's
+  fail-closed rule above.
   ✅ "re-ran `gh pr list` before writing this status line — two of the
   five PRs I had recorded as open merged since the last check."
   ❌ repeating "PR #44 is open" in a new report because that was true
@@ -1308,8 +1315,9 @@ that re-queried the live source and found the recorded state two days
 out of date. Distinguished at drafting time from delegation-and-review's
 existing pinned-model-string rule, which covers a different clock
 (hosted-endpoint behavior drift, not repo-administrative-state drift) —
-checked against that file's current text before writing this one to
-avoid restating it under different wording. Ships `unprobed` per the
+checked against both delegation-and-review's pinned-model-string rule and
+this file's own §3 factual-claims-decay clause before writing this one, to
+avoid restating either under different wording. Ships `unprobed` per the
 covenant; its probe joins the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
