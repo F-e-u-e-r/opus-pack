@@ -469,24 +469,32 @@ axes, treat it as load-bearing — the pass fails closed.
   occurrence is an anecdote; two is a pattern.
 - **Placement test** for any new rule: can it be a hook (machine-enforced)?
   If not, can it live on-demand (skill / fix log)? Only when both answers
-  are no does it earn an always-loaded line.
-- **A rule earning an always-loaded line still owes a second placement
-  question: which existing bullet does it belong inside?** (`unprobed` —
-  private incident as shape; see Provenance.) Default to folding a new
-  clause into the host bullet that already owns its topic — a trailing
-  sentence, an added example, an extra clause — over adding a sibling
-  bullet next to it; a standalone new bullet is the fallback for content
-  with no existing host, not the default shape for every addition. Two
-  reviewed drafts each placed a rule wrong — one in the wrong SECTION
-  entirely (caught before merge), one as a correctly-sectioned but
-  unnecessary standalone bullet duplicating an existing bullet's scope
-  (caught only after merge, by the maintainer folding it into the host
-  bullet it should have extended). Both were placement errors with sound
-  content — the fix in each case kept every word of substance and only
-  moved where it lived. Before adding a new bullet: read every bullet in
-  the target section in full and ask whether the addition is this
-  bullet's own topic with new detail, not a neighboring topic; only when
-  no bullet's scope covers it does a new standalone bullet fire.
+  are no does it earn an always-loaded line. An always-loaded line still
+  owes a second placement question: which existing bullet does it belong
+  inside? (`unprobed` — private incident as shape; see Provenance.) Default
+  to folding a new clause into the host bullet that already owns its
+  topic — a trailing sentence, an added example, an extra clause — over
+  adding a sibling bullet next to it; a standalone new bullet is the
+  fallback for content with no existing host, not the default shape for
+  every addition. (Distinct from §5's keyword-grep-absence rule: that rule
+  asks whether the fact already exists anywhere; this one asks, once it's
+  confirmed genuinely new, whether it still belongs *inside* an existing
+  bullet's scope rather than beside it.) Two reviewed drafts each placed a
+  rule wrong — one in the wrong SECTION entirely (caught before merge), one
+  as a correctly-sectioned but unnecessary standalone bullet duplicating an
+  existing bullet's scope (caught only after merge, by the maintainer
+  folding it into the host bullet it should have extended). Both were
+  placement errors with sound content — the fix in each case kept every
+  word of substance and only moved where it lived. Before adding a new
+  bullet: first confirm the SECTION is correct — check the addition against
+  the target section's own scope, not merely the nearest bullet's — a rule
+  placed in the wrong section is a coarser version of the same skipped
+  check. Then read every bullet in the target section in full and ask
+  whether the addition is this bullet's own topic with new detail, not a
+  neighboring topic; only when no bullet's scope covers it does a new
+  standalone bullet fire. Genuinely unclear whether the addition is this
+  bullet's topic or a neighbor's → treat as unresolved and flag for the §6
+  reviewer rather than defaulting to standalone.
   ✅ "the new clause extends the existing dead-probe bullet with a
   first-invocation case, rather than adding a sibling bullet next to it."
   ❌ adding a new standalone bullet for a rule that a maintainer later
