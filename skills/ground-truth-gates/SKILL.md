@@ -174,6 +174,27 @@ records that moved.** Re-`--update` only after eyeballing an *intended*
 change, and only as the orchestrator/reviewer — never the editing worker's
 own call (rule 4 below: gate changes are not the worker's to make).
 
+**A frozen baseline inherits its environment's floating-point noise —
+round iteratively-solved values before freezing, and prove the freeze on
+a second environment** (`unprobed` — contributor incident as shape; see
+Provenance). A golden/replay baseline containing *iteratively solved*
+numerics (an IRR, a solver output, anything converged rather than computed
+closed-form) freezes the last-bit FP behavior of the runtime that produced
+it; a different runtime major diverges around the 13th decimal and the
+gate false-fails on noise — and a false-failing gate gets weakened or
+pinned, not fixed. Round such fields to a declared precision in the
+snapshot mapper — part of the gate, not the production code — coarse
+enough to absorb environment noise, fine enough that a real behavioral
+change still fails. Then prove the property by running the gate on a
+different runtime major than the one that froze the baseline: a pass on
+the freezing environment alone shows the snapshot matches itself, not
+that it is environment-stable. Pinning the runtime to match the baseline
+is the stopgap that hides the instability and hands the same red run to
+the next environment change; rounding is the durable fix.
+❌ "CI is red but every diff is in the 13th decimal place — pin CI to my
+local runtime version." Green again, and the incident re-runs on the next
+major bump.
+
 **replay variant — parity (no corpus):** a refactor of pure-ish logic (config parsing, path
 handling, formatting) often has no logged corpus to replay. Keep the pre-change
 implementation *callable* — a pinned import, a second checkout, or
@@ -973,6 +994,17 @@ probe; shorter comparison prose). Ships `unprobed` per the covenant; its
 probe — seed a suite stripping one alias of a two-alias dependency,
 confirm a ruled reviewer catches the live second alias where a bare one
 does not — joins the standing #115 queue.
+The FP-noise snapshot clause (2026-08-07) comes from a contributor incident
+(contributor-reported, not linkable): a golden projection snapshot frozen
+under one Node major failed CI under another, every diff an
+iteratively-solved IRR field diverging at ~1e-13; the first fix pinned CI's
+runtime to match the freezing machine (green, stopgap), the durable fix
+rounded the field to 10 dp in the snapshot mapper, removed the pin, and
+proved the property by re-running green on the very major that had failed.
+Ships `unprobed` per the covenant; its probe — freeze a solver output on
+one runtime, grade on another, observe whether a ruled reviewer reaches
+for rounding-in-the-mapper where a bare one reaches for the pin — joins
+the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
