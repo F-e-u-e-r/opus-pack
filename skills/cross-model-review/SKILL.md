@@ -144,6 +144,14 @@ irreproducible-false-positive bucket, which is for findings that do not
 reproduce at all. Non-applicability is severity evidence, not ownership
 evidence: a latent path the branch itself introduces stays its own
 must-fix however empty today's store is — deployment catches up.
+The same applies to the deployment **platform**, not just its data: a
+severity claim can be version-conditional (measured: a reviewer's top P1
+"prints ALL GREEN with zero gates" held only on bash >=4.4 — on the machine
+it described, bash 3.2 crashed instead). Bind the severity to the
+affected supported environment(s) the claim is about — reproduce there
+before relaying it, and never generalize one platform's or version's
+reproduction to another without its own run; "reproduced somewhere" is
+not "reproduced where it ships". (`unprobed` — see Provenance.)
 neg: filing a reviewer's "P1, not merge-ready" against a refactor for a quirk
 that reproduces identically on the merge-base — the review still pays off (spin
 the quirk off as its own fix), but the branch is clean and the label was
@@ -298,6 +306,18 @@ only path to reportability. Folded here because multi-lens
 gates read converged findings as stronger, which is exactly where an
 unreproduced-but-agreed claim slips through. Ships `unprobed` per the
 covenant; its probe joins the private round-5 queue.
+The §3 version-conditional-severity clause (2026-08-07) comes from a
+contributor-reported incident (not linkable): a reviewer's top P1 —
+"prints ALL GREEN with zero gates" — reproduced only on bash >=4.4,
+while the deployment machine the finding itself described ran bash 3.2,
+which crashed on the same input instead; the relayed severity was
+platform-version-conditional and did not hold where the code shipped.
+Recorded as the measured incident shape only: the clause binds a
+severity claim to the affected supported environment(s) it is about,
+and does not extend to a general runtime-difference taxonomy.
+Contributed via PR #151; wording narrowed at gate to bind to the
+affected environment(s) rather than a single machine. Ships `unprobed`
+per the covenant; its probe joins the standing #115 queue.
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier
