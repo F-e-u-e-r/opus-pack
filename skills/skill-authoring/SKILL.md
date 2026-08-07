@@ -101,6 +101,30 @@ axes, treat it as load-bearing — the pass fails closed.
   was caught in the author's own draft before submission
   (contributor-reported). (This clause ships `unprobed` — see Provenance.)
   ❌ "the sync contract is in §4" (recalled; the quoted line was in §3).
+- **Draft a Provenance narrative by re-reading the primary source, not from
+  a carried paraphrase** (`unprobed` — private incident as shape; see
+  Provenance). A rule's incident paragraph is usually written well after
+  the incident — verified once, then drafted later from a summary held in
+  working memory or an earlier chat message. That gap is where a
+  paraphrase drifts: verify-time and draft-time are separated by enough
+  steps (verify → draft → review → fix) that a detail can quietly change
+  shape between them, and unlike a wrong command a fabricated narrative
+  detail does not fail loud — it reads as plausible and passes a review
+  scoped to judging the rule's TEXT rather than re-checking its story
+  against the source. Before committing an incident paragraph: re-open
+  the primary source (the session transcript, the PR thread, the finding
+  file) and re-quote or re-derive the specific claim, exactly as the
+  cross-reference rule above requires for a pointer — a paraphrase is not
+  a citation. A reviewer told not to re-verify quoted incident details
+  (a reasonable scope narrowing — see the completion-claim audit) will
+  not catch this; the discipline sits with the author, at draft time.
+  ✅ "re-opened the source transcript before writing the incident
+  paragraph, confirmed the described sequence matches the actual tool
+  calls in order."
+  ❌ drafting an incident paragraph from a two-sessions-old summary
+  ("something like a background miner died mid-run and skewed the
+  results") without re-reading the transcript it claims to describe —
+  the actual incident was a different, unrelated scenario.
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
@@ -1396,3 +1420,14 @@ underlying session is verifiable by the contributor, not linkable here.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
+The §2 draft-time re-read rule (2026-08-07) comes from a contributor
+incident (not linkable): a rule's incident paragraph was drafted from a
+paraphrased summary carried across sessions rather than from the
+source transcript, and the resulting narrative did not match what
+actually happened — a specific, concrete sequence that had never
+occurred was described in its place. Caught by the author's own
+subsequent re-check against the source before the text was finalized;
+the review that had already looked at the rule's TEXT was correctly
+not asked to re-verify the incident's factual details, and would not
+have caught this. Ships `unprobed` per the covenant; its probe joins
+the standing #115 queue.
