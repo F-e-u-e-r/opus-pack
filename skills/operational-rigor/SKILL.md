@@ -799,6 +799,25 @@ When rigor conflicts with finishing sooner, rigor wins.
   re-derive a value you compute from it — a redacted or protected sample, not raw
   third-party values by default (they may carry secrets/PII; security-architect
   minimize-by-type).
+- **A recorded claim about mutable repo/workflow state decays — re-check the
+  live source before repeating it, not just before acting on it**
+  (`unprobed` — private incident as shape; see Provenance). A PR's open/
+  merged/closed status, a branch's current head, an issue's state: each is
+  a fact about something that changes on someone else's schedule, and a
+  session that reads it once and carries the reading forward in notes or a
+  report is stating a stale fact as current. This differs from
+  delegation-and-review's pinned-model-string rule — that one covers a
+  hosted endpoint's *behavior* drifting under a fixed identifier; this one
+  covers a repo's *administrative state* drifting under a fixed reference
+  (a PR number, a branch name) — the two decay on different clocks and
+  need separate re-checks. Before repeating a stored state claim in a
+  report or using it to decide a next step, re-query the live source (`gh
+  pr list`, `git ls-remote`, the issue tracker) rather than trusting the
+  last-known reading, however recently it was taken.
+  ✅ "re-ran `gh pr list` before writing this status line — two of the
+  five PRs I had recorded as open merged since the last check."
+  ❌ repeating "PR #44 is open" in a new report because that was true
+  three sessions ago, without a fresh query.
 
 ## 5. Adversarial self-review and completion
 
@@ -1280,6 +1299,18 @@ the underlying session is verifiable by the contributor, not linkable
 here. Ships `unprobed` per the covenant; its probe joins the standing
 #115 queue — a future campaign, not round-5, which was a completed,
 frozen ten-target slice this rule was not part of.
+The §4 mutable-repo-state-decay rule (2026-08-07) comes from a
+contributor-reported incident (not linkable): a status note carried a
+PR's state forward across two later reports without a fresh check;
+each report was accurate as of its own last query but stale by the time
+it was read, and the gap was only caught on an explicit status sweep
+that re-queried the live source and found the recorded state two days
+out of date. Distinguished at drafting time from delegation-and-review's
+existing pinned-model-string rule, which covers a different clock
+(hosted-endpoint behavior drift, not repo-administrative-state drift) —
+checked against that file's current text before writing this one to
+avoid restating it under different wording. Ships `unprobed` per the
+covenant; its probe joins the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
