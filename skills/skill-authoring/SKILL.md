@@ -487,15 +487,33 @@ axes, treat it as load-bearing — the pass fails closed.
   incidents, session history, open issues/PRs), not one incident
   reinterpreted twice; and **routing** — a natural-language prompt a user
   or agent would actually write reaches this skill over its siblings
-  without stacking multiple qualifiers to rule out everything else. A
-  prompt that only routes correctly once several conditions are named
-  together is evidence the capability already routes elsewhere by its
-  strongest single qualifier, and the candidate is redundant with that
-  sibling rather than a skill in its own right. A residual-value check
-  closes it: once any single-qualifier surface is credited to the sibling
-  that already owns it, does what remains still distinguish the skill's
-  central claim from doing nothing? If the answer is no, the candidate is
-  dead on arrival regardless of how well it is built.
+  without stacking multiple qualifiers to rule out everything else. Test
+  routing directly: write the prompt using only the single strongest
+  qualifier that distinguishes this candidate from its closest sibling,
+  with every other named condition dropped. If that one-qualifier prompt
+  already reaches this skill, routing passes; if it lands on a sibling
+  instead, and only reaches the candidate once a second, third, or fourth
+  condition is added back, routing fails — regardless of how many
+  qualifiers "feel" reasonable to name together in real use. A prompt that
+  only routes correctly once several conditions are named together is
+  evidence the capability already routes elsewhere by its strongest single
+  qualifier, and the candidate is redundant with that sibling rather than a
+  skill in its own right. A residual-value check closes it: once any
+  single-qualifier surface is credited to the sibling that already owns it,
+  does what remains still distinguish the skill's central claim from doing
+  nothing? If the answer is no, the candidate is dead on arrival regardless
+  of how well it is built. This generalizes the "category earns a file"
+  test later in this section from project-skill-library categories to any
+  candidate skill or category — that bullet's incident-and-history bar is
+  the demand axis above, applied to one library shape; do not restate it
+  separately when reviewing a project-skill category.
+  ✅ "two independent, non-synthetic hits found by the sweep — a leaked
+  token incident and an unrelated stalled-rollout incident, each needing
+  this exact capability and neither reducible to the other — plus a
+  routing check: the single-qualifier prompt 'audit this for leaked
+  secrets' already reaches this skill over its siblings with no other
+  condition named" — both axes pass on their own single strongest
+  evidence, not a stack.
   ❌ "the demand scenario is our own project's source incident" — one
   incident interpreted as multiple demand hits is not independent demand.
   ❌ "it routes correctly when a user asks for hygiene AND audit AND debt
@@ -1423,14 +1441,18 @@ queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
 The §5 demand+routing existence gate (2026-08-07) comes from a
 contributor's own staged skill candidate, closed by the pack's owner
-after a three-axis review: an exhaustive read-only sweep across the
-candidate's PRs/issues, review history, and a private routing corpus
-found exactly one demand hit, and that hit's actual driver was a
-different, already-published sibling's intent — the residual classes
-were incidental findings alongside it, not independent demand; each
-residual class individually routed to an existing sibling by its
-strongest single qualifier, and the only prompt that reached the
-candidate needed all of them stacked at once. The candidate had passed
+after a two-axis review with a closing residual-value check: an
+exhaustive read-only sweep across the candidate's PRs/issues, review
+history, and a private routing corpus found exactly one demand hit
+(axis 1 FAIL) that on inspection was actually driven by an
+already-published sibling's intent, not independent demand — the
+residual classes were incidental findings alongside it, not independent
+demand hits of their own; each residual class individually routed to an
+existing sibling by its strongest single qualifier (axis 2 FAIL), and the
+only prompt that reached the candidate needed all of them stacked at
+once — so the residual-value check, run once routing had credited every
+single-qualifier surface elsewhere, closed the gate with nothing left to
+distinguish the candidate from doing nothing. The candidate had passed
 every integrity check (references resolved, no collisions, three
 adversarial review rounds green, CI green) and was still correctly
 killed, because none of those checks test existence. Contributor-
