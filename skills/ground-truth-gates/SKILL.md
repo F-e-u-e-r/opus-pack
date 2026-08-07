@@ -355,7 +355,12 @@ A generic green test is not proof. A gate is real only if:
    scanning nothing (a guard script once did this for the very file its outage
    check was written for). A passing scan must also prove its input set is
    non-empty — assert the matched count is non-zero; merely printing it is the
-   same vacuous green if nothing fails on 0. A **substring grader whose match
+   same vacuous green if nothing fails on 0. Its partial twin: a scanner may
+   consume some inputs while silently skipping others because an error was
+   swallowed or a cap went unreported; a non-zero count does not make that
+   coverage complete — an undeclared required subset left unread is
+   INCOMPLETE, never a clean pass. (`unprobed` — see Provenance.) A
+   **substring grader whose match
    token can occur in the graded corpus** — scanning prose for a word that the
    corpus itself may contain scores the corpus, not the behavior, and unlike
    the zero-input scanner above this one runs correctly over a non-empty input
@@ -917,6 +922,24 @@ converged on all four dispositions against the then-current main. All
 four ship `unprobed` per the covenant; their probes join the standing
 #115 queue — a future campaign, not round-5, which was a completed,
 frozen ten-target slice these rules were not part of.
+The rule-3 partial-input twin of the zero-input scanner shape
+(2026-08-07) comes from the review history of a staged-and-declined
+scanner candidate (PR #129, closed unmerged, retained as historical
+evidence): two reproduced silent-omission defects — an unreadable
+subtree swallowed by the walker's error handler, and a single unreadable
+file dropped the same way one level down — each made a partially-read
+tree report as clean until folded into an explicit incomplete result
+class. A three-lens cross-family duplication audit (grok-4.5 high;
+gpt-5.6-luna at ultra and max) agreed the zero-input remedy — a non-zero
+matched count — passes the partial case; the lenses split on whether
+adjacent semantics (the sentinel bullet's INCOMPLETE bound, scoped to
+its declared surface manifest; operational-rigor's fail-closed and
+labelled-degradation rules) already covered it, and the owner
+adjudicated a one-sentence fold: the semantic doctrine exists elsewhere,
+but the local gate-design checklist lacked this named shape, and the
+remedy differs in kind (cf. item 10's placement note). Ships `unprobed`
+per the covenant; its probe — a grader shape of partial consumption with
+a non-zero matched count — joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
