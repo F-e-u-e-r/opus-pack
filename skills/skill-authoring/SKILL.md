@@ -115,16 +115,20 @@ axes, treat it as load-bearing — the pass fails closed.
   the primary source (the session transcript, the PR thread, the finding
   file) and re-quote or re-derive the specific claim, exactly as the
   cross-reference rule above requires for a pointer — a paraphrase is not
-  a citation. A reviewer told not to re-verify quoted incident details
-  (a reasonable scope narrowing — see the completion-claim audit) will
-  not catch this; the discipline sits with the author, at draft time.
+  a citation. (Distinct from the next bullet: this is about whether the
+  incident happened as described; the next bullet is about whether the
+  described incident, even if accurate, actually justifies the mechanism
+  prescribed.) A reviewer told not to re-verify quoted incident details (a
+  reasonable scope narrowing — see delegation-and-review §3's
+  completion-claim audit) will not catch this; the discipline sits with
+  the author, at draft time.
   ✅ "re-opened the source transcript before writing the incident
   paragraph, confirmed the described sequence matches the actual tool
   calls in order."
   ❌ drafting an incident paragraph from a two-sessions-old summary
-  ("something like a background miner died mid-run and skewed the
-  results") without re-reading the transcript it claims to describe —
-  the actual incident was a different, unrelated scenario.
+  ("something like a dependency install failed partway through and left
+  stale files behind") without re-reading the transcript it claims to
+  describe — the actual incident was a different, unrelated scenario.
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
@@ -1421,8 +1425,9 @@ Ships `unprobed` per the covenant; its probe joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
 The §2 draft-time re-read rule (2026-08-07) comes from a contributor
-incident (not linkable): a rule's incident paragraph was drafted from a
-paraphrased summary carried across sessions rather than from the
+incident, cited as shape; the underlying session is verifiable by the
+contributor, not linkable here: a rule's incident paragraph was drafted
+from a paraphrased summary carried across sessions rather than from the
 source transcript, and the resulting narrative did not match what
 actually happened — a specific, concrete sequence that had never
 occurred was described in its place. Caught by the author's own
