@@ -470,6 +470,28 @@ axes, treat it as load-bearing — the pass fails closed.
 - **Placement test** for any new rule: can it be a hook (machine-enforced)?
   If not, can it live on-demand (skill / fix log)? Only when both answers
   are no does it earn an always-loaded line.
+- **A rule earning an always-loaded line still owes a second placement
+  question: which existing bullet does it belong inside?** (`unprobed` —
+  private incident as shape; see Provenance.) Default to folding a new
+  clause into the host bullet that already owns its topic — a trailing
+  sentence, an added example, an extra clause — over adding a sibling
+  bullet next to it; a standalone new bullet is the fallback for content
+  with no existing host, not the default shape for every addition. Two
+  reviewed drafts each placed a rule wrong — one in the wrong SECTION
+  entirely (caught before merge), one as a correctly-sectioned but
+  unnecessary standalone bullet duplicating an existing bullet's scope
+  (caught only after merge, by the maintainer folding it into the host
+  bullet it should have extended). Both were placement errors with sound
+  content — the fix in each case kept every word of substance and only
+  moved where it lived. Before adding a new bullet: read every bullet in
+  the target section in full and ask whether the addition is this
+  bullet's own topic with new detail, not a neighboring topic; only when
+  no bullet's scope covers it does a new standalone bullet fire.
+  ✅ "the new clause extends the existing dead-probe bullet with a
+  first-invocation case, rather than adding a sibling bullet next to it."
+  ❌ adding a new standalone bullet for a rule that a maintainer later
+  folds into an existing one two lines above — extra surface area for
+  content that already had a home.
 - Log recurring *slop* the same way — agent output that compiles and looks
   plausible but is subtly wrong (the six patterns are canonical in
   operational-rigor §5). One category captured once prevents it forever.
@@ -1396,3 +1418,14 @@ underlying session is verifiable by the contributor, not linkable here.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
+The §4 fold-into-host placement rule (2026-08-07) comes from two
+contributor-reported incidents (not linkable). A drafted rule was placed
+in a section governing a neighboring domain rather than the one it
+belonged to, caught by a reviewer before merge and relocated intact. A
+second, separately drafted rule was correctly sectioned but landed as a
+new standalone bullet duplicating an existing bullet's scope; this one
+reached main before the pack owner folded it into the host bullet it
+should have extended, in a later maintenance pass. Both were placement
+errors, not content errors — the substance of each survived unedited,
+only its location moved. Ships `unprobed` per the covenant; its probe
+joins the standing #115 queue.
