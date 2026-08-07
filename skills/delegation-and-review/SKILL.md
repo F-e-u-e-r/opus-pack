@@ -216,7 +216,13 @@ treat every returned result as a claim until verified.
     with no warm entry — has a distinct expected signature: the FIRST call
     in a fresh process or session runs slow or times out for reasons that
     have nothing to do with the target's reachability, and a bare timeout
-    there is not yet a death reading. Before recording it dead: re-invoke
+    there is not yet a death reading. Before recording it dead — and only
+    when the invocation is safe to repeat: read-shaped, idempotent, or
+    explicitly retriable (a timed-out call that may have had side effects
+    — a send, a write, a merge, a payment — has UNKNOWN commit state:
+    settle what actually landed at the destination first, never
+    blind-replay it, and diagnose the target's liveness with a separate
+    harmless read instead) — re-invoke
     once more in the same session, warm; if the same call now returns
     promptly, the first failure was cold-start latency, not a capability
     gap — the failed cold call is void as evidence about the target (log
@@ -1296,6 +1302,11 @@ differential-diagnosis bullet's two ladders (single endpoint empty,
 model empty on some tasks) did not name; this adds it as a third,
 narrower ladder rather than folding it into either, since its remedy
 (one warm re-invocation in the same session) differs from both.
+Bounded at gate: the warm re-invocation applies only to invocations
+safe to repeat (read-shaped, idempotent, or explicitly retriable) — a
+timed-out side-effecting call has unknown commit state and settles what
+landed at the destination instead of being replayed, so the ladder can
+never read as an at-least-once mutation license.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue.
 Stable behavioral rules; re-check
