@@ -550,6 +550,27 @@ A generic green test is not proof. A gate is real only if:
    ❌ "the tool reports 40% savings on every run" — including on input it
    provably cannot compress; nothing asserted the zero-savings case, and
    nothing calibrated the 40%.
+12. **A test that disables a dependency must disable every name it resolves
+   through** (`unprobed` — private incident as shape; see Provenance). A
+   dependency a test means to remove — an env var, a config key, a
+   credential — often resolves through more than one name: a singular and a
+   plural form, an old alias kept for compatibility, a fallback path checked
+   in order. A test that strips one name and asserts the fallback-absent
+   behavior can pass while a still-live alias silently satisfies the
+   dependency underneath it — the suite reports the fallback path exercised
+   when the code never left the primary one. This is item 3's
+   never-registered-test failure wearing a different mask: the assertion
+   runs and is honestly evaluated, but the precondition it depends on
+   ("this dependency is absent") was never actually true. Before trusting a
+   dependency-absent test, enumerate every name/path the target resolves
+   through — read the resolution code, don't infer it from one call site —
+   and strip all of them; then confirm the test fails when only the
+   supposedly-disabled name is restored, proving the assertion depends on
+   the precondition it claims.
+   ❌ "verified the fallback path with GROQ_API_KEY unset" — the process
+   still exported GROQ_API_KEYS (plural, the pool form), which the loader
+   checks first; the fallback the test named never ran, green for as long
+   as the test existed.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -940,6 +961,19 @@ but the local gate-design checklist lacked this named shape, and the
 remedy differs in kind (cf. item 10's placement note). Ships `unprobed`
 per the covenant; its probe — a grader shape of partial consumption with
 a non-zero matched count — joins the standing #115 queue.
+Item 12 (multi-name dependency strip; 2026-08-07) comes from a contributor
+incident (contributor-reported, not linkable). A test titled "verifies the
+fallback path with the primary key absent" built a subprocess environment
+that stripped one env-var name; the machine also exported a second, plural
+name for the same credential pool, which the loader checked first and which
+the test left untouched — the fallback path the test's own title named had
+never executed once, for as long as the test existed. Found by a
+fresh-context review of the same suite; fixed by enumerating and stripping
+every name the loader reads, after which the test failed honestly and then
+passed for the right reason. Ships `unprobed` per the covenant; its probe —
+seed a suite that strips one alias of a two-alias dependency and confirm a
+ruled reviewer catches the live second alias where a bare one does not —
+joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
