@@ -551,22 +551,25 @@ A generic green test is not proof. A gate is real only if:
    provably cannot compress; nothing asserted the zero-savings case, and
    nothing calibrated the 40%.
 12. **A test that disables a dependency must disable every name it resolves
-   through** (`unprobed` — private incident as shape; see Provenance). A
+   through** (`unprobed` — contributor incident as shape; see Provenance). A
    dependency a test means to remove — an env var, a config key, a
    credential — often resolves through more than one name: a singular and a
    plural form, an old alias kept for compatibility, a fallback path checked
    in order. A test that strips one name and asserts the fallback-absent
    behavior can pass while a still-live alias silently satisfies the
    dependency underneath it — the suite reports the fallback path exercised
-   when the code never left the primary one. This is item 3's
-   never-registered-test failure wearing a different mask: the assertion
-   runs and is honestly evaluated, but the precondition it depends on
-   ("this dependency is absent") was never actually true. Before trusting a
-   dependency-absent test, enumerate every name/path the target resolves
-   through — read the resolution code, don't infer it from one call site —
-   and strip all of them; then confirm the test fails when only the
-   supposedly-disabled name is restored, proving the assertion depends on
-   the precondition it claims.
+   when the code never left the primary one. This is closer to item 10's
+   shadowed-subject failure than to item 3's never-registered test: nothing
+   here is unexecuted, mocked, or tautological — the assertion runs to
+   completion and is honestly evaluated — but it runs against a precondition
+   ("this dependency is absent") that was never actually true, the same way
+   item 10's green suite runs to completion against a subject that was never
+   actually the edited copy. Before trusting a dependency-absent test,
+   enumerate every name/path the target resolves through — read the
+   resolution code, don't infer it from one call site — and strip all of
+   them; then, starting from that fully-stripped baseline, restore only the
+   supposedly-disabled name and confirm the test now fails — proving the
+   assertion depends on the precondition it claims, not on coincidence.
    ❌ "verified the fallback path with GROQ_API_KEY unset" — the process
    still exported GROQ_API_KEYS (plural, the pool form), which the loader
    checks first; the fallback the test named never ran, green for as long
