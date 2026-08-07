@@ -101,6 +101,13 @@ axes, treat it as load-bearing — the pass fails closed.
   was caught in the author's own draft before submission
   (contributor-reported). (This clause ships `unprobed` — see Provenance.)
   ❌ "the sync contract is in §4" (recalled; the quoted line was in §3).
+  The same discipline covers an incident NARRATIVE, not just a pointer:
+  draft a Provenance paragraph from the re-opened primary source (the
+  transcript, the PR thread, the finding file), never from a paraphrase
+  carried across sessions — narrative drift reads plausible and passes a
+  review scoped to the rule's text, and a reviewer told not to re-verify
+  quoted incident details will not catch it; the discipline sits with the
+  author at draft time. (`unprobed` — see Provenance.)
 - **Verifying the incident does not verify the prescription.** Distilling an
   incident into a rule is a lossy transform that can introduce a bug the
   incident never had: the rule cites a real failure yet prescribes a
@@ -469,7 +476,17 @@ axes, treat it as load-bearing — the pass fails closed.
   occurrence is an anecdote; two is a pattern.
 - **Placement test** for any new rule: can it be a hook (machine-enforced)?
   If not, can it live on-demand (skill / fix log)? Only when both answers
-  are no does it earn an always-loaded line.
+  are no does it earn an always-loaded line. An always-loaded line still
+  owes a second placement question: which existing bullet already owns
+  its topic? Confirm the SECTION first — check the addition against the
+  section's own scope, not merely the nearest bullet's — then read the
+  target section's bullets in full and default to folding the new clause
+  into the host bullet that owns it (a trailing sentence, an added
+  example, an extra clause); a standalone new bullet is the fallback for
+  content with no existing host, not the default shape. Genuinely unclear
+  whether it is this bullet's topic or a neighbor's → flag for the §6
+  reviewer rather than defaulting to standalone. (`unprobed` — see
+  Provenance.)
 - Log recurring *slop* the same way — agent output that compiles and looks
   plausible but is subtly wrong (the six patterns are canonical in
   operational-rigor §5). One category captured once prevents it forever.
@@ -1396,3 +1413,18 @@ underlying session is verifiable by the contributor, not linkable here.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue — a future campaign, not round-5, which was a completed, frozen
 ten-target slice this rule was not part of.
+The §4 second-level placement question and the §2 narrative-re-read
+clause (2026-08-07) land as one fold pass from two contributor PRs
+(#155, #158), each dispositioned FOLD/TRIM in the eight-PR batch
+reconciliation: the contributed drafts carried sound content at
+standalone-bullet weight (42 and 40 added lines), refolded here into
+their host bullets at roughly a quarter of that. #155's incidents: a
+drafted rule placed in the wrong section (caught by a reviewer before
+merge, relocated intact) and a correctly-sectioned rule landed as a
+standalone bullet duplicating an existing bullet's scope (reached main;
+folded into its host by the maintainer in a later pass) — placement
+errors with sound content, only the location moved. #158's incident: a
+rule's incident paragraph drafted from a summary carried across
+sessions did not match the source transcript it claimed to describe.
+All contributor-reported, not linkable. Each clause ships `unprobed`
+per the covenant; both probes join the standing #115 queue.

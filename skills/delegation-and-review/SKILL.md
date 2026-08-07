@@ -159,8 +159,8 @@ treat every returned result as a claim until verified.
   decision-time re-probe the rule above demands can itself come back
   empty) cannot distinguish an intermittent transport flake from a
   genuine capability gap, and the reads route differently (demote to
-  supervised use, drop from the pool, or fix your own side first). Two
-  situations, two ladders:
+  supervised use, drop from the pool, or fix your own side first). Three
+  situations, three ladders:
   - **A single endpoint returns empty/no bytes.** Before declaring it
     dead: (1) re-probe raw, ruling out your own parsing (a grep pattern
     against the wrong response shape reads as "empty" too); (2) verify
@@ -207,7 +207,37 @@ treat every returned result as a claim until verified.
     cannot tell these apart, and routing on the wrong read either
     burns budget on a broken transport or drops a usable model from
     the pool.
-  Either way, for a routing or safety decision the ladders refine the
+  - **A subsystem hangs past its normal latency, or times out, on its
+    first invocation this session** (if the response instead comes back
+    promptly with zero bytes on that first call, that is ladder 1's
+    empty-endpoint case, not this one — this ladder is for the call not
+    returning in time, not for a fast empty answer). A cold start — a
+    serverless function, a lazily-loaded tool backend, a connection pool
+    with no warm entry — has a distinct expected signature: the FIRST call
+    in a fresh process or session runs slow or times out for reasons that
+    have nothing to do with the target's reachability, and a bare timeout
+    there is not yet a death reading. Before recording it dead — and only
+    when the invocation is safe to repeat: read-shaped, idempotent, or
+    explicitly retriable (a timed-out call that may have had side effects
+    — a send, a write, a merge, a payment — has UNKNOWN commit state:
+    settle what actually landed at the destination first, never
+    blind-replay it, and diagnose the target's liveness with a separate
+    harmless read instead) — re-invoke
+    once more in the same session, warm; if the same call now returns
+    promptly, the first failure was cold-start latency, not a capability
+    gap — the failed cold call is void as evidence about the target (log
+    the incident as cold-start if you keep incident notes, but it counts
+    for nothing in the target's capability record). Only a timeout that
+    repeats on the warm retry, or one whose error explicitly names a cause
+    other than a cold start, earns the single-endpoint ladder above. This
+    is not a license to retry every failure hoping it was cold — the retry
+    costs one call and settles a specific, common, session-scoped
+    confound; a target that still doesn't answer after a warm retry is
+    diagnosed the same way as any other single-endpoint failure. For a
+    load-bearing routing decision, one warm success is provisional, not
+    proof — confirm with ladder 1's differential before routing
+    risk-sensitive work to the target.
+  In every case, for a routing or safety decision the ladders refine the
   DIAGNOSIS, never the binding above: an empty, flaky, or unresolved
   probe of a property leaves that property UNKNOWN, and work relying
   on it still does not route to that model — the differential decides
@@ -1258,6 +1288,27 @@ checkpoints that stop and surface even in autonomous mode and are
 never auto-approved (the never-fabricate boundary). Both ship
 `unprobed` per the covenant; their probes join the standing #115
 queue — a future campaign, not part of any completed campaign.
+The §1 cold-start ladder (2026-08-07) comes from two contributor
+incidents in different environments (contributor-reported, not
+linkable): four separate false "model dead" verdicts were each revived
+by a second, warmed probe — sometimes an identical retry, sometimes the
+same call with streaming enabled — rather than trusting the first
+non-streaming timeout, and a scheduled tool-search gate stalled on its
+first cold invocation of a session before succeeding on re-entry. Both
+share the same shape — the first
+touch of a lazily-initialized subsystem timing out for reasons
+unrelated to the target's reachability — which the existing
+differential-diagnosis bullet's two ladders (single endpoint empty,
+model empty on some tasks) did not name; this adds it as a third,
+narrower ladder rather than folding it into either, since its remedy
+(one warm re-invocation in the same session) differs from both.
+Bounded at gate: the warm re-invocation applies only to invocations
+safe to repeat (read-shaped, idempotent, or explicitly retriable) — a
+timed-out side-effecting call has unknown commit state and settles what
+landed at the destination instead of being replayed, so the ladder can
+never read as an at-least-once mutation license.
+Ships `unprobed` per the covenant; its probe joins the standing #115
+queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
