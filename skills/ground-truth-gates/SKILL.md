@@ -558,10 +558,11 @@ A generic green test is not proof. A gate is real only if:
    Strip one name and the fallback-absent assertion can pass while a
    still-live alias silently satisfies the dependency underneath — the
    suite reports the fallback path exercised when the code never left the
-   primary one. Nothing is mocked or unexecuted; the assertion runs
-   honestly against a precondition that was never true — item 10's shape
-   (a sound suite against the wrong subject), not item 3's never-registered
-   test. Before trusting one: enumerate every name/path the target
+   primary one. Nothing is mocked or unexecuted; like item 10's green
+   suite the assertion runs honestly — but here against a false
+   precondition (the right subject in the wrong dependency state), a
+   shape of its own, not item 3's never-registered test. Before trusting
+   one: enumerate every name/path the target
    resolves through (read the resolution code, not one call site) and
    strip them all; then restore ONLY the supposedly-disabled name and
    confirm the test now fails — the assertion depends on its claimed
