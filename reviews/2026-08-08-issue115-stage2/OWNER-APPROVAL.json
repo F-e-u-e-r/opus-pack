@@ -3,8 +3,9 @@
   "stage2_package_id": "issue115-stage2-v1",
   "baseline_main": "fac48c2086b318b31a9c80fd823ef8c0ed956eed",
   "stage1_sealed_prereg_sha256": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
-  "manifest_sha256": null,
-  "status": "PENDING-OWNER-APPROVAL",
-  "owner_signature": null,
-  "timestamp": null
+  "manifest_sha256": "25700fd5bce2b07bbf5e89e9080bb0777acafea7a8282b081e7ac3c24972e860",
+  "status": "APPROVED",
+  "approval_scope": "Frozen STAGE-2 package issue115-stage2-v1 is APPROVED as published (PR #163; sealed content commit db09c2d; seal-record head a9d5095). This receipt approves the frozen package only. It is NOT behavioral-run authorization: no dry-run, smoke, or scored execution is authorized by it; run authorization (state row 1) remains a separate, later owner act.",
+  "owner_signature": "Owner conversational authorization, 2026-08-08, durable-publication checkpoint ruling (recorded in Claude session 0132RthrKSsMkywcEwtkXhkx): approval of frozen package issue115-stage2-v1 at MANIFEST.sha256 25700fd5bce2b07bbf5e89e9080bb0777acafea7a8282b081e7ac3c24972e860. Canonical semantic approval record per this package's schema — no cryptographic signature, key, or signing material exists or is claimed.",
+  "timestamp": "2026-08-08"
 }
