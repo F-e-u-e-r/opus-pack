@@ -1,0 +1,151 @@
+# Issue-115 STAGE-2 Operational Runbook
+
+Authority: this runbook OPERATIONALIZES the sealed STAGE-1 contract
+(`PREREG-v6-SEALED.md`, sha256
+`2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8`).
+It may not alter §B claims, arm semantics, outcome arithmetic or
+domain, marker scope, the verification-only boundary, or the budget
+envelope (92 planned / 110 hard cap / 18 reserve). Where faithful
+operationalization would require any such change: HOLD and return to
+the owner — STAGE-1 is not reopened by this document. Behavioral runs
+executed under STAGE-2 design work: 0; no dry-run, smoke, or scored
+run is authorized until the owner's post-review go.
+
+## 1. Canonical execution schedule (resolves §K-5 in part)
+
+The whole campaign expands, before execution, into ONE linear
+slot schedule with absolute slot numbers. Generation rule (mechanical,
+re-derivable):
+
+1. Slot 0 = the dry-run (identity confirmation).
+2. Fixtures are numbered 1–13 in campaign order (owner target order,
+   S-order within a target): 1 T1F1, 2 T2S1, 3 T2S2, 4 T3F1, 5 T4S1,
+   6 T4S2, 7 T5S1, 8 T5S2, 9 T6S1, 10 T6S2, 11 T7S1a, 12 T7S1b,
+   13 T7S2.
+3. For each fixture in order: first its smoke slot, then its six
+   scored slots in the counterbalanced interleave — ODD campaign
+   position: bare-1, ruled-1, bare-2, ruled-2, bare-3, ruled-3; EVEN
+   position: ruled-1, bare-1, ruled-2, bare-2, ruled-3, bare-3.
+   (Parity table: odd = T1F1, T2S2, T4S1, T5S1, T6S1, T7S1a, T7S2;
+   even = T2S1, T3F1, T4S2, T5S2, T6S2, T7S1b.)
+4. A licensed same-slot rerun executes immediately after its original
+   slot; it consumes reserve and does not renumber anything.
+5. An owner-authorized SUSPECT fixture-set rerun unit is appended at
+   the CURRENT END of the remaining schedule at authorization time
+   (original slots stay VOID; the unit's internal order follows rule 3
+   for its fixtures; no smoke re-run — the smoke certifies the fixture
+   text, which is unchanged).
+
+Slot positions are commitments of ORDER, not wall-clock time: a
+skipped (HOLD) target compresses the timeline but never reorders the
+remaining slots, so no post-hoc selection arises; every receipt
+records the actual timestamp.
+
+## 2. §K-1 — Multi-target HOLD queue
+
+- HOLD(target) skips that target's remaining slots (they keep their
+  numbers, marked SKIPPED in the ledger); all other targets proceed in
+  unchanged relative order.
+- Multiple targets may be held concurrently; each holds independently.
+- Resume queue: owner-authorized resumes are executed in ORIGINAL
+  owner target order, never authorization order. A resumed target's
+  remaining slots are appended at the current end of the schedule
+  (original numbering retained for identity, appended for execution
+  order); an in-flight slot is never interrupted to reorder.
+- Resume preconditions (all): the §A drift check for that target
+  passes against fresh `origin/main`; the MANIFEST re-hash passes for
+  every artifact the target uses; the executor identity configuration
+  is unchanged since the campaign's dry-run (a changed model id/config
+  → HOLD(campaign), owner decision — no new dry-run without owner
+  authorization, since a dry-run is a behavioral invocation).
+- A HOLD(target) caused by drift resumes only if the owner rules the
+  DRIFT-SHADOWED disposition allows it (per sealed §D, shadowed
+  evidence never discharges the marker; resumption for a re-run
+  against restored wording is an owner decision outside this
+  campaign's automatic paths).
+
+## 3. §K-2 — Repair mini-gate failure exit
+
+- A repair artifact (fixture-vN) that FAILS its static mini-gate
+  (final-gate lens re-review + owner sign-off, per sealed §E) — or
+  that the owner declines to sign — becomes FROZEN-INVALID: it is
+  never executed, "run first, repair later" is prohibited.
+- The fixture then follows the sealed automatic-retirement semantics
+  (a fixture that cannot produce a valid, gated text is RETIRED), with
+  §D's retirement consequences (single-fixture marker →
+  OUT-OF-SCOPE; member of a multi-fixture marker set → that marker
+  INCONCLUSIVE(RETIRED-MEMBER), sibling unrun slots cancelled).
+- The mini-gate itself is static review only — no behavioral
+  invocation is part of gating a repair.
+
+## 4. §K-3 — Retired-fixture slot accounting
+
+- The retired fixture's own unrun slots (smoke and scored) are marked
+  RETIRED-CANCELLED in the ledger: never executed, never charged.
+- Already-executed runs of a retired fixture remain in the receipts as
+  descriptive evidence only (per sealed §D).
+- **No replacement fixtures exist in this campaign.** Substituting a
+  new fixture would create a new claim surface, which the sealed
+  contract does not preregister — reserve is never spent on
+  replacement, and a desire for one is a STAGE-1-level change: HOLD
+  and return to the owner.
+- Denominators are never rewritten: the sealed §D
+  INCONCLUSIVE(RETIRED-MEMBER) / OUT-OF-SCOPE rules are the only
+  outcome effect of retirement.
+
+## 5. §K-4 — Campaign-HOLD resume semantics
+
+- Resumable automatically-with-owner-authorization: HOLD(campaign)
+  from infra causes (≥4 consecutive INVALID-RUN; second infra-failed
+  smoke; dry-run precondition failure) — after the infra cause is
+  identified and remedied outside the campaign.
+- STOP states (class-1/2/3 interruption) resume per sealed §F: owner
+  authorization + fresh drift check; class-3-affected markers are
+  SUSPECT and follow their own adjudication, never silently resumed.
+- Resume preconditions (all, receipted): fresh drift check over all
+  non-terminal targets; full MANIFEST.sha256 re-verification (every
+  fixture/wrapper/rubric/checklist hash); PREREG-v6 hash re-verified
+  `2c7e3f21…`; executor identity configuration unchanged (else
+  HOLD(campaign) to owner); budget ledger re-derived from receipts
+  and consistent.
+- Receipt validity across resume: all pre-HOLD receipts remain valid
+  except where a sealed rule invalidates them (drift → DRIFT-SHADOWED;
+  SUSPECT adjudication outcomes; VOIDed slots stay VOID).
+- The consecutive-INVALID-RUN counter resets to zero at resume (the
+  infra cause was remedied); the pre-HOLD count is recorded in the
+  resume receipt.
+
+## 6. §K-5 — Remaining sequencing (operationalized, semantics unchanged)
+
+- SUSPECT rerun units: atomic costs — T1 6, T3 6, T5-placement 6,
+  T5-narrative 6, T2 12, T4 12, T6 12, T7 18 (fixtures × 2 arms × 3;
+  no smoke re-run). The unit starts only if remaining budget ≥ its
+  full cost (sealed v6 atomicity); a cap-blocked SUSPECT unit leaves
+  the marker IN SUSPECT with a CAP-EXHAUSTED annotation for the
+  owner's remaining outlets.
+- Cap atomicity and precedence: exactly as sealed §E (safety/drift
+  triggers recorded first; no partial rerun; cap-blocked single-slot
+  rerun → arm INCOMPLETE annotated CAP-EXHAUSTED).
+- Counterbalanced arm ordering: the §1 parity table, fixed.
+- Smoke-before-scored: enforced by the §1 schedule (a fixture's smoke
+  slot always precedes its scored slots; a smoke that has not PASSED
+  its gradability/viability checklist blocks that fixture's scored
+  slots — repair-gate or retirement per sealed rules).
+- Target HOLD / DRIFT-SHADOWED handling: exactly as sealed §A/§D/§F;
+  this runbook adds only the queue/resume mechanics of §2/§5 above.
+
+## 7. Receipts and ledger discipline
+
+Every transition in `STATE-MACHINE.md` emits the receipt named there.
+The slot ledger (`SLOT-LEDGER.md`) is append-only during execution;
+budget arithmetic is re-derived from receipts at every HOLD, resume,
+and campaign close — a divergence between ledger and receipts is
+itself a HOLD(campaign) trigger (protocol deviation).
+
+## 8. What this runbook may never do
+
+Convert SUSPECT, DRIFT-SHADOWED, invalidity, or cap exhaustion into a
+different epistemic outcome; alter any sealed predicate, claim, arm
+rule, or budget number; execute or simulate any behavioral run; edit
+doctrine or markers; create replacement fixtures. Any path that seems
+to require one of these → HOLD, report to the owner.

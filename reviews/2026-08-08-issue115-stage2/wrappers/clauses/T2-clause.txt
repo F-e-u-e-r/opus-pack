@@ -1,0 +1,29 @@
+  - **A subsystem hangs past its normal latency, or times out, on its
+    first invocation this session** (if the response instead comes back
+    promptly with zero bytes on that first call, that is ladder 1's
+    empty-endpoint case, not this one — this ladder is for the call not
+    returning in time, not for a fast empty answer). A cold start — a
+    serverless function, a lazily-loaded tool backend, a connection pool
+    with no warm entry — has a distinct expected signature: the FIRST call
+    in a fresh process or session runs slow or times out for reasons that
+    have nothing to do with the target's reachability, and a bare timeout
+    there is not yet a death reading. Before recording it dead — and only
+    when the invocation is safe to repeat: read-shaped, idempotent, or
+    explicitly retriable (a timed-out call that may have had side effects
+    — a send, a write, a merge, a payment — has UNKNOWN commit state:
+    settle what actually landed at the destination first, never
+    blind-replay it, and diagnose the target's liveness with a separate
+    harmless read instead) — re-invoke
+    once more in the same session, warm; if the same call now returns
+    promptly, the first failure was cold-start latency, not a capability
+    gap — the failed cold call is void as evidence about the target (log
+    the incident as cold-start if you keep incident notes, but it counts
+    for nothing in the target's capability record). Only a timeout that
+    repeats on the warm retry, or one whose error explicitly names a cause
+    other than a cold start, earns the single-endpoint ladder above. This
+    is not a license to retry every failure hoping it was cold — the retry
+    costs one call and settles a specific, common, session-scoped
+    confound; a target that still doesn't answer after a warm retry is
+    diagnosed the same way as any other single-endpoint failure. For a
+    load-bearing routing decision, one warm success is provisional, not
+    proof — confirm with ladder 1's differential before routing

@@ -1,0 +1,17 @@
+- **A recurring, remote-breaking cross-file invariant earns its check
+  at the earliest reliable feedback layer — proven green at baseline
+  before it may block** (`unprobed` — contributor rollout as shape; see
+  Provenance). When a known coupling keeps breaking far from the edits
+  that break it, move a minimal deterministic check for THAT invariant
+  to the earliest layer that can reliably run it — an edit-time hook
+  where one exists, else CI; the ship gate stays the authoritative
+  layer either way. Run the check at baseline BEFORE it may block:
+  wired over an already-red state it blocks every edit it covers,
+  unrelated ones included, and a guard that
+  blocks all work gets deleted, not fixed — so scope it to the targeted
+  sub-check, and leave the full suite to the ship gate. It blocks with
+  the failure reported, never a repair — which side of a coupling is
+  right is judgment, and gate changes stay the orchestrator's call
+  (rule 4).
+  ❌ "the hook runs the full test suite on every edit" — the suite was
+  already red with unrelated failures, so it blocked all work from its

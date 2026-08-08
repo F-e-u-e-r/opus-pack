@@ -1,0 +1,7 @@
+  The same discipline covers an incident NARRATIVE, not just a pointer:
+  draft a Provenance paragraph from the re-opened primary source (the
+  transcript, the PR thread, the finding file), never from a paraphrase
+  carried across sessions — narrative drift reads plausible and passes a
+  review scoped to the rule's text, and a reviewer told not to re-verify
+  quoted incident details will not catch it; the discipline sits with the
+  author at draft time. (`unprobed` — see Provenance.)
