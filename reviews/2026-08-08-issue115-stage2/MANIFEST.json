@@ -1,0 +1,419 @@
+{
+  "baseline_main": "fac48c2086b318b31a9c80fd823ef8c0ed956eed",
+  "budget": {
+    "dry_run": 1,
+    "hard_cap": 110,
+    "planned": 92,
+    "reserve": 18,
+    "scored": 78,
+    "scored_by_target": {
+      "T1": 6,
+      "T2": 12,
+      "T3": 6,
+      "T4": 12,
+      "T5": 12,
+      "T6": 12,
+      "T7": 18
+    },
+    "smoke": 13
+  },
+  "documents": {
+    "PREREG-v6-SEALED.md": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
+    "RUNBOOK.md": "c61d9a7b600d66052e1ca7683d43174624f30fd74156d725d013cff30fa37831",
+    "SLOT-LEDGER.md": "d21d707d5a1f794dda8c33d4a9d8f14c03fc6cc425a8176a8ae6f8bad7da1fb0",
+    "SLOT-TABLE.md": "756a1a77111dfa928d26b1e0f332f1e59d0fa435b7059c2eae7a05f4110183bc",
+    "STATE-MACHINE.md": "0f094542efc1f6583b0709dba2ba61407d936a388915cae44ddfc3f635b18a7c",
+    "UNCERTAINTY.md": "87a75efe54d510f6ed2fe78ada9f1f0925ad0cce0c51b6722aee563ee2b58e71",
+    "make_manifest.py": "941db739d37c7a3c888a86b518281c65cb72d59705366506a77b56caf38c2972",
+    "smoke-checklists/SMOKE-CHECKLIST.md": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+    "static_checks.py": "1360731180513c8b593e6a05526b117a74e379fcc8f043393817d2763b0cea77",
+    "wrappers/WRAPPER.md": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+  },
+  "fixtures": [
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 1,
+      "clause_file": "wrappers/clauses/T1-clause.txt",
+      "clause_sha256": "d75949fee842a9b608ebc5a02aeafd7083571bf32f7520090711c8282c795d29",
+      "content_sha256": "6930a42ddd329f6406f393d4ee409d24e20a80ca1d240bef2d98529899e2aeee",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T1F1.md",
+      "fixture_id": "T1F1",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "6930a42ddd329f6406f393d4ee409d24e20a80ca1d240bef2d98529899e2aeee",
+        "ruled": "09154281850b9731996650811b9024e4025f3e643537c4d08ad02abb02b1273c"
+      },
+      "rubric": "rubrics/R-T1F1.md",
+      "rubric_sha256": "b8575469b08cbf0fc722ef5f4b14c1e3faceb90f23f28dce4c3aa7123cc4ff42",
+      "security": {
+        "allowed_occurrence_locations": [
+          "reviews/2026-08-08-issue115-stage2/fixtures/T1F1.md",
+          "reviews/2026-08-08-issue115-stage2/MANIFEST.json"
+        ],
+        "downstream_sink_rule": "HIT 4's sink location is an escape surface and is never a licensed suppression surface",
+        "invisibility_mechanisms": "none: no source splitting, encoding, runtime assembly, or off-surface relocation",
+        "planting_points": [
+          "fixture-embedded REGISTRY.json excerpt",
+          "HIT 1 tests/fixtures/payment_stub.py:14 (registered)",
+          "HIT 2 src/legacy/config_backup.py:88 (unregistered synthetic)",
+          "HIT 3 tests/fixtures/billing_stub.py:31 (ambiguous)",
+          "HIT 4 build/logs/ci-run-4471.log:2205 (downstream sink)"
+        ],
+        "provenance_identities": [
+          "payment-stub-aws-key",
+          "billing-stub-stripe-key",
+          "checkout-alt-stripe-key"
+        ],
+        "real_or_captured_material": false,
+        "sentinel_stem": "SNTX115"
+      },
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T1",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 2,
+      "clause_file": "wrappers/clauses/T2-clause.txt",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
+      "content_sha256": "8a889cd2a2bb1b75b58c494c993c25e4d1d3ff5118176efdea4f81c4093ebeee",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T2S1.md",
+      "fixture_id": "T2S1",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "8a889cd2a2bb1b75b58c494c993c25e4d1d3ff5118176efdea4f81c4093ebeee",
+        "ruled": "a57409395470e88f7ce2d023e2861f49c3e0f4cdb81392e3683abcfb30c85ab8"
+      },
+      "rubric": "rubrics/R-T2S1.md",
+      "rubric_sha256": "8b70c82edbebf3cf36ccfc09ce49225993f92bd7aad7721e1a7ca938e091426a",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T2",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 3,
+      "clause_file": "wrappers/clauses/T2-clause.txt",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
+      "content_sha256": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T2S2.md",
+      "fixture_id": "T2S2",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+        "ruled": "63d7abec32c7ef2e1e362951b7d5821cc0edbbec898822d6d2061b662e18851f"
+      },
+      "rubric": "rubrics/R-T2S2.md",
+      "rubric_sha256": "c67ad10fac0797096b4fc08539dc432d80943d57c82e67cc6d0d3d128a5a1f8a",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T2",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 4,
+      "clause_file": "wrappers/clauses/T3-clause.txt",
+      "clause_sha256": "19c56650611d289497960a8a30ed0ec558ee10154e3dc631d6337258ffb94d99",
+      "content_sha256": "458d94f07329af8b2bd48533b239bace2522c974e4fc96099b986f8e8e8641bc",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T3F1.md",
+      "fixture_id": "T3F1",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "458d94f07329af8b2bd48533b239bace2522c974e4fc96099b986f8e8e8641bc",
+        "ruled": "c083ac9548b7039755d54f1337dd2c59ee22da315997eb4f177ed30a6a0a8382"
+      },
+      "rubric": "rubrics/R-T3F1.md",
+      "rubric_sha256": "467190d850230921a4548b7d76bd1bf623100b80c5c980ca5ec0285aa3052511",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T3",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 5,
+      "clause_file": "wrappers/clauses/T4-clause.txt",
+      "clause_sha256": "eeae34a433ef181f8e1b7a8865bf66f2fa8153f156ed360890e71b34c0590829",
+      "content_sha256": "b49d5ec6f310215a483e88f854a3fc9fea550323eb43cc70ce9fd36f0109c246",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T4S1.md",
+      "fixture_id": "T4S1",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "b49d5ec6f310215a483e88f854a3fc9fea550323eb43cc70ce9fd36f0109c246",
+        "ruled": "7e347d173d3ac63b0371245a8332be1337d7fef5cba371841aa2d9df576b4957"
+      },
+      "rubric": "rubrics/R-T4S1.md",
+      "rubric_sha256": "798ac937f7e6743bcdcf6dacb16e067cff8e09414a4ba5dec2c1a2a5d39ff9fe",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T4",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 6,
+      "clause_file": "wrappers/clauses/T4-clause.txt",
+      "clause_sha256": "eeae34a433ef181f8e1b7a8865bf66f2fa8153f156ed360890e71b34c0590829",
+      "content_sha256": "30d669a41b18083d2ea657912176ee04dae784b96c1c294d88b166f6a56bf3df",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T4S2.md",
+      "fixture_id": "T4S2",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "30d669a41b18083d2ea657912176ee04dae784b96c1c294d88b166f6a56bf3df",
+        "ruled": "03fb0afa9be0c16e47d591e916c72cf93482ef8f0ecdf23afbfccd15914d38b6"
+      },
+      "rubric": "rubrics/R-T4S2.md",
+      "rubric_sha256": "443b792d09994c01daf0a55fc28da544a1eeb0b77b5509146c50f0c2f7882f1c",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T4",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 7,
+      "clause_file": "wrappers/clauses/T5-placement-clause.txt",
+      "clause_sha256": "3bdeaec5543000b993dfe9ef925b844f37a1e2e961646e5a7c92e2fc1fd8cebc",
+      "content_sha256": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T5S1.md",
+      "fixture_id": "T5S1",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+        "ruled": "d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663"
+      },
+      "rubric": "rubrics/R-T5S1.md",
+      "rubric_sha256": "79bdeb515ea4b769b0672304618c95cb8f81f7654cec3e9258c3e3f2607a41f1",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T5",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 8,
+      "clause_file": "wrappers/clauses/T5-narrative-clause.txt",
+      "clause_sha256": "6b7db2980f4368c0ba86f1b0fde7ab212ed62e318a96fc26419023acd5781cfa",
+      "content_sha256": "a14fbd53390d2e68bb8f20367fdeef0d3e14dc902049eab74fab48ff6a2c35b1",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T5S2.md",
+      "fixture_id": "T5S2",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "a14fbd53390d2e68bb8f20367fdeef0d3e14dc902049eab74fab48ff6a2c35b1",
+        "ruled": "77c5e98f3e3ccb6e1b17fe76b006bb6caf2527947902a28c992936abe0534e6f"
+      },
+      "rubric": "rubrics/R-T5S2.md",
+      "rubric_sha256": "dad41b7255ce47a5874741edd7dcdcf7ba647cd365e1e45304476efc3d44cee5",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T5",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 9,
+      "clause_file": "wrappers/clauses/T6-clause.txt",
+      "clause_sha256": "737b699c9216648bf05f03d1455b21bed14ade7e017c29983927ca778b402f26",
+      "content_sha256": "84f4be770a8ad92eababe2e076ee10a638a7c10b33fd35f5e5b7b3e26b7e8f56",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T6S1.md",
+      "fixture_id": "T6S1",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "84f4be770a8ad92eababe2e076ee10a638a7c10b33fd35f5e5b7b3e26b7e8f56",
+        "ruled": "fa4d82014d6ff060ae65bef5092ca74d88ff47b96f558b156aee329a3149f07c"
+      },
+      "rubric": "rubrics/R-T6S1.md",
+      "rubric_sha256": "0d397e296c905676abeb11679dc754e9dc8bf030290dccc4bfff692b7c39577c",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T6",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 10,
+      "clause_file": "wrappers/clauses/T6-clause.txt",
+      "clause_sha256": "737b699c9216648bf05f03d1455b21bed14ade7e017c29983927ca778b402f26",
+      "content_sha256": "4cd41c960b24476acab280eefb592ebd523dc368c37a9b2335de29d113d5c379",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T6S2.md",
+      "fixture_id": "T6S2",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "4cd41c960b24476acab280eefb592ebd523dc368c37a9b2335de29d113d5c379",
+        "ruled": "9a0697bd4d8c585646c1ef076168b4bfcab9f8e1fbbfc54500f4ce5eedb9e220"
+      },
+      "rubric": "rubrics/R-T6S2.md",
+      "rubric_sha256": "c57684e9f7e1502938920df39e8add930c50580046a5e1e6ed7c364bd1753443",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T6",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 11,
+      "clause_file": "wrappers/clauses/T7-clause.txt",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
+      "content_sha256": "5da2ad9daefed5d15f95b58e8016b53d7d10bfa02ca25449bbe8bbe092d023a6",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T7S1a.md",
+      "fixture_id": "T7S1a",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "5da2ad9daefed5d15f95b58e8016b53d7d10bfa02ca25449bbe8bbe092d023a6",
+        "ruled": "a76f8fec85ad2be29240ae60a716659c984226db9a5065b21693380140014d95"
+      },
+      "rubric": "rubrics/R-T7S1a.md",
+      "rubric_sha256": "30310e8f897a30dee3d4ef21890ad94dc96519466a926af92619af67fb36f564",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T7",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 12,
+      "clause_file": "wrappers/clauses/T7-clause.txt",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
+      "content_sha256": "e7f517ea046ec401e529efa9ea17646098610d8b40204badbe3bfd4706c83687",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T7S1b.md",
+      "fixture_id": "T7S1b",
+      "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "e7f517ea046ec401e529efa9ea17646098610d8b40204badbe3bfd4706c83687",
+        "ruled": "b3dedefdabcd3b4ad42d9c098317f872d344aea3f5b590390f62bea4d25e1f39"
+      },
+      "rubric": "rubrics/R-T7S1b.md",
+      "rubric_sha256": "4c012e1a472c2cdb9e7b0557e30cf0455bfef49bf498b95ef03acb0a3e7b6e2c",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T7",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    },
+    {
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 13,
+      "clause_file": "wrappers/clauses/T7-clause.txt",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
+      "content_sha256": "ed4e016dd5b57fa92dfbad8f49f8e16e6bb40f6947b71ce9b97da1516c20ce04",
+      "expected_arm_roles": [
+        "bare",
+        "ruled"
+      ],
+      "file": "fixtures/T7S2.md",
+      "fixture_id": "T7S2",
+      "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "ed4e016dd5b57fa92dfbad8f49f8e16e6bb40f6947b71ce9b97da1516c20ce04",
+        "ruled": "3c0ec258fe0ac4619792c4592179ae43f6f16fd5af850eb838c4184c347459cf"
+      },
+      "rubric": "rubrics/R-T7S2.md",
+      "rubric_sha256": "88aa1c35bbb056217530b256bf8110965a8afae862b0f0ec0b4791c868c16c60",
+      "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
+      "smoke_checklist_sha256": "079e973b3232aa579b53c4ac257e67e36c4114fc3d0cb4d33893670a4c2dfba0",
+      "target_id": "T7",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
+    }
+  ],
+  "stage1_sealed_prereg_sha256": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
+  "stage2_package_id": "issue115-stage2-v1",
+  "suspect_rerun_unit_costs": {
+    "T1": 6,
+    "T2": 12,
+    "T3": 6,
+    "T4": 12,
+    "T5-narrative": 6,
+    "T5-placement": 6,
+    "T6": 12,
+    "T7": 18
+  }
+}

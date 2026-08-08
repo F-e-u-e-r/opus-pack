@@ -1,0 +1,8 @@
+The same applies to the deployment **platform**, not just its data: a
+severity claim can be version-conditional (measured: a reviewer's top P1
+"prints ALL GREEN with zero gates" held only on bash >=4.4 — on the machine
+it described, bash 3.2 crashed instead). Bind the severity to the
+affected supported environment(s) the claim is about — reproduce there
+before relaying it, and never generalize one platform's or version's
+reproduction to another without its own run; "reproduced somewhere" is
+not "reproduced where it ships". (`unprobed` — see Provenance.)
