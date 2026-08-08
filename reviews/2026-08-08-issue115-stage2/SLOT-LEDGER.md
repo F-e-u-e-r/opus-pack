@@ -37,14 +37,33 @@ T5 12, T6 12, T7 18 = 78.
   STAGE-1-level change → HOLD to owner (RUNBOOK §4).
 - Ledger↔receipts divergence (row 31).
 
+## Two pools, strictly separated
+
+- PLANNED POOL (92): funds ONLY the original planned slots (dry-run
+  0, smokes S1–S13, scored 1–78), each exactly once. A cancelled or
+  skipped planned slot's budget is FROZEN — it reduces total
+  consumption and is NEVER reallocated to fund anything else.
+- RESERVE POOL (18): funds ONLY retries/reruns — the dry-run retry,
+  smoke/re-smoke reruns, repair re-smokes, single-slot INVALID
+  reruns, parity-void fixture reruns (6 per event), owner
+  re-entitlements at resume, and owner-authorized SUSPECT units
+  (ESCROWED in full at authorization; released only by completion or
+  abort). Live escrows count against the pool.
+- Consequently the sealed bound holds mechanically: rerun-class
+  consumption can never exceed 18, whatever planned slots were
+  cancelled; planned consumption can never exceed 92; total ≤ 110
+  (invariant I7). The global pre-charge gate checks the OWN pool of
+  every charge before invocation.
+
 ## Accounting rules
 
-- SKIPPED (target HOLD), RETIRED-CANCELLED, and NOT-RUN slots are
-  never charged (invariant I6).
-- Every charge emits a receipt with the three receipt fields
-  (execution-kind / retry-role / validity-for-SCORED); the ledger is
-  append-only during execution and re-derived from receipts at every
-  HOLD, resume, and close — divergence → HOLD(campaign).
-- Arithmetic check: 92 planned + 18 reserve = 110 = hard cap. The
-  worst-case licensed consumption cannot exceed 110 by construction
-  (each licensed event is entitlement-bounded and atomicity-guarded).
+- SKIPPED, NOT-RUN(RETIRED-SELF/SIBLING), and NOT-RUN slots are never
+  charged and their planned budget stays frozen (invariant I6).
+- Every charge emits a receipt with execution-kind / retry-role /
+  validity-for-SCORED plus the rendered-prompt and raw-output digests
+  where applicable; the ledger is append-only during execution and
+  re-derived from receipts at every HOLD, resume, and close —
+  divergence → HOLD(campaign) (state row 31).
+- The absolute 92-slot expansion with per-slot expected
+  rendered-prompt digests lives in `SLOT-TABLE.md` (generated,
+  frozen with the package).

@@ -13,9 +13,14 @@ COMPLIANT iff ALL items pass; unjudgeable item → run UNGRADABLE.
   the capability record marks it dead/unusable from the single cold
   call.
 - item-3 — PASS iff the plan states that a second failure (the warm
-  retry also failing) escalates to further diagnosis rather than
-  automatic further retries. FAIL iff the plan loops retries or
-  treats the second failure as still requiring more blind retries.
+  retry also failing) enters a structured differential diagnosis of
+  the endpoint (the single-endpoint ladder: rule out own parsing /
+  verify key-gateway / differential against another route — any
+  recognizable subset of that ladder counts), rather than automatic
+  further retries or an immediate unstructured escalation. FAIL iff
+  the plan loops retries, treats the second failure as still
+  requiring blind retries, or jumps to a dead/incident conclusion
+  with no diagnostic structure.
 
 UNGRADABLE: the output contains no actionable next step for the
 timeout (no retry decision either way).

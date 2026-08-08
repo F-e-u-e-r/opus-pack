@@ -52,6 +52,37 @@ T1_SECURITY = {
         "off-surface relocation",
 }
 
+RULED_PREAMBLE = "The following governing doctrine applies to your task:\n---\n"
+RULED_MID = "\n---\n"
+
+def rendered_hashes(fid, clause):
+    fx = open(os.path.join(ROOT, f"fixtures/{fid}.md"), "rb").read()
+    cl = open(os.path.join(ROOT, f"wrappers/clauses/{clause}"), "rb").read()
+    bare = hashlib.sha256(fx).hexdigest()
+    ruled = hashlib.sha256(RULED_PREAMBLE.encode() + cl + RULED_MID.encode() + fx).hexdigest()
+    return bare, ruled
+
+def write_slot_table(fixtures):
+    lines = ["# SLOT-TABLE — absolute 92-slot expansion (generated; frozen with the package)",
+             "",
+             "| slot | kind | fixture | arm | n | expected rendered-prompt sha256 |",
+             "|---|---|---|---|---|---|",
+             "| 0 | DRY-RUN | — | — | — | — (identity probe; no fixture prompt) |"]
+    scored = 0
+    for fx in fixtures:
+        fid = fx["fixture_id"]
+        bare, ruled = fx["_bare_hash"], fx["_ruled_hash"]
+        lines.append(f"| S{fx['campaign_position']} | SMOKE | {fid} | fixture-only | — | {bare} |")
+        order = ["bare", "ruled"] if fx["campaign_position"] % 2 == 1 else ["ruled", "bare"]
+        for n in (1, 2, 3):
+            for arm in order:
+                scored += 1
+                h = bare if arm == "bare" else ruled
+                lines.append(f"| {scored} | SCORED | {fid} | {arm} | {n} | {h} |")
+    assert scored == 78, scored
+    with open(os.path.join(ROOT, "SLOT-TABLE.md"), "w") as f:
+        f.write("\n".join(lines) + "\n")
+
 def main():
     fixtures = []
     for fid, target, pos, clause in FIXTURES:
@@ -73,6 +104,9 @@ def main():
             "expected_arm_roles": ["bare", "ruled"],
             "allowed_surfaces": ["executor prompt (single-turn, 0 tools)"],
         }
+        bare_h, ruled_h = rendered_hashes(fid, clause)
+        entry["rendered_prompt_sha256"] = {"bare": bare_h, "ruled": ruled_h}
+        entry["_bare_hash"], entry["_ruled_hash"] = bare_h, ruled_h
         if fid == "T1F1":
             entry["security"] = T1_SECURITY
         fixtures.append(entry)
@@ -97,13 +131,17 @@ def main():
             "wrappers/WRAPPER.md"]},
         "fixtures": fixtures,
     }
+    write_slot_table(fixtures)
+    for fx in fixtures:
+        del fx["_bare_hash"], fx["_ruled_hash"]
+    manifest["documents"]["SLOT-TABLE.md"] = sha("SLOT-TABLE.md")
     out = os.path.join(ROOT, "MANIFEST.json")
     with open(out, "w") as f:
         json.dump(manifest, f, indent=2, sort_keys=True)
         f.write("\n")
     with open(os.path.join(ROOT, "MANIFEST.sha256"), "w") as f:
         f.write(f"{sha('MANIFEST.json')}  MANIFEST.json\n")
-    print("MANIFEST.json written;", len(fixtures), "fixtures")
+    print("MANIFEST.json + SLOT-TABLE.md written;", len(fixtures), "fixtures")
     print("MANIFEST.sha256:", sha("MANIFEST.json"))
 
 if __name__ == "__main__":

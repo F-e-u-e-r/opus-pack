@@ -15,3 +15,5 @@
   (rule 4).
   ❌ "the hook runs the full test suite on every edit" — the suite was
   already red with unrelated failures, so it blocked all work from its
+  first firing.
+

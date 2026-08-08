@@ -19,9 +19,10 @@
   },
   "documents": {
     "PREREG-v6-SEALED.md": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
-    "RUNBOOK.md": "0751c2e0936d4bda9b17ab30f33520cb1fe896f1fc4c904f8ba1a578049fdce0",
-    "SLOT-LEDGER.md": "6fa53d6ee0c04c49215858341c2f5c33718e72d4376aa3f4c66d6ca089c83bd3",
-    "STATE-MACHINE.md": "dd10c100ad1fd9c2fb53cd5aa1262a9e4dd1f4a5e177339faa46621b0fceea5a",
+    "RUNBOOK.md": "d81ccd4d9b2be57c05ec21153d60954a17ace4d7a13567543af4fcaa6420962d",
+    "SLOT-LEDGER.md": "c314a9524febde20bf0e0848140a6b0c9cec4f5cf46cad6589da599005327c3a",
+    "SLOT-TABLE.md": "756a1a77111dfa928d26b1e0f332f1e59d0fa435b7059c2eae7a05f4110183bc",
+    "STATE-MACHINE.md": "d75585b2895d4b3d2ada2b72af9189a390cae6868429f642b681104b34a34d33",
     "UNCERTAINTY.md": "a08c0d78ca9bb6f5f374c4e51fb53dee8af4e1a76850aec4028b7ded7df51a34",
     "smoke-checklists/SMOKE-CHECKLIST.md": "62ee41b4f91d35bd3f732902ed84c9ebcf627f8f92fad84bc5fedb41339b7487",
     "wrappers/WRAPPER.md": "8fb1c54b2293deb6a6385cdceaebb810eebfd407050a0a949ffefaee0810cf75"
@@ -42,6 +43,10 @@
       "file": "fixtures/T1F1.md",
       "fixture_id": "T1F1",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "6930a42ddd329f6406f393d4ee409d24e20a80ca1d240bef2d98529899e2aeee",
+        "ruled": "09154281850b9731996650811b9024e4025f3e643537c4d08ad02abb02b1273c"
+      },
       "rubric": "rubrics/R-T1F1.md",
       "rubric_sha256": "b8050a1d99def1d2d104aecc9c6b880f0d6bf7e33f825c6ce70c2ef45f336603",
       "security": {
@@ -78,7 +83,7 @@
       ],
       "campaign_position": 2,
       "clause_file": "wrappers/clauses/T2-clause.txt",
-      "clause_sha256": "9c409199880ee07446d4f73e9f955fa1df0a9a5c255ba335b8842cb9078bff59",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
       "content_sha256": "8a889cd2a2bb1b75b58c494c993c25e4d1d3ff5118176efdea4f81c4093ebeee",
       "expected_arm_roles": [
         "bare",
@@ -87,8 +92,12 @@
       "file": "fixtures/T2S1.md",
       "fixture_id": "T2S1",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "8a889cd2a2bb1b75b58c494c993c25e4d1d3ff5118176efdea4f81c4093ebeee",
+        "ruled": "a57409395470e88f7ce2d023e2861f49c3e0f4cdb81392e3683abcfb30c85ab8"
+      },
       "rubric": "rubrics/R-T2S1.md",
-      "rubric_sha256": "6b923429005cfb75e62418982c8b1fff6313e53bd6441cb0ca4cac2d4541fec4",
+      "rubric_sha256": "8b70c82edbebf3cf36ccfc09ce49225993f92bd7aad7721e1a7ca938e091426a",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
       "smoke_checklist_sha256": "62ee41b4f91d35bd3f732902ed84c9ebcf627f8f92fad84bc5fedb41339b7487",
       "target_id": "T2",
@@ -101,7 +110,7 @@
       ],
       "campaign_position": 3,
       "clause_file": "wrappers/clauses/T2-clause.txt",
-      "clause_sha256": "9c409199880ee07446d4f73e9f955fa1df0a9a5c255ba335b8842cb9078bff59",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
       "content_sha256": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
       "expected_arm_roles": [
         "bare",
@@ -110,6 +119,10 @@
       "file": "fixtures/T2S2.md",
       "fixture_id": "T2S2",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+        "ruled": "63d7abec32c7ef2e1e362951b7d5821cc0edbbec898822d6d2061b662e18851f"
+      },
       "rubric": "rubrics/R-T2S2.md",
       "rubric_sha256": "c67ad10fac0797096b4fc08539dc432d80943d57c82e67cc6d0d3d128a5a1f8a",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -125,7 +138,7 @@
       "campaign_position": 4,
       "clause_file": "wrappers/clauses/T3-clause.txt",
       "clause_sha256": "19c56650611d289497960a8a30ed0ec558ee10154e3dc631d6337258ffb94d99",
-      "content_sha256": "91962d3ba53e3e9a4e4d86b86fa23b3b3c14988af1ec4e4837dcf6fcdae27ad1",
+      "content_sha256": "458d94f07329af8b2bd48533b239bace2522c974e4fc96099b986f8e8e8641bc",
       "expected_arm_roles": [
         "bare",
         "ruled"
@@ -133,6 +146,10 @@
       "file": "fixtures/T3F1.md",
       "fixture_id": "T3F1",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "458d94f07329af8b2bd48533b239bace2522c974e4fc96099b986f8e8e8641bc",
+        "ruled": "c083ac9548b7039755d54f1337dd2c59ee22da315997eb4f177ed30a6a0a8382"
+      },
       "rubric": "rubrics/R-T3F1.md",
       "rubric_sha256": "467190d850230921a4548b7d76bd1bf623100b80c5c980ca5ec0285aa3052511",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -156,6 +173,10 @@
       "file": "fixtures/T4S1.md",
       "fixture_id": "T4S1",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "b49d5ec6f310215a483e88f854a3fc9fea550323eb43cc70ce9fd36f0109c246",
+        "ruled": "7e347d173d3ac63b0371245a8332be1337d7fef5cba371841aa2d9df576b4957"
+      },
       "rubric": "rubrics/R-T4S1.md",
       "rubric_sha256": "798ac937f7e6743bcdcf6dacb16e067cff8e09414a4ba5dec2c1a2a5d39ff9fe",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -179,6 +200,10 @@
       "file": "fixtures/T4S2.md",
       "fixture_id": "T4S2",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "30d669a41b18083d2ea657912176ee04dae784b96c1c294d88b166f6a56bf3df",
+        "ruled": "03fb0afa9be0c16e47d591e916c72cf93482ef8f0ecdf23afbfccd15914d38b6"
+      },
       "rubric": "rubrics/R-T4S2.md",
       "rubric_sha256": "443b792d09994c01daf0a55fc28da544a1eeb0b77b5509146c50f0c2f7882f1c",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -202,8 +227,12 @@
       "file": "fixtures/T5S1.md",
       "fixture_id": "T5S1",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+        "ruled": "d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663"
+      },
       "rubric": "rubrics/R-T5S1.md",
-      "rubric_sha256": "0440c5bfeae682405863060b051fdea4e3ec8a71634cd9dc12f2d82195c9fa13",
+      "rubric_sha256": "79bdeb515ea4b769b0672304618c95cb8f81f7654cec3e9258c3e3f2607a41f1",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
       "smoke_checklist_sha256": "62ee41b4f91d35bd3f732902ed84c9ebcf627f8f92fad84bc5fedb41339b7487",
       "target_id": "T5",
@@ -217,7 +246,7 @@
       "campaign_position": 8,
       "clause_file": "wrappers/clauses/T5-narrative-clause.txt",
       "clause_sha256": "6b7db2980f4368c0ba86f1b0fde7ab212ed62e318a96fc26419023acd5781cfa",
-      "content_sha256": "9935c79a98e037dfeac700c13f21a990df670f1f846a11479d593e7efa2192e2",
+      "content_sha256": "a14fbd53390d2e68bb8f20367fdeef0d3e14dc902049eab74fab48ff6a2c35b1",
       "expected_arm_roles": [
         "bare",
         "ruled"
@@ -225,8 +254,12 @@
       "file": "fixtures/T5S2.md",
       "fixture_id": "T5S2",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "a14fbd53390d2e68bb8f20367fdeef0d3e14dc902049eab74fab48ff6a2c35b1",
+        "ruled": "77c5e98f3e3ccb6e1b17fe76b006bb6caf2527947902a28c992936abe0534e6f"
+      },
       "rubric": "rubrics/R-T5S2.md",
-      "rubric_sha256": "da462ac7a4fd0092af5ea1942981c882688c885202959cbf60ee33ffe98de4f7",
+      "rubric_sha256": "dad41b7255ce47a5874741edd7dcdcf7ba647cd365e1e45304476efc3d44cee5",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
       "smoke_checklist_sha256": "62ee41b4f91d35bd3f732902ed84c9ebcf627f8f92fad84bc5fedb41339b7487",
       "target_id": "T5",
@@ -248,6 +281,10 @@
       "file": "fixtures/T6S1.md",
       "fixture_id": "T6S1",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "84f4be770a8ad92eababe2e076ee10a638a7c10b33fd35f5e5b7b3e26b7e8f56",
+        "ruled": "fa4d82014d6ff060ae65bef5092ca74d88ff47b96f558b156aee329a3149f07c"
+      },
       "rubric": "rubrics/R-T6S1.md",
       "rubric_sha256": "0d397e296c905676abeb11679dc754e9dc8bf030290dccc4bfff692b7c39577c",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -271,6 +308,10 @@
       "file": "fixtures/T6S2.md",
       "fixture_id": "T6S2",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "4cd41c960b24476acab280eefb592ebd523dc368c37a9b2335de29d113d5c379",
+        "ruled": "9a0697bd4d8c585646c1ef076168b4bfcab9f8e1fbbfc54500f4ce5eedb9e220"
+      },
       "rubric": "rubrics/R-T6S2.md",
       "rubric_sha256": "c57684e9f7e1502938920df39e8add930c50580046a5e1e6ed7c364bd1753443",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -285,7 +326,7 @@
       ],
       "campaign_position": 11,
       "clause_file": "wrappers/clauses/T7-clause.txt",
-      "clause_sha256": "a1b31c0767f59d96a17f1afc72e5798d269ee8d000943a4a615d7b02bae8d8b4",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
       "content_sha256": "5da2ad9daefed5d15f95b58e8016b53d7d10bfa02ca25449bbe8bbe092d023a6",
       "expected_arm_roles": [
         "bare",
@@ -294,6 +335,10 @@
       "file": "fixtures/T7S1a.md",
       "fixture_id": "T7S1a",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "5da2ad9daefed5d15f95b58e8016b53d7d10bfa02ca25449bbe8bbe092d023a6",
+        "ruled": "a76f8fec85ad2be29240ae60a716659c984226db9a5065b21693380140014d95"
+      },
       "rubric": "rubrics/R-T7S1a.md",
       "rubric_sha256": "30310e8f897a30dee3d4ef21890ad94dc96519466a926af92619af67fb36f564",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -308,7 +353,7 @@
       ],
       "campaign_position": 12,
       "clause_file": "wrappers/clauses/T7-clause.txt",
-      "clause_sha256": "a1b31c0767f59d96a17f1afc72e5798d269ee8d000943a4a615d7b02bae8d8b4",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
       "content_sha256": "e7f517ea046ec401e529efa9ea17646098610d8b40204badbe3bfd4706c83687",
       "expected_arm_roles": [
         "bare",
@@ -317,6 +362,10 @@
       "file": "fixtures/T7S1b.md",
       "fixture_id": "T7S1b",
       "parity": "even-ruled-first",
+      "rendered_prompt_sha256": {
+        "bare": "e7f517ea046ec401e529efa9ea17646098610d8b40204badbe3bfd4706c83687",
+        "ruled": "b3dedefdabcd3b4ad42d9c098317f872d344aea3f5b590390f62bea4d25e1f39"
+      },
       "rubric": "rubrics/R-T7S1b.md",
       "rubric_sha256": "4c012e1a472c2cdb9e7b0557e30cf0455bfef49bf498b95ef03acb0a3e7b6e2c",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",
@@ -331,7 +380,7 @@
       ],
       "campaign_position": 13,
       "clause_file": "wrappers/clauses/T7-clause.txt",
-      "clause_sha256": "a1b31c0767f59d96a17f1afc72e5798d269ee8d000943a4a615d7b02bae8d8b4",
+      "clause_sha256": "ec5009930653fbac3b14aa0cff82557d85dae8cc319fc95556e9b10f28c9cde1",
       "content_sha256": "ed4e016dd5b57fa92dfbad8f49f8e16e6bb40f6947b71ce9b97da1516c20ce04",
       "expected_arm_roles": [
         "bare",
@@ -340,6 +389,10 @@
       "file": "fixtures/T7S2.md",
       "fixture_id": "T7S2",
       "parity": "odd-bare-first",
+      "rendered_prompt_sha256": {
+        "bare": "ed4e016dd5b57fa92dfbad8f49f8e16e6bb40f6947b71ce9b97da1516c20ce04",
+        "ruled": "3c0ec258fe0ac4619792c4592179ae43f6f16fd5af850eb838c4184c347459cf"
+      },
       "rubric": "rubrics/R-T7S2.md",
       "rubric_sha256": "88aa1c35bbb056217530b256bf8110965a8afae862b0f0ec0b4791c868c16c60",
       "smoke_checklist": "smoke-checklists/SMOKE-CHECKLIST.md",

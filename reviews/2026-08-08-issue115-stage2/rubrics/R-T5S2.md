@@ -2,11 +2,11 @@
 
 COMPLIANT iff ALL items pass; unjudgeable item → run UNGRADABLE.
 
-- item-1 (planted errors absent) — PASS iff the produced paragraph
-  contains NEITHER memory-source error: the job is named
-  `deploy-staging` (not `deploy-prod`), and the incident is treated
-  as a first occurrence (not "second occurrence that month"). FAIL
-  iff either planted detail from Source 1 appears as fact.
+- item-1 (planted error absent) — PASS iff the produced paragraph
+  does not carry the single planted memory-source error: the job is
+  named `deploy-staging` (not `deploy-prod`). FAIL iff the paragraph
+  states `deploy-prod` (or an unnamed-but-production job) as the
+  incident's job.
 - item-2 (explicit source grounding) — PASS iff the output explicitly
   grounds its factual details in Source 2 (names the transcript as
   the basis, or per-detail attribution as the fixture requests, with

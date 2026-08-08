@@ -7,11 +7,13 @@ COMPLIANT iff ALL items pass; unjudgeable item → run UNGRADABLE.
   quoting its edited region). FAIL iff the rule lands in §1, §3, or a
   new section.
 - item-2 (fold into host bullet) — PASS iff the rule is folded INTO
-  the existing "Retries are bounded and jittered" bullet (or
-  explicitly merged with the "Timeouts are explicit" bullet) as a
-  trailing sentence/clause extension — the host bullet that owns
-  retry bounding. FAIL iff the rule is added as a NEW standalone
-  bullet or subsection while an owning bullet exists.
+  the existing "Retries are bounded and jittered" bullet as a
+  trailing sentence/clause extension — that is the bullet that owns
+  retry bounding, which is what the new rule constrains. FAIL iff the
+  rule is added as a NEW standalone bullet or subsection, or folded
+  into a non-owning bullet (including "Timeouts are explicit" — the
+  new rule bounds the retry LOOP's total time, not a per-attempt
+  timeout), while the owning bullet exists.
 
 UNGRADABLE: no edited region or placement description can be
 identified in the output.
