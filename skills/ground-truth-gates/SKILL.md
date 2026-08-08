@@ -773,36 +773,23 @@ enforces one at runtime — and has its own failure design:
   global policy control fires everywhere by design. (Distinct from the
   fail-direction choice above, which governs a guard a project is already subject
   to.)
-- **A coupled-edit tripwire runs the dependents' check at edit time — verified
-  green at baseline first, and it blocks with the failure, never a fix**
-  (`unprobed` — contributor rollout as shape; see Provenance). Documented
-  cross-file couplings — a header saying "keep the two in sync", a
-  hand-maintained mirror, a golden snapshot over shared constants — break at
-  edit time and surface far away, so wire an edit-time hook keyed on the
-  coupled file that runs the specific check its dependents rely on and, on
-  failure, blocks with the failure text fed back to the editor, so the ripple
-  is fixed inside the same change. Three disciplines make it a gate rather
-  than a nuisance. Mine tripwires from the repo's own coupling documentation
-  and from dead compile-time gates (a type-level parity assertion no script
-  ever runs is coverage nobody gets — resurrect it as the tripwire), and
-  verify every candidate check by RUNNING it before wiring: coupling comments
-  cite regeneration scripts that were never committed and test directories
-  that no longer exist. Run the check at baseline BEFORE the hook exists —
-  the pass half of rule 2's two-sided proof, applied to a blocking guard: a
-  tripwire wired over an already-red suite blocks every edit including the
-  unrelated ones, and a guard that blocks all work gets deleted, not fixed;
-  scope to targeted sub-checks verified green, and leave the full suite to
-  the ship gate, not the per-edit loop. And block-and-report, never auto-fix:
-  the repair needs judgment (accept the new golden numbers, or revert the
-  code? which side of the mirror is right?), so the hook's *decision* stays
-  deterministic per item 6 while the *repair* stays with the editor — an
-  auto-repairing hook makes that call silently, in whichever direction it
-  was hardcoded. Pair the hook with a CI twin running the identical checks:
-  the hook is the fast in-session loop on one machine; the CI layer is the
-  authoritative gate for every contributor.
+- **A recurring cross-file invariant earns its check at the earliest
+  reliable feedback layer — proven green at baseline before it may
+  block** (`unprobed` — contributor rollout as shape; see Provenance).
+  When a known coupling keeps breaking far from the edits that break it,
+  move a minimal deterministic check for THAT invariant to the earliest
+  layer that can reliably run it — an edit-time hook where one exists,
+  else CI; the ship gate stays the authoritative layer either way. Run
+  the check at baseline BEFORE it may block: wired over an already-red
+  state it blocks every edit, unrelated ones included, and a guard that
+  blocks all work gets deleted, not fixed — so scope it to the targeted
+  sub-check, and leave the full suite to the ship gate. It blocks with
+  the failure reported, never a repair — which side of a coupling is
+  right is judgment, and gate changes stay the orchestrator's call
+  (rule 4).
   ❌ "the hook runs the full test suite on every edit" — the suite was
-  already red with unrelated failures, so the guard blocked all work from
-  its first firing.
+  already red with unrelated failures, so it blocked all work from its
+  first firing.
 
 ## When NOT to build a gate
 
@@ -1042,23 +1029,20 @@ on one runtime, grade on a second the baseline claims to support,
 observe whether a ruled reviewer reaches for a declared numeric
 contract where a bare one reaches for the pin — joins the standing
 #115 queue.
-The coupled-edit tripwire bullet (2026-08-07) comes from a contributor
-rollout (contributor-reported, not linkable): the pattern was installed
-across five repos in one day, each tripwire mined from the repo's own
-coupling comments (a "keep the two in sync" prose mirror; a hand-maintained
-duplicate documented as byte-identical) or from a dead compile-time gate (an
-i18n parity type-assertion that no script ever ran, resurrected by the hook
-and its CI twin), and every hook verified two-sided by piping synthetic edit
-events — a green path and at least one red path each, reverted cleanly. The
-baseline-first clause comes from the same rollout: one repo's full suite was
-already red with three unrelated failures, which a naive full-suite hook
-would have converted into a block on every edit; the scout reports for the
-same rollout also cited a regeneration script never committed and a test
-directory that no longer existed, which is the run-every-candidate clause.
-Ships `unprobed` per the covenant; its probe — seed a documented two-file
-coupling with a red baseline sub-check and observe whether a ruled reviewer
-demands the baseline run before wiring where a bare one does not — joins
-the standing #115 queue.
+The coupled-edit early-check bullet (2026-08-07; maintainer fold
+2026-08-08) comes from a contributor rollout (contributor-reported, not
+linkable): tripwire hooks installed across five repos in one day, each
+verified two-sided by piped synthetic edit events; one repo's suite was
+already red with three unrelated failures — a naive full-suite hook
+would have blocked every edit, which is the baseline-first clause. The
+earliest-reliable-layer form and the hook-as-example scoping are the
+fold's; the original's edit-time-hook mandate, dead-gate resurrection,
+and CI-twin pairing were trimmed as duplicating existing rules (item 3,
+rule 4) or over-generalizing the rollout. Ships `unprobed` per the
+covenant; its probe — seed a two-file coupling with a red baseline
+sub-check, observe whether a ruled reviewer demands the baseline run
+before the check may block where a bare one wires it straight in —
+joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
