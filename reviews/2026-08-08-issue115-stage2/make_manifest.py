@@ -148,7 +148,8 @@ def main():
             "PREREG-v6-SEALED.md", "RUNBOOK.md", "STATE-MACHINE.md",
             "SLOT-LEDGER.md", "UNCERTAINTY.md",
             "smoke-checklists/SMOKE-CHECKLIST.md",
-            "wrappers/WRAPPER.md"]},
+            "wrappers/WRAPPER.md",
+            "make_manifest.py", "static_checks.py"]},
         "fixtures": fixtures,
     }
     write_slot_table(fixtures)

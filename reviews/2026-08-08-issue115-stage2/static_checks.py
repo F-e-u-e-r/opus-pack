@@ -33,6 +33,12 @@ for fx in m["fixtures"]:
 check("manifest-hashes: every recorded sha256 re-derives", ok)
 check("manifest-self-hash: MANIFEST.sha256 matches MANIFEST.json",
       text("MANIFEST.sha256").split()[0] == sha("MANIFEST.json"))
+check("freeze-set: documents cover the full operational set, both gates included",
+      set(m["documents"]) == {
+          "PREREG-v6-SEALED.md", "RUNBOOK.md", "STATE-MACHINE.md",
+          "SLOT-LEDGER.md", "UNCERTAINTY.md",
+          "smoke-checklists/SMOKE-CHECKLIST.md", "wrappers/WRAPPER.md",
+          "make_manifest.py", "static_checks.py", "SLOT-TABLE.md"})
 
 # 2. Sealed STAGE-1 binding.
 check("sealed-prereg: PREREG-v6-SEALED.md hash equals the sealed 2c7e3f21…",
@@ -187,11 +193,26 @@ for dirpath, _, files in os.walk(ROOT):
                     hits.append(f"{rel}:{pat.pattern}")
 check("extinction-sweep: deleted-lifecycle residue absent package-wide",
       hits == [], str(hits))
-check("twin-sweep: sentinel stem SNTX115 appears only in T1F1 + MANIFEST + this checker",
-      all(("SNTX115" in text(p)) == (p in ("fixtures/T1F1.md", "MANIFEST.json", "static_checks.py"))
-          for p in ["fixtures/T1F1.md", "MANIFEST.json", "static_checks.py",
-                     "fixtures/T2S1.md", "fixtures/T6S1.md", "RUNBOOK.md",
-                     "PREREG-v6-SEALED.md"]))
+# Sentinel containment: walk EVERY package file; the stem may appear
+# only where the fixture design plants it or where tooling must name it.
+_sentinel_allowed = {"fixtures/T1F1.md", "MANIFEST.json",
+                     "make_manifest.py", "static_checks.py"}
+_sentinel_hits, _sentinel_present = [], set()
+for dirpath, _, files in os.walk(ROOT):
+    for fn in files:
+        rel = os.path.relpath(os.path.join(dirpath, fn), ROOT)
+        try:
+            body = text(rel)
+        except (UnicodeDecodeError, IsADirectoryError):
+            continue
+        if "SNTX115" in body:
+            _sentinel_present.add(rel)
+            if rel not in _sentinel_allowed:
+                _sentinel_hits.append(rel)
+check("twin-sweep: sentinel stem SNTX115 confined to its four authorized files "
+      "(full package walk)",
+      _sentinel_hits == [] and {"fixtures/T1F1.md", "MANIFEST.json"} <= _sentinel_present,
+      str(_sentinel_hits))
 
 # 9. T1 security: no real-looking credentials beyond the declared synthetics.
 t1 = text("fixtures/T1F1.md")
@@ -208,7 +229,7 @@ check("t1-security: no invisibility mechanisms declared or present",
 # 10. Unicode sweep over all fixtures (zero-width/bidi/tag-block),
 # pattern built entirely from escapes so this file carries no such char.
 _ranges = [(0x200B, 0x200F), (0x202A, 0x202E), (0x2066, 0x2069),
-           (0x2060, 0x2060), (0x061C, 0x061C), (0xFEFF, 0xFEFF),
+           (0x2060, 0x2064), (0x061C, 0x061C), (0xFEFF, 0xFEFF),
            (0xE0000, 0xE007F)]
 bad = re.compile("[" + "".join(
     re.escape(chr(a)) + "-" + re.escape(chr(b)) if a != b else re.escape(chr(a))

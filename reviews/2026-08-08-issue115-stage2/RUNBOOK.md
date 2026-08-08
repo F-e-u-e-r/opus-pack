@@ -177,7 +177,7 @@ scored invocation (state rows 14/14b).
   SUSPECT and follow their own adjudication, never silently resumed.
 - ADJUDICATION-INTERRUPTED, FIXTURE-DEFECT, and PARITY holds resume
   only through the owner adjudication records defined in state rows
-  23/7b/27b — there is no generic resume for an owner-mediated path.
+  23b/7b/27b — there is no generic resume for an owner-mediated path.
 - Resume preconditions (all, receipted): fresh drift check over all
   non-terminal targets; full re-verification against the approved
   package version's MANIFEST (every fixture/wrapper/rubric/checklist
