@@ -106,7 +106,14 @@ scored invocation (state rows 14/14b).
   outside the set (or any `make_manifest.py` regeneration outside a
   repair mini-gate) is a protocol deviation (state row 31).
   Self-consistency between a regenerated MANIFEST and edited
-  artifacts proves nothing on its own.
+  artifacts proves nothing on its own. DERIVED ARTIFACTS:
+  AMENDMENTS.json is the gate-written receipt chain itself;
+  SLOT-TABLE.md, MANIFEST.json, and MANIFEST.sha256 are DERIVED
+  views, regenerated exactly once inside a repair's amendment
+  transaction with their new hashes recorded in that amendment
+  receipt — the single versioned digest authority for every slot is
+  the fixture's current valid version (start anchor, or latest
+  amendment), per STATE-MACHINE's R-SLOT BINDING.
 
 ## 4. §K-3 — Retired-fixture slot accounting
 

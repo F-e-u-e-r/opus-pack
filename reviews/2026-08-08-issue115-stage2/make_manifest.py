@@ -85,13 +85,29 @@ def write_slot_table(fixtures):
 
 def main():
     am_path = os.path.join(ROOT, "AMENDMENTS.json")
-    if os.path.exists(am_path):
-        chain = json.load(open(am_path)).get("amendments", [])
-        if chain and "--amend" not in sys.argv:
-            print("REFUSED: amendment chain is non-empty; regeneration outside "
-                  "a repair mini-gate is a protocol deviation (state row 31). "
-                  "Re-run with --amend only as part of a gated repair.")
-            return 1
+    chain = json.load(open(am_path)).get("amendments", []) if os.path.exists(am_path) else []
+    if chain and "--amend" not in sys.argv:
+        print("REFUSED: amendment chain is non-empty; regeneration outside "
+              "a repair mini-gate is a protocol deviation (state row 31).")
+        return 1
+    if "--amend" in sys.argv:
+        # --amend fixtures/<id>.md — the gated repair transaction:
+        # the chain's TAIL entry must name this path, carry an owner
+        # signature, and its new_sha256 must equal the file's current
+        # bytes; only fixture paths are amendable.
+        try:
+            target = sys.argv[sys.argv.index("--amend") + 1]
+        except IndexError:
+            print("REFUSED: --amend requires a fixtures/<id>.md path"); return 1
+        if not target.startswith("fixtures/"):
+            print("REFUSED: only fixture paths are amendable"); return 1
+        if not chain or chain[-1].get("path") != target:
+            print("REFUSED: the amendment chain's tail entry does not name", target); return 1
+        tail = chain[-1]
+        if not tail.get("owner_signature"):
+            print("REFUSED: tail amendment lacks an owner signature"); return 1
+        if sha(target) != tail.get("new_sha256"):
+            print("REFUSED: current bytes of", target, "do not match the tail receipt's new_sha256"); return 1
     fixtures = []
     for fid, target, pos, clause in FIXTURES:
         entry = {

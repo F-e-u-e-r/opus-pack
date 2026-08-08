@@ -98,8 +98,32 @@ check("state-machine: r4 enforcement present",
                              "AMENDMENT RECEIPT", "TERMINAL DOMAIN GUARD",
                              "CONSERVATIVE SCOPE RULE", "PERMANENT"]))
 am = json.load(open(os.path.join(ROOT, "AMENDMENTS.json")))
-check("amendments: chain file present with empty preregistered chain",
-      isinstance(am.get("amendments"), list) and am["amendments"] == [])
+chain = am.get("amendments")
+ok = isinstance(chain, list)
+if ok and chain:
+    # Non-empty chain: validate schema, fixtures-only scope, chained
+    # linkage from the start anchor, current-bytes match, version
+    # progression, and rendered-digest re-derivation.
+    REQ = {"path", "version_tag", "old_sha256", "new_sha256",
+           "new_rendered_bare_sha256", "new_rendered_ruled_sha256",
+           "owner_signature", "timestamp"}
+    current = {f["file"]: f["content_sha256"] for f in m["fixtures"]}
+    heads, versions = {}, {}
+    for e in chain:
+        if not (isinstance(e, dict) and REQ <= set(e)): ok = False; break
+        p = e["path"]
+        if not p.startswith("fixtures/"): ok = False; break
+        prev = heads.get(p, current.get(p))
+        if prev is None or e["old_sha256"] != prev: ok = False; break
+        vn = e["version_tag"]
+        if versions.get(p, 1) + 1 != int(vn.rsplit("v", 1)[-1]): ok = False; break
+        versions[p] = int(vn.rsplit("v", 1)[-1])
+        heads[p] = e["new_sha256"]
+        if not e["owner_signature"]: ok = False; break
+    if ok:
+        for p, h in heads.items():
+            if sha(p) != h: ok = False
+check("amendments: chain valid (empty, or schema+linkage+current-bytes+versions verified)", ok)
 check("runbook: manifest-immutability + rendered-prompt + evidence rules present",
       all(k in rb for k in ["MANIFEST immutability", "SLOT-TABLE.md",
                              "runner-native evidence", "NOT-RUN(RETIRED-SIBLING)"
