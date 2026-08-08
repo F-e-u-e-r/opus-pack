@@ -175,25 +175,27 @@ change, and only as the orchestrator/reviewer — never the editing worker's
 own call (rule 4 below: gate changes are not the worker's to make).
 
 **A frozen baseline inherits its environment's floating-point noise —
-round iteratively-solved values before freezing, and prove the freeze on
-a second environment** (`unprobed` — contributor incident as shape; see
-Provenance). A golden/replay baseline containing *iteratively solved*
-numerics (an IRR, a solver output, anything converged rather than computed
-closed-form) freezes the last-bit FP behavior of the runtime that produced
-it; a different runtime major diverges around the 13th decimal and the
-gate false-fails on noise — and a false-failing gate gets weakened or
-pinned, not fixed. Round such fields to a declared precision in the
-snapshot mapper — part of the gate, not the production code — coarse
-enough to absorb environment noise, fine enough that a real behavioral
-change still fails. Then prove the property by running the gate on a
-different runtime major than the one that froze the baseline: a pass on
-the freezing environment alone shows the snapshot matches itself, not
-that it is environment-stable. Pinning the runtime to match the baseline
-is the stopgap that hides the instability and hands the same red run to
-the next environment change; rounding is the durable fix.
+declare the numeric contract, and prove portability only where claimed**
+(`unprobed` — contributor incident as shape; see Provenance). A baseline
+holding *iteratively solved* numerics (an IRR, a solver output —
+converged, not closed-form) freezes the last-bit FP behavior of the
+runtime that produced it; another runtime major diverges in the
+insignificant digits and the gate false-fails on noise — and a
+false-failing gate gets weakened or dropped (the allow-list rationale
+under verify-by-reconstruction below). The comparator instead expresses the numeric contract actually
+promised — a declared precision, tolerance, or canonicalization, in the
+snapshot mapper: part of the gate, not the production code — coarse
+enough to absorb environment noise, fine enough that a genuine
+behavioral change still fails (the incident's durable remedy: rounding
+the solver field in the mapper). A baseline claimed portable across
+supported environments proves that claim on a second, relevantly
+different one — a pass on the freezing environment shows the snapshot
+matches itself, not that it is environment-stable. A deliberately pinned
+runtime is a declared contract owing no proof of a claim it never made;
+a pin added to silence a red is a stopgap that hands the same red to the
+next environment change.
 ❌ "CI is red but every diff is in the 13th decimal place — pin CI to my
-local runtime version." Green again, and the incident re-runs on the next
-major bump.
+local runtime version."
 
 **replay variant — parity (no corpus):** a refactor of pure-ish logic (config parsing, path
 handling, formatting) often has no logged corpus to replay. Keep the pre-change
@@ -994,17 +996,19 @@ probe; shorter comparison prose). Ships `unprobed` per the covenant; its
 probe — seed a suite stripping one alias of a two-alias dependency,
 confirm a ruled reviewer catches the live second alias where a bare one
 does not — joins the standing #115 queue.
-The FP-noise snapshot clause (2026-08-07) comes from a contributor incident
-(contributor-reported, not linkable): a golden projection snapshot frozen
-under one Node major failed CI under another, every diff an
-iteratively-solved IRR field diverging at ~1e-13; the first fix pinned CI's
-runtime to match the freezing machine (green, stopgap), the durable fix
+The FP-noise numeric-contract clause (2026-08-07; maintainer fold
+2026-08-08) comes from a contributor incident (contributor-reported,
+not linkable): a golden projection snapshot frozen under one Node major
+failed CI under another, every diff an iteratively-solved IRR field at
+~1e-13; the first fix pinned CI's runtime (stopgap), the durable fix
 rounded the field to 10 dp in the snapshot mapper, removed the pin, and
-proved the property by re-running green on the very major that had failed.
-Ships `unprobed` per the covenant; its probe — freeze a solver output on
-one runtime, grade on another, observe whether a ruled reviewer reaches
-for rounding-in-the-mapper where a bare one reaches for the pin — joins
-the standing #115 queue.
+re-ran green on the very major that had failed. The incident evidences
+the rounding remedy and the pin-first shape; the numeric-contract form
+and the claimed-portability/pinned-contract boundary are the fold's.
+Ships `unprobed` per the covenant; its probe — freeze a solver output
+on one runtime, grade on another, observe whether a ruled reviewer
+reaches for a declared numeric contract where a bare one reaches for
+the pin — joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
