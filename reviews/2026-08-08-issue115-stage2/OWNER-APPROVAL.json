@@ -1,0 +1,10 @@
+{
+  "note": "OWNER_APPROVAL_RECEIPT — the fifth identity value of the package version model (RUNBOOK 3). Binds the owner's approval BY VALUE to one exact package id + MANIFEST.sha256. Lives outside the manifest's hash set to avoid self-reference; static_checks.py binds it by value equality. While status is PENDING-OWNER-APPROVAL the package is unapproved and no behavioral run is authorized. An amendment never edits this file in place: it produces a NEW package version with a fresh receipt.",
+  "stage2_package_id": "issue115-stage2-v1",
+  "baseline_main": "fac48c2086b318b31a9c80fd823ef8c0ed956eed",
+  "stage1_sealed_prereg_sha256": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
+  "manifest_sha256": null,
+  "status": "PENDING-OWNER-APPROVAL",
+  "owner_signature": null,
+  "timestamp": null
+}

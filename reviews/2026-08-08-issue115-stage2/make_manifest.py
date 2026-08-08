@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """Generate MANIFEST.json + MANIFEST.sha256 for the Issue-115 STAGE-2
 package. Deterministic; re-run to re-derive. Read-only over artifact
-files; writes only the two manifest outputs."""
+files; writes only the two manifest outputs.
+
+Package version model (RUNBOOK 3): a package version is immutable
+once owner-approved. This script regenerates a manifest only while
+the current package id is UNapproved; authoring a new version means
+changing PACKAGE_ID here (plus a fresh OWNER-APPROVAL.json receipt),
+never mutating an approved manifest in place. There is no amendment
+chain and no --amend mode."""
 import hashlib, json, os, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+PACKAGE_ID = "issue115-stage2-v1"
 STAGE1_SEALED = "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8"
 BASELINE_MAIN = "fac48c2086b318b31a9c80fd823ef8c0ed956eed"
 
@@ -84,30 +92,18 @@ def write_slot_table(fixtures):
         f.write("\n".join(lines) + "\n")
 
 def main():
-    am_path = os.path.join(ROOT, "AMENDMENTS.json")
-    chain = json.load(open(am_path)).get("amendments", []) if os.path.exists(am_path) else []
-    if chain and "--amend" not in sys.argv:
-        print("REFUSED: amendment chain is non-empty; regeneration outside "
-              "a repair mini-gate is a protocol deviation (state row 31).")
-        return 1
-    if "--amend" in sys.argv:
-        # --amend fixtures/<id>.md — the gated repair transaction:
-        # the chain's TAIL entry must name this path, carry an owner
-        # signature, and its new_sha256 must equal the file's current
-        # bytes; only fixture paths are amendable.
-        try:
-            target = sys.argv[sys.argv.index("--amend") + 1]
-        except IndexError:
-            print("REFUSED: --amend requires a fixtures/<id>.md path"); return 1
-        if not target.startswith("fixtures/"):
-            print("REFUSED: only fixture paths are amendable"); return 1
-        if not chain or chain[-1].get("path") != target:
-            print("REFUSED: the amendment chain's tail entry does not name", target); return 1
-        tail = chain[-1]
-        if not tail.get("owner_signature"):
-            print("REFUSED: tail amendment lacks an owner signature"); return 1
-        if sha(target) != tail.get("new_sha256"):
-            print("REFUSED: current bytes of", target, "do not match the tail receipt's new_sha256"); return 1
+    # Approved-version immutability guard: while OWNER-APPROVAL.json
+    # binds the CURRENT package id with status APPROVED, this manifest
+    # is frozen — regeneration is a protocol deviation (state row 31).
+    ap_path = os.path.join(ROOT, "OWNER-APPROVAL.json")
+    if os.path.exists(ap_path):
+        ap = json.load(open(ap_path))
+        if (ap.get("status") == "APPROVED"
+                and ap.get("stage2_package_id") == PACKAGE_ID):
+            print("REFUSED: package version", PACKAGE_ID, "is owner-approved "
+                  "and immutable; author a NEW version (new PACKAGE_ID + "
+                  "fresh approval receipt) instead of regenerating it.")
+            return 1
     fixtures = []
     for fid, target, pos, clause in FIXTURES:
         entry = {
@@ -136,7 +132,7 @@ def main():
         fixtures.append(entry)
 
     manifest = {
-        "package": "issue115-stage2",
+        "stage2_package_id": PACKAGE_ID,
         "stage1_sealed_prereg_sha256": STAGE1_SEALED,
         "baseline_main": BASELINE_MAIN,
         "budget": {"planned": 92, "hard_cap": 110, "reserve": 18,
@@ -150,7 +146,7 @@ def main():
                                      "T7": 18},
         "documents": {p: sha(p) for p in [
             "PREREG-v6-SEALED.md", "RUNBOOK.md", "STATE-MACHINE.md",
-            "SLOT-LEDGER.md", "UNCERTAINTY.md", "AMENDMENTS.json",
+            "SLOT-LEDGER.md", "UNCERTAINTY.md",
             "smoke-checklists/SMOKE-CHECKLIST.md",
             "wrappers/WRAPPER.md"]},
         "fixtures": fixtures,

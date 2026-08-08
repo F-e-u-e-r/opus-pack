@@ -42,3 +42,11 @@ STAGE-2-specific additions:
    n=3 per arm cannot estimate, only bound, residual order effects;
    no order-effect statistic will be computed (preregistered
    omission, budget-bound).
+7. The three exception paths (SUSPECT rerun, parity rerun, artifact
+   amendment) are owner-mediated by design: the machine fails closed
+   to HOLD and executes owner records verbatim. This trades the
+   review-resistant complexity of autonomous exception lifecycles
+   for reliance on the quality and sealed-consistency of each owner
+   record at adjudication time — the records are receipted and
+   auditable after the fact, but no static check validates a future
+   owner decision in advance.

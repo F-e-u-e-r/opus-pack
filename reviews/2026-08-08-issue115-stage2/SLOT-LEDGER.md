@@ -25,12 +25,11 @@ T5 12, T6 12, T7 18 = 78.
 | Smoke infra rerun | 1 per smoke | once per smoke (row 8); second failure → HOLD, not reserve |
 | Scored INVALID-RUN same-slot rerun | 1 per slot | once per slot (row 15); second → arm INCOMPLETE, not reserve |
 | Re-smoke infra rerun | 1 per re-smoke | once (row 12c); second → HOLD(campaign): SMOKE-INFRA |
-| Repair re-smoke | 1 per repaired fixture | max one repair per fixture (row 10) |
-| Parity-void fixture rerun unit | 6 per event | one-use per fixture per event; encumbered atomically at execution position (row 27b); aborts release undrawn encumbrance (row 27c) |
+| Post-amendment re-smoke | 1 per amended fixture | max one repair per fixture (row 7b; owner-approved amendment packet) |
 | Owner re-entitlement at resume | 1 per HOLD event | single bound invocation, no nested retries (row 26) |
-| Owner-authorized SUSPECT fixture-set rerun unit | T1 6 · T2 12 · T3 6 · T4 12 · T5-placement 6 · T5-narrative 6 · T6 12 · T7 18 | one-shot per marker; charged atomically at execution position (rows 23a/24); an un-smoked unit fixture first clears its unconsumed planned smoke slot |
+| Owner-authorized rerun unit (SUSPECT row 23 / parity row 27b) | SUSPECT units: T1 6 · T2 12 · T3 6 · T4 12 · T5-placement 6 · T5-narrative 6 · T6 12 · T7 18; parity: 6 per affected fixture | licensed ONLY by an explicit owner authorization record; reserve −1 per R-slot at execution; sealed atomic start (the reserve must fund the full unit at its position or it does not start); an un-smoked unit fixture first clears its unconsumed planned smoke slot; any interruption → ADJUDICATION-INTERRUPTED hold, back to the owner |
 
-## Exhaustion and failure outcomes (typed per the r4 state rows — the
+## Exhaustion and failure outcomes (typed per the state rows — the
 ledger never substitutes a different branch)
 
 - Second dry-run failure → HOLD(campaign): PRECONDITION-FAILED (row 4).
@@ -42,20 +41,22 @@ ledger never substitutes a different branch)
   with CAP-EXHAUSTED annotation (row 28).
 - Pre-charge failure of a reserve-funded DRY-RUN/SMOKE-kind retry or
   re-entitlement → HOLD(campaign): RESERVE-EXHAUSTED (row 28b).
-- SUSPECT unit unfundable at its execution position → marker stays
-  SUSPECT + CAP-EXHAUSTED annotation, rerun-used stays consumed
-  (row 23a-else); at authorization with no prior grant → row 24
-  advisory (rerun-used not consumed).
-- Parity unit unfundable at its execution position → the fixture's
-  IN-DOMAIN marker(s) INCONCLUSIVE(PARITY-VOID); non-domain markers
-  keep their states with annotations (row 27b-else).
-- No partial rerun exists on any path; encumbered unit slots are
-  pre-funded and never trigger the cap-close row.
+- Owner-authorized unit unfundable in full at its execution position
+  (sealed atomicity): the unit does not start — a SUSPECT unit's
+  marker stays SUSPECT + CAP-EXHAUSTED annotation with the owner's
+  restore/demote outlets intact (row 23); a parity unit's affected
+  in-domain marker(s) → INCONCLUSIVE(PARITY-VOID) (row 27b).
+- Objective fixture defect at smoke → HOLD(campaign): FIXTURE-DEFECT;
+  owner outlets retire / amend (new package version) / close
+  (rows 7/7b).
+- No partial rerun exists on any path; an interrupted owner-authorized
+  unit freezes at ADJUDICATION-INTERRUPTED with prior evidence
+  preserved (row 23) — never a silent cancellation or auto-recovery.
 - Replacement fixtures: no such mechanism exists; wanting one is a
   STAGE-1-level change → HOLD to owner (RUNBOOK §4).
 - Ledger↔receipts divergence, evidence-free INVALID labels, or any
-  hash outside the per-path valid digest set → HOLD(campaign):
-  PROTOCOL (row 31).
+  hash differing from the approved package version's MANIFEST →
+  HOLD(campaign): PROTOCOL (row 31).
 
 ## Two pools, strictly separated
 
@@ -64,13 +65,13 @@ ledger never substitutes a different branch)
   skipped planned slot's budget is FROZEN — it reduces total
   consumption and is NEVER reallocated to fund anything else.
 - RESERVE POOL (18): funds ONLY retries/reruns — the dry-run retry,
-  smoke/re-smoke reruns, repair re-smokes, single-slot INVALID
-  reruns, parity-void fixture reruns (6 per event, charged atomically
-  at execution position), owner re-entitlements at resume, and
-  owner-authorized SUSPECT units (encumbered atomically IN FULL at the
-  unit's execution position (drawn down per R-slot; released on abort) — no authorization-time reservation, so
-  the sealed first-come consumption order over the executed schedule
-  is preserved; a unit unfundable at its position never starts).
+  smoke/re-smoke reruns, post-amendment re-smokes, single-slot
+  INVALID reruns, owner re-entitlements at resume, and the R-slots
+  of owner-authorized rerun units (reserve −1 per slot at execution
+  position; no authorization-time reservation, so the sealed
+  first-come consumption order over the executed schedule is
+  preserved; a unit unfundable in full at its position never
+  starts).
 - Consequently the sealed bound holds mechanically: rerun-class
   consumption can never exceed 18, whatever planned slots were
   cancelled; planned consumption can never exceed 92; total ≤ 110
@@ -83,9 +84,10 @@ ledger never substitutes a different branch)
   charged and their planned budget stays frozen (invariant I6).
 - Every charge emits a receipt with execution-kind / retry-role /
   validity-for-SCORED plus the rendered-prompt and raw-output digests
-  where applicable; the ledger is append-only during execution and
-  re-derived from receipts at every HOLD, resume, and close —
-  divergence → HOLD(campaign) (state row 31).
+  where applicable and the runner-native completion-status evidence;
+  the ledger is append-only during execution and re-derived from
+  receipts at every HOLD, resume, and close — divergence →
+  HOLD(campaign) (state row 31).
 - The absolute 92-slot expansion with per-slot expected
   rendered-prompt digests lives in `SLOT-TABLE.md` (generated,
   frozen with the package).

@@ -39,6 +39,29 @@ check("sealed-prereg: PREREG-v6-SEALED.md hash equals the sealed 2c7e3f21…",
       sha("PREREG-v6-SEALED.md") == m["stage1_sealed_prereg_sha256"]
       == "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8")
 
+# 2b. Package version model: id + approval receipt (bound by value,
+# outside the manifest hash set — RUNBOOK 3).
+pid = m.get("stage2_package_id", "")
+check("package-id: manifest carries a versioned stage2_package_id",
+      bool(re.fullmatch(r"issue115-stage2-v\d+", pid)))
+check("package-model: AMENDMENTS.json is gone (no amendment chain exists)",
+      not os.path.exists(os.path.join(ROOT, "AMENDMENTS.json"))
+      and "AMENDMENTS.json" not in m["documents"])
+ap_ok = os.path.exists(os.path.join(ROOT, "OWNER-APPROVAL.json"))
+if ap_ok:
+    ap = json.load(open(os.path.join(ROOT, "OWNER-APPROVAL.json")))
+    ap_ok = (ap.get("stage2_package_id") == pid
+             and ap.get("baseline_main") == m["baseline_main"]
+             and ap.get("stage1_sealed_prereg_sha256") == m["stage1_sealed_prereg_sha256"]
+             and ap.get("status") in ("PENDING-OWNER-APPROVAL", "APPROVED"))
+    if ap_ok and ap["status"] == "APPROVED":
+        ap_ok = (ap.get("manifest_sha256") == sha("MANIFEST.json")
+                 and bool(ap.get("owner_signature")))
+    if ap_ok and ap["status"] == "PENDING-OWNER-APPROVAL":
+        ap_ok = not ap.get("owner_signature")
+check("approval-receipt: OWNER-APPROVAL.json present, binds this package id "
+      "by value (APPROVED additionally binds MANIFEST.sha256 + signature)", ap_ok)
+
 # 3. Inventory: 13 fixtures, 13 rubrics, 8 clause files, unique ids/positions.
 fids = [f["fixture_id"] for f in m["fixtures"]]
 check("inventory: 13 fixtures, unique ids", len(fids) == 13 and len(set(fids)) == 13)
@@ -82,54 +105,32 @@ for f in m["fixtures"]:
     if "UNGRADABLE" not in r or "conjunctive" not in r: ok = False
 check("rubrics: each declares conjunctive scoring and an UNGRADABLE clause", ok)
 
-# 7. State machine: nine required states + r2 additions + invariants.
+# 7. State machine: nine required states + v6 structure + invariants I1-I8.
 sm = text("STATE-MACHINE.md")
 ok = all(s in sm for s in ["READY", "HOLD(target)", "HOLD(campaign)", "SUSPECT",
                             "DRIFT-SHADOWED", "INCOMPLETE", "CAP-EXHAUSTED",
                             "RETIRED", "COMPLETE"])
 check("state-machine: all nine required states covered", ok)
-check("state-machine: invariants I1-I7 declared",
-      all(f"I{i}" in sm for i in range(1, 8)))
-check("state-machine: r4 enforcement present",
-      all(k in sm for k in ["GLOBAL PRE-CHARGE GATE", "ENCUMBRANCE MODEL",
-                             "DRIFT PREEMPTION", "VALIDITY-EVIDENCE RULE",
-                             "SUSPECT-RERUN-PENDING", "23a", "23d", "27b",
-                             "28b", "12c", "30b", "30c", "R-SLOT BINDING",
-                             "AMENDMENT RECEIPT", "TERMINAL DOMAIN GUARD",
-                             "CONSERVATIVE SCOPE RULE", "PERMANENT"]))
-am = json.load(open(os.path.join(ROOT, "AMENDMENTS.json")))
-chain = am.get("amendments")
-ok = isinstance(chain, list)
-if ok and chain:
-    # Non-empty chain: validate schema, fixtures-only scope, chained
-    # linkage from the start anchor, current-bytes match, version
-    # progression, and rendered-digest re-derivation.
-    REQ = {"path", "version_tag", "old_sha256", "new_sha256",
-           "new_rendered_bare_sha256", "new_rendered_ruled_sha256",
-           "owner_signature", "timestamp"}
-    current = {f["file"]: f["content_sha256"] for f in m["fixtures"]}
-    heads, versions = {}, {}
-    for e in chain:
-        if not (isinstance(e, dict) and REQ <= set(e)): ok = False; break
-        p = e["path"]
-        if not p.startswith("fixtures/"): ok = False; break
-        prev = heads.get(p, current.get(p))
-        if prev is None or e["old_sha256"] != prev: ok = False; break
-        vn = e["version_tag"]
-        if versions.get(p, 1) + 1 != int(vn.rsplit("v", 1)[-1]): ok = False; break
-        versions[p] = int(vn.rsplit("v", 1)[-1])
-        heads[p] = e["new_sha256"]
-        if not e["owner_signature"]: ok = False; break
-    if ok:
-        for p, h in heads.items():
-            if sha(p) != h: ok = False
-check("amendments: chain valid (empty, or schema+linkage+current-bytes+versions verified)", ok)
-check("runbook: manifest-immutability + rendered-prompt + evidence rules present",
-      all(k in rb for k in ["MANIFEST immutability", "SLOT-TABLE.md",
-                             "runner-native evidence", "NOT-RUN(RETIRED-SIBLING)"
-                             ]) or all(k in rb + sm for k in
-                            ["MANIFEST immutability", "SLOT-TABLE.md",
-                             "runner-native evidence"]))
+check("state-machine: invariants I1-I8 declared",
+      all(f"I{i}" in sm for i in range(1, 9)))
+check("state-machine: v6 owner-mediated structure present",
+      all(k in sm for k in ["OPERATIONAL PRINCIPLE", "GLOBAL PRE-CHARGE GATE",
+                             "GLOBAL FREEZE RULE", "DRIFT PREEMPTION",
+                             "TERMINAL-WRITE GUARD", "VALIDITY-EVIDENCE RULE",
+                             "FIXTURE-DEFECT", "ADJUDICATION-INTERRUPTED",
+                             "OWNER-AUTHORIZED UNIT EXECUTION",
+                             "TERMINAL DOMAIN GUARD", "CONSERVATIVE SCOPE RULE",
+                             "completion-status", "AUTHORIZATION RECORD",
+                             "27b", "28b", "12c", "30b", "30c"]))
+_ws = lambda s: re.sub(r"\s+", " ", s)
+check("principle: the owner's fail-closed sentence anchors both docs (WS-normalized)",
+      "fail-closed to owner adjudication" in _ws(sm)
+      and "fail-closed to owner adjudication" in _ws(rb))
+check("runbook: package version model + integrity rules present",
+      all(k in rb for k in ["PACKAGE VERSION MODEL", "STAGE2_PACKAGE_ID",
+                             "OWNER_APPROVAL_RECEIPT", "IMMUTABLE",
+                             "SLOT-TABLE.md", "runner-native",
+                             "NOT-RUN(RETIRED-SIBLING)"]))
 
 # 7b. SLOT-TABLE integrity: 92 rows, hashes re-derive from artifacts.
 st = text("SLOT-TABLE.md")
@@ -137,15 +138,14 @@ rows = [l for l in st.splitlines() if l.startswith("| ")]
 data_rows = [r for r in rows if r.split("|")[1].strip() not in ("slot", "---")]
 check("slot-table: exactly 92 slot rows (1 dry + 13 smoke + 78 scored)",
       len(data_rows) == 92)
-import hashlib as _h
 pre = "The following governing doctrine applies to your task:\n---\n".encode()
 mid = "\n---\n".encode()
 ok = True
 for f in m["fixtures"]:
     fx = open(os.path.join(ROOT, f["file"]), "rb").read()
     cl = open(os.path.join(ROOT, f["clause_file"]), "rb").read()
-    if f["rendered_prompt_sha256"]["bare"] != _h.sha256(fx).hexdigest(): ok = False
-    if f["rendered_prompt_sha256"]["ruled"] != _h.sha256(pre + cl + mid + fx).hexdigest(): ok = False
+    if f["rendered_prompt_sha256"]["bare"] != hashlib.sha256(fx).hexdigest(): ok = False
+    if f["rendered_prompt_sha256"]["ruled"] != hashlib.sha256(pre + cl + mid + fx).hexdigest(): ok = False
     if f["rendered_prompt_sha256"]["bare"] not in st: ok = False
     if f["rendered_prompt_sha256"]["ruled"] not in st: ok = False
 check("slot-table: rendered-prompt digests re-derive and appear per fixture", ok)
@@ -154,11 +154,11 @@ check("slot-table: rendered-prompt digests re-derive and appear per fixture", ok
 sl = text("SLOT-LEDGER.md")
 check("ledger: two-pool separation + frozen-cancelled + position-funding declared",
       all(k in sl for k in ["PLANNED POOL (92)", "RESERVE POOL (18)",
-                             "NEVER reallocated", "execution position"]))
+                             "NEVER reallocated", "execution position",
+                             "ADJUDICATION-INTERRUPTED"]))
 
-# 8. Twin sweep: receipt schema three-axis everywhere; no stale mixed-axis
-# list. The pattern is built by concatenation so this checker's own source
-# cannot self-match.
+# 8. Twin sweeps. Patterns are built by concatenation so this checker's
+# own source cannot self-match.
 stale = "DRY-RUN / SMOKE / " + "INVALID-RUN"
 hits = []
 for dirpath, _, files in os.walk(ROOT):
@@ -168,6 +168,24 @@ for dirpath, _, files in os.walk(ROOT):
             if stale in text(rel):
                 hits.append(rel)
 check("twin-sweep: stale mixed-axis receipt list absent package-wide",
+      hits == [], str(hits))
+# Deleted-lifecycle extinction: no residue of the mechanized SUSPECT/
+# parity/amendment machinery survives anywhere in the package prose.
+# The row id uses a word-boundary regex so hex digests cannot false-hit.
+_extinct = [re.compile(r"\b23" + r"d\b"), re.compile("encumbr", re.I),
+            re.compile("SUSPECT-RERUN-" + "PENDING", re.I),
+            re.compile("cancellation exists only " + "before", re.I),
+            re.compile("AMENDMENT " + "RECEIPT", re.I)]
+hits = []
+for dirpath, _, files in os.walk(ROOT):
+    for fn in files:
+        if fn.endswith((".md", ".txt")) and fn != "PREREG-v6-SEALED.md":
+            rel = os.path.relpath(os.path.join(dirpath, fn), ROOT)
+            body = text(rel)
+            for pat in _extinct:
+                if pat.search(body):
+                    hits.append(f"{rel}:{pat.pattern}")
+check("extinction-sweep: deleted-lifecycle residue absent package-wide",
       hits == [], str(hits))
 check("twin-sweep: sentinel stem SNTX115 appears only in T1F1 + MANIFEST + this checker",
       all(("SNTX115" in text(p)) == (p in ("fixtures/T1F1.md", "MANIFEST.json", "static_checks.py"))
@@ -205,6 +223,3 @@ if fails:
     print(f"{len(fails)} FAILED: {fails}")
     sys.exit(1)
 print("ALL STATIC CHECKS PASSED")
-
-if __name__ == "__main__" or True:
-    pass

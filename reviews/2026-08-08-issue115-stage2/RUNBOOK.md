@@ -11,6 +11,16 @@ the owner — STAGE-1 is not reopened by this document. Behavioral runs
 executed under STAGE-2 design work: 0; no dry-run, smoke, or scored
 run is authorized until the owner's post-review go.
 
+OPERATIONAL PRINCIPLE (owner-ruled): rare exception paths that change
+evidence eligibility, rerun entitlement, or artifact identity are
+fail-closed to owner adjudication rather than autonomously repaired
+by the campaign state machine. The three such paths — a SUSPECT
+rerun, a runner-parity rerun, an artifact amendment — share one
+shape: event → HOLD(campaign) + receipts → explicit owner
+adjudication record → machine executes that record or the campaign
+closes. The deterministic 92-slot main path below is fully
+mechanized; the exception paths deliberately are not.
+
 ## 1. Canonical execution schedule (resolves §K-5 in part)
 
 The whole campaign expands, before execution, into ONE linear
@@ -30,16 +40,18 @@ re-derivable):
    even = T2S1, T3F1, T4S2, T5S2, T6S2, T7S1b.)
 4. A licensed same-slot rerun executes immediately after its original
    slot; it consumes reserve and does not renumber anything.
-5. An owner-authorized SUSPECT fixture-set rerun unit is appended at
-   the CURRENT END of the remaining schedule at authorization time as
-   R-slots (numbered R<u>.<k>; expected rendered-prompt digests equal
-   the fixture×arm digests in SLOT-TABLE.md — the prompt bytes are
-   unchanged; VOID original slots are never reused). Prior evidence is
-   preserved until the unit COMPLETES (delayed VOID; state rows
-   23–23d). Funding is charged atomically at the unit's execution
-   position, never reserved at authorization (sealed first-come
-   order). A unit fixture whose smoke never passed runs its unconsumed
-   planned smoke slot first and must CLEAR before its unit slots.
+5. The R-slots of an owner-authorized rerun unit (STATE-MACHINE rows
+   23/27b) are appended at the CURRENT END of the remaining schedule
+   when the owner's authorization record is executed (numbered
+   R<u>.<k>; expected rendered-prompt digests equal the fixture×arm
+   digests in SLOT-TABLE.md — the prompt bytes are unchanged; VOID
+   original slots are never reused). Funding is reserve −1 per R-slot
+   at execution, atomic start per sealed §E (the reserve must fund
+   the full unit at its position or it does not start); prior
+   evidence is preserved until the unit completes (the sealed
+   delayed-VOID term recorded in the authorization record). A unit
+   fixture whose smoke never passed runs its unconsumed planned
+   smoke slot first and must CLEAR before its unit slots.
 
 Slot positions are commitments of ORDER, not wall-clock time: a
 skipped (HOLD) target compresses the timeline but never reorders the
@@ -70,50 +82,65 @@ scored invocation (state rows 14/14b).
   position governs execution order — fully deterministic given the
   authorization receipts.)
 - Resume preconditions (all): the §A drift check for that target
-  passes against fresh `origin/main`; the MANIFEST re-hash passes for
-  every artifact the target uses; the executor identity configuration
-  is unchanged since the campaign's dry-run (a changed model id/config
-  → HOLD(campaign), owner decision — no new dry-run without owner
-  authorization, since a dry-run is a behavioral invocation).
+  passes against fresh `origin/main`; the re-hash passes against the
+  approved package's MANIFEST for every artifact the target uses; the
+  executor identity configuration is unchanged since the campaign's
+  dry-run (a changed model id/config → HOLD(campaign), owner decision
+  — no new dry-run without owner authorization, since a dry-run is a
+  behavioral invocation).
 - A HOLD(target) caused by drift has NO in-campaign resume, ever:
   DRIFT-SHADOWED is terminal (I4). Any re-run against restored
   wording is a NEW owner decision outside this campaign — it never
   resumes the shadowed target or revives its evidence in-campaign.
 
-## 3. §K-2 — Repair mini-gate failure exit
+## 3. §K-2 — Fixture defects, amendments, and the package version model
 
-- A repair artifact (fixture-vN) that FAILS its static mini-gate
-  (final-gate lens re-review + owner sign-off, per sealed §E) — or
-  that the owner declines to sign — becomes FROZEN-INVALID: it is
-  never executed, "run first, repair later" is prohibited.
-- The fixture then follows the sealed automatic-retirement semantics
-  (a fixture that cannot produce a valid, gated text is RETIRED), with
-  §D's retirement consequences (single-fixture marker →
-  OUT-OF-SCOPE; member of a multi-fixture marker set → that marker
-  INCONCLUSIVE(RETIRED-MEMBER), sibling unrun slots cancelled).
-- The mini-gate itself is static review only — no behavioral
-  invocation is part of gating a repair. A re-smoke that fails its
-  CHECKLIST retires the fixture (state row 12b); a re-smoke
-  transport/protocol failure follows smoke-infra semantics instead
-  (one reserve-funded rerun, second failure → HOLD(campaign); row
-  12c) — infrastructure can never select or retire a fixture.
-- MANIFEST immutability (versioned-digest model): the campaign-start
-  anchor is the MERGED TREE's digest set. A repair mini-gate issues an
-  owner-signed AMENDMENT RECEIPT (old hash → new hash); the campaign's
-  VALID DIGEST SET at any moment = the start anchor ⊕ all amendment
-  receipts, and every integrity check compares against that set — so
-  a legitimate repair never trips the anchor check, while any hash
-  outside the set (or any `make_manifest.py` regeneration outside a
-  repair mini-gate) is a protocol deviation (state row 31).
-  Self-consistency between a regenerated MANIFEST and edited
-  artifacts proves nothing on its own. DERIVED ARTIFACTS:
-  AMENDMENTS.json is the gate-written receipt chain itself;
-  SLOT-TABLE.md, MANIFEST.json, and MANIFEST.sha256 are DERIVED
-  views, regenerated exactly once inside a repair's amendment
-  transaction with their new hashes recorded in that amendment
-  receipt — the single versioned digest authority for every slot is
-  the fixture's current valid version (start anchor, or latest
-  amendment), per STATE-MACHINE's R-SLOT BINDING.
+- A smoke that fails checklist items 2/3 on a clean invocation
+  evidences a preregistered objective fixture defect → HOLD(campaign):
+  FIXTURE-DEFECT (state row 7). No autonomous repair exists. The
+  owner's adjudication record chooses exactly one outlet (row 7b):
+  RETIRE the fixture (sealed §D consequences per row 13; the
+  defective artifact is FROZEN-INVALID — it is never executed, "run
+  first, repair later" is prohibited); AMEND it via an amendment
+  packet under the package version model below; or CLOSE the
+  campaign.
+- PACKAGE VERSION MODEL. A STAGE-2 package version is identified by
+  exactly five values:
+  1. `STAGE2_PACKAGE_ID` (e.g. `issue115-stage2-v1`);
+  2. `MANIFEST.sha256` (the digest of MANIFEST.json, which hashes
+     every artifact);
+  3. `BASELINE` (the frozen main SHA, `fac48c20…`);
+  4. `STAGE1_HASH` (the sealed PREREG digest, `2c7e3f21…`);
+  5. `OWNER_APPROVAL_RECEIPT` (`OWNER-APPROVAL.json` — the owner's
+     approval bound BY VALUE to this exact package id and
+     MANIFEST.sha256; it lives OUTSIDE the manifest's hash set to
+     avoid self-reference, and static checks bind it by value
+     equality instead).
+  An approved package version is IMMUTABLE. An AMENDMENT — any
+  change to a fixture, wrapper, rubric, checklist, or operational
+  document — is NOT an in-campaign transition: the owner-approved
+  amendment packet produces a NEW package version (new
+  STAGE2_PACKAGE_ID, regenerated MANIFEST + MANIFEST.sha256 + fresh
+  OWNER_APPROVAL_RECEIPT), and the old version stays immutable on
+  the record (version history retained, sealed §E). The sealed
+  mini-STAGE-2 gate applies before any re-smoke: final-gate lens
+  re-review of the affected scope + owner sign-off; max ONE repair
+  per fixture; an approved repair VOIDS every prior run of the
+  amended fixture; the re-smoke is reserve-funded and every
+  invocation counts against the cap (sealed §E). A packet the
+  final-gate lens fails, or the owner declines, leaves outlets
+  retire/close only.
+- At every moment exactly ONE approved package version governs
+  execution, and every integrity check compares against ITS manifest.
+  There is no amendment chain, no in-campaign digest mutation, and no
+  chain verifier: any artifact hash differing from the governing
+  manifest is a protocol deviation (state row 31), full stop.
+  Self-consistency between a regenerated manifest and edited
+  artifacts proves nothing — only the OWNER_APPROVAL_RECEIPT binds a
+  manifest to authority. `make_manifest.py` regenerates a manifest
+  only when authoring a new package version; regenerating over a
+  live approved version is itself a protocol deviation, and the
+  script refuses it while the approval receipt binds the current id.
 
 ## 4. §K-3 — Retired-fixture slot accounting
 
@@ -140,45 +167,53 @@ scored invocation (state rows 14/14b).
   DRY-RUN/SMOKE-kind retry) — after the infra cause is identified and
   remedied outside the campaign. Per state row 26: at most ONE
   owner-attached re-entitlement per HOLD event (reserve-funded, must
-  reach its verdict before dependent slots), and a SECOND HOLD of the
-  same subtype resumes only with infra-remediation evidence in the
-  resume receipt — else the owner's remaining path is campaign
-  close.
+  reach its verdict before dependent slots; binding fields per row 26,
+  with DRY-RUN-kind bindings recorded N/A by construction), and a
+  SECOND HOLD of the same subtype resumes only with infra-remediation
+  evidence in the resume receipt — else the owner's remaining path is
+  campaign close.
 - STOP states (class-1/2/3 interruption) resume per sealed §F: owner
   authorization + fresh drift check; class-3-affected markers are
   SUSPECT and follow their own adjudication, never silently resumed.
+- ADJUDICATION-INTERRUPTED, FIXTURE-DEFECT, and PARITY holds resume
+  only through the owner adjudication records defined in state rows
+  23/7b/27b — there is no generic resume for an owner-mediated path.
 - Resume preconditions (all, receipted): fresh drift check over all
-  non-terminal targets; full MANIFEST.sha256 re-verification (every
-  fixture/wrapper/rubric/checklist hash); PREREG-v6 hash re-verified
-  `2c7e3f21…`; executor identity configuration unchanged (else
-  HOLD(campaign) to owner); budget ledger re-derived from receipts
-  and consistent.
+  non-terminal targets; full re-verification against the approved
+  package version's MANIFEST (every fixture/wrapper/rubric/checklist
+  hash) and of MANIFEST.sha256 itself; PREREG-v6 hash re-verified
+  `2c7e3f21…`; the OWNER-APPROVAL record still binds the governing
+  package id and manifest digest; executor identity configuration
+  unchanged (else HOLD(campaign) to owner); budget ledger re-derived
+  from receipts and consistent.
 - Receipt validity across resume: all pre-HOLD receipts remain valid
-  except where a sealed rule invalidates them (drift → DRIFT-SHADOWED;
-  SUSPECT adjudication outcomes; VOIDed slots stay VOID).
+  except where a sealed rule invalidates them (drift →
+  DRIFT-SHADOWED; SUSPECT adjudication outcomes; VOIDed slots stay
+  VOID).
 - The consecutive-INVALID-RUN counter resets to zero at resume (the
   infra cause was remedied); the pre-HOLD count is recorded in the
   resume receipt.
 
 ## 6. §K-5 — Remaining sequencing (operationalized, semantics unchanged)
 
-- SUSPECT rerun units: atomic costs — T1 6, T3 6, T5-placement 6,
-  T5-narrative 6, T2 12, T4 12, T6 12, T7 18 (fixtures × 2 arms × 3).
-  The whole unit is funded atomically at its execution position from
-  the reserve pool (sealed v6 atomicity + first-come order); a
-  cap-blocked unit leaves the marker IN SUSPECT with a CAP-EXHAUSTED
-  annotation for the owner's remaining outlets, prior evidence
-  intact. The rerun outlet is one-shot per marker, consumed at
-  authorization; cancellation exists only before the unit's first
-  slot starts.
-- Cap atomicity and precedence: exactly as sealed §E (safety/drift
-  triggers recorded first; no partial rerun; cap-blocked single-slot
-  rerun → arm INCOMPLETE annotated CAP-EXHAUSTED).
+- Owner-mediated exception paths: the SUSPECT rerun, the parity
+  rerun, and the amendment path are fail-closed owner adjudications
+  (state rows 23, 27b, 7b and §3 above) — the authorization record,
+  not the machine, is the entitlement. Unit costs the records cite
+  (sealed arithmetic, fixtures × 2 arms × 3): T1 6, T3 6,
+  T5-placement 6, T5-narrative 6, T2 12, T4 12, T6 12, T7 18; a
+  parity rerun is 6 per affected fixture.
+- Cap atomicity and precedence: exactly as sealed §E — safety/drift
+  triggers recorded first; no partial rerun (a unit the reserve
+  cannot fund in full at its position does not start); a cap-blocked
+  single-slot rerun → arm INCOMPLETE annotated CAP-EXHAUSTED; a
+  cap-blocked SUSPECT unit → the marker stays SUSPECT annotated
+  CAP-EXHAUSTED, returned to the owner's remaining outlets.
 - Counterbalanced arm ordering: the §1 parity table, fixed.
 - Smoke-before-scored: enforced by the §1 schedule (a fixture's smoke
   slot always precedes its scored slots; a smoke that has not PASSED
   its gradability/viability checklist blocks that fixture's scored
-  slots — repair-gate or retirement per sealed rules).
+  slots — FIXTURE-DEFECT hold or retirement per sealed rules).
 - Target HOLD / DRIFT-SHADOWED handling: exactly as sealed §A/§D/§F;
   this runbook adds only the queue/resume mechanics of §2/§5 above.
 
@@ -188,20 +223,24 @@ Every transition in `STATE-MACHINE.md` emits the receipt named there.
 The slot ledger (`SLOT-LEDGER.md`) is append-only during execution;
 budget arithmetic is re-derived from receipts at every HOLD, resume,
 and campaign close — a divergence between ledger and receipts is
-itself a HOLD(campaign) trigger (protocol deviation). Two
+itself a HOLD(campaign) trigger (protocol deviation). Three
 integrity requirements bind every receipt: (1) each run receipt
 carries the rendered-prompt sha256 and the raw-output sha256, so a
-raw-output file can be re-verified byte-for-byte; (2) an INVALID-RUN
-classification is legitimate only with runner-native evidence
-attached (the API error body, exit status, or the specific hash
-mismatch) — an evidence-free INVALID label is itself a protocol
-deviation (row 31), so an unfavorable-looking output can never be
-laundered into a rerun.
+raw-output file can be re-verified byte-for-byte; (2) each receipt
+carries the runner-native completion-status evidence (the completion
+object's finish/stop state, or the API error body / exit status /
+specific hash mismatch) — the field the VALIDITY-EVIDENCE RULE's
+intact-completion test reads; (3) an INVALID-RUN classification is
+legitimate only with that runner-native evidence attached — an
+evidence-free INVALID label is itself a protocol deviation (row 31),
+so an unfavorable-looking output can never be laundered into a rerun.
 
 ## 8. What this runbook may never do
 
 Convert SUSPECT, DRIFT-SHADOWED, invalidity, or cap exhaustion into a
 different epistemic outcome; alter any sealed predicate, claim, arm
 rule, or budget number; execute or simulate any behavioral run; edit
-doctrine or markers; create replacement fixtures. Any path that seems
-to require one of these → HOLD, report to the owner.
+doctrine or markers; create replacement fixtures; derive, cancel, or
+revive a rerun entitlement or amendment on its own (owner records
+only). Any path that seems to require one of these → HOLD, report to
+the owner.
