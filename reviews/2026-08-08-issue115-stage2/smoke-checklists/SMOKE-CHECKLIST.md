@@ -15,8 +15,11 @@ conditions fixture survival (sealed §C).
    output: for each item, a PASS or FAIL verdict is derivable; no
    item is structurally unjudgeable against an output of this shape.
 
-Failure handling is fixed by the state machine: an item-3 failure (or
-an item-1/2 failure with a clean invocation) evidences an objective
-fixture defect → repair-gate (max one per fixture; re-smoke fail →
-automatic retirement). A transport/protocol failure is INVALID-RUN
-semantics on a smoke: one rerun, second → HOLD(campaign).
+Failure handling is fixed by the state machine: item 1 is HARNESS
+evidence — its failure (or any transport/protocol failure) is smoke
+infrastructure semantics (state rows 8/9: one reserve-funded rerun,
+second failure → HOLD(campaign)); infrastructure never triggers
+repair or retirement. Only a CLEAN invocation failing item 2 or item
+3 evidences an objective fixture defect → repair-gate (max one per
+fixture; a clean re-smoke failing items 2/3 again → automatic
+retirement, state rows 7/12b).

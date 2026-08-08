@@ -31,10 +31,15 @@ re-derivable):
 4. A licensed same-slot rerun executes immediately after its original
    slot; it consumes reserve and does not renumber anything.
 5. An owner-authorized SUSPECT fixture-set rerun unit is appended at
-   the CURRENT END of the remaining schedule at authorization time
-   (original slots stay VOID; the unit's internal order follows rule 3
-   for its fixtures; no smoke re-run — the smoke certifies the fixture
-   text, which is unchanged).
+   the CURRENT END of the remaining schedule at authorization time as
+   R-slots (numbered R<u>.<k>; expected rendered-prompt digests equal
+   the fixture×arm digests in SLOT-TABLE.md — the prompt bytes are
+   unchanged; VOID original slots are never reused). Prior evidence is
+   preserved until the unit COMPLETES (delayed VOID; state rows
+   23–23d). Funding is charged atomically at the unit's execution
+   position, never reserved at authorization (sealed first-come
+   order). A unit fixture whose smoke never passed runs its unconsumed
+   planned smoke slot first and must CLEAR before its unit slots.
 
 Slot positions are commitments of ORDER, not wall-clock time: a
 skipped (HOLD) target compresses the timeline but never reorders the
@@ -93,19 +98,23 @@ scored invocation (state rows 14/14b).
   transport/protocol failure follows smoke-infra semantics instead
   (one reserve-funded rerun, second failure → HOLD(campaign); row
   12c) — infrastructure can never select or retire a fixture.
-- MANIFEST immutability: after the package freezes (the reviews/ PR
-  merges), the authoritative digest set is the MERGED TREE;
-  `make_manifest.py` may be re-run ONLY as part of a repair
-  mini-gate's versioning step, and any other regeneration — or any
-  artifact hash that no longer matches the campaign-start digest — is
-  a protocol deviation (state row 31). Self-consistency between a
-  regenerated MANIFEST and edited artifacts proves nothing; the
-  comparison anchor is always the campaign-start receipt's digest.
+- MANIFEST immutability (versioned-digest model): the campaign-start
+  anchor is the MERGED TREE's digest set. A repair mini-gate issues an
+  owner-signed AMENDMENT RECEIPT (old hash → new hash); the campaign's
+  VALID DIGEST SET at any moment = the start anchor ⊕ all amendment
+  receipts, and every integrity check compares against that set — so
+  a legitimate repair never trips the anchor check, while any hash
+  outside the set (or any `make_manifest.py` regeneration outside a
+  repair mini-gate) is a protocol deviation (state row 31).
+  Self-consistency between a regenerated MANIFEST and edited
+  artifacts proves nothing on its own.
 
 ## 4. §K-3 — Retired-fixture slot accounting
 
 - The retired fixture's own unrun slots (smoke and scored) are marked
-  RETIRED-CANCELLED in the ledger: never executed, never charged.
+  NOT-RUN(RETIRED-SELF) in the ledger — never executed, never charged
+  (same-marker-set siblings' unrun slots: NOT-RUN(RETIRED-SIBLING),
+  per state row 13).
 - Already-executed runs of a retired fixture remain in the receipts as
   descriptive evidence only (per sealed §D).
 - **No replacement fixtures exist in this campaign.** Substituting a
@@ -119,10 +128,16 @@ scored invocation (state rows 14/14b).
 
 ## 5. §K-4 — Campaign-HOLD resume semantics
 
-- Resumable automatically-with-owner-authorization: HOLD(campaign)
-  from infra causes (≥4 consecutive INVALID-RUN; second infra-failed
-  smoke; dry-run precondition failure) — after the infra cause is
-  identified and remedied outside the campaign.
+- Resumable with owner authorization: HOLD(campaign) from infra
+  causes (≥4 consecutive INVALID-RUN; second infra-failed smoke;
+  dry-run precondition failure; reserve exhaustion on a
+  DRY-RUN/SMOKE-kind retry) — after the infra cause is identified and
+  remedied outside the campaign. Per state row 26: at most ONE
+  owner-attached re-entitlement per HOLD event (reserve-funded, must
+  reach its verdict before dependent slots), and a SECOND HOLD of the
+  same subtype resumes only with infra-remediation evidence in the
+  resume receipt — else the owner's remaining path is campaign
+  close.
 - STOP states (class-1/2/3 interruption) resume per sealed §F: owner
   authorization + fresh drift check; class-3-affected markers are
   SUSPECT and follow their own adjudication, never silently resumed.
@@ -142,11 +157,14 @@ scored invocation (state rows 14/14b).
 ## 6. §K-5 — Remaining sequencing (operationalized, semantics unchanged)
 
 - SUSPECT rerun units: atomic costs — T1 6, T3 6, T5-placement 6,
-  T5-narrative 6, T2 12, T4 12, T6 12, T7 18 (fixtures × 2 arms × 3;
-  no smoke re-run). The unit starts only if remaining budget ≥ its
-  full cost (sealed v6 atomicity); a cap-blocked SUSPECT unit leaves
-  the marker IN SUSPECT with a CAP-EXHAUSTED annotation for the
-  owner's remaining outlets.
+  T5-narrative 6, T2 12, T4 12, T6 12, T7 18 (fixtures × 2 arms × 3).
+  The whole unit is funded atomically at its execution position from
+  the reserve pool (sealed v6 atomicity + first-come order); a
+  cap-blocked unit leaves the marker IN SUSPECT with a CAP-EXHAUSTED
+  annotation for the owner's remaining outlets, prior evidence
+  intact. The rerun outlet is one-shot per marker, consumed at
+  authorization; cancellation exists only before the unit's first
+  slot starts.
 - Cap atomicity and precedence: exactly as sealed §E (safety/drift
   triggers recorded first; no partial rerun; cap-blocked single-slot
   rerun → arm INCOMPLETE annotated CAP-EXHAUSTED).

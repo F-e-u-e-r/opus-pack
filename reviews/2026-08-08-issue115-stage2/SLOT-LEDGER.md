@@ -25,7 +25,7 @@ T5 12, T6 12, T7 18 = 78.
 | Smoke infra rerun | 1 per smoke | once per smoke (row 8); second failure → HOLD, not reserve |
 | Scored INVALID-RUN same-slot rerun | 1 per slot | once per slot (row 15); second → arm INCOMPLETE, not reserve |
 | Repair re-smoke | 1 per repaired fixture | max one repair per fixture (row 10) |
-| Owner-authorized SUSPECT fixture-set rerun unit | T1 6 · T2 12 · T3 6 · T4 12 · T5-placement 6 · T5-narrative 6 · T6 12 · T7 18 | only if remaining budget ≥ full unit (rows 23/24); no smoke re-run inside the unit |
+| Owner-authorized SUSPECT fixture-set rerun unit | T1 6 · T2 12 · T3 6 · T4 12 · T5-placement 6 · T5-narrative 6 · T6 12 · T7 18 | one-shot per marker; charged atomically at execution position (rows 23a/24); an un-smoked unit fixture first clears its unconsumed planned smoke slot |
 
 ## What must HOLD instead of spending reserve
 
@@ -45,10 +45,12 @@ T5 12, T6 12, T7 18 = 78.
   consumption and is NEVER reallocated to fund anything else.
 - RESERVE POOL (18): funds ONLY retries/reruns — the dry-run retry,
   smoke/re-smoke reruns, repair re-smokes, single-slot INVALID
-  reruns, parity-void fixture reruns (6 per event), owner
-  re-entitlements at resume, and owner-authorized SUSPECT units
-  (ESCROWED in full at authorization; released only by completion or
-  abort). Live escrows count against the pool.
+  reruns, parity-void fixture reruns (6 per event, charged atomically
+  at execution position), owner re-entitlements at resume, and
+  owner-authorized SUSPECT units (charged atomically IN FULL at the
+  unit's execution position — no authorization-time reservation, so
+  the sealed first-come consumption order over the executed schedule
+  is preserved; a unit unfundable at its position never starts).
 - Consequently the sealed bound holds mechanically: rerun-class
   consumption can never exceed 18, whatever planned slots were
   cancelled; planned consumption can never exceed 92; total ≤ 110

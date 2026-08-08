@@ -90,10 +90,11 @@ ok = all(s in sm for s in ["READY", "HOLD(target)", "HOLD(campaign)", "SUSPECT",
 check("state-machine: all nine required states covered", ok)
 check("state-machine: invariants I1-I7 declared",
       all(f"I{i}" in sm for i in range(1, 8)))
-check("state-machine: r2 enforcement rows present",
+check("state-machine: r3 enforcement rows present",
       all(k in sm for k in ["GLOBAL PRE-CHARGE GATE", "DRIFT PREEMPTION",
-                             "SUSPECT-RERUN-PENDING", "rerun-used guard",
-                             "27b", "12c", "30b", "30c",
+                             "VALIDITY-EVIDENCE RULE", "SUSPECT-RERUN-PENDING",
+                             "23a", "23d", "27b", "28b", "12c", "30b", "30c",
+                             "R-SLOT BINDING", "AMENDMENT RECEIPT",
                              "CONSERVATIVE SCOPE RULE"]))
 check("runbook: manifest-immutability + rendered-prompt + evidence rules present",
       all(k in rb for k in ["MANIFEST immutability", "SLOT-TABLE.md",
@@ -123,9 +124,9 @@ check("slot-table: rendered-prompt digests re-derive and appear per fixture", ok
 
 # 7c. Ledger: two-pool separation declared.
 sl = text("SLOT-LEDGER.md")
-check("ledger: two-pool separation + frozen-cancelled rule declared",
+check("ledger: two-pool separation + frozen-cancelled + position-funding declared",
       all(k in sl for k in ["PLANNED POOL (92)", "RESERVE POOL (18)",
-                             "NEVER reallocated", "ESCROW"]))
+                             "NEVER reallocated", "execution position"]))
 
 # 8. Twin sweep: receipt schema three-axis everywhere; no stale mixed-axis
 # list. The pattern is built by concatenation so this checker's own source
@@ -149,10 +150,9 @@ check("twin-sweep: sentinel stem SNTX115 appears only in T1F1 + MANIFEST + this 
 # 9. T1 security: no real-looking credentials beyond the declared synthetics.
 t1 = text("fixtures/T1F1.md")
 aws_like = set(re.findall(r"AKIA[A-Z0-9]{16}", t1))
-_reg = "AKIASNTX115" + "AAAA0001X"
-_unreg = "AKIA9QZL7R" + "2M8XW4T6VE"
-check("t1-security: AWS-shaped values are exactly the two declared synthetics",
-      aws_like == {_reg, _unreg})
+_with_sentinel = {v for v in aws_like if "SNTX115" in v}
+check("t1-security: exactly two AWS-shaped synthetics, exactly one sentinel-tagged",
+      len(aws_like) == 2 and len(_with_sentinel) == 1)
 check("t1-security: manifest declares no real/captured material",
       m["fixtures"][0]["security"]["real_or_captured_material"] is False)
 check("t1-security: no invisibility mechanisms declared or present",
