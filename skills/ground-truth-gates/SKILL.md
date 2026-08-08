@@ -183,13 +183,14 @@ runtime that produced it; another runtime major diverges in the
 insignificant digits and the gate false-fails on noise — with the
 consequence the allow-list rationale under verify-by-reconstruction
 below records. The comparator instead expresses the numeric contract actually
-promised — a declared precision, tolerance, or canonicalization, in the
-snapshot mapper: part of the gate, not the production code — coarse
-enough to absorb environment noise, fine enough that a genuine
-behavioral change still fails (the incident's durable remedy: rounding
-the solver field in the mapper). A baseline claimed portable across
-supported environments proves that claim on a second, relevantly
-different one — a pass on the freezing environment shows the snapshot
+promised — a declared precision, tolerance, canonicalization, or other
+justified normalization, living in the gate's comparator or snapshot
+mapper, never the production code — coarse enough to absorb environment
+noise, fine enough that a genuine behavioral change still fails (the
+incident's durable remedy: rounding the solver field in the mapper). A
+baseline claimed portable across supported environments proves that
+claim on a second, relevantly different one — a pass on the freezing
+environment shows the snapshot
 matches itself, not that it is environment-stable. A runtime pinned as a
 recorded decision — documented before the red, not relabelled after it
 (operational-rigor §3's documented-decision rule) — owes no proof of a
