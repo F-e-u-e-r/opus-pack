@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Cdqf9ttgP6KdYEhX6j9Tk",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Provenance\n\nOn 2026-07-19, a production deploy served stale artifacts due to insufficient cache-key specificity (Source 2, 14:02–14:07). The deploy-staging job had restored a cache entry keyed only on branch name, failing to account for changes to the lockfile (Source 2, 14:07). Investigation identified the cache step as the root cause, and adding the lockfile hash to the cache key resolved the issue (Source 2, 14:31). The incident consumed approximately 40 minutes of oncall time before resolution (Source 1; Source 2, 14:44). This was the first observed occurrence of this particular failure mode in the deployment pipeline (Source 2, 14:44)."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 364,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 168,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
