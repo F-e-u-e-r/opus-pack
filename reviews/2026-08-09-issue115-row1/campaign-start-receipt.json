@@ -1,0 +1,16 @@
+{
+  "receipt_type": "campaign-start",
+  "state_transition": "row 1: READY -> RUNNING (owner Row 1 authorization, scope: slot 0 dry-run only, then STOP)",
+  "timestamp": "2026-08-08T16:19:22Z",
+  "stage2_package_id": "issue115-stage2-v1",
+  "package_merge_sha": "7facc5381eb3ee4f0ef198ec80c05a68f935d4b6",
+  "manifest_sha256": "25700fd5bce2b07bbf5e89e9080bb0777acafea7a8282b081e7ac3c24972e860",
+  "stage1_sealed_prereg_sha256": "2c7e3f21ebd8d574590fd4a23578f8ed29f74df258b2307f2ae55c430a299eb8",
+  "campaign_baseline": "fac48c2086b318b31a9c80fd823ef8c0ed956eed",
+  "owner_approval_status": "APPROVED (verified pre-run)",
+  "target_roster": ["T1/#152", "T2/#157", "T3/#153", "T4/#151", "T5/#159 (2 units)", "T6/#161", "T7/#160"],
+  "drift_check_a": "ALL 8 BINDINGS PASS at origin/main 7facc538 (blob SHA exact + anchor WS-verbatim + unprobed marker present, per target)",
+  "static_checks": "34/34 PASSED pre-run",
+  "runner": "ant CLI 1.22.1, user_oauth profile, org 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c, base https://api.anthropic.com",
+  "authorization_scope_note": "Owner authorized exactly one preregistered dry-run (slot 0). Smoke and scored slots are NOT unlocked. No marker may be discharged by this run."
+}
