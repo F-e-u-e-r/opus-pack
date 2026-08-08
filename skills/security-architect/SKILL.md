@@ -77,6 +77,63 @@ fearmongering — a hobby tool and a payment flow do not get the same bar.
   an in-value tag (ground-truth-gates' sentinel-tagged fixtures) makes
   provenance one grep WHERE a suite was so minted — outside one, a
   missing tag proves nothing and the presumption stands.
+- **Scanner and guard design inherits name-is-not-provenance at the value
+  level.** A suppression or allowlist keyed on incidental line context
+  re-encodes name-as-provenance as code: a format-valid key is real
+  however much prose sits beside it (measured 2026-08-07: a secret
+  scanner whose placeholder test consumed the whole line scored a real
+  AKIA-shaped key 0 actionable because a trailing comment said
+  "example" — three adversarial review rounds had passed it). A
+  credential-shaped match is never suppressed or downgraded on nearby
+  naming or prose alone — `example`, `placeholder`, a comment, a
+  filename, a path record intent, never provenance (the clause above,
+  reaching the detector's own logic); a suppression or allowlist entry
+  is licensed by machine-verifiable, scope-bounded fixture provenance:
+  a registration record — the sentinel discipline's in-value marker
+  plus its manifest (ground-truth-gates' sentinel-tagged-fixture rule)
+  — that this rule requires to resolve the COMPLETE matched value to
+  exactly one fixture identity and to the exact sites the suite plants
+  it at, never a glob or suite-wide surface; a record that resolves
+  less licenses nothing. A sentinel tag in the value, a bare manifest
+  row, or membership of a path or suite resolves nothing on its own;
+  any occurrence of the value at an unrecorded site stays actionable;
+  ambiguous or overlapping resolution fails closed. The leak-scan's
+  declared surface-and-window manifest is coverage — where escapes are
+  looked for — never an occurrence license: a fixture value found on a
+  downstream sink (a log, a built artifact) is the escape the sentinel
+  scan exists to catch, never suppressible. Provenance is minted at
+  fixture synthesis, only for freshly generated, non-authenticating
+  values: reusing a live or captured credential's MATERIAL never mints
+  it (a live credential never lands in fixtures — ground-truth-gates'
+  own bound), while a shape-preserving derivative around newly
+  generated material, per its detector-positives discipline, is a
+  synthesis and mints normally; relabeling a value already in the
+  corpus does not mint it; evidence a registered value has entered
+  live use revokes its license until the owner records a qualifying
+  resolution — disproving the evidence, or rotating or
+  de-authenticating the value — never acceptance alone: a value that
+  still authenticates never regains the license; a retroactive claim
+  goes to the owner per the untagged-example clause above, and until
+  the confirmed registration is recorded, the hit stays actionable. This binds
+  suppression — whatever removes a hit from the actionable set or
+  keeps one from being created: an input prefilter, negative matcher,
+  or pre-emission score keyed on context is suppression too, as are
+  allowlist, score, filter, dedup-merge, and rank or routing cutoffs —
+  not reading: context may still order, group, and route SURFACED
+  hits, but an unlicensed hit keeps its urgency, delivery, and
+  decision route — reachable-but-buried is a downgrade, and an
+  operation that would drop or bury one is suppression and needs the
+  license above. (`unprobed` — see
+  Provenance.) The fixture side of the same contract: a
+  credential-shaped fixture that trips a sibling guard earns its pass
+  by being registered the same way — one fixture identity and scope
+  that every guard in the pipeline resolves — never by making the
+  fixture invisible to the guard: lexical transformation of the
+  at-rest text (source splitting, encoding, mutation), build- or
+  run-time assembly of the value, or relocation off a scanned surface
+  each manufacture a blind spot at exactly the shape the guard exists
+  to see, and defeat the sentinel scan's verbatim bound. (`unprobed` —
+  see Provenance.)
 - Severity ladder — use these words consistently:
   - **Critical** — exploitable now with data loss/account takeover; stop and fix.
   - **High** — must fix before production exposure.
@@ -500,7 +557,12 @@ A secret that ever reached git history, a log, a client bundle, or a chat is
 **burned. Rotate it now** — deleting the file or rewriting history does not
 un-leak it (clones, caches, and scrapers already have it). Then: find how it
 got there, add a pre-commit/push scanner (e.g. gitleaks, GitHub push
-protection), and check access logs for use of the old credential.
+protection), and check access logs for use of the old credential. A clean
+scan discharges only the corpus it actually read — a working-tree scan
+proves nothing about git history, where this rule's subject lives on after
+the delete — so a clean claim names its scanned surfaces (working tree,
+index, history, built artifacts), and an unscanned surface stays
+undischarged. (`unprobed` — see Provenance.)
 
 ## Output shape
 
@@ -616,5 +678,28 @@ to the owner instead. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue — a future
 campaign, not round-5, which was a completed, frozen ten-target slice
 this rule was not part of.
+
+The scanner-suppression bullet and the incident-response scan-scope
+clause (2026-08-07) are the redesigned landing of contributed PR #152
+(firaen22), dispositioned in the 2026-08-07 #151–#158 batch
+reconciliation as that PR's owner-authorized surviving items. The
+measured incident stands as contributed: a staged secret scanner, green
+through three adversarial review rounds, tested its placeholder pattern
+against the whole line, so a real format-valid AKIA-shaped key scored 0
+actionable off a trailing "example" comment; the same cluster surfaced
+credential-shaped self-test fixtures blocking an unrelated fail-closed
+vault-sync guard, and a 2026-06 audit's one still-live leaked credential
+existing only in git history (contributor-reported, not linkable). The
+contribution's remedy for the fixture collision — lexically transforming
+fixture literals until sibling guards stop matching — was REJECTED at
+reconciliation as a guard-evasion pattern (it manufactures the blind
+spot the guards exist to close) and is recorded here as that rejection,
+not as a rule, so it carries no probe debt; the shipped remedy is the
+existing sentinel/manifest fixture-provenance discipline
+(ground-truth-gates' sentinel-tagged-fixture rule) that both new
+clauses key on. Each surviving clause ships `unprobed` per the
+covenant; their probes join the standing #115 queue — a future
+campaign, not round-5, which was a completed, frozen ten-target slice
+these clauses were not part of.
 
 Volatile facts to re-verify yearly: platform storage APIs and deprecations.
