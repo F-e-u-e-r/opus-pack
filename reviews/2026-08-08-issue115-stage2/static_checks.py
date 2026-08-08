@@ -90,12 +90,16 @@ ok = all(s in sm for s in ["READY", "HOLD(target)", "HOLD(campaign)", "SUSPECT",
 check("state-machine: all nine required states covered", ok)
 check("state-machine: invariants I1-I7 declared",
       all(f"I{i}" in sm for i in range(1, 8)))
-check("state-machine: r3 enforcement rows present",
-      all(k in sm for k in ["GLOBAL PRE-CHARGE GATE", "DRIFT PREEMPTION",
-                             "VALIDITY-EVIDENCE RULE", "SUSPECT-RERUN-PENDING",
-                             "23a", "23d", "27b", "28b", "12c", "30b", "30c",
-                             "R-SLOT BINDING", "AMENDMENT RECEIPT",
-                             "CONSERVATIVE SCOPE RULE"]))
+check("state-machine: r4 enforcement present",
+      all(k in sm for k in ["GLOBAL PRE-CHARGE GATE", "ENCUMBRANCE MODEL",
+                             "DRIFT PREEMPTION", "VALIDITY-EVIDENCE RULE",
+                             "SUSPECT-RERUN-PENDING", "23a", "23d", "27b",
+                             "28b", "12c", "30b", "30c", "R-SLOT BINDING",
+                             "AMENDMENT RECEIPT", "TERMINAL DOMAIN GUARD",
+                             "CONSERVATIVE SCOPE RULE", "PERMANENT"]))
+am = json.load(open(os.path.join(ROOT, "AMENDMENTS.json")))
+check("amendments: chain file present with empty preregistered chain",
+      isinstance(am.get("amendments"), list) and am["amendments"] == [])
 check("runbook: manifest-immutability + rendered-prompt + evidence rules present",
       all(k in rb for k in ["MANIFEST immutability", "SLOT-TABLE.md",
                              "runner-native evidence", "NOT-RUN(RETIRED-SIBLING)"

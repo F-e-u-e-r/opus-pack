@@ -75,11 +75,10 @@ scored invocation (state rows 14/14b).
   is unchanged since the campaign's dry-run (a changed model id/config
   → HOLD(campaign), owner decision — no new dry-run without owner
   authorization, since a dry-run is a behavioral invocation).
-- A HOLD(target) caused by drift resumes only if the owner rules the
-  DRIFT-SHADOWED disposition allows it (per sealed §D, shadowed
-  evidence never discharges the marker; resumption for a re-run
-  against restored wording is an owner decision outside this
-  campaign's automatic paths).
+- A HOLD(target) caused by drift has NO in-campaign resume, ever:
+  DRIFT-SHADOWED is terminal (I4). Any re-run against restored
+  wording is a NEW owner decision outside this campaign — it never
+  resumes the shadowed target or revives its evidence in-campaign.
 
 ## 3. §K-2 — Repair mini-gate failure exit
 

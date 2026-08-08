@@ -27,15 +27,32 @@ T5 12, T6 12, T7 18 = 78.
 | Repair re-smoke | 1 per repaired fixture | max one repair per fixture (row 10) |
 | Owner-authorized SUSPECT fixture-set rerun unit | T1 6 · T2 12 · T3 6 · T4 12 · T5-placement 6 · T5-narrative 6 · T6 12 · T7 18 | one-shot per marker; charged atomically at execution position (rows 23a/24); an un-smoked unit fixture first clears its unconsumed planned smoke slot |
 
-## What must HOLD instead of spending reserve
+## Exhaustion and failure outcomes (typed per the r4 state rows — the
+ledger never substitutes a different branch)
 
-- A second infra failure of the same smoke or slot (rows 9/16).
-- A second dry-run failure (row 4).
-- Any unit the remaining budget cannot fund IN FULL (rows 24/28 — no
-  partial rerun, ever).
+- Second dry-run failure → HOLD(campaign): PRECONDITION-FAILED (row 4).
+- Second harness/transport failure of the same smoke or re-smoke →
+  HOLD(campaign): SMOKE-INFRA (rows 9/12c).
+- Second INVALID-RUN in the same scored slot → that arm INCOMPLETE
+  (row 16 — an arm consequence, not a campaign HOLD).
+- Pre-charge failure of a single-slot scored retry → arm INCOMPLETE
+  with CAP-EXHAUSTED annotation (row 28).
+- Pre-charge failure of a reserve-funded DRY-RUN/SMOKE-kind retry or
+  re-entitlement → HOLD(campaign): RESERVE-EXHAUSTED (row 28b).
+- SUSPECT unit unfundable at its execution position → marker stays
+  SUSPECT + CAP-EXHAUSTED annotation, rerun-used stays consumed
+  (row 23a-else); at authorization with no prior grant → row 24
+  advisory (rerun-used not consumed).
+- Parity unit unfundable at its execution position → the fixture's
+  IN-DOMAIN marker(s) INCONCLUSIVE(PARITY-VOID); non-domain markers
+  keep their states with annotations (row 27b-else).
+- No partial rerun exists on any path; encumbered unit slots are
+  pre-funded and never trigger the cap-close row.
 - Replacement fixtures: no such mechanism exists; wanting one is a
   STAGE-1-level change → HOLD to owner (RUNBOOK §4).
-- Ledger↔receipts divergence (row 31).
+- Ledger↔receipts divergence, evidence-free INVALID labels, or any
+  hash outside the per-path valid digest set → HOLD(campaign):
+  PROTOCOL (row 31).
 
 ## Two pools, strictly separated
 

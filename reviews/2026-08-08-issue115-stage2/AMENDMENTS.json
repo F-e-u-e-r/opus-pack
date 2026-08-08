@@ -1,0 +1,4 @@
+{
+  "note": "Amendment chain for the versioned-digest model (STATE-MACHINE row 10; RUNBOOK 3). Empty until a repair mini-gate issues a receipt. Each entry: {path, version_tag, old_sha256, new_sha256, new_rendered_bare_sha256, new_rendered_ruled_sha256, owner_signature, timestamp}. A path's latest entry supersedes its prior hash; make_manifest.py refuses regeneration while this chain is non-empty unless invoked with --amend as part of a repair mini-gate.",
+  "amendments": []
+}

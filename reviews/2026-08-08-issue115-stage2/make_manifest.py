@@ -84,6 +84,14 @@ def write_slot_table(fixtures):
         f.write("\n".join(lines) + "\n")
 
 def main():
+    am_path = os.path.join(ROOT, "AMENDMENTS.json")
+    if os.path.exists(am_path):
+        chain = json.load(open(am_path)).get("amendments", [])
+        if chain and "--amend" not in sys.argv:
+            print("REFUSED: amendment chain is non-empty; regeneration outside "
+                  "a repair mini-gate is a protocol deviation (state row 31). "
+                  "Re-run with --amend only as part of a gated repair.")
+            return 1
     fixtures = []
     for fid, target, pos, clause in FIXTURES:
         entry = {
@@ -126,7 +134,7 @@ def main():
                                      "T7": 18},
         "documents": {p: sha(p) for p in [
             "PREREG-v6-SEALED.md", "RUNBOOK.md", "STATE-MACHINE.md",
-            "SLOT-LEDGER.md", "UNCERTAINTY.md",
+            "SLOT-LEDGER.md", "UNCERTAINTY.md", "AMENDMENTS.json",
             "smoke-checklists/SMOKE-CHECKLIST.md",
             "wrappers/WRAPPER.md"]},
         "fixtures": fixtures,
