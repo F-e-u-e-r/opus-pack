@@ -174,6 +174,31 @@ records that moved.** Re-`--update` only after eyeballing an *intended*
 change, and only as the orchestrator/reviewer — never the editing worker's
 own call (rule 4 below: gate changes are not the worker's to make).
 
+**A frozen baseline inherits its environment's floating-point noise —
+declare the numeric contract, and prove portability only where claimed**
+(`unprobed` — contributor incident as shape; see Provenance). A baseline
+holding *iteratively solved* numerics (an IRR, a solver output —
+converged, not closed-form) freezes the last-bit FP behavior of the
+runtime that produced it; another runtime major diverges in the
+insignificant digits and the gate false-fails on noise — with the
+consequence the allow-list rationale under verify-by-reconstruction
+below records. The comparator instead expresses the numeric contract actually
+promised — a declared precision, tolerance, canonicalization, or other
+justified normalization, living in the gate's comparator or snapshot
+mapper, never the production code — coarse enough to absorb environment
+noise, fine enough that a genuine behavioral change still fails (the
+incident's durable remedy: rounding the solver field in the mapper). A
+baseline claimed portable across supported environments proves that
+claim on a second, relevantly different one — a pass on the freezing
+environment shows the snapshot
+matches itself, not that it is environment-stable. A runtime pinned as a
+recorded decision — documented before the red, not relabelled after it
+(operational-rigor §3's documented-decision rule) — owes no proof of a
+claim it never made; a pin added to silence a red is a stopgap that
+hands the same red to the next environment change.
+❌ "CI is red but every diff is in the 13th decimal place — pin CI to my
+local runtime version."
+
 **replay variant — parity (no corpus):** a refactor of pure-ish logic (config parsing, path
 handling, formatting) often has no logged corpus to replay. Keep the pre-change
 implementation *callable* — a pinned import, a second checkout, or
@@ -973,6 +998,20 @@ probe; shorter comparison prose). Ships `unprobed` per the covenant; its
 probe — seed a suite stripping one alias of a two-alias dependency,
 confirm a ruled reviewer catches the live second alias where a bare one
 does not — joins the standing #115 queue.
+The FP-noise numeric-contract clause (2026-08-07; maintainer fold
+2026-08-08) comes from a contributor incident (contributor-reported,
+not linkable): a golden projection snapshot frozen under one Node major
+failed CI under another, every diff an iteratively-solved IRR field at
+~1e-13; the first fix pinned CI's runtime (stopgap), the durable fix
+rounded the field to 10 dp in the snapshot mapper, removed the pin, and
+re-ran green on the very major that had failed. The incident evidences
+the rounding remedy and the pin-first shape; the numeric-contract form
+and the claimed-portability/pinned-contract boundary are the fold's.
+Ships `unprobed` per the covenant; its probe — freeze a solver output
+on one runtime, grade on a second the baseline claims to support,
+observe whether a ruled reviewer reaches for a declared numeric
+contract where a bare one reaches for the pin — joins the standing
+#115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
