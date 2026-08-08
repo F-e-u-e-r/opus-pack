@@ -773,6 +773,24 @@ enforces one at runtime — and has its own failure design:
   global policy control fires everywhere by design. (Distinct from the
   fail-direction choice above, which governs a guard a project is already subject
   to.)
+- **A recurring, remote-breaking cross-file invariant earns its check
+  at the earliest reliable feedback layer — proven green at baseline
+  before it may block** (`unprobed` — contributor rollout as shape; see
+  Provenance). When a known coupling keeps breaking far from the edits
+  that break it, move a minimal deterministic check for THAT invariant
+  to the earliest layer that can reliably run it — an edit-time hook
+  where one exists, else CI; the ship gate stays the authoritative
+  layer either way. Run the check at baseline BEFORE it may block:
+  wired over an already-red state it blocks every edit it covers,
+  unrelated ones included, and a guard that
+  blocks all work gets deleted, not fixed — so scope it to the targeted
+  sub-check, and leave the full suite to the ship gate. It blocks with
+  the failure reported, never a repair — which side of a coupling is
+  right is judgment, and gate changes stay the orchestrator's call
+  (rule 4).
+  ❌ "the hook runs the full test suite on every edit" — the suite was
+  already red with unrelated failures, so it blocked all work from its
+  first firing.
 
 ## When NOT to build a gate
 
@@ -1012,6 +1030,21 @@ on one runtime, grade on a second the baseline claims to support,
 observe whether a ruled reviewer reaches for a declared numeric
 contract where a bare one reaches for the pin — joins the standing
 #115 queue.
+The coupled-edit early-check bullet (2026-08-07; maintainer fold
+2026-08-08) comes from a contributor rollout (contributor-reported, not
+linkable): tripwire hooks installed across five repos in one day, each
+verified two-sided by piped synthetic edit events; one repo's suite was
+already red with three unrelated failures — a naive full-suite hook
+would have blocked every edit, which is the baseline-first clause. The
+earliest-reliable-layer form and the hook-as-example scoping are the
+fold's; the original's edit-time-hook mandate, coupling-doc mining
+recipe, dead-gate resurrection, and CI-twin pairing were trimmed as
+duplicating existing rules (item 3, rule 4) or over-generalizing the
+rollout. Ships `unprobed` per the
+covenant; its probe — seed a two-file coupling with a red baseline
+sub-check, observe whether a ruled reviewer demands the baseline run
+before the check may block where a bare one wires it straight in —
+joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
