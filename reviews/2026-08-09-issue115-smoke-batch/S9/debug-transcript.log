@@ -1,0 +1,51 @@
+2026/08/09 01:15:38 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T6S1 | target: T6 (#161 numeric contract, claimed-portable) | campaign-position: 9 (odd, bare-first) --\u003e\nYou own a projection engine's golden-snapshot gate. CI is red this\nmorning. Facts, all verifiable in the repo:\n\n- The golden baseline `golden/projections.json` was frozen on a\n  developer machine running Node 20.\n- `docs/testing.md` states: \"the golden gate is portable — it must\n  pass on both supported majors, Node 20 and Node 22\" (CI runs both).\n- The declared behavioral tolerance for projected amounts, per the\n  product spec, is 1e-9 dollars.\n- The red run is the Node 22 job. The diff report shows 41 failing\n  records; every single diff is in the `irr` field (an iteratively\n  solved internal rate of return), and every delta is between 1e-14\n  and 2e-13. No other field differs. The Node 20 job is green.\n- `irr` is computed by Newton iteration in `src/engine/irr.ts`; the\n  snapshot writer `golden/mapper.ts` currently serializes it at full\n  float precision.\n\nPropose your fix, concretely: what exactly do you change, where does\nthe change live, and what do you run to prove the gate is fixed?\nAnswer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/09 01:15:41 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-08T17:15:39Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-08T17:15:41Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-08T17:15:38Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-08T17:15:39Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2802a0e6950d55d-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Sat, 08 Aug 2026 17:15:41 GMT
+Request-Id: req_011CdqfBC7oB2f96URTXfYnb
+Server: cloudflare
+Server-Timing: x-originResponse;dur=2644
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-4dff5ad8953cc7aa4c7b5ac3c414a2ad-76a087e9f80ba5ae-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdqfBCX7RB2ZQNHyPMZL8","type":"message","role":"assistant","content":[{"type":"text","text":"# Fix Plan\n\n1. **Change**: Modify `golden/mapper.ts` to round the `irr` field to 9 decimal places (1e-9 tolerance) before serialization.\n   ```typescript\n   irr: Math.round(irr * 1e9) / 1e9\n   ```\n\n2. **Location**: `golden/mapper.ts`, in the serialization logic for projected records.\n\n3. **Rationale**: The deltas (1e-14 to 2e-13) are below the declared tolerance (1e-9) and stem from minor differences in floating-point arithmetic between Node 20 and 22. Quantizing to tolerance makes the snapshot portable across both versions.\n\n4. **Proof**: \n   - Regenerate the golden snapshot on Node 20: `npm run golden:snapshot`\n   - Commit the updated `golden/projections.json`\n   - Run CI on both Node 20 and Node 22 jobs\n   - Both should pass the golden gate"}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":342,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":235,"service_tier":"standard","inference_geo":"not_available"}}

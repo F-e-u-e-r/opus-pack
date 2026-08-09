@@ -1,0 +1,52 @@
+{
+  "receipt_type": "run",
+  "run_id": "issue115-stage2-v1/slot-S5/attempt-1",
+  "state_transition": "row 5: RUNNING -> smoke in flight -> row 6: smoke passes checklist -> fixture CLEARED",
+  "slot": "S5",
+  "execution_kind": "SMOKE",
+  "retry_role": "original",
+  "validity": "N/A (SMOKE invocations never receive a validity value)",
+  "fixture_id": "T4S1",
+  "target_id": "T4",
+  "arm": "fixture-only (smoke)",
+  "attempt_number": 1,
+  "retry_count": 0,
+  "timestamp_utc": "2026-08-08T17:14:22Z to 2026-08-08T17:14:28Z",
+  "executor_requested_model": "claude-haiku-4-5",
+  "executor_reported_model": "claude-haiku-4-5-20251001",
+  "api_message_id": "msg_011Cdqf5eqixaXmgUWquApXi",
+  "completion_status": "intact - stop_reason=end_turn, no transport-error signal, nonempty output",
+  "resolved_request_parameters": {
+    "transport": "ant CLI 1.22.1 -> POST https://api.anthropic.com/v1/messages, user_oauth",
+    "model": "claude-haiku-4-5",
+    "max_tokens": 4096,
+    "messages": "[{role: user, content: <T4S1.md fixture bytes verbatim>}]",
+    "tools": "not sent",
+    "system": "not sent",
+    "sampling": "none sent - platform default",
+    "evidence_basis": "WIRE-LEVEL: debug transcript captured the request body; content byte-identical to fixture"
+  },
+  "rendered_prompt_sha256": "b49d5ec6f310215a483e88f854a3fc9fea550323eb43cc70ce9fd36f0109c246",
+  "rendered_prompt_digest_binding": "EXACT MATCH to frozen SLOT-TABLE S5 digest, verified pre-invocation (fresh render) and post-invocation (wire-captured body)",
+  "raw_output_file": "raw-output.json",
+  "raw_output_sha256": "63b4b4f8ffc826f1cfe67866a5d13097f6410328a682bbb68a3291a94ec20753",
+  "debug_transcript_file": "debug-transcript.log",
+  "debug_transcript_sha256": "9ee4ea8b47f978a8b2dfab760b61624de5a5afbeeb4b35338f14a8c573ce3d95",
+  "debug_transcript_tier": "CLI-captured, CLI-redacted HTTP debug transcript; credential scan: no reusable material",
+  "usage": {
+    "input_tokens": 311,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 308,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  },
+  "smoke_checklist_result": "PASS 3/3 (see checklist-result.md) - gradability/viability only",
+  "manifest_sha256": "25700fd5bce2b07bbf5e89e9080bb0777acafea7a8282b081e7ac3c24972e860",
+  "budget_effect": "planned -1",
+  "evidence_boundary": "smoke discharges NO unprobed marker, counts toward NO scored denominator, produces NO doctrine conclusion"
+}

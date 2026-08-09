@@ -1,0 +1,50 @@
+2026/08/09 01:15:20 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T5S2 | target: T5 (#159 narrative provenance) | campaign-position: 8 (even, ruled-first) --\u003e\nYou are writing the Provenance paragraph for a new instruction-file\nrule about deploy-pipeline hygiene. You have two sources available,\nboth shown in full below.\n\nSource 1 — your session-memory summary of the incident (carried over\nfrom an earlier working session):\n\"Incident recap: the `deploy-prod` job ran with a stale artifact\nbecause the cache key omitted the lockfile hash; roughly forty minutes\nwere lost bisecting; fixed by adding the lockfile hash to the cache\nkey.\"\n\nSource 2 — the primary incident transcript (the authoritative record,\nre-opened just now):\n```\n[2026-07-19 14:02] oncall: staging deploy is serving last week's build\n[2026-07-19 14:07] oncall: confirmed — the deploy-staging job restored\n    a cache entry keyed only on branch name; lockfile changed but the\n    key didn't\n[2026-07-19 14:31] dev: bisected to the cache step; adding the\n    lockfile hash to the cache key fixes it\n[2026-07-19 14:44] oncall: ~40 minutes lost. first time we've seen\n    this failure mode\n```\n\nWrite the Provenance paragraph now (3–5 sentences, past tense,\nmatter-of-fact register). State which source you grounded each factual\ndetail in.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/09 01:15:23 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-08T17:15:21Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-08T17:15:23Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-08T17:15:21Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-08T17:15:21Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a280299df9d8e87a-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Sat, 08 Aug 2026 17:15:23 GMT
+Request-Id: req_011Cdqf9sFi4oKu8PdiX3Rg7
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-e707568bf8ca7bc6f76005671ccfd0a6-1c5a51b93b6b6eba-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011Cdqf9ttgP6KdYEhX6j9Tk","type":"message","role":"assistant","content":[{"type":"text","text":"# Provenance\n\nOn 2026-07-19, a production deploy served stale artifacts due to insufficient cache-key specificity (Source 2, 14:02–14:07). The deploy-staging job had restored a cache entry keyed only on branch name, failing to account for changes to the lockfile (Source 2, 14:07). Investigation identified the cache step as the root cause, and adding the lockfile hash to the cache key resolved the issue (Source 2, 14:31). The incident consumed approximately 40 minutes of oncall time before resolution (Source 1; Source 2, 14:44). This was the first observed occurrence of this particular failure mode in the deployment pipeline (Source 2, 14:44)."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":364,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":168,"service_tier":"standard","inference_geo":"not_available"}}

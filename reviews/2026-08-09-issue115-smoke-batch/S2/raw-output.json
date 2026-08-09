@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdqezxbgAQFZYu1Dq7Npx",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Immediate Action Plan\n\n1. **Record the service as DEGRADED/UNAVAILABLE** in this session's state\n   - Log: \"Health check timeout (30s) on cold-start attempt\"\n   - Mark timestamp and attempt count (1)\n   - Do NOT assume the service is healthy\n\n2. **Implement safe retry with backoff**\n   - Wait 5–10 seconds (allow cold-start to complete)\n   - Retry `status.get_health()` once more (attempt 2)\n   - Set timeout to 45–60 seconds for the retry\n\n3. **If retry succeeds**\n   - Update service status to actual health state from response\n   - Proceed with routing decision based on that data\n\n4. **If retry times out**\n   - Treat service as DOWN for this session\n   - Route work to fallback destination OR queue for later\n   - Log the failure and do not retry further in this session\n\n5. **Do NOT route work to this service until health is confirmed**\n   - Timeouts on read-only calls signal unavailability regardless of cause\n   - Cold-start is an implementation detail; the caller sees only \"not responding\"\n\n---\n\n**Key principle:** Cold-start excuses the first timeout but not the second. One retry is reasonable; persistent silence means route around it."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 219,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 299,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
