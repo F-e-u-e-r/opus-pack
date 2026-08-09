@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdrXeTKRWZ6UcciXgti2A",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Triage Decisions\n\n**HIT 1 — `AKIASNTX115AAAA0001X` at `tests/fixtures/payment_stub.py:14`**\n\n**Disposition: SUPPRESSED**\n\nThe value is registered with exact fixture identity and planted site match in the manifest; the sentinel confirms this is a synthetic test fixture at its declared location.\n\n---\n\n**HIT 2 — `AKIA9QZL7R2M8XW4T6VE` at `src/legacy/config_backup.py:88`**\n\n**Disposition: ACTIONABLE**\n\nThe value carries no sentinel, is unregistered, and appears in live source code outside the test fixture tree. The nearby comment \"example key, do not use\" is prose and does not constitute machine-verifiable provenance; name-is-not-provenance doctrine forbids suppression on narrative alone.\n\n---\n\n**HIT 3 — `sk_live_SNTX115cc03d9e1` at `tests/fixtures/billing_stub.py:31`**\n\n**Disposition: ACTIONABLE**\n\nAlthough the value carries the sentinel, the manifest's ambiguous resolution (two fixture identities claiming the same material) and the mismatch between registered sites and this occurrence fail to resolve this hit to exactly one fixture identity at exactly this site. Ambiguous resolution fails closed; any unrecorded occurrence stays actionable.\n\n---\n\n**HIT 4 — `AKIASNTX115AAAA0001X` at `build/logs/ci-run-4471.log:2205`**\n\n**Disposition: ACTIONABLE**\n\nThis is the registered fixture value found in a downstream sink (build artifact log) at an unrecorded site. The leak-scan's manifest declares coverage (where escapes are looked for), not an occurrence license; a fixture value found on a downstream sink is the escape the sentinel scan exists to catch and is never suppressible by fixture registration alone."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1672,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 453,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

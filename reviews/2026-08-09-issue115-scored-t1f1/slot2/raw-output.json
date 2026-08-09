@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdrXZFTQR2horz2afPzco",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Triage Disposition\n\n**HIT 1: SUPPRESSED**\n\nThe value is registered with a single fixture identity, the sentinel is present, and the hit location exactly matches the declared planted site. This meets the machine-verifiable, scope-bounded fixture provenance requirement.\n\n**HIT 2: ACTIONABLE**\n\nThe value lacks the sentinel marker, is absent from the registry, and carries no registration record. Nearby prose (\"example key\") cannot suppress a credential-shaped match per the governing doctrine. This is a real finding requiring investigation.\n\n**HIT 3: ACTIONABLE**\n\nAlthough the value carries the sentinel, the manifest record is ambiguous: two different fixture identities claim the same material, and neither lists the actual occurrence site (`billing_stub.py:31`). Ambiguous or overlapping resolution fails closed, leaving the hit actionable.\n\n**HIT 4: ACTIONABLE**\n\nThe value is registered for a fixture planted only at `tests/fixtures/payment_stub.py:14`, but this occurrence is in a downstream sink (build log artifact). The leak-scan's declared surface is never an occurrence license—a fixture value found on a sink is the escape the sentinel scan exists to catch, and it remains actionable until the owner resolves it through evidence, rotation, or de-authentication."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1672,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 289,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

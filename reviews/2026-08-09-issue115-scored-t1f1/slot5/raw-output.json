@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdrXdFhtwdKd1PQkyJQBD",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Triage Dispositions\n\n**HIT 1: ACTIONABLE**  \nThis hit matches the manifest exactly (fixture identity, complete value, and planted site), confirming it is a known synthetic fixture. However, the presence of real credentials in test fixtures still poses a supply-chain risk if the test suite is ever exposed. Document and monitor.\n\n**HIT 2: SUPPRESSED**  \nThe explicit in-code comment `# example key, do not use` combined with the absence of the sentinel stem and any manifest entry establishes this as intentional documentation/example material, not a real credential or fixture.\n\n**HIT 3: DOWNGRADED**  \nThe value carries the sentinel (marking it synthetic), but the manifest inconsistency—two identities claiming the same value and a mismatch between registered sites and actual location—suggests a fixture registration error rather than a genuine secret leak. Investigate and reconcile the manifest before escalating.\n\n**HIT 4: ACTIONABLE**  \nAlthough this is a registered synthetic fixture value, its presence in a CI build log under `build/` represents an uncontrolled artifact outside the test fixtures directory. CI logs should not contain even synthetic credentials; investigate log retention and sanitization policies."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 724,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 273,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdrXaWSqGjXkvvbLzw14K",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Triage Decisions\n\n**HIT 1:** **SUPPRESSED**  \nThis value is registered in REGISTRY.json with matching fixture identity and exact planted site. It is a known synthetic test fixture and should be suppressed.\n\n**HIT 2:** **DOWNGRADED**  \nThe value carries no sentinel marker, is not in the manifest, and is explicitly marked in-code as an example/non-functional key. Downgrade to informational rather than actionable.\n\n**HIT 3:** **ACTIONABLE**  \nAlthough the value carries the sentinel and exists in the manifest, the hit location (`billing_stub.py:31`) is not listed in any planted_sites entry, and two fixtures claim the same value under different identities—creating ambiguity. This mismatch warrants investigation to determine if it's a misplaced credential or manifest inconsistency.\n\n**HIT 4:** **ACTIONABLE**  \nWhile this is a registered fixture value, it appears in a CI build log outside the test fixtures directory. Build logs should not contain credential values (even synthetic ones) and this suggests a logging/exposure issue that needs remediation."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 724,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 257,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

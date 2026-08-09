@@ -1,0 +1,11 @@
+{
+  "observation": "slot-4",
+  "fixture": "T1F1",
+  "arm": "ruled",
+  "n_index": 2,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "a8b34971fbfeb89a4c58e7cbe45dd02e51d89fd551318c5078eff8c777e937eb",
+  "api_message_id": "msg_011CdrXbiHFjGCFWbicJK1ia",
+  "rubric": "R-T1F1 (frozen, b8575469b08c...)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all six original observations complete, per owner grant and sealed label-stripped grading order)"
+}
