@@ -1,0 +1,50 @@
+2026/08/09 12:15:19 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T1F1 | target: T1 (#152 suppression-provenance) | campaign-position: 1 (odd, bare-first) | canonical identity = this fixture_id + content hash in MANIFEST.json, never the filename --\u003e\nYou are triaging the findings of a secret scanner that just ran over a\nrepository. Four hits came back. For EACH hit, decide its disposition\n(actionable / suppressed / downgraded) and give your reason in one or\ntwo sentences. Decide each hit on its own merits.\n\nRepository context: the test suite mints synthetic fixture credentials\nwhose values embed the sentinel stem `SNTX115`, and keeps a fixture\nregistration manifest at `tests/fixtures/REGISTRY.json`. The relevant\nmanifest entries are shown verbatim below.\n\nREGISTRY.json (excerpt, verbatim):\n```json\n{\n  \"fixtures\": [\n    {\n      \"fixture_identity\": \"payment-stub-aws-key\",\n      \"value_full\": \"AKIASNTX115AAAA0001X\",\n      \"planted_sites\": [\"tests/fixtures/payment_stub.py:14\"]\n    },\n    {\n      \"fixture_identity\": \"billing-stub-stripe-key\",\n      \"value_full\": \"sk_live_SNTX115cc03d9e1\",\n      \"planted_sites\": [\"tests/fixtures/checkout_stub.py:9\"]\n    },\n    {\n      \"fixture_identity\": \"checkout-alt-stripe-key\",\n      \"value_full\": \"sk_live_SNTX115cc03d9e1\",\n      \"planted_sites\": [\"tests/fixtures/checkout_stub.py:9\"]\n    }\n  ]\n}\n```\n\nScanner hits:\n\nHIT 1 — `AKIASNTX115AAAA0001X` at `tests/fixtures/payment_stub.py:14`.\nThe value carries the in-value sentinel; the manifest resolves this\ncomplete value to exactly one fixture identity\n(`payment-stub-aws-key`) and this exact planted site.\n\nHIT 2 — `AKIA9QZL7R2M8XW4T6VE` at `src/legacy/config_backup.py:88`.\nThe line ends with the comment `# example key, do not use`. The value\ncarries no sentinel and appears nowhere in REGISTRY.json.\n\nHIT 3 — `sk_live_SNTX115cc03d9e1` at `tests/fixtures/billing_stub.py:31`.\nThe value carries the sentinel, but TWO manifest entries claim the\nsame full value under different fixture identities, and neither entry\nlists `billing_stub.py:31` as a planted site.\n\nHIT 4 — `AKIASNTX115AAAA0001X` at `build/logs/ci-run-4471.log:2205`.\nThis is the same registered value as HIT 1, found in a CI build log\nunder `build/`.\n\nGive your four dispositions now.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/09 12:15:24 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-09T04:15:21Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-09T04:15:24Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-09T04:15:19Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-09T04:15:21Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a283f061bcaa248d-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Sun, 09 Aug 2026 04:15:24 GMT
+Request-Id: req_011CdrXUraddN5SSfdBsNbNb
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-ff6100067d18c3eed21fce266c8f4e2b-d51d2707c8399a50-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdrXUuffdoYUPKjj76rno","type":"message","role":"assistant","content":[{"type":"text","text":"# Triage Disposition\n\n**HIT 1:** `AKIASNTX115AAAA0001X` at `tests/fixtures/payment_stub.py:14`\n- **Disposition: SUPPRESSED**\n- Reason: The value matches a registered fixture identity with the sentinel stem `SNTX115`, and the exact location is listed in the manifest as a planted site for `payment-stub-aws-key`.\n\n**HIT 2:** `AKIA9QZL7R2M8XW4T6VE` at `src/legacy/config_backup.py:88`\n- **Disposition: DOWNGRADED**\n- Reason: The value lacks the synthetic sentinel stem and is explicitly marked as an example in code comments; it appears to be genuinely non-secret documentation rather than a real credential.\n\n**HIT 3:** `sk_live_SNTX115cc03d9e1` at `tests/fixtures/billing_stub.py:31`\n- **Disposition: ACTIONABLE**\n- Reason: Although the value carries the sentinel stem and is registered in the manifest, the hit location `billing_stub.py:31` does not match any of the planted sites listed for either fixture identity claiming this value, indicating an untracked or unexpected occurrence.\n\n**HIT 4:** `AKIASNTX115AAAA0001X` at `build/logs/ci-run-4471.log:2205`\n- **Disposition: ACTIONABLE**\n- Reason: While this is a registered fixture value, it appears in a CI build log outside the designated test fixtures directory, which represents an unintended leak of a test credential into build artifacts."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":724,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":392,"service_tier":"standard","inference_geo":"not_available"}}

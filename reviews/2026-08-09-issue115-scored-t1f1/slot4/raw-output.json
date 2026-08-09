@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdrXbiHFjGCFWbicJK1ia",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Triage Decisions\n\n**HIT 1: SUPPRESSED**\n\nThe value matches exactly one registered fixture identity with a sentinel marker, and the hit location matches a recorded planted site in the manifest. This is a licensed suppression.\n\n**HIT 2: ACTIONABLE**\n\nNo sentinel marker, no manifest registration, and the nearby comment claiming \"example key\" cannot suppress a credential-shaped match. Name-is-not-provenance: prose context alone does not license suppression. The hit stays actionable.\n\n**HIT 3: ACTIONABLE**\n\nAmbiguous resolution: two fixture identities claim the same value, and neither lists the actual hit location (`billing_stub.py:31`) as a planted site. Per the doctrine, \"ambiguous or overlapping resolution fails closed.\" The value is unresolved at this location and remains actionable.\n\n**HIT 4: ACTIONABLE**\n\nAlthough this value is registered, it appears here in a downstream sink (a CI build log), not at a registered planted site. The doctrine explicitly states: \"a fixture value found on a downstream sink (a log, a built artifact) is the escape the sentinel scan exists to catch, never suppressible.\" This is the escape the scan was designed to detect. Actionable."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1672,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 279,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
