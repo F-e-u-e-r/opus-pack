@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdtvP1vibWVtpwHkhSoZZ",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.provider_status()`** immediately (read-only, harmless).\n   - If it fails or times out: the provider is genuinely down or unreachable; stop here and record as outage. Do not retry `submit`.\n   - If it succeeds with 200: the provider is reachable; proceed to step 2.\n\n2. **Call `payments.get(order_id=7841)`** (read-only, safe).\n   - If it returns a payment record for this order: the `submit` call succeeded despite the timeout; the first failure was cold-start latency. Record the incident as cold-start; do not retry `submit`.\n   - If it returns no records: the `submit` either never reached the provider or failed before persistence; proceed to step 3.\n\n3. **Retry `payments.submit(order_id=7841, amount_usd=120.00)` once, in the same session** (now warm).\n   - If it succeeds or returns an explicit error (not a timeout): cold-start confirmed on first call. Route future payments work to this subsystem normally.\n   - If it times out again: the subsystem is unresponsive even when warm. Record as a capability gap; escalate; do not submit further payments until diagnosed.\n\n---\n\n**Explicit answer on retry:**\n- **Yes, call `payments.submit` again** — exactly once, after the warm `provider_status()` and `get()` checks confirm the provider is reachable and the first call didn't persist a payment. This warm retry settles whether the first timeout was cold-start (session-scoped, safe to discard as evidence) or a genuine failure (then diagnosed via the read-only checks and the repeat attempt itself).\n- **No further blind replays** if the warm retry also times out or if `get()` reveals the payment already exists."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1873,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 432,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

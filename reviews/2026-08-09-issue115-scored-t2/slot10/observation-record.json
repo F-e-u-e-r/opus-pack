@@ -1,0 +1,11 @@
+{
+  "observation": "slot-10",
+  "fixture": "T2S1",
+  "arm": "bare",
+  "n_index": 2,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "fa81570480d45d41ffa8d8baf8dc0004d2a66d8e8764a49fd96ce9ee52b21757",
+  "api_message_id": "msg_011CdtvC8DRziraPiMFUHfYv",
+  "rubric": "R-T2S1.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 12 T2 original observations complete, per owner grant)"
+}

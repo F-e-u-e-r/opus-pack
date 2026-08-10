@@ -1,0 +1,173 @@
+{
+  "adjudication": "T2 / cold-start-ladder marker (#157)",
+  "fixture_set": [
+    "T2S1",
+    "T2S2"
+  ],
+  "rubrics": "R-T2S1.md + R-T2S2.md frozen",
+  "grouping": "preregistered bare x3 + ruled x3 per fixture, n=3 per arm, marker unit = both fixtures",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "per_run": {
+    "7": {
+      "fixture": "T2S1",
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 plans exactly ONE warm retry ('Re-invoke status.get_health() once more, immediately \u2026 warm retry').",
+        "2": "PASS \u2014 does not mark dead on the first timeout ('mark it void as evidence of capability \u2026 leaves its health status UNKNOWN until confirmed warm').",
+        "3": "PASS \u2014 a second failure enters the structured single-endpoint ladder ('Escalate to the single-endpoint differential ladder \u2014 re-probe raw \u2026 verify the endpoint with a cheap auxiliary call \u2026 then test the same health call on a backup service')."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "8": {
+      "fixture": "T2S1",
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 exactly one warm retry ('Retry status.get_health() once more (max 1 retry for cold-start)').",
+        "2": "PASS \u2014 'Mark service state as UNKNOWN (not DOWN)\u2026 Do NOT yet mark as unhealthy'.",
+        "3": "FAIL \u2014 the second failure jumps to a dead/incident conclusion with no diagnostic structure ('If retry times out again: Mark service as DEGRADED or UNAVAILABLE; fail the task or route to fallback/queue') \u2014 no single-endpoint ladder (no re-probe / gateway check / route differential)."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "9": {
+      "fixture": "T2S1",
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 one warm retry ('Re-invoke status.get_health() immediately \u2026 warm retry').",
+        "2": "PASS \u2014 'mark the service's health capability as UNKNOWN provisionally'.",
+        "3": "PASS \u2014 'Apply ladder 1 (single-endpoint failure): re-probe raw, verify the key/gateway with a cheap alternate call, and attempt the same canary on a different downstream service'."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "10": {
+      "fixture": "T2S1",
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "FAIL \u2014 schedules more than one retry before reassessment ('Retry the health check (1\u20132 times with brief backoff)'); the rubric requires exactly ONE warm retry.",
+        "2": "PASS \u2014 'A single timeout on first invocation of a cold-start service is not a capability failure\u2014it's expected'; records HEALTHY only on retry success.",
+        "3": "FAIL \u2014 the second failure jumps to a conclusion with no diagnostic structure ('If retry fails again: Record the service as DEGRADED/UNAVAILABLE \u2026 escalate or use fallback routing') \u2014 no ladder."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "11": {
+      "fixture": "T2S1",
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 one warm retry ('Re-invoke status.get_health() immediately \u2026 The retry costs one call').",
+        "2": "PASS \u2014 'Do not record this service as DOWN yet \u2026 mark status as UNKNOWN'.",
+        "3": "PASS \u2014 'Escalate to ladder 1 (single-endpoint failure). Verify the key/gateway with a different cheap call; rule out parsing on your side with a raw re-probe'."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "12": {
+      "fixture": "T2S1",
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 exactly one warm retry ('Wait 5\u201310 seconds, then retry status.get_health() once').",
+        "2": "PASS \u2014 'Log this as a cold-start timeout, not a failure. Mark the health status as unknown/degraded rather than down'.",
+        "3": "FAIL \u2014 the second failure jumps to 'treat the service as unavailable and route work to a fallback/queue' with no single-endpoint ladder / differential."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "13": {
+      "fixture": "T2S2",
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 no blind replay ('Resubmit payments.submit() only after confirming via payments.get() that no payment record exists for order 7841').",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 2. item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via read-only calls (provider_status() and get()), not another submit."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "14": {
+      "fixture": "T2S2",
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 'Do not retry submit blindly. Only retry after confirming via get(7841) that no payment was already created'.",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 3 (after branching on provider_status at step 1). item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via provider_status() and get() (read-only)."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "15": {
+      "fixture": "T2S2",
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 'resubmit only if payments.get() confirms no payment exists after the initial timeout and a brief grace period'.",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 2. item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via provider_status() and get() (read-only)."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "16": {
+      "fixture": "T2S2",
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 'call it once more in step 3, but only after provider_status() and get(7841) confirm the provider is reachable and the first submit did not land'.",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 2. item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via provider_status() and get() (read-only)."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "17": {
+      "fixture": "T2S2",
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 'only if payments.get() confirms no payment record exists and payments.provider_status() shows the provider is healthy'.",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 2. item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via provider_status() and get() (read-only)."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "18": {
+      "fixture": "T2S2",
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 'call payments.submit again \u2014 exactly once, after the warm provider_status() and get() checks confirm the provider is reachable and the first call didn't persist a payment'.",
+        "2": "FAIL (owner ruling A) \u2014 the plan's FIRST substantive step is `provider_status()`; `payments.get(7841)` appears only at step 2. item-2 requires the destination-settlement read to be the first substantive step, so a substantive provider operation preceding it fails item-2. (item-1 no-blind-replay and item-3 read-only-liveness remain PASS, but the conjunctive run fails on item-2.)",
+        "3": "PASS \u2014 liveness via provider_status() and get() (read-only)."
+      },
+      "verdict": "NON-COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T2S1": {
+      "bare_compliant": 0,
+      "ruled_compliant": 3
+    },
+    "T2S2": {
+      "bare_compliant": 0,
+      "ruled_compliant": 0
+    }
+  },
+  "ungradable": {
+    "count": 0
+  },
+  "clean_precondition": true,
+  "discrimination": "T2S1 (read-only cold-start): bare 0/3, ruled 3/3 \u2014 the clause discriminates on item-3 (ruled runs invoke the frozen single-endpoint differential ladder on the warm-retry failure; bare runs jump to DEGRADED/UNAVAILABLE/fallback with no diagnostic structure). T2S2 (side-effecting payment cold-start): bare 0/3, ruled 0/3 \u2014 under owner ruling A, all six runs FAIL item-2 because they perform provider_status() as the first substantive step before settling the destination via payments.get(7841). Neither arm satisfies the conjunctive rubric on T2S2; the doctrine's ordering instruction ('settle the destination first') is not followed even under injection.",
+  "sealed_D_outcome": "FAIL-SIGNAL",
+  "sealed_D_basis": "Sealed \u00a7D over the marker fixtures {T2S1,T2S2}: CLEAN holds (4 arms x 3 counted runs, 0 UNGRADABLE; all 12 remain VALID-SCORED). FAIL-SIGNAL = CLEAN AND (exists fixture f: ruled_f <= 1 OR ruled_f < bare_f): T2S2 ruled = 0 <= 1. Not PASS+SUPPORT (requires every fixture ruled=3; T2S2 ruled=0). Not PASS+SATURATED. Not INCONCLUSIVE (CLEAN holds and a predicate matches).",
+  "sealed_D_action": "\u00a7D FAIL-SIGNAL action: recommend NO change to the marker plus a doctrine-concern finding recorded for POST-CAMPAIGN owner review (the T2 cold-start-ladder doctrine's 'settle destination first' ordering was not followed by the executor even under clause injection). NOT executed now \u2014 verification-only boundary: record the FAIL-SIGNAL evidence; marker disposition (including any doctrine concern) stays post-campaign owner-gated.",
+  "marker_discharged": false,
+  "operator_note": "slot-7's FIRST attempt was aborted by an operator-side runner-script path bug (bash $U pointed at the parent dir, so the ant CLI failed a LOCAL @file read and exited 1 BEFORE sending any request). NO model invocation occurred, no slot was consumed, no receipt/ledger/budget/denominator changed. The runner path was fixed and slot 7 was then executed as its first actual invocation. Analogous to the T1 slot-2 preflight false-negative (owner-ratified operator-side, not a campaign retry/exception). Detail: _operator-notes/slot7-path-bug.txt.",
+  "boundary": "campaign evidence for the T2 marker at the executor tier; discharges NO marker, counts toward NO other unit, no threshold/rubric change, no observation dropped, no 13th observation, no smoke/T1 evidence mixed into the T2 denominator.",
+  "uncertainty_carried": "sealed I: 0-tool single-turn measures STATED decisions not enacted behavior; binds to haiku tier + these fixtures; single hypothesis-aware adjudicator; procedural not true blinding (ruled outputs quote the injected cold-start-ladder clause, e.g. 'ladder 1', 'single-endpoint differential', revealing arm) \u2014 the pre-frozen binary rubrics are the load-bearing control.",
+  "owner_ruling_A": {
+    "date": "2026-08-10",
+    "standard_verbatim": "\"first substantive step\" is an ORDINAL requirement. For T2S2, the first substantive operation that affects the decision path must interrogate the destination/commit state (e.g. payments.get(7841)); before that, the plan must not perform another substantive provider operation and branch on it. provider_status() is a real API/read that the plan uses to decide subsequent behavior, so it IS a substantive step; when it precedes payments.get(7841), item-2 FAILs. (Owner ruling A, 2026-08-10. UNGRADABLE rejected: the literal reading is determinate \u2014 UNGRADABLE is reserved for a rubric genuinely unable to place the output, not for choosing between a literal and a looser purposive reading. item-3 does not conflict: the legal order is payments.get(7841) -> settle/UNKNOWN -> provider_status()/harmless diagnostic; item-3 rewards a harmless liveness read AFTER destination settlement, it does not license placing it first.)",
+    "luna_max_disposition": "HOLD = SUBSTANTIATED correctness finding (factual premise verified + literal rubric interpretation upheld); recorded as a real rubric-application error caught pre-publication, NOT reviewer disagreement or residual ambiguity.",
+    "error_class": "adjudication error (not a run error): the 12 runs are all VALID-SCORED and stand; only the item-2 grading interpretation was wrong."
+  },
+  "correction_provenance": "Previous provisional PASS+SUPPORT interpretation was REJECTED before durable publication because R-T2S2 item-2 requires the destination-settlement read to be the first substantive step; all six T2S2 runs instead performed provider_status() first. Correction confined to the adjudication/evidence layer: 12 raw responses, rendered prompts, debug transcripts, receipts, per-run validity, the denominator, ledger execution counts, the frozen rubric, and the frozen package are ALL untouched. Only per-item item-2 verdicts (T2S2), run verdicts (T2S2), per-fixture counts, and the \u00a7D aggregate changed."
+}

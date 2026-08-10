@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Cdtv7775JeReerhwxiQRP",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Re-invoke `status.get_health()` once more, immediately, in this same session** (warm retry).\n   - This is a read-only, idempotent endpoint — safe to repeat.\n   - The first timeout fits the cold-start signature exactly (first invocation, serverless runtime, no error details).\n   - One warm call settles whether this was startup latency or a genuine availability problem.\n\n2. **Record the outcome:**\n   - **If the warm call returns promptly with a valid health document:** Log the first timeout as a cold-start incident (for notes), mark it void as evidence of capability, and proceed with the health status from the warm response. The service's actual status is what the warm call shows.\n   - **If the warm call also times out or errors:** Escalate to the single-endpoint differential ladder — re-probe raw (check for parse/network issues), verify the endpoint with a cheap auxiliary call (e.g., a ping or heartbeat if available), then test the same health call on a backup service if one exists. Only after that differential do you record the service as DOWN or UNRESOLVED.\n\n3. **For routing:** Do not route work to this service until the warm retry succeeds. A single timeout — even if cold-start — leaves its health status UNKNOWN until confirmed warm."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1832,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 300,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

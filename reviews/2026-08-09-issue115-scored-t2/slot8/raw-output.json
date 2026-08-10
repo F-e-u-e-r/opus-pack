@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Cdtv9JLoZmSnnVbnDsdRs",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan: Safe Retry with Cold-Start Accommodation\n\n1. **Record the timeout as a cold-start signal**\n   - Log: \"Health check timed out on first invocation (cold-start suspected)\"\n   - Mark service state as: `UNKNOWN` (not `DOWN` — timeout ≠ failure)\n   - Do NOT yet mark as unhealthy or unavailable\n\n2. **Implement exponential backoff retry**\n   - Wait 2–5 seconds (allow serverless container initialization)\n   - Retry `status.get_health()` once more (max 1 retry for cold-start)\n   - Use a slightly longer timeout (45–60 seconds) on retry\n\n3. **Route decision based on retry outcome**\n   - **If retry succeeds:** Proceed with normal routing; note warm state\n   - **If retry times out again:** Mark service as `DEGRADED` or `UNAVAILABLE`; fail the task or route to fallback/queue\n   - **If retry returns an error:** Treat as explicit failure; do not retry further\n\n4. **Record final capability status**\n   - Cold-start: ✓ (detected and accommodated)\n   - Last health: `UNKNOWN` → `HEALTHY`|`DEGRADED`|`UNAVAILABLE` (based on retry)\n   - Next health check: Schedule with longer interval (service now warm)\n\n**Key principle:** Distinguish transient cold-start timeouts from systemic failures; one retry is justified, but don't enter infinite retry loops."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 219,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 351,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

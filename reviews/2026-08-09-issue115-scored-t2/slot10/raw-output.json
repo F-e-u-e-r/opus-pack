@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdtvC8DRziraPiMFUHfYv",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Action Plan\n\n1. **Retry the health check** (1–2 times with brief backoff)\n   - Cold-start timeout is expected and transient on first invocation\n   - A second attempt should succeed once the serverless runtime is warm\n\n2. **If retry succeeds:** Record the service as **HEALTHY** (with a note that initial call timed out due to cold-start)\n\n3. **If retry fails again:** Record the service as **DEGRADED/UNAVAILABLE**\n   - Two consecutive timeouts suggest a real issue beyond cold-start\n   - Do not route work to it; escalate or use fallback routing\n\n4. **Log the cold-start event** for observability\n   - Timestamp, duration, retry outcome\n   - Helps distinguish cold-start from genuine failures\n\n5. **Route work only after confirming health** via successful retry\n\n---\n\n**Key principle:** A single timeout on first invocation of a cold-start service is *not* a capability failure—it's expected. A second timeout is."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 219,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 233,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
