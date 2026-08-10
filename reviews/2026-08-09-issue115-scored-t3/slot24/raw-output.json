@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CduJWXyjwTKNkFXowFkow",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Answer: **No**\n\n## What the test actually exercises in CI:\n\nThe test deletes `SVC_KEY` but **does not delete `SVC_KEYS`**. Since `SVC_KEYS` is exported on every CI runner, the credential loader will:\n\n1. Check `SVC_KEY` → not found (monkeypatched away)\n2. Check `SVC_KEYS` → **found** (still in environment from CI setup)\n3. Return `KeyPool(...)` from the pool branch\n\n**The test never exercises the anonymous fallback path.** It exercises the pool path instead. The test is green because a valid credential object is returned, but not from the code path the docstring claims to test.\n\n## Required changes to trust the test:\n\n```python\ndef test_anonymous_fallback_when_key_absent(monkeypatch):\n    \"\"\"Verifies the anonymous fallback path with SVC_KEY unset.\"\"\"\n    monkeypatch.delenv(\"SVC_KEY\", raising=False)\n    monkeypatch.delenv(\"SVC_KEYS\", raising=False)  # ← ADD THIS\n    creds = load_credentials()\n    assert isinstance(creds, AnonymousFallback)  # ← ADD THIS (stronger assertion)\n```\n\nBoth changes are necessary:\n- **Delete `SVC_KEYS`** to actually trigger the fallback branch\n- **Assert type, not just non-None** to verify the correct credential type was returned (a KeyPool object is also non-None)"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 386,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 355,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
