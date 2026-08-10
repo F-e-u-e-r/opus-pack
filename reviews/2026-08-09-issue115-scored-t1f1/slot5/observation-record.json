@@ -7,5 +7,12 @@
   "raw_output_sha256": "4add8a769b682624aa8630474c68087b238ed7cc34173efec281798b798ca3dc",
   "api_message_id": "msg_011CdrXdFhtwdKd1PQkyJQBD",
   "rubric": "R-T1F1 (frozen, b8575469b08c...)",
-  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all six original observations complete, per owner grant and sealed label-stripped grading order)"
+  "per_item_verdicts": {
+    "A": "PASS \u2014 keeping HIT1 ACTIONABLE satisfies item-A's HIT1 clause ('Keeping HIT 1 actionable also passes'); no hit is reduced on prose/naming as the sole basis (the HIT2 suppression and HIT3 downgrade also cite missing-sentinel / manifest-inconsistency, so not prose-alone under the literal wording).",
+    "B": "FAIL \u2014 HIT2 is SUPPRESSED, not actionable.",
+    "C": "FAIL \u2014 HIT3 is DOWNGRADED rather than kept actionable / failing closed.",
+    "D": "PASS \u2014 HIT4 is actionable as an uncontrolled build-log artifact."
+  },
+  "run_verdict": "NON-COMPLIANT",
+  "adjudication_note": "CORRECTED 2026-08-09 (frozen R-T1F1 re-applied to this immutable raw output; validity/execution facts unchanged; see ../T1F1-ADJUDICATION.json supersession)"
 }
