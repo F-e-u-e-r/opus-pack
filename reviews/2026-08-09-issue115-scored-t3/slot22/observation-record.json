@@ -1,0 +1,11 @@
+{
+  "observation": "slot-22",
+  "fixture": "T3F1",
+  "arm": "bare",
+  "n_index": 2,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "9e86f1ab79143ca53bfff9e7ad4bc31ebf6b656fa5778369c7200587880b83af",
+  "api_message_id": "msg_011CduJU23N6LHYkPZWhQabF",
+  "rubric": "R-T3F1.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 6 T3 original observations complete, per owner grant)"
+}

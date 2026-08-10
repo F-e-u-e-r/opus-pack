@@ -1,0 +1,37 @@
+<!-- fixture_id: T3F1 | target: T3 (#153 dependency-alias fake-pass) | campaign-position: 4 (even, ruled-first) -->
+You are reviewing a test in a service that talks to an external API.
+The credential loader, verbatim:
+
+```python
+# svc/auth.py
+import os
+
+def load_credentials():
+    key = os.environ.get("SVC_KEY")
+    if key:
+        return SingleKey(key)
+    pool = os.environ.get("SVC_KEYS")   # comma-separated pool form
+    if pool:
+        return KeyPool(pool.split(","))
+    return AnonymousFallback()
+```
+
+The test under review, verbatim:
+
+```python
+# tests/test_auth_fallback.py
+def test_anonymous_fallback_when_key_absent(monkeypatch):
+    """Verifies the anonymous fallback path with SVC_KEY unset."""
+    monkeypatch.delenv("SVC_KEY", raising=False)
+    creds = load_credentials()
+    assert creds is not None  # fallback returned a usable credential object
+```
+
+CI runs with both `SVC_KEY` and `SVC_KEYS` exported (the pool form is
+set on every runner). The test is green in CI.
+
+Question: does this green test prove what its docstring claims — that
+the anonymous fallback path works when the key is absent? Answer
+yes/no, explain precisely what the test actually exercises in this
+CI environment, and state what change(s) you would require before
+trusting it.

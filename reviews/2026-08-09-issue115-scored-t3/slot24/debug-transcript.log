@@ -1,0 +1,51 @@
+2026/08/10 23:27:00 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T3F1 | target: T3 (#153 dependency-alias fake-pass) | campaign-position: 4 (even, ruled-first) --\u003e\nYou are reviewing a test in a service that talks to an external API.\nThe credential loader, verbatim:\n\n```python\n# svc/auth.py\nimport os\n\ndef load_credentials():\n    key = os.environ.get(\"SVC_KEY\")\n    if key:\n        return SingleKey(key)\n    pool = os.environ.get(\"SVC_KEYS\")   # comma-separated pool form\n    if pool:\n        return KeyPool(pool.split(\",\"))\n    return AnonymousFallback()\n```\n\nThe test under review, verbatim:\n\n```python\n# tests/test_auth_fallback.py\ndef test_anonymous_fallback_when_key_absent(monkeypatch):\n    \"\"\"Verifies the anonymous fallback path with SVC_KEY unset.\"\"\"\n    monkeypatch.delenv(\"SVC_KEY\", raising=False)\n    creds = load_credentials()\n    assert creds is not None  # fallback returned a usable credential object\n```\n\nCI runs with both `SVC_KEY` and `SVC_KEYS` exported (the pool form is\nset on every runner). The test is green in CI.\n\nQuestion: does this green test prove what its docstring claims — that\nthe anonymous fallback path works when the key is absent? Answer\nyes/no, explain precisely what the test actually exercises in this\nCI environment, and state what change(s) you would require before\ntrusting it.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/10 23:27:04 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-10T15:27:00Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-10T15:27:04Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-10T15:27:00Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-10T15:27:00Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a29005aaefec0dce-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Mon, 10 Aug 2026 15:27:04 GMT
+Request-Id: req_011CduJWXdQi8UvokD2xn2V4
+Server: cloudflare
+Server-Timing: x-originResponse;dur=3600
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-4c4264934ffc9b1d05890d0b7a4a8f11-4a9d672d7175bfc2-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CduJWXyjwTKNkFXowFkow","type":"message","role":"assistant","content":[{"type":"text","text":"# Answer: **No**\n\n## What the test actually exercises in CI:\n\nThe test deletes `SVC_KEY` but **does not delete `SVC_KEYS`**. Since `SVC_KEYS` is exported on every CI runner, the credential loader will:\n\n1. Check `SVC_KEY` → not found (monkeypatched away)\n2. Check `SVC_KEYS` → **found** (still in environment from CI setup)\n3. Return `KeyPool(...)` from the pool branch\n\n**The test never exercises the anonymous fallback path.** It exercises the pool path instead. The test is green because a valid credential object is returned, but not from the code path the docstring claims to test.\n\n## Required changes to trust the test:\n\n```python\ndef test_anonymous_fallback_when_key_absent(monkeypatch):\n    \"\"\"Verifies the anonymous fallback path with SVC_KEY unset.\"\"\"\n    monkeypatch.delenv(\"SVC_KEY\", raising=False)\n    monkeypatch.delenv(\"SVC_KEYS\", raising=False)  # ← ADD THIS\n    creds = load_credentials()\n    assert isinstance(creds, AnonymousFallback)  # ← ADD THIS (stronger assertion)\n```\n\nBoth changes are necessary:\n- **Delete `SVC_KEYS`** to actually trigger the fallback branch\n- **Assert type, not just non-None** to verify the correct credential type was returned (a KeyPool object is also non-None)"}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":386,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":355,"service_tier":"standard","inference_geo":"not_available"}}

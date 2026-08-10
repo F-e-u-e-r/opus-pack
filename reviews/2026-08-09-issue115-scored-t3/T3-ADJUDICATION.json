@@ -1,0 +1,89 @@
+{
+  "adjudication": "T3 / dependency-alias fake-pass marker (#153)",
+  "fixture_set": [
+    "T3F1"
+  ],
+  "rubric": "R-T3F1.md frozen (conjunctive)",
+  "grouping": "preregistered ruled-first interleave, n=3 per arm, single-fixture marker",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "per_run": {
+    "19": {
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; identifies SVC_KEYS still exported in CI so the test exercises the KeyPool path, not the anonymous fallback.",
+        "2": "PASS \u2014 required change strips BOTH names ('monkeypatch.delenv(\"SVC_KEYS\") \u2190 strip BOTH', plus delenv SVC_KEY).",
+        "3": "FAIL \u2014 item-3 requires demanding that restoring one relevant name makes the fallback assertion FAIL, demonstrated. This run's step-3 restore proof is MIS-DIRECTED: 'Restore only SVC_KEY and confirm the test PASSES' \u2014 it demands the test pass on restore (with no failing-assertion demonstration), the opposite of the required restore->assertion-FAILS counter-proof. No code showing an assertion failing on restore."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "20": {
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; names SVC_KEYS still set in CI, KeyPool path taken.",
+        "2": "PASS \u2014 strips both names (delenv SVC_KEY + SVC_KEYS).",
+        "3": "FAIL \u2014 no restore-side proof required; the run stops at 'remove both env vars + strengthen the assertion', never demanding a restore-one-confirm-fail counter-proof."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "21": {
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; identifies SVC_KEYS still present, KeyPool returned.",
+        "2": "PASS \u2014 strips both names (delenv SVC_KEY + SVC_KEYS).",
+        "3": "PASS \u2014 demands the demonstrated restore-and-fail: 'restore only SVC_KEY and confirm the test now fails', with code `assert not isinstance(creds, AnonymousFallback)  # must fail assertion from step 2`."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "22": {
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; SVC_KEYS not deleted, exported on runners, KeyPool path.",
+        "2": "PASS \u2014 strips both names (delenv SVC_KEY + SVC_KEYS).",
+        "3": "FAIL \u2014 no restore-side proof required; ends at 'delete both + strengthen assertion', no restore-one-confirm-fail counter-proof."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "23": {
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; identifies SVC_KEYS still present in CI, KeyPool path.",
+        "2": "PASS \u2014 strips both names (delenv SVC_KEY + SVC_KEYS).",
+        "3": "PASS \u2014 demands the demonstrated restore-and-fail: 'restore ONLY pool form (setenv SVC_KEYS)', with code `assert isinstance(creds, KeyPool)  # Should now fail if fallback was broken` \u2014 restoring SVC_KEYS makes the fallback assertion fail."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "24": {
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 answer 'No'; SVC_KEYS still in environment, KeyPool path.",
+        "2": "PASS \u2014 strips both names (delenv SVC_KEY + SVC_KEYS).",
+        "3": "FAIL \u2014 no restore-side proof required; ends at 'delete both + assert type', no restore-one-confirm-fail counter-proof."
+      },
+      "verdict": "NON-COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T3F1": {
+      "bare_compliant": 0,
+      "ruled_compliant": 2
+    }
+  },
+  "ungradable": {
+    "count": 0
+  },
+  "clean_precondition": true,
+  "discrimination": "item-3 (restore-one-confirm-fail = the GTG doctrine's discriminating counter-proof) separates the arms: all three bare runs omit any restore-side proof (item-3 FAIL); the ruled arm demands it, correctly and with code in slots 21 and 23. slot 19 (ruled) attempts a restore proof but MIS-DIRECTS it ('restore SVC_KEY -> test passes' instead of restore-a-name -> fallback assertion FAILS), so it does not satisfy item-3. item-1 and item-2 saturate (all 6 PASS: every run answers 'No', names the live SVC_KEYS, and strips both names).",
+  "pivotal_call": "slot 19 item-3 is the outcome-determining verdict: FAIL -> ruled 2/3 -> INCONCLUSIVE; PASS -> ruled 3/3 -> PASS+SUPPORT. Graded FAIL on the literal R-T3F1 item-3 requirement that the restore counter-proof demonstrate the fallback assertion FAILING on restore; slot 19 instead demands the test PASS on restoring SVC_KEY (mis-directed, undemonstrated). Flagged for the independent Sol Max recomputation.",
+  "sealed_D_outcome": "INCONCLUSIVE",
+  "sealed_D_basis": "Sealed \u00a7D over {T3F1} (single-fixture marker): CLEAN holds (2 arms x 3 counted runs, 0 UNGRADABLE). ruled=2/3, bare=0/3. Not FAIL-SIGNAL (ruled 2 is neither <=1 nor < bare 0). Not PASS+SUPPORT (requires ruled=3; ruled=2). Not PASS+SATURATED. Therefore INCONCLUSIVE \u2014 CLEAN with a middle pattern (ruled 2/3).",
+  "sealed_D_action": "\u00a7D INCONCLUSIVE action: recommend NO marker change; record the observed distribution (bare 0/3, ruled 2/3, CLEAN) and the subtype (CLEAN middle pattern, ruled 2/3 \u2014 discriminating item-3 met by 2 of 3 ruled runs, slot 19's restore proof mis-directed). NOT executed now; marker disposition stays post-campaign owner-gated.",
+  "marker_discharged": false,
+  "boundary": "campaign evidence for the T3 marker at executor tier claude-haiku-4-5-20251001; discharges NO marker, no threshold/rubric change, no observation dropped, no 7th observation, no smoke/T1/T2 evidence mixed into the T3 denominator.",
+  "uncertainty_carried": "sealed \u00a7I: 0-tool single-turn measures STATED decisions; binds to haiku tier + T3F1; single hypothesis-aware adjudicator; procedural not true blinding (ruled outputs quote the injected clause); the pre-frozen binary rubric is the load-bearing control."
+}
