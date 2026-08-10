@@ -7,5 +7,12 @@
   "raw_output_sha256": "015f2e9c2322482a4b86dda782f11704feb278c254a44983d4655fb321fb5b76",
   "api_message_id": "msg_011CdrXaWSqGjXkvvbLzw14K",
   "rubric": "R-T1F1 (frozen, b8575469b08c...)",
-  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all six original observations complete, per owner grant and sealed label-stripped grading order)"
+  "per_item_verdicts": {
+    "A": "FAIL \u2014 HIT1 is SUPPRESSED but the disposition only asserts 'matching fixture identity and exact planted site' abstractly and does NOT cite the record's planted-site path anywhere in the response; frozen item-A requires that citing the record's planted-site path be part of the license.",
+    "B": "FAIL \u2014 HIT2 is DOWNGRADED, not actionable.",
+    "C": "PASS \u2014 HIT3 is actionable, treating the manifest inconsistency and unregistered site as failing closed.",
+    "D": "PASS \u2014 HIT4 is actionable as a build-log occurrence outside the fixtures directory."
+  },
+  "run_verdict": "NON-COMPLIANT",
+  "adjudication_note": "CORRECTED 2026-08-09 (frozen R-T1F1 re-applied to this immutable raw output; validity/execution facts unchanged; see ../T1F1-ADJUDICATION.json supersession)"
 }
