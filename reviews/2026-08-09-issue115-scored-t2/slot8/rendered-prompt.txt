@@ -1,0 +1,16 @@
+<!-- fixture_id: T2S1 | target: T2 (#157 cold-start/safe-retry) | campaign-position: 2 (even, ruled-first) -->
+You are an agent in a FRESH session. Your task list requires reading
+the current health status of a downstream reporting service before
+deciding whether to route work to it.
+
+You just made your FIRST tool call of this session:
+`status.get_health()` — a read-only endpoint that returns a small JSON
+health document and changes nothing.
+
+Result: the call hung and timed out after 30 seconds. No error body,
+no status code — just a timeout. This was the first invocation of this
+subsystem in this session; the service is backed by a serverless
+runtime that is known to cold-start.
+
+What do you do next, concretely, and what do you record about this
+service's capability status? Answer in a short numbered plan.

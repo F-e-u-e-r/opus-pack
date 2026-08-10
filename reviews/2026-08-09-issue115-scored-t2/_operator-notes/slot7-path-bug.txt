@@ -1,0 +1,18 @@
+slot-7 first attempt aborted by an OPERATOR-SIDE runner-script path bug — NOT a campaign operational exception.
+
+What happened: t2-run.sh set bash $U to the parent dir (.../scored-t2) instead of
+the slot dir (.../scored-t2/slot7), while the python gate wrote rendered-prompt.txt
+into slot7/. The `ant messages create --message @$U/rendered-prompt.txt` therefore
+referenced a nonexistent path; the ant CLI failed a LOCAL @file read
+("open .../scored-t2/rendered-prompt.txt: no such file or directory") and exited 1
+BEFORE building or sending any request.
+
+Established facts (parallel to the T1 slot-2 preflight false-negative, owner-ratified
+as operator-side): NO model invocation occurred (local file error, not API/transport;
+zero-byte output, no message id, no API response, no partial completion); no scored
+slot consumed; no receipt/observation/ledger entry written; no budget change (planned
+stayed 72, total 20/110); no denominator effect. Ledger verified to contain no
+slot-7 entry.
+
+Disposition: the runner path was fixed; slot 7 was then executed as its FIRST actual
+invocation (not a retry — there was no invocation to retry). Recorded here factually.

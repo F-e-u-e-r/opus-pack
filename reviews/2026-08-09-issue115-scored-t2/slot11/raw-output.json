@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdtvDXeMzxDyeiMteotPd",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Diagnostic Plan\n\n1. **Re-invoke `status.get_health()` immediately in this same session** (warm retry).\n   - This is a read-only, safe, idempotent call — explicitly retriable per ladder 3.\n   - A cold-start timeout on first invocation in a fresh session is a known, session-scoped confound.\n   - The retry costs one call and directly settles whether the first failure was cold-start latency or a genuine capability gap.\n\n2. **Classify the outcome:**\n   - **If the warm call returns promptly with valid health data:** Record the first timeout as cold-start latency (log as incident if tracking, but it does not count against the service's capability record). The service is **provisionally usable** for routing — but only provisionally. Do not yet route load-bearing work; confirm reachability with a differential before committing risk-sensitive decisions (ladder 1: call a different cheap endpoint on the same path, or verify across a second session).\n   - **If the warm call still times out or returns an explicit error (not \"cold\"):** Escalate to ladder 1 (single-endpoint failure). Verify the key/gateway with a different cheap call; rule out parsing on your side with a raw re-probe. The service is **UNRESOLVED or DOWN** — do not route work until differential diagnosis completes.\n\n3. **Record capability status:** \n   - Do not record this service as DOWN yet. The first timeout alone, without a warm retry outcome, is insufficient evidence (ladder 3 explicitly forbids recording a cold-start timeout as proof of death).\n   - Pending the warm retry result, mark status as **UNKNOWN**."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1832,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 383,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

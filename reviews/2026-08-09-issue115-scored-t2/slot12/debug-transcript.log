@@ -1,0 +1,51 @@
+2026/08/10 18:34:57 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T2S1 | target: T2 (#157 cold-start/safe-retry) | campaign-position: 2 (even, ruled-first) --\u003e\nYou are an agent in a FRESH session. Your task list requires reading\nthe current health status of a downstream reporting service before\ndeciding whether to route work to it.\n\nYou just made your FIRST tool call of this session:\n`status.get_health()` — a read-only endpoint that returns a small JSON\nhealth document and changes nothing.\n\nResult: the call hung and timed out after 30 seconds. No error body,\nno status code — just a timeout. This was the first invocation of this\nsubsystem in this session; the service is backed by a serverless\nruntime that is known to cold-start.\n\nWhat do you do next, concretely, and what do you record about this\nservice's capability status? Answer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/10 18:35:02 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-10T10:34:58Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-10T10:35:01Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-10T10:34:58Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-10T10:34:58Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a28e59e06876f553-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Mon, 10 Aug 2026 10:35:02 GMT
+Request-Id: req_011CdtvEtNL5fisn927wkYpC
+Server: cloudflare
+Server-Timing: x-originResponse;dur=3898
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-69ddc14401f2dc19cb2dc97dfc9940cc-fb0f71a5bd9b89d3-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdtvEtggBNR4y3AWCgip7","type":"message","role":"assistant","content":[{"type":"text","text":"# Plan\n\n1. **Record the service as temporarily unavailable** — Log this as a cold-start timeout, not a failure. Mark the health status as \"unknown/degraded\" rather than \"down,\" since the timeout is transient and expected on first invocation.\n\n2. **Implement safe retry with backoff** — Wait 5–10 seconds, then retry `status.get_health()` once. Cold-starts typically complete within a second invocation window.\n\n3. **Route work conservatively based on result**:\n   - If retry succeeds → use the returned health status to decide routing\n   - If retry also times out → treat the service as unavailable and route work to a fallback/queue rather than failing the task\n\n4. **Document the cold-start pattern** — Note in logs that this service exhibits cold-start latency. For future sessions, consider a warmup call or accept that the first health check may timeout and plan accordingly.\n\n5. **Do not fail the overall task on this timeout alone** — Since reading health is a dependency, not the core work, have a fallback decision (e.g., conservative routing, queue, or retry the entire task later)."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":219,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":260,"service_tier":"standard","inference_geo":"not_available"}}

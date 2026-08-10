@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdtvAtqzGFqgiZyr9yaL8",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Re-invoke `status.get_health()` immediately in this same session** (warm retry). This is safe: it's a read-only, idempotent endpoint with no side effects, and the first timeout is a known cold-start signature.\n\n2. **Evaluate the warm retry result:**\n   - **If it returns promptly (within normal latency):** Record the first timeout as a cold-start incident (log it for reference), but mark the service's health capability as **UNKNOWN provisionally** — one warm success is not proof for a load-bearing routing decision. Do not route risk-sensitive work until confirmed via a differential (e.g., a second warm call succeeds, or cross-check with an alternate method).\n   - **If it times out again or returns an explicit error:** Apply ladder 1 (single-endpoint failure): re-probe raw, verify the key/gateway with a cheap alternate call, and attempt the same canary on a different downstream service if available. Record the diagnosis (transport vs. capability gap) and route accordingly.\n   - **If it returns a fast empty response:** Treat as ladder 1's empty-endpoint case, not a timeout — proceed with that differential.\n\n3. **Record the outcome:** Cold-start confirmed → incident log only, capability stays UNKNOWN until differential confirms. Warm retry fails → diagnosed via ladder 1, recorded as UNRESOLVED or outage per attributed cause.\n\n**Do not route critical work to this service based on the single warm success alone.**"
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1832,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 338,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

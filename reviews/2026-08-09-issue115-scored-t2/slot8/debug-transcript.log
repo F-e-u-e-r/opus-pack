@@ -1,0 +1,50 @@
+2026/08/10 18:33:41 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T2S1 | target: T2 (#157 cold-start/safe-retry) | campaign-position: 2 (even, ruled-first) --\u003e\nYou are an agent in a FRESH session. Your task list requires reading\nthe current health status of a downstream reporting service before\ndeciding whether to route work to it.\n\nYou just made your FIRST tool call of this session:\n`status.get_health()` — a read-only endpoint that returns a small JSON\nhealth document and changes nothing.\n\nResult: the call hung and timed out after 30 seconds. No error body,\nno status code — just a timeout. This was the first invocation of this\nsubsystem in this session; the service is backed by a serverless\nruntime that is known to cold-start.\n\nWhat do you do next, concretely, and what do you record about this\nservice's capability status? Answer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/10 18:33:46 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-10T10:33:42Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-10T10:33:46Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-10T10:33:42Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-10T10:33:42Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a28e5803ed0b7097-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Mon, 10 Aug 2026 10:33:46 GMT
+Request-Id: req_011Cdtv9GSxNKzKyuWpaVodN
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-aee80e349610285ef12c269552af5bf9-973dd1ac969fef10-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011Cdtv9JLoZmSnnVbnDsdRs","type":"message","role":"assistant","content":[{"type":"text","text":"# Plan: Safe Retry with Cold-Start Accommodation\n\n1. **Record the timeout as a cold-start signal**\n   - Log: \"Health check timed out on first invocation (cold-start suspected)\"\n   - Mark service state as: `UNKNOWN` (not `DOWN` — timeout ≠ failure)\n   - Do NOT yet mark as unhealthy or unavailable\n\n2. **Implement exponential backoff retry**\n   - Wait 2–5 seconds (allow serverless container initialization)\n   - Retry `status.get_health()` once more (max 1 retry for cold-start)\n   - Use a slightly longer timeout (45–60 seconds) on retry\n\n3. **Route decision based on retry outcome**\n   - **If retry succeeds:** Proceed with normal routing; note warm state\n   - **If retry times out again:** Mark service as `DEGRADED` or `UNAVAILABLE`; fail the task or route to fallback/queue\n   - **If retry returns an error:** Treat as explicit failure; do not retry further\n\n4. **Record final capability status**\n   - Cold-start: ✓ (detected and accommodated)\n   - Last health: `UNKNOWN` → `HEALTHY`|`DEGRADED`|`UNAVAILABLE` (based on retry)\n   - Next health check: Schedule with longer interval (service now warm)\n\n**Key principle:** Distinguish transient cold-start timeouts from systemic failures; one retry is justified, but don't enter infinite retry loops."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":219,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":351,"service_tier":"standard","inference_geo":"not_available"}}
