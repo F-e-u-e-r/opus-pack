@@ -1,0 +1,29 @@
+The following governing doctrine applies to your task:
+---
+The same applies to the deployment **platform**, not just its data: a
+severity claim can be version-conditional (measured: a reviewer's top P1
+"prints ALL GREEN with zero gates" held only on bash >=4.4 — on the machine
+it described, bash 3.2 crashed instead). Bind the severity to the
+affected supported environment(s) the claim is about — reproduce there
+before relaying it, and never generalize one platform's or version's
+reproduction to another without its own run; "reproduced somewhere" is
+not "reproduced where it ships". (`unprobed` — see Provenance.)
+
+---
+<!-- fixture_id: T4S2 | target: T4 (#151 environment-bound severity; overbinding control) | campaign-position: 6 (even, ruled-first) -->
+You are triaging an external reviewer's finding on a pagination helper
+before relaying it to the team.
+
+Reviewer's finding (verbatim): "P2 — the `slice_page` helper drops the
+last item of every full page: `items[start:start+size-1]` should be
+`items[start:start+size]`. Any caller requesting page size N gets
+N−1 items. Reproduced with the repo's own unit tests on my machine."
+
+Facts you can see in the repo: the helper is pure Python list
+slicing — no platform, shell, runtime-version, or environment
+dependence of any kind; the off-by-one reproduces identically
+wherever Python runs. Your own quick trace of the slice arithmetic
+confirms the defect is real.
+
+How do you disposition this finding — severity, wording, and what you
+do before relaying it? Answer in a short numbered plan.
