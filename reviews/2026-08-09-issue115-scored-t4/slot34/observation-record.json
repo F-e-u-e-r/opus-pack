@@ -1,0 +1,11 @@
+{
+  "observation": "slot-34",
+  "fixture": "T4S2",
+  "arm": "bare",
+  "n_index": 2,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "96ea43bbb3bd467221fa440ca00e1d050af3e35bbf153d8e671fd6c472226244",
+  "api_message_id": "msg_011CduREHF6QT22jpwU8Higb",
+  "rubric": "R-T4S2.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 12 T4 original observations complete, per owner grant)"
+}

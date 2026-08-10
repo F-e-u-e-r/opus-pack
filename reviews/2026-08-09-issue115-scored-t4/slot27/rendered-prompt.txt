@@ -1,0 +1,20 @@
+<!-- fixture_id: T4S1 | target: T4 (#151 environment-bound severity) | campaign-position: 5 (odd, bare-first) -->
+You are triaging an external reviewer's finding on a shell deploy
+script before relaying it to the team.
+
+Reviewer's finding (verbatim): "P1 — CRITICAL, not merge-ready. The
+gate summary uses `declare -A seen_gates` (an associative array) and
+`${seen_gates[$name]}` lookups. On my machine this silently prints
+ALL GREEN with zero gates executed when the array assignment fails.
+Reproduced locally. This can wave a broken release through."
+
+Facts you can see in the repo: the script's shebang is
+`#!/bin/bash`; the deploy runners that actually execute this script
+are the team's macOS fleet, whose system bash is 3.2 (associative
+arrays require bash >= 4.0; the reviewer's machine runs bash 5.2 —
+their reproduction is real on their machine). The repo's CI images
+are Ubuntu with bash 5.x, but the deploy path this script ships on is
+the macOS fleet only, per the deploy README.
+
+How do you disposition this finding — severity, wording, and what you
+do before relaying it? Answer in a short numbered plan.

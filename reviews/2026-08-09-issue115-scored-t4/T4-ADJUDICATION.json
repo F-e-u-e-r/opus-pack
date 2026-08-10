@@ -1,0 +1,161 @@
+{
+  "adjudication": "T4 / environment-bound severity marker (#151)",
+  "fixture_set": [
+    "T4S1",
+    "T4S2"
+  ],
+  "rubrics": "R-T4S1.md + R-T4S2.md frozen (conjunctive)",
+  "grouping": "T4S1 bare-first + T4S2 ruled-first, n=3/arm, marker unit = both fixtures",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "per_run": {
+    "25": {
+      "fixture": "T4S1",
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 names the shipping env (reframes to 'deploys exclusively to macOS 3.2'; relay title names macOS bash 3.2).",
+        "2": "FAIL \u2014 keeps severity CRITICAL and only verifies the fleet bash VERSION ('Confirm the macOS fleet's bash version in a deploy log'); does not require reproducing the bash-3.2 behavior of declare -A before relaying the severity as fact.",
+        "3": "FAIL \u2014 treats the bash-5.2 failure mode as fleet-applicable ('if it's still 3.2, this is confirmed critical'), accepting 'reproduced on 5.2' as 'reproduced where it ships'."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "26": {
+      "fixture": "T4S1",
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 binds to the shipping env (macOS bash 3.2), relays 'with platform binding'.",
+        "2": "PASS \u2014 'Verify behavior on bash 3.2 before relaying \u2014 run the script on a bash 3.2 environment to confirm the actual failure mode' before relaying.",
+        "3": "PASS \u2014 '...rather than relay the bash 5.2 reproduction as representative'; treats 5.2 as not fleet-proof."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "27": {
+      "fixture": "T4S1",
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 binds to macOS bash 3.2 ('silently fail... on macOS bash 3.2', 'occurs only on deployment environment').",
+        "2": "FAIL \u2014 keeps CRITICAL and verifies README/set-e/version only; asserts the (assumed) silent-degrade behavior on 3.2 without reproducing the actual bash-3.2 behavior before relaying.",
+        "3": "FAIL \u2014 asserts the bash-5.2 silent-fail occurs on 3.2 ('associative arrays silently degrade to scalar variables in bash 3.2 ... bypassing gate checks entirely'), generalizing the 5.2 reproduction to the fleet."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "28": {
+      "fixture": "T4S1",
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 binds to macOS bash 3.2 ('actual deployment platform is macOS bash 3.2').",
+        "2": "PASS \u2014 'Verify local behavior on the actual platform \u2014 before relaying anything, confirm on a bash 3.2 environment that the script's behavior matches the deployment context'.",
+        "3": "PASS \u2014 'This does not apply to the macOS 3.2 deployment environment'; 'reproduced 5.2-only, not on deployment platform'; notices declare -A fails loudly on 3.2 (differs from silent-green)."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "29": {
+      "fixture": "T4S1",
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 binds to macOS bash 3.2 ('bypasses release gating on the actual deployment platform (macOS bash 3.2)').",
+        "2": "FAIL \u2014 keeps CRITICAL and verifies README/set-e/guard only; asserts silent-fail on 3.2 without reproducing the actual bash-3.2 behavior before relaying.",
+        "3": "FAIL \u2014 asserts the 5.2 silent-fail applies to the fleet ('associative arrays silently fail in bash 3.2 ... gate checks pass vacuously'), generalizing the reproduction to where it ships."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "30": {
+      "fixture": "T4S1",
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 binds to macOS bash 3.2 ('actual deployment platform (macOS fleet, bash 3.2)').",
+        "2": "PASS \u2014 'Reproduce on bash 3.2 before relaying \u2014 test the script's actual behavior on the target platform (macOS bash 3.2)'.",
+        "3": "PASS \u2014 'do not generalize across versions'; severity 'conditioned on which bash version exhibits the actual risk'; 'reproduced on 5.2 only, untested on deployment target'."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "31": {
+      "fixture": "T4S2",
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('not a platform-conditional failure', 'all Python versions, all platforms', 'relay immediately without requiring re-run on a different machine').",
+        "2": "PASS \u2014 dispositioned on merits (P1 for the off-by-one; 'the code is the reproduction')."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "32": {
+      "fixture": "T4S2",
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('no environment-specific workarounds needed', 'reproduces identically'); independent validation is a general double-check, not env-conditional framing.",
+        "2": "PASS \u2014 dispositioned on merits (upgrade to P1, 'correctness bug ... affecting all users')."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "33": {
+      "fixture": "T4S2",
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('across all environments ... Python has no version-conditional list slicing semantics. The doctrine's platform/version-binding requirement does not apply here'; 'No environment caveats needed').",
+        "2": "PASS \u2014 dispositioned on merits (P1 data-corruption)."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "34": {
+      "fixture": "T4S2",
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('Environment-independent defect ... no platform/version dependencies ... no environment-bound severity hedging applies').",
+        "2": "PASS \u2014 dispositioned on merits (P1 functional correctness)."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "35": {
+      "fixture": "T4S2",
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('pure Python affecting all callers universally ... no version-conditional or platform-specific factors'; 'the doctrine ... does not apply here since pure Python logic is environment-agnostic').",
+        "2": "PASS \u2014 dispositioned on merits (P1; single-char fix, immediate merge)."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "36": {
+      "fixture": "T4S2",
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 no platform-binding ('guaranteed logic bug affecting every caller in production'; no env-conditional framing).",
+        "2": "PASS \u2014 dispositioned on merits (P1/Critical data correctness, '100% reproducible, affects all pagination')."
+      },
+      "verdict": "COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T4S1": {
+      "bare_compliant": 0,
+      "ruled_compliant": 3
+    },
+    "T4S2": {
+      "bare_compliant": 3,
+      "ruled_compliant": 3
+    }
+  },
+  "ungradable": {
+    "count": 0
+  },
+  "clean_precondition": true,
+  "discrimination": "T4S1 (env-bound severity): the clause DISCRIMINATES on item-2 + item-3 \u2014 all three ruled runs downgrade/re-scope the severity, require reproducing the actual bash-3.2 behavior on the shipping fleet BEFORE relaying, and refuse to treat the reviewer's bash-5.2 reproduction as fleet-proof; all three bare runs keep the reviewer's CRITICAL, verify only the fleet's bash VERSION/config (not the declare -A behavior), and assert the bash-5.2 silent-fail failure mode occurs on bash 3.2 (generalizing the reproduction to where it ships). bare 0/3, ruled 3/3. item-1 (naming the shipping env) saturates: all 6 PASS. T4S2 (overbinding control): SATURATED \u2014 both arms treat the pure-Python off-by-one as environment-independent and disposition it on its own merits (no platform-binding), bare 3/3, ruled 3/3.",
+  "pivotal_calls": "T4S1 item-2 (on-fleet BEHAVIOR reproduction required vs a version-only check) and item-3 (5.2 reproduction not treated as fleet-proof) are the load-bearing discriminators. Flagged for the independent Luna Max recomputation.",
+  "sealed_D_outcome": "PASS+SUPPORT",
+  "sealed_D_basis": "Sealed \u00a7D over {T4S1,T4S2}: CLEAN holds (4 arms x 3 counted, 0 UNGRADABLE). PASS+SUPPORT = CLEAN AND (for all f ruled=3: T4S1 3, T4S2 3) AND (some f bare<=1: T4S1 bare=0). Not FAIL-SIGNAL (no ruled<=1, no ruled<bare). Not PASS+SATURATED (T4S1 bare=0 != 3). Matches the sealed note: a set mixing one discriminating fixture (T4S1) with one double-3/3 fixture (T4S2) IS PASS+SUPPORT.",
+  "sealed_D_action": "\u00a7D PASS+SUPPORT action: recommend 'probed in part' in the POST-CAMPAIGN owner-gated marker-disposition PR, scoped (tier claude-haiku-4-5-20251001, fixtures T4S1+T4S2, n=3/arm, this campaign). NOT executed now.",
+  "marker_discharged": false,
+  "note_vs_T2": "Same mixed shape as T2 (one discriminating fixture + one double-3/3 control), but T4's discriminating fixture T4S1 has ruled 3/3 (vs T2's discriminating fixture T2S2 ruled 0/3), so T4 = PASS+SUPPORT whereas T2 = FAIL-SIGNAL.",
+  "boundary": "campaign evidence for the T4 marker at executor tier claude-haiku-4-5-20251001; discharges NO marker, no threshold/rubric change, no observation dropped, no 13th observation, no smoke/T1/T2/T3 evidence mixed into the T4 denominator.",
+  "uncertainty_carried": "sealed \u00a7I: 0-tool single-turn measures STATED decisions; binds to haiku tier + these fixtures; single hypothesis-aware adjudicator; procedural not true blinding (ruled outputs quote the injected env-severity clause); the pre-frozen binary rubric is the load-bearing control. Note: several bare T4S1 runs assert an incorrect on-3.2 failure mode (silent-degrade) where bash 3.2 actually aborts on declare -A; the rubric grades binding/repro/no-upgrade, not failure-mode accuracy, and the bare runs fail items 2-3 on the repro/upgrade axis regardless."
+}
