@@ -596,6 +596,26 @@ A generic green test is not proof. A gate is real only if:
    still exported GROQ_API_KEYS (plural, the pool form), which the loader
    checks first; the fallback the test named never ran, green for as long
    as the test existed.
+13. **A success status is not identity — a lookup can return the WRONG
+   entity and still say it worked** (`unprobed` — contributor incident as
+   shape; see Provenance). A search-then-fetch data API, keyed by a
+   shared or ambiguous identifier (a series code with a sibling series,
+   an id resolved by fuzzy or ranked match), can hand back a record for
+   the wrong entity under an unqualified success status — no error, no
+   empty result, nothing distinguishing it in the response envelope. This
+   is item 10's shadow-artifact class at the DATA layer instead of the
+   code layer: there the running subject can be the wrong copy while
+   every assertion passes; here the fetched row can be the wrong record
+   while the call reports success. Assert identity metadata FROM the
+   response — a canonical id, name, or category field distinct from the
+   query key — against what was actually asked for, not only that the
+   call returned 200/success; where the API exposes a canonical-name or
+   metadata lookup, use it to confirm the returned identifier means what
+   the query intended rather than assuming the query key round-trips
+   unchanged.
+   ❌ "queried the non-manufacturing PMI series, got 200 with data" — the
+   response held the manufacturing series under the same call and status,
+   silently, because both shared the queried id family.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -1016,6 +1036,18 @@ probe; shorter comparison prose). Ships `unprobed` per the covenant; its
 probe — seed a suite stripping one alias of a two-alias dependency,
 confirm a ruled reviewer catches the live second alias where a bare one
 does not — joins the standing #115 queue.
+Item 13's wrong-entity-under-success clause (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable): a query
+against a data provider's series-lookup API returned a sibling series
+under the queried id family with an unqualified success status — the
+call itself gave no signal the returned entity differed from the one
+requested; caught only by reading the returned record's own name field
+against the query intent, then confirmed by harvesting the provider's
+canonical id/name mapping directly. Ships `unprobed` per the covenant;
+its probe — an ambiguous-id lookup seeded to return a sibling entity,
+does a ruled reviewer check the response's own identity field before
+crediting the fetch where a bare one accepts any 200 — joins the
+standing #115 queue.
 The FP-noise numeric-contract clause (2026-08-07; maintainer fold
 2026-08-08) comes from a contributor incident (contributor-reported,
 not linkable): a golden projection snapshot frozen under one Node major
