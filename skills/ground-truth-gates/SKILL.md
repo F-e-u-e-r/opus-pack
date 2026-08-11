@@ -237,6 +237,29 @@ audit log), or the claim stays state-only, said so. No independent
 prescription available → the re-run is a consistency check, labelled so —
 never a proof.
 
+**When direct state readback is unreliable or unavailable, verify through
+a downstream observable that must move under a correct application and
+cannot move otherwise** (`unprobed` — contributor incident as shape; see
+Provenance). A control/treatment pair — run the system once without the
+change and once with it, over identical input, and assert the
+treatment's downstream signal differs from the control's in the
+direction the change predicts, written down BEFORE either run (P1 > P0,
+not merely P1 ≠ P0) — proves the application happened even where the
+state it touched cannot be read back directly (an opaque UI setting, a
+third-party system with no inspectable state). The same differential
+form pins protocol-level bugs: diff your own request byte-for-byte
+against the target system's own observed WORKING request for the same
+operation — a length or byte-offset difference the diff surfaces is
+often the entire defect.
+✅ "state readback was unavailable; ran the flow with the setting unset
+(P0) and set (P1) over identical inputs, asserted P1 > P0 before either
+run — passed, proving the setting reached the downstream calculation."
+✅ "diffed my request body against the app's own captured working
+request byte-for-byte; length differed by 5, decoding to exactly the
+two JSON quotes and `Bearer ` my construction had dropped."
+❌ a single successful run with no control, read as proof the change
+did anything — nothing rules out the same output with the change absent.
+
 **In parity work, the artifact settles disputes — reading it beats
 adjudicating between reviewers or picking the plausible option**
 (`unprobed` — contributor incident as shape; see Provenance). When the
@@ -960,6 +983,19 @@ ideas only, no text — same sourcing and acknowledgements as the two
 2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
 needing generalized wording; the wording here is this pack's. All three ship
 `unprobed` per the covenant; their probes join the private round-5 queue.
+The downstream-observable-differential bullet (2026-08-12) comes from
+contributor incidents (contributor-reported, not linkable), two
+instances in one project: an application setting with no reliable
+direct readback was proven applied by a control/treatment run over a
+downstream calculation the setting must move; separately, an auth
+protocol bug was pinned by diffing an outgoing request byte-for-byte
+against the target application's own observed working request for the
+same operation, the byte-length delta decoding directly to the missing
+field. Ships `unprobed` per the covenant; its probe — a state change
+with no reliable readback, does a ruled reviewer demand a
+control/treatment differential before crediting "applied" where a
+bare one accepts a single successful-looking run — joins the standing
+#115 queue.
 The artifact-settles-disputes and derive-the-derivable-constant bullets
 (2026-08-04) come from one contributor session's parity-implementation
 work against a financial workbook: two independent reviewers flagged a
