@@ -232,6 +232,28 @@ axes, treat it as load-bearing — the pass fails closed.
   --help lists the flag now (existence), a dry-run invocation
   accepted it (function); corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."
+- **A recorded environment remedy is a hypothesis on reuse, not a fact —
+  verify it fired this time, and retract it in place when it doesn't**
+  (`unprobed` — private incident as shape; see Provenance). A fix for an
+  environment quirk (a process restart, a service bounce, a config
+  toggle) gets written to memory once it worked, then reused across
+  sessions on the strength of that one success — but the underlying
+  cause can be a different bug next time the same symptom appears, or
+  the environment can have moved out from under the remedy entirely.
+  Applying a recorded remedy without confirming the symptom actually
+  cleared repeats the capability-negative failure above in the opposite
+  direction: a false negative fails silent, a false remedy fails LOUD
+  the first time someone trusts it and it doesn't work — but only if
+  the session checks; skipped, it just re-applies the broken fix next
+  time too. Before writing "X fixes Y" into a durable file: confirm Y
+  actually cleared, not merely that X ran without erroring. Before
+  reapplying a recorded remedy: confirm it fixed THIS occurrence before
+  moving on, and when it doesn't, correct the rule in place (per the
+  correction discipline below) rather than leaving the disproven fix
+  for the next reader.
+  ❌ "restart the service — that's the documented fix" written once,
+  applied unverified in three later sessions, until a session that
+  checked found the symptom persisted and the note was stale.
 - Correct a stale rule in place — never append the correction below the old
   line. A zero-context reader obeys whichever sentence it reads first, not
   the latest one.
@@ -1428,3 +1450,14 @@ rule's incident paragraph drafted from a summary carried across
 sessions did not match the source transcript it claimed to describe.
 All contributor-reported, not linkable. Each clause ships `unprobed`
 per the covenant; both probes join the standing #115 queue.
+The recorded-environment-remedy bullet (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable): a service
+restart recorded in memory as "the fix" for an environment symptom
+after it cleared once was reused across several later sessions, then
+directly falsified — the same restart no longer cleared the symptom,
+and the durable note claiming it did was itself the thing that needed
+correcting. Ships `unprobed` per the covenant; its probe — reuse a
+recorded remedy for a symptom whose underlying cause has since
+changed, observe whether a ruled reviewer checks the symptom cleared
+before moving on where a bare one trusts the note — joins the standing
+#115 queue.
