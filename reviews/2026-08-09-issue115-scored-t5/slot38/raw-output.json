@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CduUGUc7jMZL5uBzJ6Gjv",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Placement Decision\n\n**Where to add it:**\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n  A retry wrapper must cap total elapsed time, not only attempt count\n  — a per-attempt timeout with unbounded attempts still hangs the\n  caller. Declare both the attempt cap and the wall-clock cap at the\n  call site.\n```\n\n**Explanation:**\n\nThe new rule is a tightening of the existing **\"Timeouts are explicit\"** bullet — it clarifies that per-attempt timeouts alone are insufficient and mandates an additional wall-clock ceiling. This is not a sibling concern but a refinement of the same topic (timeout discipline), so it folds naturally into that bullet's second sentence rather than creating a standalone third bullet."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 645,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 272,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

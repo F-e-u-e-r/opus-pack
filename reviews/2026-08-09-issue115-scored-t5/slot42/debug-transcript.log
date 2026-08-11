@@ -1,0 +1,50 @@
+2026/08/11 01:36:14 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"The following governing doctrine applies to your task:\n---\n- **Placement test** for any new rule: can it be a hook (machine-enforced)?\n  If not, can it live on-demand (skill / fix log)? Only when both answers\n  are no does it earn an always-loaded line. An always-loaded line still\n  owes a second placement question: which existing bullet already owns\n  its topic? Confirm the SECTION first — check the addition against the\n  section's own scope, not merely the nearest bullet's — then read the\n  target section's bullets in full and default to folding the new clause\n  into the host bullet that owns it (a trailing sentence, an added\n  example, an extra clause); a standalone new bullet is the fallback for\n  content with no existing host, not the default shape. Genuinely unclear\n  whether it is this bullet's topic or a neighbor's → flag for the §6\n  reviewer rather than defaulting to standalone. (`unprobed` — see\n  Provenance.)\n\n---\n\u003c!-- fixture_id: T5S1 | target: T5 (#159 placement) | campaign-position: 7 (odd, bare-first) --\u003e\nYou maintain the instruction file below. A colleague hands you a new\n4-line rule that has been approved for inclusion, and asks you to add\nit to the file. Show exactly where and how you would add it (quote the\nedited region), and explain your placement decision in one or two\nsentences.\n\nThe approved new rule (verbatim, wording may be lightly fitted to the\nfile's style but not weakened):\n\"A retry wrapper must cap total elapsed time, not only attempt count —\na per-attempt timeout with unbounded attempts still hangs the caller.\nDeclare both the attempt cap and the wall-clock cap at the call site.\"\n\nThe instruction file, verbatim:\n\n```markdown\n# service-calls.md — how this repo talks to external services\n\n## 1. Choosing an endpoint\n\n- Prefer the versioned endpoint; the unversioned alias may repoint at\n  any time.\n- A sandbox endpoint never substitutes for a live smoke check.\n\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n\n## 3. Recording outcomes\n\n- Every failed call series logs its final disposition (gave-up /\n  succeeded-after-N) with the elapsed wall-clock time.\n```\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/11 01:36:19 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-10T17:36:15Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-10T17:36:18Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-10T17:36:15Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-10T17:36:15Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a290c2fcb9b44f3d-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Mon, 10 Aug 2026 17:36:19 GMT
+Request-Id: req_011CduUN9hjc7Z6A7DkVuUj5
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-0d864f3ad5e01e3d56e2815342aa77a9-1673fb440ccc804d-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CduUNAHTnmKeDggwBNjey","type":"message","role":"assistant","content":[{"type":"text","text":"# Placement Decision\n\nI would edit **§2, second bullet** (\"Timeouts are explicit\") by appending a new sentence:\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n  A retry wrapper must also cap total elapsed time, not only attempt\n  count — declare both the attempt cap and the wall-clock cap at the\n  call site.\n```\n\n**Rationale:** The new rule belongs in the \"Timeouts are explicit\" bullet because it clarifies and strengthens the timeout discipline already owned by that bullet. It addresses a specific failure mode (unbounded attempts causing hangs) that is a direct sibling concern to per-attempt timeout declarations, not a separate topic. Folding it as a trailing sentence keeps related timeout guidance together and avoids fragmenting §2's coherence."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":645,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":278,"service_tier":"standard","inference_geo":"not_available"}}

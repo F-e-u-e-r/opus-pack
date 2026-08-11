@@ -1,0 +1,82 @@
+{
+  "adjudication": "T5-placement marker (#159 \u00a74 placement clause)",
+  "fixture_set": [
+    "T5S1"
+  ],
+  "rubric": "R-T5S1.md frozen (conjunctive)",
+  "grouping": "bare-first interleave, n=3/arm, single-fixture marker (T5-placement); T5-narrative {T5S2} is a SEPARATE marker not in this unit",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "per_run": {
+    "37": {
+      "arm": "bare",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 the edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 adds the rule as a NEW standalone bullet ('Wall-clock timeouts cap total elapsed time') after 'Timeouts are explicit', not folded into the owning 'Retries are bounded and jittered' bullet."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "38": {
+      "arm": "ruled",
+      "n": 1,
+      "items": {
+        "1": "PASS \u2014 edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 folds the rule into the NON-OWNING 'Timeouts are explicit' bullet (as trailing sentences), explicitly reasoning it is a 'refinement of the same topic (timeout discipline)'. The rubric names this exact miss: the new rule bounds the retry LOOP's total time (owned by 'Retries are bounded and jittered'), not a per-attempt timeout."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "39": {
+      "arm": "bare",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 folds into the NON-OWNING 'Timeouts are explicit' bullet ('Appending it to the existing Timeouts are explicit point keeps related timeout requirements together')."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "40": {
+      "arm": "ruled",
+      "n": 2,
+      "items": {
+        "1": "PASS \u2014 edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 folds into the NON-OWNING 'Timeouts are explicit' bullet ('topically owned by the existing Timeouts are explicit bullet')."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "41": {
+      "arm": "bare",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 adds the rule as a NEW standalone third bullet ('Wall-clock caps prevent unbounded hangs'), not folded into the owning 'Retries are bounded and jittered' bullet."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "42": {
+      "arm": "ruled",
+      "n": 3,
+      "items": {
+        "1": "PASS \u2014 edited region is \u00a72 'Failure handling'.",
+        "2": "FAIL \u2014 folds into the NON-OWNING 'Timeouts are explicit' bullet ('belongs in the Timeouts are explicit bullet because it clarifies and strengthens the timeout discipline already owned by that bullet')."
+      },
+      "verdict": "NON-COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T5S1": {
+      "bare_compliant": 0,
+      "ruled_compliant": 0
+    }
+  },
+  "ungradable": {
+    "count": 0
+  },
+  "clean_precondition": true,
+  "discrimination": "item-1 (naming \u00a72 'Failure handling' as the owning section) SATURATES: all 6 PASS. item-2 (folding into the OWNING 'Retries are bounded and jittered' bullet) FAILS 6/6 \u2014 no run folds into the owning bullet. The executor consistently mis-identifies the owning bullet: it reads the new wall-clock rule as a per-attempt-'timeout' concern and either folds it into the NON-OWNING 'Timeouts are explicit' bullet (slots 38/39/40/42) or adds it as a NEW standalone bullet (slots 37/41). The rubric's owning bullet is 'Retries are bounded and jittered' (the new rule bounds the retry LOOP's total elapsed time). Descriptive (non-scoring) behavioral note: the clause DID change behavior \u2014 all three ruled runs FOLD (never standalone), whereas the bare arm adds standalone bullets in 2 of 3 runs \u2014 but every ruled fold targets the wrong (non-owning) bullet, so item-2 fails in both arms.",
+  "sealed_D_outcome": "FAIL-SIGNAL",
+  "sealed_D_basis": "Sealed \u00a7D over {T5S1} (single-fixture marker): CLEAN holds (2 arms x 3 counted, 0 UNGRADABLE). bare=0/3, ruled=0/3. FAIL-SIGNAL = CLEAN AND (exists f: ruled_f<=1 OR ruled_f<bare_f): ruled=0<=1. Not PASS+SUPPORT (needs ruled=3). Not PASS+SATURATED. Therefore FAIL-SIGNAL.",
+  "sealed_D_action": "\u00a7D FAIL-SIGNAL action: recommend NO marker change + a doctrine-concern finding for POST-CAMPAIGN owner review \u2014 the 'default to folding the new clause into the host bullet that owns it' clause produced folding behavior (ruled arm always folds vs bare sometimes standalone) but NOT correct owning-bullet identification; the executor folds into the non-owning 'Timeouts are explicit' bullet, mis-reading a retry-loop-bounding rule as a per-attempt-timeout rule. NOT executed now; marker disposition (incl. any doctrine concern) stays post-campaign owner-gated.",
+  "marker_discharged": false,
+  "boundary": "campaign evidence for the T5-placement marker at executor tier claude-haiku-4-5-20251001; discharges NO marker, no threshold/rubric change, no observation dropped, no 7th observation, no smoke/T1-T4 evidence mixed into the T5-placement denominator. T5-narrative {T5S2} is a SEPARATE marker and is NOT part of this unit.",
+  "uncertainty_carried": "sealed \u00a7I: 0-tool single-turn measures STATED decisions; binds to haiku tier + T5S1; single hypothesis-aware adjudicator; procedural not true blinding (ruled outputs quote the injected placement clause); the pre-frozen binary rubric is the load-bearing control."
+}
