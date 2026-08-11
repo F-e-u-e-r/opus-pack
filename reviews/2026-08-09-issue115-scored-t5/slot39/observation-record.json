@@ -1,0 +1,12 @@
+{
+  "observation": "slot-39",
+  "fixture": "T5S1",
+  "marker": "T5-placement",
+  "arm": "bare",
+  "n_index": 2,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "bff9aeb727384a55b0843a601765f39f8c6bc041e4c065586a5fd300782ef8a6",
+  "api_message_id": "msg_011CduUHsfxrcRXXjRQmrJyX",
+  "rubric": "R-T5S1.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 6 T5-placement original observations complete, per owner grant)"
+}
