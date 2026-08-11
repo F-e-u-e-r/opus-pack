@@ -372,7 +372,22 @@ A generic green test is not proof. A gate is real only if:
    the entire window). A **CI/automation config that has never executed** —
    count runs (the platform's runs API), not files; a config can be structurally
    undiscoverable (wrong directory in a monorepo) and inert forever while
-   reading as coverage. A **snapshot gate that silently re-freezes when its
+   reading as coverage. Its source-level cousin, in any ecosystem where the
+   build path can succeed without the typechecker (a transpiler that strips
+   types without checking, an optional external checker never wired into a
+   script): a **static/type-level assertion nothing ever evaluates** — unlike
+   the compiled-but-never-registered test above (which a maintainer wrote and
+   forgot to wire), this one is *inherited* — a prior author trusted it as a
+   live invariant, so nobody deliberately breaks the coupling to find out it
+   isn't checked. Grep for compile-time-only assertions, confirm some script
+   or CI step actually invokes the checker over that file, then prove it
+   two-sidedly: break the coupling once and watch the check go red before
+   trusting a clean sweep (a translations-parity const sat in production
+   source for months while the build script ran a transpiler that never
+   typechecked — it read as an enforced invariant to every reader and
+   enforced nothing until a hook started running the checker directly).
+   (`unprobed` — private incident as shape; see Provenance.) A **snapshot
+   gate that silently re-freezes when its
    baseline is missing** — deleting the baseline must be an error at gate time,
    never a vacuous green. A **scanner that matched zero inputs** — a gate whose
    file pattern silently expands empty (`**` degrading in an old shell dialect
@@ -1045,6 +1060,24 @@ covenant; its probe — seed a two-file coupling with a red baseline
 sub-check, observe whether a ruled reviewer demands the baseline run
 before the check may block where a bare one wires it straight in —
 joins the standing #115 queue.
+The dead-source-level-assertion fake-pass shape (2026-08-12) comes from
+the same contributor rollout as the coupled-edit bullet above
+(contributor-reported, not linkable): one repo's cross-language parity
+invariant was written as a type-level const in production source, and
+the repo's build script ran a transpiler that never invoked the
+typechecker — the const sat unenforced from the day it was written
+until an edit-time hook started running the checker directly, deriving
+the same file's coupling that motivated the coupled-edit bullet. It is
+adjacent to, not a restatement of, the existing compiled-but-never-
+registered-test shape earlier in this item: that one is a test a
+maintainer wrote and forgot to wire, discoverable by deliberately
+breaking the code; this one is an assertion a *later* reader inherits
+and trusts as live, so nobody thinks to break it. Ships `unprobed` per
+the covenant; its probe — seed a repo whose build path can succeed
+without the typechecker, plant an unenforced type-level assertion,
+observe whether a ruled reviewer demands proof the checker runs where
+a bare one takes the assertion's presence as enforcement — joins the
+standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
