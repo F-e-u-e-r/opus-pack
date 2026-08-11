@@ -787,10 +787,20 @@ enforces one at runtime — and has its own failure design:
   sub-check, and leave the full suite to the ship gate. It blocks with
   the failure reported, never a repair — which side of a coupling is
   right is judgment, and gate changes stay the orchestrator's call
-  (rule 4).
+  (rule 4). A narrow trigger watching a broad check can name the wrong
+  edit: the check catches drift the trigger did not cause, so its block
+  reason must carry the check's own output verbatim, not only a canned
+  "you changed X" diagnosis naming the trigger — the diagnosis is a hint
+  toward the likely edit, the tool output is the evidence, and only the
+  output can point past the trigger to an earlier, unwatched one
+  (`unprobed` — contributor rollout as shape; see Provenance).
   ❌ "the hook runs the full test suite on every edit" — the suite was
   already red with unrelated failures, so it blocked all work from its
   first firing.
+  ❌ "You changed translations.ts and tsc now fails" as the block's only
+  reason — the actual break was a fixture drifted by an earlier edit to
+  a file the hook never watches; recovery worked only because the raw
+  tsc output was embedded alongside the canned line.
 
 ## When NOT to build a gate
 
@@ -1045,6 +1055,17 @@ covenant; its probe — seed a two-file coupling with a red baseline
 sub-check, observe whether a ruled reviewer demands the baseline run
 before the check may block where a bare one wires it straight in —
 joins the standing #115 queue.
+The verbatim-output amendment to that bullet (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable) on the same
+deployed hook, first-hand: an edit to a translations file re-ran the
+coupled type check, which failed on a fixture in an unrelated,
+unwatched file drifted by an earlier edit in the same session — the
+hook's canned "you changed X" reason named the triggering edit, not
+the actual break, and recovery depended on the verbatim compiler
+output the block also carried. Ships `unprobed` per the covenant; its
+probe — armed with only the canned reason, does a bare model self-blame
+the trigger and stall, where a ruled one reads the attached raw output
+and finds the real site — joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
