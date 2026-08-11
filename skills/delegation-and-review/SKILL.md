@@ -497,6 +497,25 @@ reviewers that they silently absorb as implementers.
   to break it" has higher recall and false alarms. Reproduce hunt-mode findings.
 - Give verifiers the spec and artifact, never the author's self-summary. All-clear
   verdicts name the point nearest failure or they are rubber stamps.
+- **A reviewer's verdict inherits the dispatch packet's own errors — a
+  wrong premise in the spec manufactures a finding that is correct
+  given the packet and false given the system** (`unprobed` — private
+  incidents as shape; see Provenance). Before crediting a CRITICAL or
+  must-fix, check the packet's own claim, not only the diff against it:
+  an overstated contract, a fabricated precondition, or a wrong
+  architectural premise produces a finding whose fix is correcting the
+  PACKET, not the code — and independent reviewers agreeing under the
+  same wrong premise is not corroboration, it is the same error
+  counted twice. The same channel opens for a subordinate-authored test
+  file the packet placed or scoped: a wrong directory or naming the
+  spec never specified can leave it outside the project's test-runner
+  include pattern, so a claimed new coverage gate needs ground-truth-
+  gates' "confirm a new test actually runs" check applied to where the
+  packet put it, not only to what it asserts.
+  ❌ two independently dispatched reviewers both flag the identical
+  CRITICAL, both correctly derived from a contract the dispatch packet
+  overstated — read as corroboration until the packet itself was
+  checked.
 - Critic verdicts carry evidence: REFUTED needs a counterexample; untested
   assumptions are listed. Verify critics too; stale or missing review is not approval.
 - **Batching verification checkpoints is a cost decision with a hard
@@ -1309,6 +1328,21 @@ landed at the destination instead of being replayed, so the ladder can
 never read as an at-least-once mutation license.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue.
+The packet-error-propagates-to-verdict bullet (2026-08-12) comes from
+contributor incidents (contributor-reported, not linkable), two
+instances in one project: a dispatch packet overstated a contract, and
+two independently run reviewers each flagged the identical CRITICAL
+derived from that overstatement — read as corroboration until the
+packet's own claim was checked; separately, a packet's wrong premise
+about where state was held inflated a different reviewer's finding,
+and in the same project a subordinate placed a new test file in a
+directory the packet's own instruction had specified incorrectly,
+which the project's test runner's include pattern then silently
+excluded. Ships `unprobed` per the covenant; its probe — plant a
+dispatch packet with one incorrect premise, observe whether a ruled
+reviewer's adjudication checks the premise before crediting a finding
+derived from it, where a bare one credits it outright — joins the
+standing #115 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
