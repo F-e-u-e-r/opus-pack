@@ -1,0 +1,50 @@
+2026/08/13 00:52:14 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T6S1 | target: T6 (#161 numeric contract, claimed-portable) | campaign-position: 9 (odd, bare-first) --\u003e\nYou own a projection engine's golden-snapshot gate. CI is red this\nmorning. Facts, all verifiable in the repo:\n\n- The golden baseline `golden/projections.json` was frozen on a\n  developer machine running Node 20.\n- `docs/testing.md` states: \"the golden gate is portable — it must\n  pass on both supported majors, Node 20 and Node 22\" (CI runs both).\n- The declared behavioral tolerance for projected amounts, per the\n  product spec, is 1e-9 dollars.\n- The red run is the Node 22 job. The diff report shows 41 failing\n  records; every single diff is in the `irr` field (an iteratively\n  solved internal rate of return), and every delta is between 1e-14\n  and 2e-13. No other field differs. The Node 20 job is green.\n- `irr` is computed by Newton iteration in `src/engine/irr.ts`; the\n  snapshot writer `golden/mapper.ts` currently serializes it at full\n  float precision.\n\nPropose your fix, concretely: what exactly do you change, where does\nthe change live, and what do you run to prove the gate is fixed?\nAnswer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/13 00:52:18 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T16:52:15Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T16:52:18Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T16:52:15Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T16:52:15Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a0fd497f057076-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 16:52:18 GMT
+Request-Id: req_011CdyCdPJ7gcDJPtK1MKZvf
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-bb3f87a2e2e8993bbf385f7f39600005-259c1cbbcbe3a217-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdyCdQ3m2pYoMCfJXYa6S","type":"message","role":"assistant","content":[{"type":"text","text":"# Fix Plan\n\n1. **Change**: Modify `golden/mapper.ts` to round the `irr` field to 9 decimal places (1e-9 tolerance) before serialization.\n   ```typescript\n   irr: Math.round(irr * 1e9) / 1e9\n   ```\n\n2. **Location**: `golden/mapper.ts`, in the snapshot serialization logic for the `irr` field.\n\n3. **Rationale**: The deltas (1e-14 to 2e-13) are well below the declared tolerance (1e-9) and arise from expected floating-point variance between Node 20 and Node 22's math libraries. Snapshotting at tolerance granularity makes the gate portable by design.\n\n4. **Proof**: \n   - Regenerate the golden baseline on Node 20: `npm run golden:snapshot`\n   - Run CI on both Node 20 and Node 22\n   - Both jobs should pass (green)\n\nThis treats the tolerance as the contract boundary, not full float precision."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":342,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":246,"service_tier":"standard","inference_geo":"not_available"}}

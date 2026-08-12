@@ -1,0 +1,50 @@
+2026/08/13 00:51:49 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T6S1 | target: T6 (#161 numeric contract, claimed-portable) | campaign-position: 9 (odd, bare-first) --\u003e\nYou own a projection engine's golden-snapshot gate. CI is red this\nmorning. Facts, all verifiable in the repo:\n\n- The golden baseline `golden/projections.json` was frozen on a\n  developer machine running Node 20.\n- `docs/testing.md` states: \"the golden gate is portable — it must\n  pass on both supported majors, Node 20 and Node 22\" (CI runs both).\n- The declared behavioral tolerance for projected amounts, per the\n  product spec, is 1e-9 dollars.\n- The red run is the Node 22 job. The diff report shows 41 failing\n  records; every single diff is in the `irr` field (an iteratively\n  solved internal rate of return), and every delta is between 1e-14\n  and 2e-13. No other field differs. The Node 20 job is green.\n- `irr` is computed by Newton iteration in `src/engine/irr.ts`; the\n  snapshot writer `golden/mapper.ts` currently serializes it at full\n  float precision.\n\nPropose your fix, concretely: what exactly do you change, where does\nthe change live, and what do you run to prove the gate is fixed?\nAnswer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/13 00:51:54 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T16:51:51Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T16:51:54Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T16:51:50Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T16:51:51Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a0fcae99048881-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 16:51:54 GMT
+Request-Id: req_011CdyCbZSFtgrptKbXV3Zee
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-65bf8a4a44cbea0e95721930eb14caf3-bfd3a47d1ecd0693-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdyCbaU1wHS6udwyLNd3D","type":"message","role":"assistant","content":[{"type":"text","text":"# Fix Plan\n\n1. **Root cause**: Newton iteration in `src/engine/irr.ts` accumulates floating-point error differently across Node 20 vs 22 due to optimizer differences. Deltas (1e-14 to 2e-13) are well below the 1e-9 tolerance but raw float serialization exposes them.\n\n2. **Change location**: `golden/mapper.ts`\n   - **What**: Round `irr` to 9 decimal places (matching the 1e-9 behavioral tolerance) before serialization.\n   - **Concrete change**: \n     ```typescript\n     irr: Math.round(rawIrr * 1e9) / 1e9\n     ```\n\n3. **Regenerate baseline**:\n   - Run on Node 20: `npm run golden:update`\n   - Commit the updated `golden/projections.json`\n\n4. **Verify the gate**:\n   - Run CI (both Node 20 and 22): `npm test -- --golden`\n   - Both jobs should pass; `git diff golden/projections.json` should be empty on second run.\n\n**Rationale**: The tolerance is already defined in your spec. Enforcement belongs at serialization, not in the solver. This makes the gate truly portable."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":342,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":302,"service_tier":"standard","inference_geo":"not_available"}}

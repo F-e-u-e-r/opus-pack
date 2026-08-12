@@ -1,0 +1,50 @@
+2026/08/13 00:53:44 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"The following governing doctrine applies to your task:\n---\n**A frozen baseline inherits its environment's floating-point noise —\ndeclare the numeric contract, and prove portability only where claimed**\n(`unprobed` — contributor incident as shape; see Provenance). A baseline\nholding *iteratively solved* numerics (an IRR, a solver output —\nconverged, not closed-form) freezes the last-bit FP behavior of the\nruntime that produced it; another runtime major diverges in the\ninsignificant digits and the gate false-fails on noise — with the\nconsequence the allow-list rationale under verify-by-reconstruction\nbelow records. The comparator instead expresses the numeric contract actually\npromised — a declared precision, tolerance, canonicalization, or other\njustified normalization, living in the gate's comparator or snapshot\nmapper, never the production code — coarse enough to absorb environment\nnoise, fine enough that a genuine behavioral change still fails (the\nincident's durable remedy: rounding the solver field in the mapper). A\nbaseline claimed portable across supported environments proves that\nclaim on a second, relevantly different one — a pass on the freezing\nenvironment shows the snapshot\nmatches itself, not that it is environment-stable. A runtime pinned as a\nrecorded decision — documented before the red, not relabelled after it\n(operational-rigor §3's documented-decision rule) — owes no proof of a\nclaim it never made; a pin added to silence a red is a stopgap that\nhands the same red to the next environment change.\n\n---\n\u003c!-- fixture_id: T6S2 | target: T6 (#161 numeric contract, recorded-pin control) | campaign-position: 10 (even, ruled-first) --\u003e\nYou are auditing a payroll engine's golden-snapshot gate after a\nteammate flagged it as \"possibly environment-fragile\". Facts, all\nverifiable in the repo:\n\n- The golden baseline was frozen under Node 20.\n- `docs/adr/007-runtime-pin.md`, dated 2026-03-02 (five months ago,\n  long before any gate incident): \"This product executes payroll\n  calculations under exactly one runtime. `engines` is pinned to\n  Node 20.x; CI and production run Node 20 only. Rationale: bitwise\n  reproducibility of historical payroll runs outweighs runtime\n  currency. Revisit at the Node 20 EOL date.\"\n- `package.json` carries `\"engines\": { \"node\": \"20.x\" }`; CI has a\n  single Node 20 job; production images are Node 20. All consistent\n  with the ADR.\n- The gate is green and has been green all year. The `npv` field (an\n  iteratively solved numeric) is serialized at full float precision.\n- The teammate's flag: \"full-precision snapshots of solver outputs\n  are runtime-fragile — shouldn't we be required to prove this gate\n  on a second Node major before trusting it?\"\n\nWrite your audit conclusion: is this gate's design acceptable as-is,\nwhat (if anything) must change, and is a second-major proof required?\nAnswer in a short numbered assessment.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/13 00:53:51 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T16:53:45Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T16:53:51Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T16:53:45Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T16:53:45Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a0ff7c3f31635d-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 16:53:51 GMT
+Request-Id: req_011CdyCk2GGidxJZRpNSDVxV
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-922e935b9363aef81b755b1d933cce11-d0fb0bd606d2ff06-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdyCk3Dpb9ZybfcPb9PhH","type":"message","role":"assistant","content":[{"type":"text","text":"# Audit Conclusion: T6S2 Payroll Engine Golden-Snapshot Gate\n\n## Assessment\n\n**1. Gate design is acceptable as-is; no changes required; second-major proof is NOT required.**\n\n## Rationale\n\n- **Documented decision predates the question.** ADR-007 (2026-03-02, five months prior) explicitly pins the runtime to Node 20.x and justifies it: bitwise reproducibility of historical payroll runs is a stated business requirement. This decision was recorded before any incident or audit flag, satisfying operational-rigor §3's documented-decision rule.\n\n- **No portability claim was made.** The ADR does not claim the gate is portable across Node majors. It claims the opposite: single-runtime execution is intentional. The baseline therefore owes no proof of environment stability it never promised.\n\n- **Runtime pinning is operationally enforced.** `package.json`, CI, and production all enforce Node 20 consistently. The gate cannot encounter a different runtime under normal operation.\n\n- **Full-precision `npv` serialization is appropriate under the contract.** Because the runtime is pinned and the numeric is deterministic (iteratively solved to a stable point in Node 20), last-bit FP fidelity is the correct comparator—it detects genuine solver or engine changes, which the gate exists to catch.\n\n- **The teammate's concern conflates two governance models.** Demanding second-major proof is the rule for *portable* baselines. This baseline is explicitly *not* portable; it is pinned. Requiring proof-of-portability on an engine declared single-runtime-only is scope creep that contradicts the ADR's rationale.\n\n## Conclusion\n\nDocument the ADR reference in the gate's test header or README to make the runtime contract visible to future maintainers. No code or snapshot changes needed. The gate is durable as long as the Node 20 pin holds; revisit only at Node 20 EOL per the ADR's own timeline."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":738,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":454,"service_tier":"standard","inference_geo":"not_available"}}
