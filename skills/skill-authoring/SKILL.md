@@ -584,20 +584,49 @@ axes, treat it as load-bearing — the pass fails closed.
   Phrase triggers as observed states ("a test failed twice"), not topic
   labels ("debugging") — states fire; labels drift.
   A skill that never fires is dead weight; a skill that always fires is a tax.
+- **A description is a rule too — probe its ROUTING, never just its
+  prose** (`unprobed` — see Provenance). The description is the
+  layer loaded before the skill fires at all, and a rule §6's
+  behavioral probe never reaches: that probe hands a fresh reader the
+  file already loaded, which tests whether the loaded content is
+  usable, never whether the file would have loaded in the first
+  place (the frontmatter `name` also routes pre-load; probing the
+  description exercises both). Writing or editing a description: probe
+  the routing as a distinct step, not folded into §6's usability
+  probe — run at least 5 natural-language task prompts at the file's
+  target executor tier (§7), each phrased as an observed state that
+  should fire the skill, none naming the skill; grade only
+  did-it-invoke, and a close or surprising call re-runs before
+  deciding (§7's own convention). Done when every prompt fires the
+  skill — a partial pass is a fail requiring a rewrite, not a passing
+  grade with a caveat. This single-skill probe cannot by itself catch
+  the sibling-collision case — a description that only misfires once a
+  similarly-worded sibling is installed; run it together with the
+  catalog-collision bullet's defense (3) below.
 - Prefer few dense skills over many fragments. A 20-file library of
   near-duplicates dilutes triggers and splits facts across homes.
 - **Catalog size itself degrades triggering — measure collision, don't just
   avoid duplicates** (`unprobed` — see Provenance). Beyond the near-duplicate
   case above, a second failure appears at scale: with many skills installed,
   context pressure trims some from view, so the right one may not fire even with
-  a clean trigger. Two defenses — (1) make description collision a *measured*
+  a clean trigger. Three defenses — (1) make description collision a *measured*
   gate, not a manual eyeball: a deterministic pairwise-similarity check across
   every skill's trigger description, failing when pairwise similarity exceeds a
   ceiling, and only lowering that ceiling over time, never raising it to pass a
   regression; (2) when triggering degrades, walk a mitigation ladder — install
   only the groups the work needs, then invoke by explicit name, then prune the
-  unused — before blaming a single skill's wording. A multi-skill install like
-  this project's own is the setting this addresses.
+  unused — before blaming a single skill's wording; (3) text similarity is a
+  proxy, not the failure — pair it with the behavioral routing probe above,
+  adding at least one prompt per candidate pair that should fire the OTHER
+  skill in the pair (candidate pairs: every pair method (1) scores above half
+  its ceiling, plus every pair the author judges to share a task domain —
+  similarity flags wording overlap, judgment flags competition the wording
+  hides); the pair-prompt fails when the wrong skill fires instead of or
+  alongside the intended one — a co-fire is a collision, not a pass. A
+  description that wins its own prompts by stealing a sibling's fails the
+  collision arm even at a clean pairwise-similarity score, since
+  differently-worded descriptions can still compete in practice. A multi-skill
+  install like this project's own is the setting this addresses.
 - Discover before writing: read the repo like an incoming engineer (history,
   reverted attempts, CI, docs), then ask the user only what the repo cannot
   tell you — a small, bounded list.
@@ -1428,3 +1457,18 @@ rule's incident paragraph drafted from a summary carried across
 sessions did not match the source transcript it claimed to describe.
 All contributor-reported, not linkable. Each clause ships `unprobed`
 per the covenant; both probes join the standing #115 queue.
+The §5 description-routing-probe rule (2026-08-12) closes a gap noticed
+while auditing a private skill cache against this file's own §6 review
+lens: the behavioral usability probe there hands the reader a skill
+already loaded, so it never exercises whether the description would
+have fired the load. The existing catalog-collision bullet already
+catches the multi-skill case of this, but only via static
+pairwise-similarity text scoring — no *behavioral* check existed for
+either the single-skill fire-at-all case or a similarity-scored-clean
+pair that still competes in practice; the new bullet adds the former
+and folds the latter into the catalog-collision bullet as its method
+(3), cross-referenced rather than duplicated. No incident is cited;
+the gap is structural, reasoned from re-reading §5 and §6 side by
+side, not from an observed misfire. Ships `unprobed` per the
+covenant; its probe (and the sibling-collision arm specifically)
+joins the standing #115 queue.
