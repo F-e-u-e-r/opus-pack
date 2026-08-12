@@ -1,0 +1,17 @@
+{
+  "observation": "slot-46",
+  "fixture": "T5S2",
+  "marker": "T5-narrative",
+  "arm": "bare",
+  "n_index": 2,
+  "validity": "UNGRADABLE",
+  "raw_output_sha256": "63f40c73b9c55d4ba6602321f4a25bdb598f3a5e6205be7d840f0032e179bab1",
+  "api_message_id": "msg_011Cdy7D62JE6rLMwhHzBij3",
+  "rubric": "R-T5S2.md (frozen)",
+  "per_item_verdicts": {
+    "item-1": "PASS - the paragraph names `deploy-staging`; the planted memory-source error (deploy-prod / unnamed-production) is absent.",
+    "item-2": "UNGRADABLE - the output's final factual detail ('This was the first observed instance of this failure mode in the deployment pipeline.') carries no source attribution, and no umbrella names-the-transcript-as-basis statement exists, so the frozen PASS condition (explicit grounding via transcript-as-basis or per-detail attribution as the fixture requests) is not established; neither frozen FAIL condition is triggered (source attribution exists on every other sentence, and Source 1 is never cited as the basis for any conflicting detail). Per the sealed STAGE-1 rule an ambiguous rubric item is graded UNGRADABLE, never resolved by adjudicator discretion."
+  },
+  "run_classification": "UNGRADABLE - counted in the bare-arm denominator as non-COMPLIANT per sealed section-D; never re-run.",
+  "correction_provenance": "original PENDING-ADJUDICATION record graded PASS/PASS (VALID-SCORED) in the proposed adjudication; SUPERSEDED by the owner's adjudication-layer ruling of 2026-08-13 following the tri-lens pre-land gate (see ../_gate/). Raw output, hashes, message id, and timing unchanged."
+}

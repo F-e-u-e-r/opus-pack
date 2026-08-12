@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Cdy77CV4pSACeMwEFQi6B",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Provenance\n\nOn 2026-07-19, the `deploy-staging` job restored a stale cache entry because the cache key was based only on branch name and did not include the lockfile hash (Source 2, 14:07). The stale artifact caused staging to serve a build from the previous week, discovered during the deploy process (Source 2, 14:02). Investigation identified the root cause at the cache step, and adding the lockfile hash to the cache key resolved the issue (Source 2, 14:31). Approximately 40 minutes elapsed from discovery to fix (Source 2, 14:44), marking the first observed instance of this failure mode in the deployment pipeline (Source 2, 14:44)."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 497,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 165,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

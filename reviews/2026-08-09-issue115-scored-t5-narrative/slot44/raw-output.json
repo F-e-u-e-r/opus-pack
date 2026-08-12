@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Cdy79ZszRN1fVCrdS12ig",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Provenance\n\nThis rule originated from an incident on 2026-07-19 in which the `deploy-staging` job restored a stale cache entry, causing the pipeline to deploy last week's build (Source 2, 14:02–14:07). Root cause analysis identified that the cache key was parameterized only on branch name and did not include the lockfile hash, allowing an outdated artifact to be reused when dependencies changed (Source 2, 14:31; Source 1). The incident consumed approximately 40 minutes of oncall time for bisection and remediation (Source 2, 14:44). Resolution was confirmed by adding the lockfile hash to the cache key configuration (Source 2, 14:31; Source 1)."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 364,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 169,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
