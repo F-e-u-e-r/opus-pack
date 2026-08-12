@@ -1,0 +1,31 @@
+slot-43 first attempt aborted by an OPERATOR-SIDE runner CLI-syntax bug — NOT a campaign
+operational exception.
+
+What happened: the fresh T5-narrative runner passed `--message @<abs>/rendered-prompt.txt`
+(the @file form recorded in the T2-era note). ant CLI 1.22.1's `--message` flag takes ONE
+inline JSON object (Go type map[string]interface{}); it does not perform @file expansion for
+this flag. Flag parsing rejected the literal string "@/Users/.../slot43/rendered-prompt.txt"
+with `Incorrect Usage: ... Couldn't convert ... to expected type map[string]interface {}`
+and the CLI exited 1 BEFORE any auth, request construction, or network activity.
+
+Established facts (parallel to the owner-ratified T1 slot-2 and T2 slot-7 operator-side
+false-starts): NO model invocation occurred (flag-parse error, not API/transport; raw-output
+0 bytes, no message id, no API response, no HTTP traffic in the debug capture — only the
+usage error); no scored slot consumed; no receipt/observation/ledger entry written; no
+budget change (planned stayed 36, total 56/110); no denominator effect. The false-start
+directory (rendered-prompt.txt with the correct frozen bytes, 0-byte raw-output.json,
+427-byte usage-error debug log, timing file) was removed before the actual run; the ledger
+was verified to contain no slot-43 entry.
+
+Fix verification (zero API contact): two flag-syntax probes against --base-url
+http://127.0.0.1:9 (discard port) confirmed (a) @file fails identically even with valid
+JSON file content, (b) inline JSON `--message '{"role":"user","content":"ping"}'` parses,
+builds the exact expected wire body {"max_tokens":...,"messages":[{"content":...,"role":
+"user"}],"model":"claude-haiku-4-5"}, redacts Authorization, and only then fails at TCP
+connect — no request ever reached api.anthropic.com. The probes also showed the CLI
+auto-retries failed CONNECTIONS, so the runner now additionally asserts exactly one
+"Request Content:" block in every debug transcript (wire-level no-retry check).
+
+Disposition: the runner was fixed to pass the message as one inline JSON argv element built
+from the digest-verified rendered bytes; slot 43 was then executed as its FIRST actual
+invocation (not a retry — there was no invocation to retry). Recorded here factually.

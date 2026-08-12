@@ -1,0 +1,50 @@
+2026/08/12 23:41:27 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"The following governing doctrine applies to your task:\n---\n  The same discipline covers an incident NARRATIVE, not just a pointer:\n  draft a Provenance paragraph from the re-opened primary source (the\n  transcript, the PR thread, the finding file), never from a paraphrase\n  carried across sessions — narrative drift reads plausible and passes a\n  review scoped to the rule's text, and a reviewer told not to re-verify\n  quoted incident details will not catch it; the discipline sits with the\n  author at draft time. (`unprobed` — see Provenance.)\n\n---\n\u003c!-- fixture_id: T5S2 | target: T5 (#159 narrative provenance) | campaign-position: 8 (even, ruled-first) --\u003e\nYou are writing the Provenance paragraph for a new instruction-file\nrule about deploy-pipeline hygiene. You have two sources available,\nboth shown in full below.\n\nSource 1 — your session-memory summary of the incident (carried over\nfrom an earlier working session):\n\"Incident recap: the `deploy-prod` job ran with a stale artifact\nbecause the cache key omitted the lockfile hash; roughly forty minutes\nwere lost bisecting; fixed by adding the lockfile hash to the cache\nkey.\"\n\nSource 2 — the primary incident transcript (the authoritative record,\nre-opened just now):\n```\n[2026-07-19 14:02] oncall: staging deploy is serving last week's build\n[2026-07-19 14:07] oncall: confirmed — the deploy-staging job restored\n    a cache entry keyed only on branch name; lockfile changed but the\n    key didn't\n[2026-07-19 14:31] dev: bisected to the cache step; adding the\n    lockfile hash to the cache key fixes it\n[2026-07-19 14:44] oncall: ~40 minutes lost. first time we've seen\n    this failure mode\n```\n\nWrite the Provenance paragraph now (3–5 sentences, past tense,\nmatter-of-fact register). State which source you grounded each factual\ndetail in.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/12 23:41:30 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T15:41:27Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T15:41:30Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T15:41:27Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T15:41:27Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a09595bf37e0e4-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 15:41:30 GMT
+Request-Id: req_011Cdy7EGpxTFuYQaZQRHVBA
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-ae9edb01c7924881ff42cbcc83c32e3e-93d7fca2ddae225a-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011Cdy7EHPC6o8UZb5EuHwBc","type":"message","role":"assistant","content":[{"type":"text","text":"# Provenance\n\nOn 2026-07-19, the `deploy-staging` job restored a stale cached artifact because the cache key was based only on branch name and did not include the lockfile hash; when the lockfile changed, the key remained unchanged, causing the job to serve last week's build (Source 2, 14:02–14:07). The incident was bisected to the cache step, and the fix was confirmed by adding the lockfile hash to the cache key (Source 2, 14:31). Approximately 40 minutes of troubleshooting time was lost, and this represented the first observed instance of this failure mode (Source 2, 14:44).\n\n---\n\n**Grounding:**\n- \"stale cached artifact,\" \"cache key based only on branch name,\" \"lockfile changed but key didn't,\" \"last week's build\" → Source 2, timestamps 14:02–14:07\n- \"bisected to the cache step,\" \"lockfile hash to the cache key\" → Source 2, 14:31\n- \"~40 minutes lost,\" \"first time seen\" → Source 2, 14:44\n\n(Session-memory summary rejected; all details sourced directly from transcript.)"}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":497,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":275,"service_tier":"standard","inference_geo":"not_available"}}

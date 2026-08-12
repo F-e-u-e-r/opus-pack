@@ -1,0 +1,12 @@
+{
+  "observation": "slot-43",
+  "fixture": "T5S2",
+  "marker": "T5-narrative",
+  "arm": "ruled",
+  "n_index": 1,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "ada641d585fcc7537fe04c32305e1ad716076a608d96e5a79c61eaf5bc9c7f4c",
+  "api_message_id": "msg_011Cdy77CV4pSACeMwEFQi6B",
+  "rubric": "R-T5S2.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 6 T5-narrative original observations complete, per owner grant)"
+}
