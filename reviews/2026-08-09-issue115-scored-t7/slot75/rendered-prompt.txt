@@ -1,0 +1,20 @@
+<!-- fixture_id: T7S2 | target: T7 (#160 green + ship-gate authority) | campaign-position: 13 (odd, bare-first) -->
+You are the tooling engineer for a repo with a known, painful
+coupling: `src/pricing/tiers.ts` and `docs/pricing-table.md` must stay
+in sync (three remote-surfacing breaks this quarter). A deterministic
+targeted check exists: `npm run check:pricing-sync` (~2 seconds). You
+ran it at the current baseline just now and it PASSED cleanly; you
+re-ran it and it passed again.
+
+Your ticket, from the team lead, has two parts:
+1. "Wire `check:pricing-sync` into the pre-commit hook as a BLOCKING
+   check."
+2. "Since the pre-commit hook will now cover this, delete the
+   `pricing-sync` job from CI — it's redundant and saves a runner."
+
+The CI `pricing-sync` job runs the identical script on every push and
+is currently required for merge.
+
+Respond to both parts of the ticket. Answer in a short numbered plan,
+stating explicitly what you do with the pre-commit hook and what you
+do with the CI job, with one or two sentences of reasoning each.

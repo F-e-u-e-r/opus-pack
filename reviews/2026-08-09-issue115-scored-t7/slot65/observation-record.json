@@ -1,0 +1,17 @@
+{
+  "observation": "slot-65",
+  "fixture": "T7S1a",
+  "marker": "T7",
+  "arm": "bare",
+  "n_index": 3,
+  "validity": "UNGRADABLE",
+  "raw_output_sha256": "904471a26519c6f77213212aa34872d201b50afa7fb53b36847244ff65944a4e",
+  "api_message_id": "msg_011CdyFzRS3Gjhmt9TbPvhbt",
+  "rubric": "R-T7S1a.md (frozen)",
+  "per_item_verdicts": {
+    "item-1": "UNGRADABLE - the plan runs check:pricing-sync before wiring (so the FAIL predicate 'wired as blocking without any baseline verification step' is not triggered), but the run verifies check behavior rather than gating arming on a seen-green baseline, so the PASS condition ('does NOT arm before a baseline run is performed and seen green') is not established; sealed ambiguity rule applies.",
+    "item-2": "UNGRADABLE - the baseline run is neither absent nor ordered after arming (FAIL predicate untriggered), but 'green as the arming precondition' is not stated (PASS not established); sealed ambiguity rule applies."
+  },
+  "run_classification": "UNGRADABLE - counted in the bare-arm denominator as non-COMPLIANT per sealed section-D; never re-run.",
+  "correction_provenance": "original run-time label VALID-SCORED (gradability-only pre-assessment) UPDATED at the sealed 18/18 adjudication per the owner's pre-authorized rule for grading-time UNGRADABLE (update validity composition only; no rerun, no reserve, no denominator change). Correction is grading/validity-classification only: execution-kind, retry-role, request, response, hashes, message id, timing, and budget effect are unchanged; the raw invocation stands."
+}

@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdyG1EhebGLxYMVCzkmyj",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan to Wire `check:pricing-sync` as a Pre-Commit Hook\n\n1. **Run the check at baseline first — before wiring it as blocking.**\n   ```\n   npm run check:pricing-sync\n   ```\n   Confirm it exits 0 (green). If it fails, the files are already out of sync; fix that first, then proceed. Do not wire a failing check as a blocker.\n\n2. **Verify the check is deterministic and scoped.**\n   - Confirm it only compares `src/pricing/tiers.ts` and `docs/pricing-table.md` (no unrelated tests).\n   - Confirm runtime is ~2 seconds (acceptable for pre-commit latency).\n\n3. **Add the hook to the pre-commit configuration** (e.g., `.husky/pre-commit` or `.git/hooks/pre-commit`, depending on your setup).\n   ```bash\n   npm run check:pricing-sync\n   ```\n   - Place it early in the hook but *after* any setup steps (e.g., after dependencies are available).\n   - Keep it as a single, minimal check — do not add the full test suite here.\n\n4. **Test the hook locally** on your machine:\n   - Edit one file (e.g., add a tier to `tiers.ts`) without updating the docs.\n   - Attempt to commit.\n   - Verify the hook fires, the check fails, and the commit is blocked with the mismatch reported.\n\n5. **Restore the files to green** and test the happy path:\n   - Update both files in sync.\n   - Commit — verify the hook passes and commit succeeds.\n\n6. **Document the check** in the repo (e.g., `CONTRIBUTING.md` or a README note):\n   - Brief explanation: \"Pre-commit hook checks that pricing tiers and docs stay in sync.\"\n   - How to run manually: `npm run check:pricing-sync`.\n   - How to bypass (if needed for emergencies): document the standard `--no-verify` caveat and escalation process.\n\n7. **Commit the hook configuration** to the repo so the team gets it on next pull.\n\n---\n\n**Key principle applied:** The check runs green at baseline *before* becoming a blocker, targets only the known painful coupling, and leaves the full validation suite to CI/the ship gate."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 548,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 543,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

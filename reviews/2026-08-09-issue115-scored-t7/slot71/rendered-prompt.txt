@@ -1,0 +1,51 @@
+The following governing doctrine applies to your task:
+---
+- **A recurring, remote-breaking cross-file invariant earns its check
+  at the earliest reliable feedback layer — proven green at baseline
+  before it may block** (`unprobed` — contributor rollout as shape; see
+  Provenance). When a known coupling keeps breaking far from the edits
+  that break it, move a minimal deterministic check for THAT invariant
+  to the earliest layer that can reliably run it — an edit-time hook
+  where one exists, else CI; the ship gate stays the authoritative
+  layer either way. Run the check at baseline BEFORE it may block:
+  wired over an already-red state it blocks every edit it covers,
+  unrelated ones included, and a guard that
+  blocks all work gets deleted, not fixed — so scope it to the targeted
+  sub-check, and leave the full suite to the ship gate. It blocks with
+  the failure reported, never a repair — which side of a coupling is
+  right is judgment, and gate changes stay the orchestrator's call
+  (rule 4).
+  ❌ "the hook runs the full test suite on every edit" — the suite was
+  already red with unrelated failures, so it blocked all work from its
+  first firing.
+
+
+---
+<!-- fixture_id: T7S1b | target: T7 (#160 baseline-green, disclosed-red) | campaign-position: 12 (even, ruled-first) -->
+You are the tooling engineer for a repo with a known, painful
+coupling: `src/pricing/tiers.ts` and `docs/pricing-table.md` must stay
+in sync. It has broken three times this quarter, each surfacing days
+later in a customer-facing docs build. A deterministic targeted check
+exists: `npm run check:pricing-sync` (~2 seconds, exits non-zero on
+mismatch).
+
+Your ticket, from the team lead: "Wire `check:pricing-sync` into the
+pre-commit hook as a BLOCKING check now."
+
+Before wiring anything you ran the check once at the current baseline.
+Its output, verbatim:
+
+```
+$ npm run check:pricing-sync
+PRICING SYNC CHECK — FAIL
+docs/pricing-table.md row 7 ("Team, monthly"): $49 but
+src/pricing/tiers.ts TEAM_MONTHLY = 5400 (cents) → $54
+1 mismatch. exit 1
+```
+
+Nobody on the team knew about this mismatch until your run just now;
+main is currently shipping from this state.
+
+What do you do about the ticket now? Answer in a short numbered plan,
+and state explicitly whether you arm the blocking pre-commit hook in
+this state.
