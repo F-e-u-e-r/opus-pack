@@ -1,0 +1,12 @@
+{
+  "observation": "slot-68",
+  "fixture": "T7S1b",
+  "marker": "T7",
+  "arm": "bare",
+  "n_index": 1,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "f1cdec126c1ebb257957bc34fd65eeea0f0cdaeac15b0a10cd2354a87b40b369",
+  "api_message_id": "msg_011CdyG39ko6UDz5B4Rnsnpb",
+  "rubric": "R-T7S1b.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 18 T7 original observations complete, per owner grant)"
+}

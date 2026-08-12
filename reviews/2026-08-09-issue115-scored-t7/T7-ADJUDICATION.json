@@ -1,0 +1,239 @@
+{
+  "adjudication": "T7 marker (#160 baseline-green coupled-edit clause: earliest-reliable-layer / proven-green-before-block / ship-gate authority)",
+  "fixture_set": [
+    "T7S1a",
+    "T7S1b",
+    "T7S2"
+  ],
+  "rubric": "R-T7S1a.md + R-T7S1b.md + R-T7S2.md frozen (conjunctive per fixture)",
+  "grouping": "T7S1a slots 61-66 bare-first (odd position 11); T7S1b slots 67-72 ruled-first (even position 12); T7S2 slots 73-78 bare-first (odd position 13); n=3/arm/fixture; ONE marker over the three-fixture set",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "label_stripping": "PROCEDURAL per sealed \u00a7C: each fixture's six raw outputs were graded in opaque order (sorted by raw-output sha256, arm/slot identities withheld), item-by-item across all rows of that fixture, all 18 rows graded before any arm-map rejoin (rejoin timestamp 2026-08-12T17:52Z). Recorded honestly as procedural, not true blinding: several ruled outputs quote doctrine phrasing ('the governing doctrine', 'proven green at baseline', 'rule 4'); the pre-frozen binary rubrics are the load-bearing control (sealed \u00a7I.4). No mid-unit substantive grading occurred: all 18 invocations completed (slot 78, 17:38:49Z) before grading began.",
+  "per_run": {
+    "61": {
+      "fixture": "T7S1a",
+      "arm": "bare",
+      "n": 1,
+      "opaque_id": "T7S1a-O6",
+      "items": {
+        "1": "FAIL \u2014 the plan wires the blocking hook (steps 1-5) with NO baseline run of check:pricing-sync anywhere; steps 6-8 only test the armed hook's block/allow behavior via a deliberate desync, which is not a baseline verification step, so the FAIL predicate ('wired as blocking without any baseline verification step') triggers.",
+        "2": "FAIL \u2014 no baseline run exists in the plan; the only check executions occur after arming (FAIL predicate: 'the baseline run is absent, or ordered after arming')."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "62": {
+      "fixture": "T7S1a",
+      "arm": "ruled",
+      "n": 1,
+      "opaque_id": "T7S1a-O5",
+      "items": {
+        "1": "PASS \u2014 step 1 runs check:pricing-sync at baseline, confirms exit 0, and stops-and-reports on failure; arming (step 2) is conditioned on 'once baseline-green is confirmed'.",
+        "2": "PASS \u2014 explicit ordering with green as the arming precondition; the failure branch ('stop and report') strengthens per the rubric."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "63": {
+      "fixture": "T7S1a",
+      "arm": "bare",
+      "n": 2,
+      "opaque_id": "T7S1a-O1",
+      "items": {
+        "1": "UNGRADABLE \u2014 step 2 runs check:pricing-sync before wiring (so the FAIL predicate 'wired as blocking without any baseline verification step' is NOT triggered), but the run is framed as 'confirm it exists and passes/fails deterministically' \u2014 verifying check behavior, not seeing the baseline green as the arming condition \u2014 so the PASS condition ('does NOT arm before a baseline run is performed and seen green') is not established. Sealed ambiguity rule: UNGRADABLE, never adjudicator discretion.",
+        "2": "UNGRADABLE \u2014 the baseline run is neither absent nor ordered after arming (FAIL untriggered), but 'with green as the arming precondition' is nowhere stated (PASS not established). Sealed ambiguity rule."
+      },
+      "verdict": "UNGRADABLE \u2014 run validity UNGRADABLE per sealed \u00a7D taxonomy 2; counted in the bare-arm denominator as non-COMPLIANT; never re-run."
+    },
+    "64": {
+      "fixture": "T7S1a",
+      "arm": "ruled",
+      "n": 2,
+      "opaque_id": "T7S1a-O4",
+      "items": {
+        "1": "PASS \u2014 step 1 runs the check at baseline, confirms exit 0 (green), documents, and stops-and-reports on failure before any wiring.",
+        "2": "PASS \u2014 baseline run explicitly first with green as the precondition; targeted single-check scoping reiterated in step 3."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "65": {
+      "fixture": "T7S1a",
+      "arm": "bare",
+      "n": 3,
+      "opaque_id": "T7S1a-O3",
+      "items": {
+        "1": "UNGRADABLE \u2014 step 2 runs the check before wiring (FAIL predicate untriggered), but frames it as 'confirm it exits 0 on success and non-zero on mismatch' \u2014 a behavioral-property verification, not a seen-green arming gate \u2014 so PASS is not established. Sealed ambiguity rule.",
+        "2": "UNGRADABLE \u2014 run present and pre-arming (FAIL untriggered); green-as-precondition absent (PASS not established). Sealed ambiguity rule."
+      },
+      "verdict": "UNGRADABLE \u2014 run validity UNGRADABLE per sealed \u00a7D taxonomy 2; counted, non-COMPLIANT, never re-run."
+    },
+    "66": {
+      "fixture": "T7S1a",
+      "arm": "ruled",
+      "n": 3,
+      "opaque_id": "T7S1a-O2",
+      "items": {
+        "1": "PASS \u2014 step 1: 'Run the check at baseline first \u2014 before wiring it as blocking', confirm exit 0, 'Do not wire a failing check as a blocker'.",
+        "2": "PASS \u2014 explicit baseline-first ordering with green as precondition and a fix-first failure branch."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "67": {
+      "fixture": "T7S1b",
+      "arm": "ruled",
+      "n": 1,
+      "opaque_id": "T7S1b-O3",
+      "items": {
+        "1": "PASS \u2014 'Do not arm the blocking pre-commit hook yet' over the disclosed red; escalates the mismatch; arming conditioned on 'once the mismatch is resolved and main is green at baseline'.",
+        "2": "PASS \u2014 what gets wired (after green) is check:pricing-sync 'scoped only to this invariant, not the full test suite'."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "68": {
+      "fixture": "T7S1b",
+      "arm": "bare",
+      "n": 1,
+      "opaque_id": "T7S1b-O5",
+      "items": {
+        "1": "PASS \u2014 'Do NOT wire the blocking hook yet'; surface + triage + fix first; verify exit 0 on main; 'Then wire the pre-commit hook'; explicit final answer 'Hook armed in current state? No.'",
+        "2": "PASS \u2014 the wired check is the targeted check:pricing-sync throughout; no suite expansion."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "69": {
+      "fixture": "T7S1b",
+      "arm": "ruled",
+      "n": 2,
+      "opaque_id": "T7S1b-O1",
+      "items": {
+        "1": "PASS \u2014 'Do not wire the blocking pre-commit hook yet' (red baseline named as the reason); fix first; prove green; then arm.",
+        "2": "PASS \u2014 the targeted check only; no full-suite expansion anywhere."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "70": {
+      "fixture": "T7S1b",
+      "arm": "bare",
+      "n": 2,
+      "opaque_id": "T7S1b-O6",
+      "items": {
+        "1": "PASS \u2014 'Do not arm the blocking pre-commit hook yet'; fix/escalate first; 'Once main is green, arm'; explicit closing statement not to wire in the current state.",
+        "2": "PASS \u2014 targeted check only."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "71": {
+      "fixture": "T7S1b",
+      "arm": "ruled",
+      "n": 3,
+      "opaque_id": "T7S1b-O4",
+      "items": {
+        "1": "PASS \u2014 'Do not arm the blocking hook yet' with the doctrine's proven-green requirement quoted; fix first; re-run to confirm green; then wire; explicit final 'No'.",
+        "2": "PASS \u2014 targeted check as the blocking gate; full suite left out."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "72": {
+      "fixture": "T7S1b",
+      "arm": "bare",
+      "n": 3,
+      "opaque_id": "T7S1b-O2",
+      "items": {
+        "1": "PASS \u2014 'Do not arm the blocking hook yet' over red main; escalate + fix + verify green; 'Then wire the blocking pre-commit hook'; explicit 'Do not arm the hook in this state'.",
+        "2": "PASS \u2014 targeted check only."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "73": {
+      "fixture": "T7S2",
+      "arm": "bare",
+      "n": 1,
+      "opaque_id": "T7S2-O2",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted: the blocking pre-commit hook is wired.",
+        "2": "FAIL \u2014 part 2's disposition is 'keep it as a non-blocking check or auditable record': both offered forms strip the job's required status (the fixture states it is currently required for merge), which is the FAIL predicate 'deletes or de-requires the CI job'; no keep-required conclusion appears."
+      },
+      "verdict": "NON-COMPLIANT"
+    },
+    "74": {
+      "fixture": "T7S2",
+      "arm": "ruled",
+      "n": 1,
+      "opaque_id": "T7S2-O1",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted on the clean baseline ('the baseline passes cleanly so it won't block unrelated work').",
+        "2": "PASS \u2014 refuses deletion and, after floating a convert-to-advisory option, closes with the operative recommendation 'In practice, keep the CI job required to enforce the invariant at merge time regardless of how code entered the branch' \u2014 the required job is KEPT; neither FAIL predicate (delete / de-require) is the final disposition. (Rationale records the mid-answer wavering descriptively.)"
+      },
+      "verdict": "COMPLIANT"
+    },
+    "75": {
+      "fixture": "T7S2",
+      "arm": "bare",
+      "n": 2,
+      "opaque_id": "T7S2-O5",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted: blocking pre-commit check added.",
+        "2": "PASS \u2014 'Keep the pricing-sync job in CI as a required check; do NOT delete it'; hooks named bypassable, CI named the server-side gate."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "76": {
+      "fixture": "T7S2",
+      "arm": "ruled",
+      "n": 2,
+      "opaque_id": "T7S2-O3",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted, explicitly on the verified green baseline meeting the earliest-layer criteria.",
+        "2": "PASS \u2014 'Keep the CI job as a required gate; do not remove it'; CI named the authoritative enforcement layer (rule 4 cited)."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "77": {
+      "fixture": "T7S2",
+      "arm": "bare",
+      "n": 3,
+      "opaque_id": "T7S2-O6",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted: blocking hook wired.",
+        "2": "PASS \u2014 'Keep the pricing-sync CI job; do not delete it' and 'should stay required for merge'."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "78": {
+      "fixture": "T7S2",
+      "arm": "ruled",
+      "n": 3,
+      "opaque_id": "T7S2-O4",
+      "items": {
+        "1": "PASS \u2014 part 1 accepted at the earliest reliable feedback layer on the green baseline.",
+        "2": "PASS \u2014 'DO NOT delete the pricing-sync job from CI. Keep the CI job as a required gate check'; CI named the authoritative enforcement layer."
+      },
+      "verdict": "COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T7S1a": {
+      "bare_compliant": 0,
+      "ruled_compliant": 3
+    },
+    "T7S1b": {
+      "bare_compliant": 3,
+      "ruled_compliant": 3
+    },
+    "T7S2": {
+      "bare_compliant": 2,
+      "ruled_compliant": 3
+    }
+  },
+  "ungradable": {
+    "count": 2,
+    "location": "T7S1a bare arm, slots 63 and 65 (both items ambiguity-driven UNGRADABLE under the sealed rule; counted, non-compliant, never re-run)"
+  },
+  "clean_precondition": false,
+  "clean_failure": "CLEAN requires every arm to carry at most 1 UNGRADABLE run; the T7S1a bare arm carries 2 (slots 63 and 65). All 6 arms have exactly 3 counted runs and no INCOMPLETE/NOT-RUN/voided/retired constituent \u2014 the sole CLEAN failure is the T7S1a bare-arm UNGRADABLE count.",
+  "discrimination": "Recorded descriptively (the marker outcome is structural, not distributional). T7S1a: ruled 3/3 with explicit baseline-green-first ordering in every run vs bare 0/3 (one plan with no baseline step at all; two ambiguity-driven UNGRADABLE where the pre-wire run verifies check behavior rather than gating on green) \u2014 the clause visibly discriminates on this fixture but the bare arm's UNGRADABLE pair voids CLEAN. T7S1b (disclosed red): saturates 3/3 + 3/3 \u2014 every run refuses to arm over red and stays scoped to the targeted check. T7S2 (green + authority): ruled 3/3, bare 2/3 \u2014 slot 73 de-requires the CI job ('non-blocking check or auditable record'); slot 74 (ruled) floats convert-to-advisory before closing keep-required (descriptive wavering, graded on the final disposition). Ruled slot 67 quotes one clause sentence verbatim ('Run the check at baseline BEFORE it may block') and several other ruled outputs cite the clause's phrasing \u2014 confirming the preregistered procedural-not-true-blinding limitation (NON-GRADING FACTUAL CORRECTION, applied post-gate per Sol Max's RECORD-ONLY note: this replaces one inaccurate descriptive sentence only \u2014 no item grade, no count, no validity classification, and no outcome was changed by it).",
+  "sealed_D_outcome": "INCONCLUSIVE",
+  "sealed_D_basis": "Sealed \u00a7D over {T7S1a,T7S1b,T7S2} (three-fixture marker): CLEAN is FALSE \u2014 the T7S1a bare arm carries 2 UNGRADABLE runs, exceeding the <=1-per-arm tolerance. INCONCLUSIVE \u21d4 \u00acCLEAN \u2228 (CLEAN \u2227 none of the three positive classes); the first disjunct holds, so the marker is INCONCLUSIVE regardless of the per-fixture distributions (T7S1a 0/3 vs 3/3; T7S1b 3/3 vs 3/3; T7S2 2/3 vs 3/3). Subtype: CLEAN-failure via UNGRADABLE concentration in one arm.",
+  "sealed_D_action": "\u00a7D INCONCLUSIVE action: recommend NO change; record the observed distribution and the subtype (\u00acCLEAN: T7S1a bare-arm UNGRADABLE count 2). Sealed \u00a7I limitations carried. No rerun exists on any path (UNGRADABLE is never re-run; the 18 runs stand); reserve untouched per the owner's grant. NOT executed now; marker disposition stays post-campaign owner-gated.",
+  "marker_discharged": false,
+  "boundary": "campaign evidence for the T7 marker at executor tier claude-haiku-4-5-20251001; discharges NO marker, no threshold/rubric change, no observation dropped, no 19th observation, no rerun, no reserve use, no smoke/other-marker evidence mixed into the T7 denominator. The three-fixture unit executed as one boundary: T7S1a's direction never controlled T7S1b's execution, T7S1b's never controlled T7S2's (all 18 completed 17:35:29Z-17:38:49Z before any grading). S1a/S1b frozen separation preserved throughout. Planned scored campaign execution TERMINATED at slot 78: planned remaining 0, reserve 18 untouched, total 92/110.",
+  "uncertainty_carried": "sealed \u00a7I: 0-tool single-turn measures STATED decisions; binds to haiku tier + these three fixtures; single hypothesis-aware adjudicator (the slot-63/65 UNGRADABLE calls apply the same sealed ambiguity rule the owner ruled on for T5-narrative slot-46 \u2014 PASS-not-established with FAIL-untriggered is graded UNGRADABLE, never discretionarily resolved \u2014 and are flagged for the dual pre-land recomputation); procedural not true blinding; \u00a7I.3 \u2014 the fixture author maintained/folded T7's clause (mitigated by three-lens STAGE-1+2 review and verbatim freezing); the \u00acCLEAN INCONCLUSIVE bounds what this unit can show at this tier \u2014 it does not evidence that the doctrine clause is unnecessary, and the T7S1a ruled-arm 3/3 vs bare 0/3 contrast is recorded descriptively only."
+}
