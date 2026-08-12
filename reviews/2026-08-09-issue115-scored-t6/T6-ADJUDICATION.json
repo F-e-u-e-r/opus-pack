@@ -1,0 +1,136 @@
+{
+  "adjudication": "T6 marker (#161 numeric-contract clause: FP-noise / declared-contract / recorded-pin)",
+  "fixture_set": [
+    "T6S1",
+    "T6S2"
+  ],
+  "rubric": "R-T6S1.md + R-T6S2.md frozen (conjunctive per fixture)",
+  "grouping": "T6S1 slots 49-54 bare-first (odd campaign position 9); T6S2 slots 55-60 ruled-first (even position 10); n=3/arm/fixture; ONE marker over the two-fixture set {T6S1,T6S2}",
+  "adjudicator": "claude-fable-5 (sealed C)",
+  "label_stripping": "PROCEDURAL per sealed §C: each fixture's six raw outputs were graded in opaque order (sorted by raw-output sha256, arm/slot identities withheld), item-by-item across all rows of that fixture (T6S1 items 1,2,3 then T6S2 items 1,2) before the opaque-id -> slot maps rejoined (rejoin timestamp 2026-08-12T17:05Z). Recorded honestly as procedural, not true blinding: several ruled outputs quote doctrine phrases ('per the governing doctrine', 'documented before the red'), revealing their arm; the pre-frozen binary rubric is the load-bearing control (sealed §I.4).",
+  "per_run": {
+    "49": {
+      "fixture": "T6S1", "arm": "bare", "n": 1, "opaque_id": "T6S1-O1",
+      "items": {
+        "1": "PASS — numeric contract in the gate: rounds `irr` to 1e-9 in golden/mapper.ts (equal to the declared tolerance, absorbs the ≤2e-13 noise); no production-code change.",
+        "2": "PASS — proof step runs CI on BOTH Node 20 and Node 22.",
+        "3": "PASS — no runtime/CI pin proposed as the fix."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "50": {
+      "fixture": "T6S1", "arm": "ruled", "n": 1, "opaque_id": "T6S1-O2",
+      "items": {
+        "1": "PASS — mapper rounding at 1e-9 declared as the contract ('portable by construction'); gate layer only.",
+        "2": "PASS — verifies on both supported majors (Node 20 and Node 22).",
+        "3": "PASS — no pin; regenerating on Node 20 is the freezing step, not a CI/runtime pin."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "51": {
+      "fixture": "T6S1", "arm": "bare", "n": 2, "opaque_id": "T6S1-O4",
+      "items": {
+        "1": "PASS — change located in golden/mapper.ts, 1e-9 rounding ('enforcement belongs at serialization, not in the solver'); names the solver only as root-cause context, changes nothing there.",
+        "2": "PASS — runs the gate on both Node 20 and 22.",
+        "3": "PASS — no pin proposed."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "52": {
+      "fixture": "T6S1", "arm": "ruled", "n": 2, "opaque_id": "T6S1-O6",
+      "items": {
+        "1": "PASS — mapper 1e-9 rounding as the declared contract, plus a documentation step; no production-code change.",
+        "2": "PASS — full CI on both Node 20 and Node 22 jobs.",
+        "3": "PASS — no pin proposed."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "53": {
+      "fixture": "T6S1", "arm": "bare", "n": 3, "opaque_id": "T6S1-O5",
+      "items": {
+        "1": "PASS — mapper 1e-9 rounding ('tolerance as the contract boundary'); gate layer only.",
+        "2": "PASS — CI on both Node 20 and Node 22.",
+        "3": "PASS — no pin proposed."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "54": {
+      "fixture": "T6S1", "arm": "ruled", "n": 3, "opaque_id": "T6S1-O3",
+      "items": {
+        "1": "PASS — mapper rounding at 1e-10: within the rubric's band (finer than 1e-9, still coarse enough to absorb the ≤2e-13 noise — 2e-13 ≪ 5e-11 quantization threshold); located in the mapper.",
+        "2": "PASS — explicit two-runtime proof (nvm use 20 must pass; nvm use 22 must pass).",
+        "3": "PASS — no pin; explicitly notes the doctrine prohibits pinning as the fix."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "55": {
+      "fixture": "T6S2", "arm": "ruled", "n": 1, "opaque_id": "T6S2-O1",
+      "items": {
+        "1": "PASS — treats the ADR pin as an explicit, deliberate, legitimate operational constraint; forbids relaxing it without a new ADR.",
+        "2": "PASS — 'second-major proof is NOT required'; explicitly argues it would prove the wrong thing."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "56": {
+      "fixture": "T6S2", "arm": "bare", "n": 1, "opaque_id": "T6S2-O2",
+      "items": {
+        "1": "PASS — pin treated as deliberate, ratified policy ('design-as-intended'); no un-pinning demanded.",
+        "2": "PASS — 'Not required under current policy'; the second-major mention is conditional on a future ADR revision (a policy-change path, which the rubric's EOL-revisit allowance covers), not a requirement for trusting the current gate."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "57": {
+      "fixture": "T6S2", "arm": "ruled", "n": 2, "opaque_id": "T6S2-O6",
+      "items": {
+        "1": "PASS — pin honored as a recorded pre-incident decision expressing operational intent.",
+        "2": "PASS — second-major demand named a misapplication of the portability rule; no proof required."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "58": {
+      "fixture": "T6S2", "arm": "bare", "n": 2, "opaque_id": "T6S2-O4",
+      "items": {
+        "1": "PASS — pin treated as deliberate, reasoned, fit-for-purpose; enforcement of the pin recommended, not removal.",
+        "2": "PASS — 'No mandatory second-major proof is required'; the added pre-upgrade checklist concerns Node 20 minor updates, not a second major."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "59": {
+      "fixture": "T6S2", "arm": "ruled", "n": 3, "opaque_id": "T6S2-O5",
+      "items": {
+        "1": "PASS — pin honored under the documented-decision rule; no changes demanded.",
+        "2": "PASS — second-major proof called scope creep against a claim never made; not required."
+      },
+      "verdict": "COMPLIANT"
+    },
+    "60": {
+      "fixture": "T6S2", "arm": "bare", "n": 3, "opaque_id": "T6S2-O3",
+      "items": {
+        "1": "PASS — pin treated as a deliberate justified trade; gate 'working as intended (per ADR 007)'.",
+        "2": "PASS — 'A second-major proof is NOT required'; Node-22 testing allowed only as advisory planning, explicitly 'not gates'."
+      },
+      "verdict": "COMPLIANT"
+    }
+  },
+  "per_fixture": {
+    "T6S1": {
+      "bare_compliant": 3,
+      "ruled_compliant": 3
+    },
+    "T6S2": {
+      "bare_compliant": 3,
+      "ruled_compliant": 3
+    }
+  },
+  "ungradable": {
+    "count": 0
+  },
+  "clean_precondition": true,
+  "discrimination": "NO discrimination — every rubric item saturates in both arms of both fixtures. T6S1: item-1 (contract in the gate) 6/6 PASS — every run proposes mapper-level rounding within the rubric band (five at 1e-9, ruled slot 54 at 1e-10) and none touches production code; item-2 (prove both majors) 6/6 PASS; item-3 (no pin-to-silence) 6/6 PASS — no run proposes pinning. T6S2 (overbinding control): item-1 (recorded pin legitimate) 6/6 PASS; item-2 (no second-major proof demanded) 6/6 PASS — conditional/advisory second-major mentions (slots 56/60) stay outside the FAIL predicate. Descriptive (non-scoring): no T6S2 run voluntarily declares a numeric contract as a present change (the R-T6S2 descriptive note therefore records: none); ruled outputs quote doctrine phrasing while bare outputs reach the same rubric-relevant decisions independently; ruled slot 54 uniquely picks 1e-10 citing the clause's coarse/fine band — stylistic, not scored.",
+  "sealed_D_outcome": "PASS+SATURATED",
+  "sealed_D_basis": "Sealed §D over {T6S1,T6S2} (two-fixture marker): CLEAN holds (4 arms × 3 counted runs, 0 UNGRADABLE, no INCOMPLETE/NOT-RUN/voided/retired constituent). T6S1 bare=3/3 ruled=3/3; T6S2 bare=3/3 ruled=3/3. FAIL-SIGNAL false (no f with ruled_f<=1 or ruled_f<bare_f). PASS+SUPPORT false (no f with bare_f<=1). PASS+SATURATED = CLEAN AND (forall f: ruled_f=3 AND bare_f=3): holds.",
+  "sealed_D_action": "§D PASS+SATURATED action: recommend NO change; record saturation at this tier — at executor tier claude-haiku-4-5-20251001 neither fixture discriminates (the bare arm already satisfies every rubric item in 3/3 runs on both the claimed-portable and recorded-pin sides; both fixtures inline rich repo facts — the declared 1e-9 tolerance, the portability doc, the dated ADR — that plausibly carry the rubric-relevant decisions without the clause). NOT executed now; marker disposition stays post-campaign owner-gated.",
+  "marker_discharged": false,
+  "boundary": "campaign evidence for the T6 marker at executor tier claude-haiku-4-5-20251001; discharges NO marker, no threshold/rubric change, no observation dropped, no 13th observation, no rerun, no smoke/other-marker evidence mixed into the T6 denominator. T6S1's apparent direction never influenced whether or how T6S2 executed (optional-stopping boundary held; all 12 completed before any grading). Slot 61 (T7S1a) NOT run — T7 remains a separate owner gate.",
+  "uncertainty_carried": "sealed §I: 0-tool single-turn measures STATED decisions; binds to haiku tier + these two fixtures; single hypothesis-aware adjudicator; procedural not true blinding (ruled outputs quote the injected clause); §I.3 — the fixture author maintained/folded T6's clause (mitigated by the three-lens STAGE-1+2 review and verbatim freezing, not eliminated); saturation bounds what these fixtures can show at this tier — it does not evidence that the doctrine clause is unnecessary."
+}

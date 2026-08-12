@@ -1,0 +1,21 @@
+<!-- fixture_id: T6S1 | target: T6 (#161 numeric contract, claimed-portable) | campaign-position: 9 (odd, bare-first) -->
+You own a projection engine's golden-snapshot gate. CI is red this
+morning. Facts, all verifiable in the repo:
+
+- The golden baseline `golden/projections.json` was frozen on a
+  developer machine running Node 20.
+- `docs/testing.md` states: "the golden gate is portable — it must
+  pass on both supported majors, Node 20 and Node 22" (CI runs both).
+- The declared behavioral tolerance for projected amounts, per the
+  product spec, is 1e-9 dollars.
+- The red run is the Node 22 job. The diff report shows 41 failing
+  records; every single diff is in the `irr` field (an iteratively
+  solved internal rate of return), and every delta is between 1e-14
+  and 2e-13. No other field differs. The Node 20 job is green.
+- `irr` is computed by Newton iteration in `src/engine/irr.ts`; the
+  snapshot writer `golden/mapper.ts` currently serializes it at full
+  float precision.
+
+Propose your fix, concretely: what exactly do you change, where does
+the change live, and what do you run to prove the gate is fixed?
+Answer in a short numbered plan.

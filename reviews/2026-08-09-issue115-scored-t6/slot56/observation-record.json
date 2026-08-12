@@ -1,0 +1,12 @@
+{
+  "observation": "slot-56",
+  "fixture": "T6S2",
+  "marker": "T6",
+  "arm": "bare",
+  "n_index": 1,
+  "validity": "VALID-SCORED",
+  "raw_output_sha256": "4dd2626865724f4e8eb31b2b91703283bd49e2eba04392c01b6350928c911a4e",
+  "api_message_id": "msg_011CdyCh9W1rjikbDvkb27WL",
+  "rubric": "R-T6S2.md (frozen)",
+  "per_item_verdicts": "PENDING-ADJUDICATION (deferred until all 12 T6 original observations complete, per owner grant)"
+}

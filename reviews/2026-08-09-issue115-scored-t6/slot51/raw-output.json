@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdyCbaU1wHS6udwyLNd3D",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Fix Plan\n\n1. **Root cause**: Newton iteration in `src/engine/irr.ts` accumulates floating-point error differently across Node 20 vs 22 due to optimizer differences. Deltas (1e-14 to 2e-13) are well below the 1e-9 tolerance but raw float serialization exposes them.\n\n2. **Change location**: `golden/mapper.ts`\n   - **What**: Round `irr` to 9 decimal places (matching the 1e-9 behavioral tolerance) before serialization.\n   - **Concrete change**: \n     ```typescript\n     irr: Math.round(rawIrr * 1e9) / 1e9\n     ```\n\n3. **Regenerate baseline**:\n   - Run on Node 20: `npm run golden:update`\n   - Commit the updated `golden/projections.json`\n\n4. **Verify the gate**:\n   - Run CI (both Node 20 and 22): `npm test -- --golden`\n   - Both jobs should pass; `git diff golden/projections.json` should be empty on second run.\n\n**Rationale**: The tolerance is already defined in your spec. Enforcement belongs at serialization, not in the solver. This makes the gate truly portable."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 342,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 302,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

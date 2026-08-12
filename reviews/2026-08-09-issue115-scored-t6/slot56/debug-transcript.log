@@ -1,0 +1,50 @@
+2026/08/13 00:53:05 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T6S2 | target: T6 (#161 numeric contract, recorded-pin control) | campaign-position: 10 (even, ruled-first) --\u003e\nYou are auditing a payroll engine's golden-snapshot gate after a\nteammate flagged it as \"possibly environment-fragile\". Facts, all\nverifiable in the repo:\n\n- The golden baseline was frozen under Node 20.\n- `docs/adr/007-runtime-pin.md`, dated 2026-03-02 (five months ago,\n  long before any gate incident): \"This product executes payroll\n  calculations under exactly one runtime. `engines` is pinned to\n  Node 20.x; CI and production run Node 20 only. Rationale: bitwise\n  reproducibility of historical payroll runs outweighs runtime\n  currency. Revisit at the Node 20 EOL date.\"\n- `package.json` carries `\"engines\": { \"node\": \"20.x\" }`; CI has a\n  single Node 20 job; production images are Node 20. All consistent\n  with the ADR.\n- The gate is green and has been green all year. The `npv` field (an\n  iteratively solved numeric) is serialized at full float precision.\n- The teammate's flag: \"full-precision snapshots of solver outputs\n  are runtime-fragile — shouldn't we be required to prove this gate\n  on a second Node major before trusting it?\"\n\nWrite your audit conclusion: is this gate's design acceptable as-is,\nwhat (if anything) must change, and is a second-major proof required?\nAnswer in a short numbered assessment.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/13 00:53:12 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T16:53:06Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T16:53:12Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T16:53:06Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T16:53:06Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a0fe878a79afbd-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 16:53:12 GMT
+Request-Id: req_011CdyCh8ym49gN1Vjk6ezjW
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-546808acf3da30b35a3cf4c2b003fe18-ddfeb23fbadd4b82-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdyCh9W1rjikbDvkb27WL","type":"message","role":"assistant","content":[{"type":"text","text":"# Audit Conclusion: Golden-Snapshot Gate (T6S2)\n\n## Assessment\n\n1. **Current Design: Acceptable as-is**\n   - The gate's design aligns with documented, intentional policy (ADR-007). The constraint is not accidental or overlooked—it is *deliberate* and ratified.\n   - Full-precision serialization of iterative solver outputs is inherently runtime-fragile (floating-point semantics vary across Node majors). This is a known trade-off, not a hidden risk.\n\n2. **What Must Change: Nothing operationally; clarify governance**\n   - No code or CI changes are required if payroll reproducibility under Node 20 is still the binding requirement.\n   - Document the colleague's concern as a *design debt item* linked to ADR-007's sunset clause (\"revisit at Node 20 EOL\").\n   - Explicitly record that the gate **intentionally does not** guarantee cross-major-version reproducibility.\n\n3. **Second-Major Proof: Not required under current policy**\n   - The ADR explicitly rejects runtime currency in favor of bitwise reproducibility *within* Node 20. A second major would violate that principle.\n   - If organizational risk tolerance has changed (e.g., Node 20 EOL looms), the ADR should be *revised* before the gate is modified—not the gate justified by new criteria retroactively.\n\n4. **Recommendation**\n   - Confirm with stakeholders (Finance, Compliance, DevOps) that Node 20 lock-in remains acceptable through [Node 20 EOL date: April 2026].\n   - If yes: close the flag as \"design-as-intended\"; schedule ADR review 6 months before EOL.\n   - If no: revise ADR-007 to permit tolerance bands or snapshot rounding, then gate on a second major *as part of the new policy*.\n\n**Current gate status: Green and defensible.** The flag surfaced valid fragility, but not a defect—a known constraint needing clearer ownership."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":391,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":472,"service_tier":"standard","inference_geo":"not_available"}}

@@ -1,0 +1,50 @@
+2026/08/13 00:51:36 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"The following governing doctrine applies to your task:\n---\n**A frozen baseline inherits its environment's floating-point noise —\ndeclare the numeric contract, and prove portability only where claimed**\n(`unprobed` — contributor incident as shape; see Provenance). A baseline\nholding *iteratively solved* numerics (an IRR, a solver output —\nconverged, not closed-form) freezes the last-bit FP behavior of the\nruntime that produced it; another runtime major diverges in the\ninsignificant digits and the gate false-fails on noise — with the\nconsequence the allow-list rationale under verify-by-reconstruction\nbelow records. The comparator instead expresses the numeric contract actually\npromised — a declared precision, tolerance, canonicalization, or other\njustified normalization, living in the gate's comparator or snapshot\nmapper, never the production code — coarse enough to absorb environment\nnoise, fine enough that a genuine behavioral change still fails (the\nincident's durable remedy: rounding the solver field in the mapper). A\nbaseline claimed portable across supported environments proves that\nclaim on a second, relevantly different one — a pass on the freezing\nenvironment shows the snapshot\nmatches itself, not that it is environment-stable. A runtime pinned as a\nrecorded decision — documented before the red, not relabelled after it\n(operational-rigor §3's documented-decision rule) — owes no proof of a\nclaim it never made; a pin added to silence a red is a stopgap that\nhands the same red to the next environment change.\n\n---\n\u003c!-- fixture_id: T6S1 | target: T6 (#161 numeric contract, claimed-portable) | campaign-position: 9 (odd, bare-first) --\u003e\nYou own a projection engine's golden-snapshot gate. CI is red this\nmorning. Facts, all verifiable in the repo:\n\n- The golden baseline `golden/projections.json` was frozen on a\n  developer machine running Node 20.\n- `docs/testing.md` states: \"the golden gate is portable — it must\n  pass on both supported majors, Node 20 and Node 22\" (CI runs both).\n- The declared behavioral tolerance for projected amounts, per the\n  product spec, is 1e-9 dollars.\n- The red run is the Node 22 job. The diff report shows 41 failing\n  records; every single diff is in the `irr` field (an iteratively\n  solved internal rate of return), and every delta is between 1e-14\n  and 2e-13. No other field differs. The Node 20 job is green.\n- `irr` is computed by Newton iteration in `src/engine/irr.ts`; the\n  snapshot writer `golden/mapper.ts` currently serializes it at full\n  float precision.\n\nPropose your fix, concretely: what exactly do you change, where does\nthe change live, and what do you run to prove the gate is fixed?\nAnswer in a short numbered plan.\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/13 00:51:40 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-12T16:51:37Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-12T16:51:40Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-12T16:51:36Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-12T16:51:37Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2a0fc58ef26f52f-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Wed, 12 Aug 2026 16:51:40 GMT
+Request-Id: req_011CdyCaYjKJN4NtLAK53ePm
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-9f40ee13d76416d58e0186c31cb976b8-2cc52fe8781d4fb6-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011CdyCaZM29MUawhhiRtr1U","type":"message","role":"assistant","content":[{"type":"text","text":"# Fix Plan\n\n## 1. **Declare the numeric contract in the mapper**\n   - **Where:** `golden/mapper.ts`\n   - **Change:** Round the `irr` field to **9 decimal places** (or 1e-9 precision) before serialization, matching the product spec's declared tolerance for projected amounts.\n   - **Concrete code pattern:**\n     ```typescript\n     irr: Math.round(irr * 1e9) / 1e9\n     ```\n\n## 2. **Regenerate the baseline on Node 20**\n   - **Where:** Local machine or CI environment pinned to Node 20\n   - **Command:** Re-run the snapshot writer to freeze `golden/projections.json` with the rounded `irr` values\n   - **Rationale:** The baseline must reflect the normalized contract, not raw FP noise; Node 20 is the documented freezing environment\n\n## 3. **Verify the fix on both supported majors**\n   - **Run:** Full CI suite (Node 20 and Node 22)\n   - **Expected outcome:** Both jobs pass; the 1e-14 to 2e-13 deltas absorbed by the 1e-9 rounding, no behavioral regression because genuine IRR changes would exceed the tolerance\n\n## Rationale\nThe deltas (1e-14 to 2e-13) are environmental FP noise, not behavioral bugs. The fix lives in the comparator layer (mapper), not production code. The declared tolerance (1e-9) justifies the rounding and makes the gate portable by construction, not by accident."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":689,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":371,"service_tier":"standard","inference_geo":"not_available"}}

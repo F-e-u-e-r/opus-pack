@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdyCe8rUuEGVhGypLpTJ4",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Fix Plan\n\n## 1. **Declare the numeric contract in `golden/mapper.ts`**\n   Modify the `irr` field serializer to round to **1e-10 dollars** (one order of magnitude tighter than the stated 1e-9 tolerance, per the doctrine: \"coarse enough to absorb environment noise, fine enough that genuine behavioral change still fails\").\n   \n   ```typescript\n   // In golden/mapper.ts, irr serialization:\n   irr: Math.round(record.irr * 1e10) / 1e10\n   ```\n\n## 2. **Regenerate the baseline on Node 20**\n   ```bash\n   nvm use 20\n   npm test -- --update-golden\n   ```\n   Commit the updated `golden/projections.json` with a message documenting the decision: \"Round IRR to 1e-10 in golden mapper to absorb cross-runtime FP noise while preserving genuine behavioral divergence (tolerance: 1e-9).\"\n\n## 3. **Verify the fix on both runtimes**\n   ```bash\n   nvm use 20 && npm test -- --golden    # must pass (baseline matches itself)\n   nvm use 22 && npm test -- --golden    # must pass (deltas < 1e-10 absorbed)\n   ```\n\n## Why this works\n- The doctrine prohibits pinning the runtime; instead, the **comparator** (mapper) expresses the actual promised precision.\n- The 1e-14–2e-13 deltas are FP noise from Newton iteration across Node versions, not genuine divergence in the projection algorithm.\n- Rounding at 1e-10 absorbs that noise while keeping 1e-9 tolerance meaningful for real bugs.\n- Regenerating on Node 20 proves the baseline is self-consistent; passing on Node 22 proves the contract is portable as claimed."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 689,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 446,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
