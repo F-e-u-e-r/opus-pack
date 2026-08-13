@@ -1,0 +1,29 @@
+{
+  "receipt_type": "campaign-start",
+  "campaign": "issue115-t2probe-v1 (PR #189, merged da9fda4883ccdce358e1dc4643d372698f9f9973)",
+  "authorization_scope": "PREFIX ONLY: 1 identity dry-run (slot 0) + P1 smoke (S1) + P2 smoke (S2) per frozen SLOT-TABLE; all 36 scored slots remain LOCKED; no retry authorized; first-exception-stop; budget accepted 39 planned / 50 hard cap as a NEW envelope — the 11 unallocated headroom is not free reserve and is not usable under this grant; old issue115-stage2-v1 reserve 18 stays locked and untouched",
+  "identity_binding": "executor = claude-haiku-4-5 (prereg §11 proposed binding, exact dated instance claude-haiku-4-5-20251001 required at dry-run); transport ant CLI user_oauth; 0 tools; single turn; platform-default sampling; any resolved-identity mismatch => 0 further invocations / HOLD",
+  "semantics_lock": "T2 intended meaning = STRICTLY-ORDINAL (settled, #188); this campaign probes transmission/reliability of current guidance only; no substantive T2 inference from dry-run or smoke outputs",
+  "unit_start_gate": {
+    "timestamp_utc": "2026-08-13T08:57Z (pre-invocation)",
+    "main_head": "da9fda4883ccdce358e1dc4643d372698f9f9973 (EXACT match to required anchor)",
+    "working_tree": "clean",
+    "static_checks": "39/39 ALL PASS (byte anchors, forbidden-token + cue scans, doctrine blob pin 896f7478172ae2c8f6c9d5bb6f54c2f2976beff6, manifest recompute, smoke item-5 satisfiability, cited-hash re-derivation)",
+    "slot_table_prefix_structure": "exactly slot 0 DRY-RUN + S1 SMOKE P1 + S2 SMOKE P2 (1+2, matches grant); 36 SCORED slots present and untouched",
+    "prefix_digests_fresh_match": {
+      "slot0": "no digest (identity probe; no fixture prompt) per frozen SLOT-TABLE",
+      "S1_expected": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade == sha256(fixtures/P1.md) fresh-recomputed",
+      "S2_expected": "3a5f4c271d300b42f13d8449acc46c3e4d1146ae6baf678169aca50c3d5bd2d1 == sha256(fixtures/P2.md) fresh-recomputed"
+    },
+    "P1xC_sealed_anchor": "rendered C-arm hash 63d7abec32c7ef2e1e362951b7d5821cc0edbbec898822d6d2061b662e18851f == sealed ruled T2S2 rendered digest (fresh cross-check vs sealed SLOT-TABLE)",
+    "history_untouched": "#188 record blob and #187 record blob byte-identical b68a4fb->HEAD; doctrine blob 896f7478 EXACT at HEAD; merge delta was 22 additions only",
+    "issue_115": "OPEN (authenticated API at gate time)",
+    "amendment_repair_state": "none (no OWNER-APPROVAL.json, no fixture v2, no amendment records)",
+    "accounting_at_start": {"dry_run": 0, "smoke": 0, "scored": 0, "total_used": "0/50", "planned_remaining": 39, "headroom_unallocated": 11, "old_reserve": "18 untouched"},
+    "runner_health": "ant CLI 1.22.1 present; auth profile default, credentials type oauth_token (user_oauth); --debug wire capture available; --message format mechanically confirmed via zero-request preflight (malformed-YAML local parse error, exit 1, zero 'Request Content' lines in debug output — no request sent; preflight artifacts retained in session scratchpad)",
+    "verdict": "ALL PASS — first invocation authorized under this grant"
+  },
+  "dry_run_prompt_sha256": "d8adb66f9915732364edb6bad6a36db633ed580ae32a4edfa75d17ae3c1801e2 (byte-identical to sealed issue115-stage2-v1 dry-run prompt)",
+  "manifest_sha256_of_MANIFEST_json": "as recorded in MANIFEST.sha256 at HEAD; package identities verified by static_checks recompute",
+  "first_exception_stop": "any sealed operational exception within the 3-slot prefix halts all further invocations under this grant; CLI/local flag errors proceed only with mechanical zero-request proof (slot-7 precedent), else HOLD"
+}
