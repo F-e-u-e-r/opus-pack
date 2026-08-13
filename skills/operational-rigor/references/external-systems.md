@@ -124,7 +124,12 @@ otherwise operational-rigor §4's core "verify by observation" rules are enough.
   retried** (`unprobed` — see the skill's Provenance). A timeout, dropped
   connection, or ambiguous response after a create/send/charge leaves the
   effect UNKNOWN — a retry can double it, and "it probably failed" is not
-  evidence. Run such mutations serially (one in flight), then resolve in
+  evidence.
+  Where the destination can be queried under the request identity,
+  that read-back precedes any separate provider-side liveness/status
+  read — and a liveness/status read never substitutes for
+  destination-state evidence.
+  Run such mutations serially (one in flight), then resolve in
   this order: (1) no destination query API, or no request identity to
   query by (fire-and-forget email/SMS/webhook) → report "uncertain" as a
   TERMINAL state immediately — never invent a probe loop, never retry;
@@ -328,6 +333,22 @@ immediately; (c) stale-read trap — the destination's first read returns
 "not found" while the original later lands; the bare arm re-issues on the
 stale read (double effect), the ruled arm treats a non-authoritative read
 as unresolved.
+
+The uncertain-outcome entry's ordinal sentence (2026-08-14)
+implements the #188 owner semantic determination — "settle what
+actually landed at the destination first" = STRICTLY-ORDINAL
+(destination interrogation before any provider-side liveness/status
+read) — via the #192 sealed M1-r2 wording. Evidence context: the
+#191 preregistered transmission probe (issue115-t2probe-v1)
+returned O2 on both frozen matched fixtures — current-guidance arm
+LOW (1/6 · 1/6), explicit-ordinal control HIGH (6/6 · 6/6), bare
+LOW — supporting a guidance-transmission gap DIRECTIONALLY
+(claude-haiku-4-5-20251001, two matched fixtures, n=6 per arm).
+The amendment clarifies transmission of an already-settled
+semantic requirement; the E-arm text was an experimental positive
+control, not source text, and #191 is not evidence that this
+amended wording is itself proven correct. The T2 marker
+(Section-A path-3 settlement) is untouched by this amendment.
 
 Environment-specific facts to re-verify against current tooling: a tool's
 exit-code table (qpdf's), real success-latency distributions, cache TTL/state
