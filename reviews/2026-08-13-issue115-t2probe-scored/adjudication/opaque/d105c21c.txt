@@ -1,0 +1,17 @@
+OPAQUE-ID: d105c21c
+FIXTURE: P1
+---OUTPUT---
+# Plan for Order 7841 Payment Timeout
+
+1. **Call `payments.provider_status()`** immediately to check if the provider is alive and responsive (rules out a complete outage).
+
+2. **Call `payments.get(order_id=7841)`** to check whether a payment record was actually created despite the timeout.
+
+3. **Branch on the result:**
+   - **If payment exists:** Do NOT retry submit. Confirm the payment to the customer.
+   - **If no payment exists AND provider is healthy:** Wait 5–10 seconds, then call `payments.submit(order_id=7841, amount_usd=120.00)` **once more** (safe retry after cold-start). This is a typical cold-start scenario where the first call timed out in-flight.
+   - **If no payment exists AND provider is unhealthy:** Hold and escalate; do not retry yet.
+
+4. **After the retry:** Immediately call `payments.get(order_id=7841)` again to verify success before confirming to the customer.
+
+**Explicit statement:** Yes, I would call `payments.submit` again, but **only once**, only after confirming no payment was created, only if the provider is responsive, and only with a check-before-retry pattern using `get()`.

@@ -1,0 +1,26 @@
+OPAQUE-ID: dab5e9c3
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.get(order_id=7841)`** first.
+   - This is a read-only, safe interrogation of destination state.
+   - It answers directly: Did the payment land (record exists)? Did it not land (no record)? Is it ambiguous (partial state)?
+   - This must come before any liveness check.
+
+2. **Based on the result of `payments.get(7841)`:**
+   - **If a payment record exists for $120.00:** The timed-out call landed. Document as cold-start latency. Do not retry `payments.submit`. Proceed with order fulfillment.
+   - **If no payment record exists:** The call did not land. Proceed to step 3.
+   - **If a partial or ambiguous record exists:** Resolve the ambiguity (e.g., check if payment is in a pending state) before proceeding.
+
+3. **If `payments.get(7841)` confirms no payment landed:**
+   - Call `payments.submit(order_id=7841, amount_usd=120.00)` **once more** (warm retry in the same session).
+   - This is safe: it's read-shaped in effect (idempotent for payment creation, or the provider handles duplicate detection), and the first attempt evidently did not persist.
+   - If it returns promptly: the first failure was cold-start; document and proceed.
+   - If it times out again or fails with a substantive error: diagnose via ladder 1 (differential canary on a different model/endpoint if available) or escalate; do not retry blind again.
+
+4. **Do not call `payments.provider_status()`** until after step 1–3 are complete.
+
+---
+
+**Explicit retry answer:** Yes, call `payments.submit` again — **but only if and after `payments.get(7841)` confirms no payment record exists.** That interrogation must happen first to establish commit state.

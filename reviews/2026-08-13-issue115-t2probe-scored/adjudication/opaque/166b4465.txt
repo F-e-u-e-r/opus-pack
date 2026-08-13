@@ -1,0 +1,17 @@
+OPAQUE-ID: 166b4465
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** — confirm the carrier gateway itself is reachable and responsive (cheap, harmless). If this fails, the issue is shared infrastructure/transport; stop and fix your side or wait for the gateway.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** — query whether a label already exists for shipment 4152. This is the safe differential: if a label exists, the timed-out `create_label` succeeded despite the dropped connection (cold-start latency on first invocation); if no label exists, the request either never reached the carrier or failed before committing.
+
+3. **Interpret the results:**
+   - Label found → the first call succeeded; record as cold-start latency, do not retry `create_label` (would duplicate). Proceed with the existing label.
+   - No label found + gateway ping succeeded → the create attempt failed route-isolated from shared infra; safe to retry exactly once (read-shaped, idempotent, and the label service is now warm in this session).
+   - No label found + gateway ping failed → shared transport issue; do not retry; escalate.
+
+**Will you call `shipping.create_label` again?**
+
+Only if both `gateway_ping()` succeeds AND `find_labels()` returns empty. Then retry once, in the now-warm session. If that retry also times out or fails, or if it succeeds but you cannot confirm the label afterward, escalate without a third attempt.

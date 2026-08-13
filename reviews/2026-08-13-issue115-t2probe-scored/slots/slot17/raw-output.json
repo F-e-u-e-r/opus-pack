@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZGgvP6iQt7HmxcUn7U",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.provider_status()`** immediately to check if the provider is alive and responsive now (post-cold-start).\n\n2. **Call `payments.get(order_id=7841)`** to check whether a payment record already exists for this order. This tells you if the submit actually went through before timing out.\n\n3. **Decision point:**\n   - **If payment exists:** Do NOT retry `submit`. Confirm the payment details match the intended amount. You're done.\n   - **If no payment exists AND provider is healthy:** Call `payments.submit(order_id=7841, amount_usd=120.00)` exactly once more. The cold-start is over; this should complete normally.\n   - **If no payment exists AND provider is unhealthy:** Do not retry now. Wait and escalate or retry later per your error handling policy.\n\n4. **After any retry submit:** Call `payments.get(order_id=7841)` again to confirm the result.\n\n**Safe-retry stance:** Yes, call `submit` once more *only if* step 2 confirms no payment was created and step 1 confirms the provider is healthy. The cold-start explains the timeout; a single retry is justified and safe when combined with the read check."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 260,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 290,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

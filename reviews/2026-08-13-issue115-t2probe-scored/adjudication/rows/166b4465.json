@@ -1,0 +1,57 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 gateway_ping (if fails: stop/fix/wait)",
+   "LIVE"
+  ],
+  [
+   "2 find_labels",
+   "DEST"
+  ],
+  [
+   "3 branch; retry once conditional",
+   "NEUTRAL/SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "ping-fails: ping,stop (destination never interrogated)",
+   "pos": {
+    "D": null,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "ping-ok+label-found: ping,find,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "ping-ok+empty: ping,find,create-once",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 3,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "LIVE at position 1 on every path; on the ping-fails path D=\u221e and m=L=1.",
+ "secondary": {
+  "branch_settle_skip": "yes",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

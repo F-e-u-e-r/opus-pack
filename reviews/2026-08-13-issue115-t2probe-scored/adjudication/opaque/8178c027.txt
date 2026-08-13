@@ -1,0 +1,15 @@
+OPAQUE-ID: 8178c027
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** immediately to determine if the carrier gateway is currently reachable. This tells me if the service is operational without side effects.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** to query whether a label already exists for this shipment. This is the critical check—if a label exists, the request succeeded despite the dropped connection.
+
+3. **Decide based on results:**
+   - If label exists: Do nothing further. Proceed with shipment 4152.
+   - If no label exists AND gateway is reachable: Call `shipping.create_label(shipment_id=4152, service_tier="express")` once more.
+   - If no label exists AND gateway is unreachable: Wait for gateway recovery, then retry create_label.
+
+**Will I call `create_label` again?** Yes, but only if `find_labels` confirms no label exists for 4152. This avoids the duplicate dispatch risk while handling the ambiguous connection failure.

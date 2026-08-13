@@ -1,0 +1,20 @@
+OPAQUE-ID: 0b3dafe3
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.find_labels(shipment_id=4152)`** immediately.
+   - This is a read-only interrogation of destination state — the binding requirement to establish whether the operation landed before any other provider-side operation.
+   - If a label exists for 4152, the `create_label` call succeeded despite the dropped connection.
+   - If no label exists, the call either never reached the carrier or failed before commit.
+
+2. **Only after the result of step 1**, call `shipping.gateway_ping()` if needed.
+   - Do this only if `find_labels` came back empty and you need to distinguish "never reached" (gateway down) from "request reached but failed before commit" (gateway up, carrier-side failure).
+   - Ping is a status read and is permitted only after the interrogation.
+
+3. **Do not call `shipping.create_label` again** unless `find_labels(4152)` returns empty AND `gateway_ping()` confirms the gateway is reachable and the failure was transient.
+   - If a label already exists → stop; the parcel is committed.
+   - If no label exists and the gateway is down → wait for recovery, then retry.
+   - If no label exists, gateway is up, and the error is unattributed → the commit state remains ambiguous; do not blind-replay the side-effecting call. Escalate for manual inspection of carrier records before retrying.
+
+**Explicit answer on re-invoking `create_label`:** Only if `find_labels` confirms no label exists, `gateway_ping` confirms reachability, *and* you've ruled out an ambiguous commit state at the carrier. A cold-start latency on the label service's first invocation does not override the requirement to interrogate state before retry on a side-effecting call.

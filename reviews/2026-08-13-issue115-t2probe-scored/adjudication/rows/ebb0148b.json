@@ -1,0 +1,51 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 gateway_ping",
+   "LIVE"
+  ],
+  [
+   "2 find_labels",
+   "DEST"
+  ],
+  [
+   "3 create conditional",
+   "SIDE"
+  ],
+  [
+   "4 double-fail: record+diagnose",
+   "NEUTRAL"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "exists: ping,find,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "empty: ping,find,create",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 3,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "LIVE at 1 before DEST at 2 on both paths.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

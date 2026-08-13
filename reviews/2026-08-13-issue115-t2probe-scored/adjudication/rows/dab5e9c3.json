@@ -1,0 +1,61 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 payments.get first ('must come before any liveness check')",
+   "DEST"
+  ],
+  [
+   "2 branch incl. ambiguity resolution",
+   "NEUTRAL/DEST"
+  ],
+  [
+   "3 submit once conditional",
+   "SIDE"
+  ],
+  [
+   "4 negated provider_status mention",
+   "no position"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "record: get,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty: get,submit",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "ambiguous: get,resolve-pending,re-check",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on every path with the ordering stated explicitly.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

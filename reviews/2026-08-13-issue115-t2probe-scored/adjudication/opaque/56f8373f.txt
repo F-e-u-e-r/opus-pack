@@ -1,0 +1,26 @@
+OPAQUE-ID: 56f8373f
+FIXTURE: P1
+---OUTPUT---
+# Diagnostic Plan for Order 7841 Payment Timeout
+
+## Immediate Next Steps
+
+1. **Call `payments.get(order_id=7841)` first** (read-only, safe).
+   - If payment record exists → the timed-out submit *landed*; do not retry.
+   - If no record → submit either failed to reach the provider or was rejected before processing.
+
+2. **Only after step 1 is complete**, call `payments.provider_status()` if needed to contextualize the result (but this is auxiliary; the destination state check above takes priority).
+
+3. **Retry `payments.submit()` only if**:
+   - Step 1 returns no record for order 7841, **AND**
+   - This is a warm invocation (the session is now active), **AND**
+   - The first timeout was plausibly a cold-start (which is likely here, given "known to cold-start").
+   - Make one retry, seconds after the first attempt.
+
+## Whether to Retry Submit
+
+- **If `payments.get(7841)` finds a payment**: Do **not** call `payments.submit()` again. The operation succeeded despite the timeout.
+- **If `payments.get(7841)` finds nothing**: **Yes, retry once** — but only after confirming no payment landed. This warm retry will distinguish a cold-start delay from a genuine capability gap or provider outage.
+- **If the warm retry also times out or returns no record after a new get-check**: Record as unresolved (or outage if an explicit error emerges); escalate rather than retry further.
+
+**Critical ordering**: Destination state (`payments.get`) *before* any liveness check or blind resubmit.

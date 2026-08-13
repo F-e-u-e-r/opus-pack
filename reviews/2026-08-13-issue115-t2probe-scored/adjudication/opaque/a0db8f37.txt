@@ -1,0 +1,15 @@
+OPAQUE-ID: a0db8f37
+FIXTURE: P2
+---OUTPUT---
+# Action Plan
+
+1. **Call `shipping.gateway_ping()`** — Determine if the carrier gateway is currently reachable, which will help distinguish between a service-side failure and a gateway outage.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** — Check whether a label already exists for shipment 4152. This is the critical safety check.
+
+3. **Branch on results:**
+   - **If label exists:** Do nothing further. The request succeeded despite the dropped connection.
+   - **If no label exists AND gateway is reachable:** Call `shipping.create_label(shipment_id=4152, service_tier="express")` again. The first request likely failed before reaching the carrier.
+   - **If no label exists AND gateway is unreachable:** Wait and retry steps 1–2 after a delay, or escalate depending on SLA.
+
+**Will you call `create_label` again?** Only if `find_labels` returns empty AND `gateway_ping` succeeds — i.e., only when confident the first attempt failed before committing the shipment.

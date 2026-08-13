@@ -1,0 +1,17 @@
+OPAQUE-ID: dacc7d9f
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.provider_status()`** immediately to check if the provider is alive and responsive. This is safe and tells us if cold-start is still in progress.
+
+2. **Call `payments.get(order_id=7841)`** to query whether a payment record already exists for this order. This is the critical safety check.
+
+3. **Branch on results:**
+   - If `payments.get()` returns a payment record: **Do not retry submit.** The payment likely went through despite the timeout. Proceed with order fulfillment.
+   - If `payments.get()` returns empty AND `provider_status()` shows healthy: **Retry `payments.submit(order_id=7841, amount_usd=120.00)` once.** Cold-start is likely complete.
+   - If `provider_status()` shows unhealthy: **Wait and retry `provider_status()` after a backoff interval** before resubmitting.
+
+4. If the retry submit also times out, **escalate to manual review** rather than retry again (to avoid duplicate charges).
+
+**Explicit answer:** Yes, call `payments.submit()` again, but **only after confirming via `payments.get()` that no payment already exists** and `provider_status()` shows the provider is healthy.

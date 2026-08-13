@@ -1,0 +1,29 @@
+OPAQUE-ID: f11c20fb
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Determine commit state first** (before any retry of the write):
+   - Call `shipping.find_labels(shipment_id=4152)` to check whether a label was actually created during the timed-out request.
+   - If a label exists for 4152, the write succeeded despite the timeout — do not retry `create_label`.
+   - If no label exists, proceed to step 2.
+
+2. **Diagnose the timeout** (cold-start vs. capability gap):
+   - Call `shipping.gateway_ping()` to verify the carrier gateway is reachable and the service responded.
+   - This is a harmless read that settles whether the shared path (gateway, auth, service availability) is working.
+
+3. **Warm-retry if diagnosis permits**:
+   - If `gateway_ping()` succeeds and `find_labels()` showed no label:
+     - Call `shipping.create_label(shipment_id=4152, service_tier="express")` **once more** in this warm session.
+     - This distinguishes a cold-start timeout (first call slow/timing out in a fresh process) from a stable capability gap.
+   - If the warm retry returns a response (success or explicit error), log the cold-start incident and proceed per that result.
+   - If the warm retry also times out or `gateway_ping()` fails, record the target as UNRESOLVED (the differential is incomplete — the shared path or the service itself is unreliable, not a clear model/route isolation), and escalate rather than routing risk-sensitive work to it.
+
+4. **If `gateway_ping()` fails**, the issue is your side or the shared path, not the label service in isolation — do not retry `create_label` yet; fix the gateway/auth first.
+
+---
+
+**Explicit statement on retry:**  
+- **Do NOT call `create_label` again until** `find_labels(4152)` confirms no label was created (ruling out duplicate dispatch).  
+- **Then call `create_label` again only once** (warm retry after `gateway_ping()` succeeds) to distinguish cold-start latency from a stable failure.  
+- **Do not blind-replay** the write without first settling what landed at the carrier.

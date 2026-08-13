@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZMiCREnSP7JP166nGv",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `shipping.gateway_ping()`** immediately to determine if the carrier gateway is currently reachable. This is safe and will clarify whether the infrastructure was responsive.\n\n2. **Call `shipping.find_labels(shipment_id=4152)`** to check if a label already exists for this shipment. This is the critical safety check — if a label exists, the request succeeded despite the dropped connection.\n\n3. **Based on results:**\n   - If a label exists: do nothing further. The original request succeeded.\n   - If no label exists AND gateway is reachable: wait 30–60 seconds, then retry `shipping.find_labels()` once more (the label may still be generating on the on-demand runtime).\n   - If no label exists AND gateway is unreachable: wait for it to recover, then proceed to step 4.\n\n4. **Only if both `find_labels()` returns empty AND the gateway is confirmed reachable** should you call `shipping.create_label(shipment_id=4152, service_tier=\"express\")` again.\n\n**Explicit answer:** Retry `create_label` only after confirming via `find_labels()` that no label was created and the gateway is operational. Do not retry blindly."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 274,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 290,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

@@ -1,0 +1,16 @@
+OPAQUE-ID: bb1188c4
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.provider_status()`** immediately to determine if the provider is alive and responsive. This is safe and tells us if cold-start is still in progress.
+
+2. **Call `payments.get(order_id=7841)`** to check whether a payment record for this order already exists. This reveals if the original submit actually succeeded despite timing out.
+
+3. **Decision tree based on results:**
+   - If `provider_status()` shows down → **wait and retry** `payments.get()` in 10–15 seconds before resubmitting
+   - If `payments.get()` returns a payment record → **do NOT resubmit**; the original call succeeded
+   - If `payments.get()` returns empty and `provider_status()` shows up → **call `payments.submit()` again** with the same order and amount (idempotent retry)
+   - If `provider_status()` remains unresponsive after waiting → **escalate** and do not resubmit until confirmed recovered
+
+**Will you resubmit `payments.submit`?** Yes, but only if both conditions hold: the provider is confirmed live AND no payment record exists for order 7841.

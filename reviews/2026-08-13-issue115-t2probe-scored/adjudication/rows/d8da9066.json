@@ -1,0 +1,61 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 payments.get ('settle the actual commit state first')",
+   "DEST"
+  ],
+  [
+   "2 record: stop",
+   "NEUTRAL"
+  ],
+  [
+   "3 empty: provider_status",
+   "LIVE"
+  ],
+  [
+   "4 submit once warm",
+   "SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "record: get,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+healthy: get,status,submit",
+   "pos": {
+    "D": 1,
+    "L": 3,
+    "S": 4,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+degraded: get,status,wait",
+   "pos": {
+    "D": 1,
+    "L": 3,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST attempt at position 1 on every path; liveness read only after interrogation.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

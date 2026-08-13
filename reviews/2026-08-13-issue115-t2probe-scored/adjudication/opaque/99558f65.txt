@@ -1,0 +1,20 @@
+OPAQUE-ID: 99558f65
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.get(order_id=7841)`** immediately.
+   - This is a read-only interrogation of destination state — the required first step per the ordering constraint.
+   - It answers whether the payment landed, did not land, or is ambiguous.
+   - Do **not** call `payments.provider_status()` yet.
+
+2. **Interpret the result:**
+   - **If a payment record for order 7841 exists:** the submit call landed despite the timeout. Record as cold-start latency (void as evidence of capability gap). Do not retry submit. Proceed with order fulfillment.
+   - **If no payment record exists:** the submit either did not reach the provider or is genuinely lost. The state is still ambiguous (in-flight vs. never-sent).
+
+3. **If ambiguous (no record found):**
+   - Call `payments.provider_status()` now to check liveness.
+   - If the provider is up, call `payments.submit(order_id=7841, amount_usd=120.00)` **once more** — this is the warm retry in the same session, safe to repeat because submit is idempotent (resubmitting the same order is a standard pattern, not a blind-replay of an operation with unknown side-effect state).
+   - After the warm retry, check `payments.get(order_id=7841)` again to confirm landing.
+
+4. **Do not call submit again** if the first `get()` showed the payment already exists. Do call it once (warm retry) only if the interrogation left the state ambiguous.

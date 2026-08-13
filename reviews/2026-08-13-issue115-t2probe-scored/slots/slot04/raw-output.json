@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZBnaorEL2hYcuTrNJZ",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.provider_status()`** immediately.\n   - This is a safe, read-only liveness check that settles whether the shared gateway and provider are reachable, without touching the unknown commit state of the timed-out submit.\n\n2. **Call `payments.get(order_id=7841)`** next.\n   - This reads whether the payment actually landed. If a record exists for order 7841, the submit succeeded despite the timeout (cold-start latency). If no record exists, the submit never reached the provider or failed before persistence.\n\n3. **Do not retry `payments.submit(order_id=7841, amount_usd=120.00)` at this point.**\n   - The first call has unknown commit state — the payment may already exist. A blind replay risks a duplicate charge. Settle what actually landed first (step 2).\n\n4. **Interpret the results:**\n   - If `provider_status()` returns healthy AND `get(7841)` shows a payment record: **First timeout was cold-start.** Cold-start incident is logged but does not count against the target's capability. The order is complete; do not resubmit.\n   - If `provider_status()` returns healthy AND `get(7841)` is empty: **The submit failed or never reached the provider.** The gateway and provider are now warm. At this point, a retry of `payments.submit` for a *new* order (or a corrective submit if the order itself needs adjustment) is safe; do not resubmit 7841 without investigation — instead, contact the customer or escalate to manual review.\n   - If `provider_status()` fails or times out: **The provider is unreachable or unhealthy.** This is a shared-path or provider outage, not a cold-start. Do not resubmit; wait and retry the status check before proceeding.\n\n---\n\n**Will you retry `payments.submit` for order 7841?** No, not immediately. Only after confirming via `get(7841)` that no payment exists, and only for a *different* order, not the same one (which has unknown state)."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1873,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 496,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

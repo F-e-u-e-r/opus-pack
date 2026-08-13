@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZFZT9TYjoqDYA98gvk",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.get(order_id=7841)`** immediately.\n   - This is a read-only interrogation of destination state — it establishes whether the payment actually landed, did not land, or is ambiguous.\n   - Do this **before** any liveness or status check.\n\n2. **Interpret the result:**\n   - If `get()` returns a payment record for $120.00: the submit landed despite the timeout. Record as cold-start latency. Do not retry submit.\n   - If `get()` returns no payment record: the submit did not land. Proceed to step 3.\n   - If `get()` itself times out or errors: state is ambiguous. Do not retry submit (blind replay of a write with unknown commit state violates the ordering rule). Escalate or wait before retrying.\n\n3. **If the payment did NOT land (step 2 returns empty):**\n   - Call `payments.submit(order_id=7841, amount_usd=120.00)` again **once more in this session** (warm retry).\n   - If it succeeds promptly: the first failure was cold-start. Proceed normally.\n   - If it times out or fails again: diagnose as a stable capability gap or outage using the single-endpoint differential ladder (confirm the key/gateway with a cheap call, test a different operation on the same endpoint if available).\n\n**Explicit statement on retry:**\n- Do **not** call `submit` again until `get(7841)` has returned and confirmed the first call did not land.\n- Call `submit` at most once more (warm) if and only if `get()` shows no payment record."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1964,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 387,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

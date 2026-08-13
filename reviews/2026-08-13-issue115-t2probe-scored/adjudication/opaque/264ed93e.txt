@@ -1,0 +1,19 @@
+OPAQUE-ID: 264ed93e
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** to verify the carrier gateway itself is reachable and responsive (cheap auxiliary check of the shared path).
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** to check whether a label already exists for this shipment. This is the key diagnostic read:
+   - If a label exists → the `create_label` call succeeded despite the dropped connection; do not retry.
+   - If no label exists → the call either never reached the gateway or failed before commit; safe to retry.
+
+3. **Do not retry `shipping.create_label` immediately.** The timeout on a fresh session is consistent with cold-start latency (on-demand runtime spin-up), not a capability gap. However, **the commit state is unknown** — a blind replay risks duplicate dispatch if the label was created server-side. The `find_labels` read settles this first.
+
+4. **Only after `find_labels` returns empty** (confirming no label was created), invoke `shipping.create_label(shipment_id=4152, service_tier="express")` again in the now-warm session.
+
+---
+
+**Retry `create_label`?** 
+Yes, but **only after** `find_labels` confirms no label exists. If `find_labels` shows a label already created, do not retry — treat the original timeout as a successful cold start with a dropped acknowledgement.

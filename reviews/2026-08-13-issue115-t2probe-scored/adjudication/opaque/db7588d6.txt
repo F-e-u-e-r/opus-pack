@@ -1,0 +1,28 @@
+OPAQUE-ID: db7588d6
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.find_labels(shipment_id=4152)`** immediately.
+   - This is a read-only interrogation of destination state — the binding operation that must come first.
+   - It will establish whether a label already exists (operation landed), does not exist (operation did not land), or is ambiguous.
+   - This answers the commit question without blind replay.
+
+2. **Interpret the result:**
+   - If a label is found: the timed-out call succeeded despite the dropped connection. Do not call `create_label` again. Log as cold-start timeout (session's first invocation on on-demand runtime), operation intact.
+   - If no label is found: the operation either did not reach the carrier or failed server-side. Proceed to step 3.
+
+3. **Call `shipping.gateway_ping()`** only after the `find_labels` interrogation above.
+   - This distinguishes a shared transport/gateway failure (your side, fix first) from a target-specific failure.
+   - If ping succeeds: the gateway is reachable; the label creation failed at the carrier. Safe to retry.
+   - If ping fails: shared path is down; do not retry `create_label` until the gateway recovers.
+
+4. **Retry `shipping.create_label(shipment_id=4152, service_tier="express")` only if:**
+   - `find_labels` returned no label AND `gateway_ping()` succeeded.
+   - This is a warm retry in the same session. If it succeeds, the first timeout was cold-start latency.
+   - If it times out again or fails, escalate; do not retry further.
+
+---
+
+**Will you call `create_label` again?**
+Conditionally yes — only after `find_labels` confirms no label exists and `gateway_ping` confirms the gateway is reachable. The first timeout may have been cold-start; a warm retry will settle it. A second timeout or failure blocks further retries and requires escalation.

@@ -1,0 +1,22 @@
+OPAQUE-ID: 626f811f
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.find_labels(shipment_id=4152)`** immediately.
+   - This is the interrogation of destination state mandated by the ordering requirement.
+   - It is read-only and safe to call regardless of the timed-out create's actual outcome.
+   - **If a label exists:** the create landed; do not call create again. Log as cold-start timeout (first invocation, on-demand runtime).
+   - **If no label exists:** the create did not land (or is genuinely ambiguous); proceed to step 2.
+
+2. **If no label was found, call `shipping.gateway_ping()`** to verify carrier gateway reachability.
+   - This confirms the shared path (auth, gateway, transport) is healthy.
+   - If ping fails: the problem is shared infrastructure, not the label service itself; escalate and do not retry create yet.
+   - If ping succeeds: proceed to step 3.
+
+3. **Call `shipping.create_label(shipment_id=4152, service_tier="express")` once more** in the same session (now warm).
+   - The first timeout was likely cold-start latency on an on-demand runtime; this warm retry will clarify whether the target is usable or actually down.
+   - If it succeeds: label created; done.
+   - If it times out or errors again: the failure is route-isolated to the label service itself; record as a capability gap and escalate; do not retry further without manual intervention.
+
+**Will you call `create_label` again?** Yes, once, in step 3 — but only if `find_labels` returns no label and `gateway_ping` succeeds. This ordering respects the strict requirement to interrogate state before any liveness check, and avoids blind replay of a call with side effects.

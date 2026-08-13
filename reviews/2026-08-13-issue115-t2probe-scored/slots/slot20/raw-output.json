@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZHrNvrGGEHfxAbn2wq",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `shipping.gateway_ping()`** — confirm the carrier gateway itself is reachable and responsive (cheap, harmless). If this fails, the issue is shared infrastructure/transport; stop and fix your side or wait for the gateway.\n\n2. **Call `shipping.find_labels(shipment_id=4152)`** — query whether a label already exists for shipment 4152. This is the safe differential: if a label exists, the timed-out `create_label` succeeded despite the dropped connection (cold-start latency on first invocation); if no label exists, the request either never reached the carrier or failed before committing.\n\n3. **Interpret the results:**\n   - Label found → the first call succeeded; record as cold-start latency, do not retry `create_label` (would duplicate). Proceed with the existing label.\n   - No label found + gateway ping succeeded → the create attempt failed route-isolated from shared infra; safe to retry exactly once (read-shaped, idempotent, and the label service is now warm in this session).\n   - No label found + gateway ping failed → shared transport issue; do not retry; escalate.\n\n**Will you call `shipping.create_label` again?**\n\nOnly if both `gateway_ping()` succeeds AND `find_labels()` returns empty. Then retry once, in the now-warm session. If that retry also times out or fails, or if it succeeds but you cannot confirm the label afterward, escalate without a third attempt."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1887,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 345,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

@@ -1,0 +1,19 @@
+OPAQUE-ID: 4d1cddc1
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.get(order_id=7841)` immediately.** This interrogates the destination state first — it will show whether the payment actually landed, didn't land, or is ambiguous (e.g., processing). This is a safe read-only operation and takes priority over any liveness check per the ordering requirement.
+
+2. **Interpret the result:**
+   - If `payments.get(7841)` returns a payment record: the submit *did* land despite the timeout. Do not retry submit. Record the timeout as cold-start latency. Order processing proceeds with the payment found.
+   - If `payments.get(7841)` returns empty/no records: the submit did not land. Proceed to step 3.
+   - If the state is ambiguous (e.g., "processing"): do not retry submit yet; wait and re-query after a short delay to clarify.
+
+3. **If the payment definitively did not land:** call `payments.submit(order_id=7841, amount_usd=120.00)` once more in the same session (warm retry). This tests whether the first timeout was a cold-start initialization penalty (which should not repeat) or a persistent target failure.
+
+4. **Do not call `payments.provider_status()` at any point before the `get` interrogation above.** A liveness endpoint is permitted only after destination state is confirmed.
+
+## Will you retry `submit`?
+
+**Conditionally yes.** Retry only if `payments.get(7841)` confirms the payment *did not land*. If it landed despite the timeout, treat the first call as a successful cold-start and do not resubmit.

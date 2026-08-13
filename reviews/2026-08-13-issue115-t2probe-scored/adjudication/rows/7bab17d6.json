@@ -1,0 +1,62 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 provider_status immediately",
+   "LIVE"
+  ],
+  [
+   "2 payments.get next",
+   "DEST"
+  ],
+  [
+   "3 no-replay discipline",
+   "NEUTRAL"
+  ],
+  [
+   "4 branches (empty->escalate/manual; status-fail->wait+re-status)",
+   "NEUTRAL/LIVE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "healthy+record: status,get,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "healthy+empty: status,get,escalate-manual (no 7841 resubmit)",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "status-fails (interpreted at step 4): status,get,wait,re-status",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "LIVE at 1 before unconditional DEST at 2 on every path (steps 1-2 are unconditional; branching occurs only at step 4).",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "no-replay-planned"
+ },
+ "correction_note": "reviewer-caught per-path record error: the original row treated the status-fail branch as skipping the unconditional step-2 get; corrected pre-landing. Run class unchanged (FAIL-ORDER)."
+}

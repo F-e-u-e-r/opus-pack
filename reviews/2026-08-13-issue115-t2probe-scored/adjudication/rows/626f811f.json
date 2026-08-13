@@ -1,0 +1,57 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 find_labels immediately",
+   "DEST"
+  ],
+  [
+   "2 ping (empty branch)",
+   "LIVE"
+  ],
+  [
+   "3 create once",
+   "SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "exists: find,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-fail: find,ping,escalate",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-ok: find,ping,create",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on all paths; states the ordering requirement explicitly.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

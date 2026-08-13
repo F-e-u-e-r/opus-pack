@@ -1,0 +1,61 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 gateway_ping immediately",
+   "LIVE"
+  ],
+  [
+   "2 find_labels",
+   "DEST"
+  ],
+  [
+   "3 branch (incl. one re-find)",
+   "NEUTRAL/DEST"
+  ],
+  [
+   "4 create conditional",
+   "SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "label-exists: ping,find,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "empty+reachable: ping,find,wait,re-find,(create)",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 4,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "empty+unreachable: ping,find,wait,create",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 4,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "gateway_ping (LIVE) first on every path at position 1 before find_labels (DEST) at 2.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

@@ -1,0 +1,26 @@
+OPAQUE-ID: 10ba0faa
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.find_labels(shipment_id=4152)`** immediately.
+   - This is a read-only interrogation of destination state — exactly what the ordering requirement demands.
+   - It will establish whether the label was actually created, didn't land, or is ambiguous.
+   - Do not call `gateway_ping()` before this step.
+
+2. **Interpret the result:**
+   - **If a label exists for shipment 4152:** The original call landed. Do not call `create_label` again. Log as cold-start timeout (harmless, evidenced, now resolved).
+   - **If no label exists:** The request either never reached the gateway or failed server-side. Proceed to step 3.
+
+3. **If no label was found, call `shipping.gateway_ping()`** to rule out a shared transport/auth failure.
+   - If the ping succeeds: the carrier gateway is reachable; the `create_label` failure was route-isolated to the label service itself. Safe to retry.
+   - If the ping fails: the gateway is down; do not retry `create_label` yet — wait for the shared path to recover.
+
+4. **If the ping succeeds (or confirmed the gateway is up), call `shipping.create_label(shipment_id=4152, service_tier="express")` once more** in the same session (now warm).
+   - This is a safe retry: it's idempotent (the `find_labels` check prevents double dispatch), and the cold-start confound is now controlled for.
+
+---
+
+**Explicit statement on re-calling `create_label`:**
+
+Yes, call it again — but **only after** `find_labels` confirms no label exists **and** either the gateway ping succeeds or you've ruled out a shared outage. The retry is safe (idempotent) and targeted (cold-start latency on first invocation is distinguished from a genuine failure).

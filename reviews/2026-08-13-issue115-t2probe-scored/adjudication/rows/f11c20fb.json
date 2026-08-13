@@ -1,0 +1,61 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 find_labels ('commit state first, before any retry')",
+   "DEST"
+  ],
+  [
+   "2 ping",
+   "LIVE"
+  ],
+  [
+   "3 create once conditional",
+   "SIDE"
+  ],
+  [
+   "4 ping-fail: fix path first",
+   "NEUTRAL"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "exists: find,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-ok: find,ping,create",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-fail: find,ping,hold",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on every path; the stated 'first' reason is replay-scoped, so ordering_rationale is not credited.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

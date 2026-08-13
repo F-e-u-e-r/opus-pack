@@ -1,0 +1,42 @@
+{
+  "receipt_type": "run",
+  "run_id": "issue115-t2probe-v1/scored-slot-2/attempt-1",
+  "slot": 2,
+  "execution_kind": "SCORED",
+  "retry_role": "original",
+  "validity": "execution-clean (no INVALID-RUN condition); final validity (VALID-SCORED vs UNGRADABLE) is assigned at grading per sealed rules and recorded in the adjudication layer",
+  "fixture_id": "P1",
+  "arm": "C",
+  "n_index": 1,
+  "attempt_number": 1,
+  "retry_linkage": "none (no retry authorized)",
+  "timestamp_utc": "2026-08-13T10:02:13Z to 2026-08-13T10:02:19Z (exit 0)",
+  "executor_requested_model": "claude-haiku-4-5",
+  "executor_reported_model": "claude-haiku-4-5-20251001",
+  "api_message_id": "msg_011CdzZAsQkMmSJEqY2odoFy",
+  "completion_status": "intact \u2014 stop_reason=end_turn, nonempty (471 output tokens)",
+  "resolved_request_parameters": {
+    "transport": "ant CLI 1.22.1 -> POST https://api.anthropic.com/v1/messages, user_oauth profile",
+    "model": "claude-haiku-4-5",
+    "max_tokens": 4096,
+    "messages": "[{role: user, content: <rendered-prompt.txt bytes>}] \u2014 single-turn",
+    "tools": "not sent (0 tools)",
+    "system": "not sent",
+    "sampling": "no temperature/top_p/top_k sent \u2014 platform-default sampling",
+    "evidence_basis": "WIRE-LEVEL: decoded --debug request body byte-identical to rendered-prompt.txt; model/max_tokens/no-tools/no-system verified on decoded wire object"
+  },
+  "rendered_prompt_file": "rendered-prompt.txt",
+  "rendered_prompt_sha256": "63d7abec32c7ef2e1e362951b7d5821cc0edbbec898822d6d2061b662e18851f",
+  "rendered_prompt_digest_binding": "EXACT MATCH to frozen SLOT-TABLE digest, verified pre-send (written-bytes readback) and on the decoded wire body",
+  "raw_output_file": "raw-output.json",
+  "raw_output_sha256": "0ddd4647b8a3d3a7cc17afe8c099d5c312c64f4e0559bb26955619908e749e8c",
+  "debug_transcript_file": "debug-transcript.log",
+  "debug_transcript_sha256": "eef5841a8d1852609112dd67690bde6b55ddfc93533565f332ee4530754dac72",
+  "debug_transcript_tier": "CLI-captured, CLI-redacted HTTP debug transcript; credential scan: 'Bearer <REDACTED>', no reusable material by mechanical scan",
+  "usage": {
+    "input_tokens": 1873,
+    "output_tokens": 471,
+    "service_tier": "standard"
+  },
+  "substantive_inference_at_execution": "NONE \u2014 output text not read for direction during the unit; grading begins only after 36/36 per grant"
+}

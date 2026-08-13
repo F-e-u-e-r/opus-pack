@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZGz7z9Rp49Pd2YYkB9",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.provider_status()`** immediately.\n   - This is a harmless read that settles whether the shared transport and authentication are working.\n   - If it fails, the problem is your side or the shared path — don't retry submit yet.\n   - If it succeeds, the provider is reachable; move to step 2.\n\n2. **Call `payments.get(order_id=7841)`** to check whether the timed-out submit actually landed.\n   - This is safe, read-only, and idempotent.\n   - If a payment record exists for order 7841, the submit succeeded despite the timeout — do **not** retry submit.\n   - If no record exists, move to step 3.\n\n3. **Retry `payments.submit(order_id=7841, amount_usd=120.00)` once, in the same session** (now warm).\n   - This is safe to retry because steps 1–2 confirm the provider is reachable and no payment was created.\n   - If submit returns promptly this time: cold-start confirmed, first timeout is void as evidence.\n   - If submit times out again: route-isolate via the differential (canary on a different model/endpoint with the same parameters), then record as UNRESOLVED or outage depending on attributed status.\n\n---\n\n**Explicit retry decision:**  \n**Yes, retry `payments.submit` once in step 3** — but only after confirming via `payments.get` that the first attempt did not land. The first timeout is a candidate cold-start (known pattern, first invocation, safe to repeat after differential confirmation); a warm retry settles whether it was latency or a real failure."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 1873,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 395,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}
