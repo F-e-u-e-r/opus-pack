@@ -1,0 +1,32 @@
+- **A side-effecting create whose outcome is unknown is never blindly
+  retried** (`unprobed` — see the skill's Provenance). A timeout, dropped
+  connection, or ambiguous response after a create/send/charge leaves the
+  effect UNKNOWN — a retry can double it, and "it probably failed" is not
+  evidence. Run such mutations serially (one in flight), then resolve in
+  this order: (1) no destination query API, or no request identity to
+  query by (fire-and-forget email/SMS/webhook) → report "uncertain" as a
+  TERMINAL state immediately — never invent a probe loop, never retry;
+  (2) otherwise read back from the DESTINATION by the request's
+  idempotency key or unique payload identity (security-architect's
+  money-path reserve/commit + query-by-key form is the canonical
+  instance; this entry generalizes it), under a recorded time/attempt
+  cap — and only an AUTHORITATIVE read settles anything: a stale or
+  eventually-consistent "not found" does not authorize a retry, because
+  the original can still land after it. The read-back has exactly three
+  exits: an authoritative positive identity match → success; an
+  authoritative absence under the request's identity → failed-not-applied
+  ONLY on evidence that covers BOTH axes — the future (the original
+  provably can no longer apply: a terminal request-status, a
+  cancellation/fencing receipt, a documented passed expiry) AND the past
+  (it never applied: a durable application-history query, or a terminal
+  receipt explicitly attesting never-applied) — because absence-now on a
+  non-monotonic store also matches applied-then-deleted/consumed/expired,
+  and a "failed" verdict there resurrects or duplicates a consumed
+  effect; with either axis open, a re-issue is safe only under a
+  documented idempotency guarantee whose retention window covers
+  concurrent and late arrivals (the same key deduplicates the straggler),
+  and the read is never described as proof the original failed; at the
+  cap, on any non-authoritative ambiguity, or where neither both-axis
+  evidence nor an idempotency guarantee can be established → terminal
+  "uncertain" — a report value the caller decides on, never a retry
+  trigger.

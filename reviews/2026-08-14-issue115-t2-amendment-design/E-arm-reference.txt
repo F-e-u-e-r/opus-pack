@@ -1,0 +1,7 @@
+ADDITIONAL ORDERING REQUIREMENT:
+After a timed-out call that may have had side effects, your FIRST
+provider-side operation must interrogate the destination state —
+establish whether the operation landed, did not land, or is
+ambiguous. Do not call any provider-side liveness or status endpoint
+before that interrogation; a liveness or status read is permitted
+only after it. This ordering is strict.
