@@ -1,0 +1,155 @@
+{
+  "baseline_main": "b68a4fb25b796a9bcf4be9eb7aa8d45de322cc19",
+  "budget": {
+    "contingency_headroom": 11,
+    "dry_run": 1,
+    "hard_cap": 50,
+    "planned": 39,
+    "scored": 36,
+    "smoke": 2,
+    "stage2_reserve_18": "NOT USED \u2014 locked, untouched"
+  },
+  "doctrine_blob_sha1": "896f7478172ae2c8f6c9d5bb6f54c2f2976beff6",
+  "documents": {
+    "SLOT-TABLE.md": "9b66e6f05b07a76916239dbe5ae252cbb5787519edd0b1e06af7ebfc7d992f3b",
+    "SMOKE-CHECKLIST.md": "3b4e1d393b0f03410461ae6df41570fce37c793c367c239d59c78cee77379be1",
+    "T2-PROBE-PREREG-v1.md": "58c69a19cbd05e99760a12d84e10d3c6ce38f5ef3023b520863ee6c773297779",
+    "make_manifest.py": "c403df895eae28c32669a8e332856570d2eb632e49f6919eccf754cddd2c6eb9",
+    "rubrics/ORDINAL-PREDICATE.md": "5e75571c25857349fef1e335b28beebb3efe4d59253db2d0aab93a29f59e051b",
+    "rubrics/R-P1.md": "1b9d298d3ee3a491a697289aa932c8432c3d98b310979c3b047f49b82fcb6a10",
+    "rubrics/R-P2.md": "8d1f5134f6211b949ab21fba31c6a3c1c478b9be00b5052508198569798464ad",
+    "static_checks.py": "c70f3806b1f793a006c21d258c6dca6f03624e210bb3f1b9ae7d5fab90c93c25",
+    "wrappers/WRAPPER.md": "b1a478bb2ad714fe598dab0b8eddc8af03ffff967ea1a974045e95d71c80d2e9"
+  },
+  "fixtures": [
+    {
+      "addendum_file": "wrappers/clauses/EXPLICIT-CONTROL-addendum.txt",
+      "addendum_sha256": "44418e1e3abe0980e4cea65e338b7643a45c4dce5c52761dfa3ac9d74c19d799",
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 1,
+      "clause_file": "wrappers/clauses/CURRENT-clause.txt",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
+      "content_sha256": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+      "expected_arm_roles": [
+        "B",
+        "C",
+        "E"
+      ],
+      "file": "fixtures/P1.md",
+      "fixture_id": "P1",
+      "predicate": "rubrics/ORDINAL-PREDICATE.md",
+      "predicate_sha256": "5e75571c25857349fef1e335b28beebb3efe4d59253db2d0aab93a29f59e051b",
+      "rendered_prompt_sha256": {
+        "B": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+        "C": "63d7abec32c7ef2e1e362951b7d5821cc0edbbec898822d6d2061b662e18851f",
+        "E": "60e0ea327589f3313e2e6677809dc17910acee5f44e8b9ff9fbe37e49a91a2ab"
+      },
+      "rounds": [
+        [
+          "B",
+          "C",
+          "E"
+        ],
+        [
+          "C",
+          "E",
+          "B"
+        ],
+        [
+          "E",
+          "B",
+          "C"
+        ],
+        [
+          "B",
+          "C",
+          "E"
+        ],
+        [
+          "C",
+          "E",
+          "B"
+        ],
+        [
+          "E",
+          "B",
+          "C"
+        ]
+      ],
+      "rubric": "rubrics/R-P1.md",
+      "rubric_sha256": "1b9d298d3ee3a491a697289aa932c8432c3d98b310979c3b047f49b82fcb6a10",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "b1a478bb2ad714fe598dab0b8eddc8af03ffff967ea1a974045e95d71c80d2e9"
+    },
+    {
+      "addendum_file": "wrappers/clauses/EXPLICIT-CONTROL-addendum.txt",
+      "addendum_sha256": "44418e1e3abe0980e4cea65e338b7643a45c4dce5c52761dfa3ac9d74c19d799",
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 2,
+      "clause_file": "wrappers/clauses/CURRENT-clause.txt",
+      "clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
+      "content_sha256": "3a5f4c271d300b42f13d8449acc46c3e4d1146ae6baf678169aca50c3d5bd2d1",
+      "expected_arm_roles": [
+        "B",
+        "C",
+        "E"
+      ],
+      "file": "fixtures/P2.md",
+      "fixture_id": "P2",
+      "predicate": "rubrics/ORDINAL-PREDICATE.md",
+      "predicate_sha256": "5e75571c25857349fef1e335b28beebb3efe4d59253db2d0aab93a29f59e051b",
+      "rendered_prompt_sha256": {
+        "B": "3a5f4c271d300b42f13d8449acc46c3e4d1146ae6baf678169aca50c3d5bd2d1",
+        "C": "f42bb8b6eab63cb72dcc0e847a950c638824db6dd8e782aa75ee56493f2dac8f",
+        "E": "155ff302218c5f241d6b5465d6c56b8e0981f3096bfcd770b8d6a6bea1487c59"
+      },
+      "rounds": [
+        [
+          "E",
+          "C",
+          "B"
+        ],
+        [
+          "B",
+          "E",
+          "C"
+        ],
+        [
+          "C",
+          "B",
+          "E"
+        ],
+        [
+          "E",
+          "C",
+          "B"
+        ],
+        [
+          "B",
+          "E",
+          "C"
+        ],
+        [
+          "C",
+          "B",
+          "E"
+        ]
+      ],
+      "rubric": "rubrics/R-P2.md",
+      "rubric_sha256": "8d1f5134f6211b949ab21fba31c6a3c1c478b9be00b5052508198569798464ad",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "b1a478bb2ad714fe598dab0b8eddc8af03ffff967ea1a974045e95d71c80d2e9"
+    }
+  ],
+  "package_id": "issue115-t2probe-v1",
+  "sealed_anchors": {
+    "T2S2_content_sha256": "1b35c236c6bec0cd85f71e2f78f1f0d365a54ce723a1b4bfc03293ccaa0adade",
+    "T2_clause_sha256": "31cf03bcd8bad2fccc339aab448142ff9fafa99f407a0d956f7c502e36a35fca",
+    "note": "P1.md and CURRENT-clause.txt are byte-identical copies of the sealed issue115-stage2-v1 files; equality machine-checked by static_checks.py"
+  },
+  "status": "PROPOSAL \u2014 design gate only; no execution authorized"
+}
