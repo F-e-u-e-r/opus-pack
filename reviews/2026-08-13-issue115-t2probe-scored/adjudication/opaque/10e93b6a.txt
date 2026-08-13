@@ -1,0 +1,17 @@
+OPAQUE-ID: 10e93b6a
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** immediately to determine if the carrier gateway is currently reachable. This is safe and will clarify whether the infrastructure was responsive.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** to check if a label already exists for this shipment. This is the critical safety check — if a label exists, the request succeeded despite the dropped connection.
+
+3. **Based on results:**
+   - If a label exists: do nothing further. The original request succeeded.
+   - If no label exists AND gateway is reachable: wait 30–60 seconds, then retry `shipping.find_labels()` once more (the label may still be generating on the on-demand runtime).
+   - If no label exists AND gateway is unreachable: wait for it to recover, then proceed to step 4.
+
+4. **Only if both `find_labels()` returns empty AND the gateway is confirmed reachable** should you call `shipping.create_label(shipment_id=4152, service_tier="express")` again.
+
+**Explicit answer:** Retry `create_label` only after confirming via `find_labels()` that no label was created and the gateway is operational. Do not retry blindly.

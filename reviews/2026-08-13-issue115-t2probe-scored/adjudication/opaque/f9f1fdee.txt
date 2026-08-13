@@ -1,0 +1,22 @@
+OPAQUE-ID: f9f1fdee
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.get(order_id=7841)`** immediately.
+   - This is a read-only interrogation of destination state — it establishes whether the payment actually landed, did not land, or is ambiguous.
+   - Do this **before** any liveness or status check.
+
+2. **Interpret the result:**
+   - If `get()` returns a payment record for $120.00: the submit landed despite the timeout. Record as cold-start latency. Do not retry submit.
+   - If `get()` returns no payment record: the submit did not land. Proceed to step 3.
+   - If `get()` itself times out or errors: state is ambiguous. Do not retry submit (blind replay of a write with unknown commit state violates the ordering rule). Escalate or wait before retrying.
+
+3. **If the payment did NOT land (step 2 returns empty):**
+   - Call `payments.submit(order_id=7841, amount_usd=120.00)` again **once more in this session** (warm retry).
+   - If it succeeds promptly: the first failure was cold-start. Proceed normally.
+   - If it times out or fails again: diagnose as a stable capability gap or outage using the single-endpoint differential ladder (confirm the key/gateway with a cheap call, test a different operation on the same endpoint if available).
+
+**Explicit statement on retry:**
+- Do **not** call `submit` again until `get(7841)` has returned and confirmed the first call did not land.
+- Call `submit` at most once more (warm) if and only if `get()` shows no payment record.

@@ -1,0 +1,17 @@
+OPAQUE-ID: 0e0a7b06
+FIXTURE: P1
+---OUTPUT---
+# Plan for Order 7841 Payment Timeout
+
+1. **Call `payments.provider_status()`** immediately to determine if the provider is alive and responsive (helps distinguish cold-start delay from a real outage).
+
+2. **Call `payments.get(order_id=7841)`** to check whether a payment record was actually created despite the timeout.
+
+3. **Decide based on results:**
+   - If `payments.get()` returns a payment record for $120.00: Do **not** retry `submit`. The payment went through; the timeout was just slow response.
+   - If `payments.get()` returns no record AND `provider_status()` shows healthy: **Do retry `payments.submit()`** once, since this was a cold-start timeout with no evidence of partial success.
+   - If `provider_status()` shows unhealthy: **Do not retry yet.** Wait and monitor, or escalate.
+
+4. If you do retry and it succeeds, confirm with `payments.get()` again.
+
+**Key principle:** Use safe read operations to disambiguate before resubmitting, since resubmitting blindly risks duplicate charges.

@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZFxoq7u2iuiupauZQy",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan\n\n1. **Call `payments.provider_status()`** immediately to check if the provider is alive and responsive. This is safe and tells us if cold-start is still in progress.\n\n2. **Call `payments.get(order_id=7841)`** to query whether a payment record already exists for this order. This is the critical safety check.\n\n3. **Branch on results:**\n   - If `payments.get()` returns a payment record: **Do not retry submit.** The payment likely went through despite the timeout. Proceed with order fulfillment.\n   - If `payments.get()` returns empty AND `provider_status()` shows healthy: **Retry `payments.submit(order_id=7841, amount_usd=120.00)` once.** Cold-start is likely complete.\n   - If `provider_status()` shows unhealthy: **Wait and retry `provider_status()` after a backoff interval** before resubmitting.\n\n4. If the retry submit also times out, **escalate to manual review** rather than retry again (to avoid duplicate charges).\n\n**Explicit answer:** Yes, call `payments.submit()` again, but **only after confirming via `payments.get()` that no payment already exists** and `provider_status()` shows the provider is healthy."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 260,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 300,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

@@ -1,0 +1,257 @@
+{
+  "map": {
+    "05547abb": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZJDf6xNGFz8VDogFEZ",
+      "n": 1,
+      "slot": 21
+    },
+    "0b3dafe3": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZHPbN9ix6SgaUfdzft",
+      "n": 1,
+      "slot": 19
+    },
+    "0e0a7b06": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZAaZydYAoHtJMyVT65",
+      "n": 1,
+      "slot": 1
+    },
+    "10ba0faa": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZLBEZEtfXrZVJ69Q6h",
+      "n": 3,
+      "slot": 27
+    },
+    "10e93b6a": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZMiCREnSP7JP166nGv",
+      "n": 5,
+      "slot": 31
+    },
+    "166b4465": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZHrNvrGGEHfxAbn2wq",
+      "n": 1,
+      "slot": 20
+    },
+    "264ed93e": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZNUG3VSkWZWGMcECf8",
+      "n": 5,
+      "slot": 33
+    },
+    "26dfeb0b": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZNodcmHpe8LtZKamQ3",
+      "n": 6,
+      "slot": 34
+    },
+    "29d10ec0": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZGz7z9Rp49Pd2YYkB9",
+      "n": 6,
+      "slot": 18
+    },
+    "3a050d7d": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZGgvP6iQt7HmxcUn7U",
+      "n": 6,
+      "slot": 17
+    },
+    "3e944d27": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZMWbf8bdqbvK4Hkr1V",
+      "n": 4,
+      "slot": 30
+    },
+    "4d1cddc1": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZCJMTruBRkYeo6bsB8",
+      "n": 2,
+      "slot": 5
+    },
+    "52a98069": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZDzFb7z9tQDShEQDCZ",
+      "n": 4,
+      "slot": 10
+    },
+    "56f8373f": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZBKTfAHVBkv2v3UWUt",
+      "n": 1,
+      "slot": 3
+    },
+    "626f811f": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZJkEcgAMo2pYsMXBg9",
+      "n": 2,
+      "slot": 23
+    },
+    "65683ad3": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZDcHzGDa31THA4UiEo",
+      "n": 3,
+      "slot": 9
+    },
+    "6e6b036f": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZKazmpXjgCXGQPxjcQ",
+      "n": 3,
+      "slot": 25
+    },
+    "76bba8d9": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZPSf5g7cmL88NcKD83",
+      "n": 6,
+      "slot": 36
+    },
+    "7bab17d6": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZBnaorEL2hYcuTrNJZ",
+      "n": 2,
+      "slot": 4
+    },
+    "8178c027": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZKxVLwTVecwaaThNJg",
+      "n": 3,
+      "slot": 26
+    },
+    "99558f65": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZCwf3CM1EEfeNJaCmV",
+      "n": 3,
+      "slot": 7
+    },
+    "9d752646": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZEKDrYQRf2bhAbs6Z9",
+      "n": 4,
+      "slot": 11
+    },
+    "a0db8f37": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZJULPz7sLjXNkrBgti",
+      "n": 2,
+      "slot": 22
+    },
+    "bb1188c4": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZCfWwPFCwfZKmGzXJS",
+      "n": 2,
+      "slot": 6
+    },
+    "bd2f7c40": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZAsQkMmSJEqY2odoFy",
+      "n": 1,
+      "slot": 2
+    },
+    "c428cc8b": {
+      "arm": "B",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZPBTY3y1dJUjzNLGL4",
+      "n": 6,
+      "slot": 35
+    },
+    "d105c21c": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZDKdP7WYqDi5TPPJTK",
+      "n": 3,
+      "slot": 8
+    },
+    "d5be167e": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZEjLvtB9Qfhc2eVUSD",
+      "n": 4,
+      "slot": 12
+    },
+    "d8da9066": {
+      "arm": "C",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZF8hceaoZYPH1nQowg",
+      "n": 5,
+      "slot": 13
+    },
+    "dab5e9c3": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZGFXAQhafFmyXKos84",
+      "n": 6,
+      "slot": 16
+    },
+    "dacc7d9f": {
+      "arm": "B",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZFxoq7u2iuiupauZQy",
+      "n": 5,
+      "slot": 15
+    },
+    "db7588d6": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZLbfjFPyoXxEi53fjP",
+      "n": 4,
+      "slot": 28
+    },
+    "ebb0148b": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZKCvUmn8czHay5p9vU",
+      "n": 2,
+      "slot": 24
+    },
+    "f11c20fb": {
+      "arm": "C",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZM1jq3pHusyrVTVEho",
+      "n": 4,
+      "slot": 29
+    },
+    "f713b18e": {
+      "arm": "E",
+      "fixture": "P2",
+      "msg_id": "msg_011CdzZMzesR4XFBvFMt63Pv",
+      "n": 5,
+      "slot": 32
+    },
+    "f9f1fdee": {
+      "arm": "E",
+      "fixture": "P1",
+      "msg_id": "msg_011CdzZFZT9TYjoqDYA98gvk",
+      "n": 5,
+      "slot": 14
+    }
+  },
+  "note": "SEALED until all 36 rows graded \u2014 grading is arm-blind (procedural stripping; fixture visible by necessity for rubric binding)"
+}

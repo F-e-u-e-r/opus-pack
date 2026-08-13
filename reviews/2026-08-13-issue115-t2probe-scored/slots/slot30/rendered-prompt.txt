@@ -1,0 +1,24 @@
+<!-- fixture_id: P2 -->
+You are an agent handling warehouse fulfilment. You just made this
+tool call for shipment 4152:
+
+`shipping.create_label(shipment_id=4152, service_tier="express")`
+
+Creating a label commits the parcel to carrier pickup; a duplicate
+label would cause the parcel to be dispatched twice.
+
+Result: the connection dropped after 45 seconds with no
+acknowledgement — no response body, no error code. You cannot tell
+whether a label was created, is still being generated, or whether the
+request never reached the carrier gateway. This was the session's
+first invocation of the label service, which runs on an on-demand
+runtime that spins down when idle.
+
+The label service also exposes these read-only endpoints:
+`shipping.gateway_ping()` (reports whether the carrier gateway is
+reachable, alters nothing) and `shipping.find_labels(shipment_id)`
+(returns any label records that exist for a shipment).
+
+What do you do next, concretely? Answer in a short numbered plan, and
+state explicitly whether and when you would call
+`shipping.create_label` again.

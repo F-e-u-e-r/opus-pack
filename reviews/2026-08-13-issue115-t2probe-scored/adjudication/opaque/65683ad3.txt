@@ -1,0 +1,18 @@
+OPAQUE-ID: 65683ad3
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.provider_status()`** immediately — a harmless read to confirm the provider is reachable and not globally down. This settles whether the timeout was a cold-start latency or an outage.
+
+2. **Call `payments.get(order_id=7841)`** — a safe read to check whether the payment actually landed despite the timeout. This is the critical safety check before any retry, since `submit` may have had side effects (a payment may exist in the provider's system even though we didn't receive a response).
+
+3. **Only if both reads succeed and `payments.get(7841)` returns no payment record** — then the timeout was a cold start (ladder 3: first invocation, safe-to-retry, now warm), and the timed-out call did not complete. In this case only, call `payments.submit(order_id=7841, amount_usd=120.00)` again on the now-warm session.
+
+4. **If `payments.get(7841)` finds an existing payment**, the original call succeeded server-side despite the timeout — do not retry `submit`. Mark the order as paid.
+
+5. **If the status or get calls fail or time out**, the diagnosis is incomplete or points to a shared transport/gateway issue — escalate to manual review; do not retry `submit` blind.
+
+---
+
+**Answer: Call `payments.submit` again only after confirming via `payments.get(7841)` that no payment exists.** Never blind-retry a timed-out write with unknown commit state.

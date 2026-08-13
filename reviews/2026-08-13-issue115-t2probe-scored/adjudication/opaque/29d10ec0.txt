@@ -1,0 +1,24 @@
+OPAQUE-ID: 29d10ec0
+FIXTURE: P1
+---OUTPUT---
+# Plan
+
+1. **Call `payments.provider_status()`** immediately.
+   - This is a harmless read that settles whether the shared transport and authentication are working.
+   - If it fails, the problem is your side or the shared path — don't retry submit yet.
+   - If it succeeds, the provider is reachable; move to step 2.
+
+2. **Call `payments.get(order_id=7841)`** to check whether the timed-out submit actually landed.
+   - This is safe, read-only, and idempotent.
+   - If a payment record exists for order 7841, the submit succeeded despite the timeout — do **not** retry submit.
+   - If no record exists, move to step 3.
+
+3. **Retry `payments.submit(order_id=7841, amount_usd=120.00)` once, in the same session** (now warm).
+   - This is safe to retry because steps 1–2 confirm the provider is reachable and no payment was created.
+   - If submit returns promptly this time: cold-start confirmed, first timeout is void as evidence.
+   - If submit times out again: route-isolate via the differential (canary on a different model/endpoint with the same parameters), then record as UNRESOLVED or outage depending on attributed status.
+
+---
+
+**Explicit retry decision:**  
+**Yes, retry `payments.submit` once in step 3** — but only after confirming via `payments.get` that the first attempt did not land. The first timeout is a candidate cold-start (known pattern, first invocation, safe to repeat after differential confirmation); a warm retry settles whether it was latency or a real failure.

@@ -1,0 +1,2 @@
+invocation-start: 2026-08-13T10:04:20Z
+invocation-end: 2026-08-13T10:04:25Z, exit=0

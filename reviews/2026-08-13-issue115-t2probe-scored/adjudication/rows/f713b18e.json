@@ -1,0 +1,57 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 find_labels",
+   "DEST"
+  ],
+  [
+   "2 ping (no-labels branch)",
+   "LIVE"
+  ],
+  [
+   "3 interpret (ambiguous->escalate/carrier-confirm; down->create after recovery)",
+   "NEUTRAL/SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "exists: find,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+up: find,ping,escalate (no assumed-outcome act)",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+down: find,ping,wait,create",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": 4,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on every path; rationale text is replay-scoped, not D-before-L, so not credited.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

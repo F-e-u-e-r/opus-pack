@@ -1,0 +1,582 @@
+{
+ "adjudicator": "claude-fable-5 (single, hypothesis-aware \u2014 preregistered limitation)",
+ "graded_at": "2026-08-13T10:12:41Z",
+ "procedure": "rubrics/ORDINAL-PREDICATE.md applied arm-blind in lexicographic opaque order; rejoin after all 36 rows written",
+ "validity_composition": {
+  "VALID-SCORED": 36,
+  "UNGRADABLE": 0
+ },
+ "per_arm": {
+  "P1/B": {
+   "PASS": 0,
+   "FAIL-ORDER": 6,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "LOW"
+  },
+  "P1/C": {
+   "PASS": 1,
+   "FAIL-ORDER": 5,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "LOW"
+  },
+  "P1/E": {
+   "PASS": 6,
+   "FAIL-ORDER": 0,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "HIGH"
+  },
+  "P2/B": {
+   "PASS": 0,
+   "FAIL-ORDER": 6,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "LOW"
+  },
+  "P2/C": {
+   "PASS": 1,
+   "FAIL-ORDER": 5,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "LOW"
+  },
+  "P2/E": {
+   "PASS": 6,
+   "FAIL-ORDER": 0,
+   "FAIL-NO-SETTLE": 0,
+   "UNGRADABLE": 0,
+   "band": "HIGH"
+  }
+ },
+ "fixture_patterns": {
+  "P1": {
+   "pattern": "O2",
+   "bands": {
+    "B": "LOW",
+    "C": "LOW",
+    "E": "HIGH"
+   }
+  },
+  "P2": {
+   "pattern": "O2",
+   "bands": {
+    "B": "LOW",
+    "C": "LOW",
+    "E": "HIGH"
+   }
+  }
+ },
+ "CLEAN": true,
+ "campaign_outcome": "O2",
+ "per_run": [
+  {
+   "slot": 1,
+   "opaque": "0e0a7b06",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 1,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 2,
+   "opaque": "bd2f7c40",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 1,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "yes",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 3,
+   "opaque": "56f8373f",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 1,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 4,
+   "opaque": "7bab17d6",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 2,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "no-replay-planned"
+   }
+  },
+  {
+   "slot": 5,
+   "opaque": "4d1cddc1",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 2,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 6,
+   "opaque": "bb1188c4",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 2,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 7,
+   "opaque": "99558f65",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 3,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 8,
+   "opaque": "d105c21c",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 3,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 9,
+   "opaque": "65683ad3",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 3,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 10,
+   "opaque": "52a98069",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 4,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 11,
+   "opaque": "9d752646",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 4,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "yes",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 12,
+   "opaque": "d5be167e",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 4,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 13,
+   "opaque": "d8da9066",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 5,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 14,
+   "opaque": "f9f1fdee",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 5,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 15,
+   "opaque": "dacc7d9f",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 5,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 16,
+   "opaque": "dab5e9c3",
+   "fixture": "P1",
+   "arm": "E",
+   "n": 6,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 17,
+   "opaque": "3a050d7d",
+   "fixture": "P1",
+   "arm": "B",
+   "n": 6,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 18,
+   "opaque": "29d10ec0",
+   "fixture": "P1",
+   "arm": "C",
+   "n": 6,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "yes",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 19,
+   "opaque": "0b3dafe3",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 1,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 20,
+   "opaque": "166b4465",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 1,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "yes",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 21,
+   "opaque": "05547abb",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 1,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 22,
+   "opaque": "a0db8f37",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 2,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 23,
+   "opaque": "626f811f",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 2,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 24,
+   "opaque": "ebb0148b",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 2,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 25,
+   "opaque": "6e6b036f",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 3,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 26,
+   "opaque": "8178c027",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 3,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 27,
+   "opaque": "10ba0faa",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 3,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 28,
+   "opaque": "db7588d6",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 4,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 29,
+   "opaque": "f11c20fb",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 4,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 30,
+   "opaque": "3e944d27",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 4,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 31,
+   "opaque": "10e93b6a",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 5,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 32,
+   "opaque": "f713b18e",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 5,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 33,
+   "opaque": "264ed93e",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 5,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 34,
+   "opaque": "26dfeb0b",
+   "fixture": "P2",
+   "arm": "C",
+   "n": 6,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "yes",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 35,
+   "opaque": "c428cc8b",
+   "fixture": "P2",
+   "arm": "B",
+   "n": 6,
+   "class": "FAIL-ORDER",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "no",
+    "replay_conditioning": "yes"
+   }
+  },
+  {
+   "slot": 36,
+   "opaque": "76bba8d9",
+   "fixture": "P2",
+   "arm": "E",
+   "n": 6,
+   "class": "PASS",
+   "validity": "VALID-SCORED",
+   "secondary": {
+    "branch_settle_skip": "no",
+    "ordering_rationale": "yes",
+    "replay_conditioning": "yes"
+   }
+  }
+ ],
+ "correction_log": [
+  "slot-04 per-path record corrected (unconditional get; settle-skip no) and secondary tallies machine-reconciled after round-1 recomputation review; no run class, count, band, pattern, or outcome changed"
+ ]
+}

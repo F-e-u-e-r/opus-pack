@@ -1,0 +1,18 @@
+OPAQUE-ID: ebb0148b
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** to verify the carrier gateway itself is reachable and your auth/transport path works. This is a cheap auxiliary check for shared infrastructure.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** to check whether a label was actually created despite the dropped connection. This is a safe read that settles the commit state without blind replay.
+   - If a label exists: the create succeeded; do not retry.
+   - If no label exists: proceed to step 3.
+
+3. **Only if step 2 confirms no label exists**, call `shipping.create_label(shipment_id=4152, service_tier="express")` again (warm retry in the same session). This is the first-invocation cold-start ladder: a serverless or lazily-loaded label service timing out on its first call in a session is a known, repeatable pattern distinct from a genuine outage.
+
+4. **If the warm retry also times out or fails**, then and only then record the label service as having a route-isolated capability problem requiring diagnosis (differential vs. other models/services, quota/entitlement blocks, etc.) before routing further work.
+
+## Explicit statement on retry:
+
+**Yes, retry `shipping.create_label` — but only after step 2 confirms no label was created.** The 45-second timeout on a fresh session is consistent with a cold start, not a genuine capability gap. The read-first check (step 2) is essential: it rules out the catastrophic case (duplicate dispatch) before the warm retry proceeds.

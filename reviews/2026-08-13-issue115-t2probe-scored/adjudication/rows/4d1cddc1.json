@@ -1,0 +1,61 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 payments.get immediately",
+   "DEST"
+  ],
+  [
+   "2 interpret (ambiguous->re-query)",
+   "NEUTRAL/DEST"
+  ],
+  [
+   "3 submit once warm (conditional)",
+   "SIDE"
+  ],
+  [
+   "4 negated provider_status mention",
+   "no position"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "record: get,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty: get,submit",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "ambiguous: get,wait,re-get",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST attempt position 1 on every path; liveness never precedes (negated mention occupies no position).",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

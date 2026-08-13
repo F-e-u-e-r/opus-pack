@@ -1,0 +1,57 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 payments.get first",
+   "DEST"
+  ],
+  [
+   "2 provider_status only-after, if needed",
+   "LIVE"
+  ],
+  [
+   "3 submit retry conditional",
+   "SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "record: get,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "none: get,(status),submit",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "retry-timeout: get,...,re-get,escalate",
+   "pos": {
+    "D": 1,
+    "L": 2,
+    "S": 3,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on all paths; explicit 'Critical ordering: destination state before any liveness check'.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

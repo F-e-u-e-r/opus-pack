@@ -1,0 +1,18 @@
+OPAQUE-ID: 26dfeb0b
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** — Verify the carrier gateway itself is reachable (cheap, read-only). If this fails, the issue is shared infrastructure or your account; stop and fix your side before any retry.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** — Query whether a label already exists for shipment 4152. This is the safe, definitive check for the side effect you care about, without blind-replaying the write.
+   - If a label exists: the original call succeeded despite the dropped connection. **Do not call `create_label` again.** Log the incident as cold-start latency (first invocation of a serverless function) and route future work normally.
+   - If no label exists: proceed to step 3.
+
+3. **Call `shipping.create_label(shipment_id=4152, service_tier="express")` again** — This is now a warm invocation in the same session. If it succeeds promptly, the first timeout was cold-start latency. If it times out or fails again, the target has a genuine capability gap; escalate or fall back.
+
+---
+
+**Will you call `create_label` again?** 
+
+**Yes, but only after confirming via `find_labels` that no label was already created.** The timeout on a write-like call leaves the commit state unknown; query the actual state first (a harmless read) before blind-replaying the write. A warm retry on the same session then isolates whether the first failure was cold-start latency or a real outage.

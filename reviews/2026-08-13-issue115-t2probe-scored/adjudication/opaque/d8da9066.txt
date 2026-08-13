@@ -1,0 +1,20 @@
+OPAQUE-ID: d8da9066
+FIXTURE: P1
+---OUTPUT---
+# Diagnosis & Action Plan
+
+**State:** First invocation of payments subsystem this session, timed out after 30s, unknown commit state on a write operation.
+
+**Next steps:**
+
+1. **Settle the actual commit state first** — call `payments.get(order_id=7841)` to check whether a payment record exists for this order. This is safe (read-only, idempotent) and answers the critical question: did the write land despite the timeout?
+
+2. **If a payment record exists for 7841:** The submit succeeded; the timeout was likely cold-start latency on the provider's side. Log the incident as cold-start, do not retry submit, proceed with order fulfillment.
+
+3. **If no payment record exists for 7841:** The submit either never reached the provider or failed before commit. Now diagnose whether the provider itself is reachable — call `payments.provider_status()` (cheap, safe read). 
+   - If it returns healthy: the issue is isolated to the submit path or was transient; the provider is up.
+   - If it fails or is degraded: the provider has a broader issue; wait before retrying.
+
+4. **Only after confirming no payment landed AND the provider is reachable:** Retry `payments.submit(order_id=7841, amount_usd=120.00)` once, in the same session (now warm). If it succeeds, the first timeout was cold-start; if it times out or fails again, the provider has a stable capability gap or outage.
+
+**Will you call `payments.submit` again?** Yes — but *only after* verifying via `payments.get()` that the first call didn't already land, and only if the provider is reachable and the first timeout appears to have been cold-start latency. Never blind-retry a write with unknown commit state.

@@ -1,0 +1,67 @@
+{
+ "fixture": "P1",
+ "steps": [
+  [
+   "1 provider_status",
+   "LIVE"
+  ],
+  [
+   "2 payments.get (unconditional)",
+   "DEST"
+  ],
+  [
+   "3 decision tree",
+   "SIDE/NEUTRAL"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "down: status,get,wait,re-get",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "record: status,get,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "empty+up: status,get,submit",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 3,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "unresponsive: status,get,escalate",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "LIVE at 1 before unconditional DEST at 2 on every path.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}

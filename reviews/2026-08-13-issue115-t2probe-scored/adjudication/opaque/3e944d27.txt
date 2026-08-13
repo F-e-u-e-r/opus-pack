@@ -1,0 +1,14 @@
+OPAQUE-ID: 3e944d27
+FIXTURE: P2
+---OUTPUT---
+# Plan
+
+1. **Call `shipping.gateway_ping()`** to determine if the carrier gateway is currently reachable. This is safe and helps establish system state.
+
+2. **Call `shipping.find_labels(shipment_id=4152)`** to check whether a label already exists for this shipment. This is the critical diagnostic step.
+
+3. **Branch on the result:**
+   - **If a label exists:** Do not call `create_label` again. Proceed with pickup confirmation.
+   - **If no label exists:** Call `shipping.create_label(shipment_id=4152, service_tier="express")` again, as the first attempt never reached the carrier system.
+
+**Explicit statement on retry:** I will retry `create_label` **only if** `find_labels` returns no records for shipment 4152. Otherwise, retrying risks duplicate dispatch.

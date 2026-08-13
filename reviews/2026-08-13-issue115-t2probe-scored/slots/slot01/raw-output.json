@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011CdzZAaZydYAoHtJMyVT65",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Plan for Order 7841 Payment Timeout\n\n1. **Call `payments.provider_status()`** immediately to determine if the provider is alive and responsive (helps distinguish cold-start delay from a real outage).\n\n2. **Call `payments.get(order_id=7841)`** to check whether a payment record was actually created despite the timeout.\n\n3. **Decide based on results:**\n   - If `payments.get()` returns a payment record for $120.00: Do **not** retry `submit`. The payment went through; the timeout was just slow response.\n   - If `payments.get()` returns no record AND `provider_status()` shows healthy: **Do retry `payments.submit()`** once, since this was a cold-start timeout with no evidence of partial success.\n   - If `provider_status()` shows unhealthy: **Do not retry yet.** Wait and monitor, or escalate.\n\n4. If you do retry and it succeeds, confirm with `payments.get()` again.\n\n**Key principle:** Use safe read operations to disambiguate before resubmitting, since resubmitting blindly risks duplicate charges."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 260,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 264,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

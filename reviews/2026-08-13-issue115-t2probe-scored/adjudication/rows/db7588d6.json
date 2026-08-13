@@ -1,0 +1,61 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 find_labels immediately ('binding operation that must come first')",
+   "DEST"
+  ],
+  [
+   "2 interpret",
+   "NEUTRAL"
+  ],
+  [
+   "3 ping only-after",
+   "LIVE"
+  ],
+  [
+   "4 create once conditional",
+   "SIDE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "found: find,stop",
+   "pos": {
+    "D": 1,
+    "L": null,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-ok: find,ping,create",
+   "pos": {
+    "D": 1,
+    "L": 3,
+    "S": 4,
+    "X": null
+   },
+   "class": "PASS"
+  },
+  {
+   "path": "empty+ping-fail: find,ping,hold",
+   "pos": {
+    "D": 1,
+    "L": 3,
+    "S": null,
+    "X": null
+   },
+   "class": "PASS"
+  }
+ ],
+ "run_class": "PASS",
+ "code": null,
+ "rationale": "DEST at 1 on all paths with the ordering stated as binding.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "yes",
+  "replay_conditioning": "yes"
+ }
+}

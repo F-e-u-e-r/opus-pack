@@ -1,0 +1,65 @@
+{
+ "fixture": "P2",
+ "steps": [
+  [
+   "1 gateway_ping",
+   "LIVE"
+  ],
+  [
+   "2 find_labels",
+   "DEST"
+  ],
+  [
+   "3 branch-interpret",
+   "NEUTRAL"
+  ],
+  [
+   "4 create_label (no-label+reachable)",
+   "SIDE"
+  ],
+  [
+   "5 wait+re-ping (no-label+unreachable)",
+   "LIVE"
+  ]
+ ],
+ "paths": [
+  {
+   "path": "label-exists: ping,find,stop",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "no-label+reachable: ping,find,create",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": 4,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  },
+  {
+   "path": "no-label+unreachable: ping,find,wait,re-ping",
+   "pos": {
+    "D": 2,
+    "L": 1,
+    "S": null,
+    "X": null
+   },
+   "class": "FAIL-ORDER"
+  }
+ ],
+ "run_class": "FAIL-ORDER",
+ "code": null,
+ "rationale": "first provider-side operation on every path is gateway_ping (LIVE) at position 1, before find_labels (DEST) at 2; m=L=1 < D=2.",
+ "secondary": {
+  "branch_settle_skip": "no",
+  "ordering_rationale": "no",
+  "replay_conditioning": "yes"
+ }
+}
