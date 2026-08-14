@@ -1,0 +1,13 @@
+- **Placement test** for any new rule: can it be a hook (machine-enforced)?
+  If not, can it live on-demand (skill / fix log)? Only when both answers
+  are no does it earn an always-loaded line. An always-loaded line still
+  owes a second placement question: which existing bullet already owns
+  its topic? Confirm the SECTION first — check the addition against the
+  section's own scope, not merely the nearest bullet's — then read the
+  target section's bullets in full and default to folding the new clause
+  into the host bullet that owns it (a trailing sentence, an added
+  example, an extra clause); a standalone new bullet is the fallback for
+  content with no existing host, not the default shape. Genuinely unclear
+  whether it is this bullet's topic or a neighbor's → flag for the §6
+  reviewer rather than defaulting to standalone. (`unprobed` — see
+  Provenance.)

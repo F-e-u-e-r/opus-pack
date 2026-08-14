@@ -1,0 +1,163 @@
+{
+  "baseline_main": "c2fc127d7d2d6263439094553e4a6aa1575eeaee",
+  "budget": {
+    "contingency_headroom": 11,
+    "dry_run": 1,
+    "hard_cap": 50,
+    "planned": 39,
+    "scored": 36,
+    "smoke": 2,
+    "stage2_reserve_18": "NOT USED \u2014 locked, untouched",
+    "t2probe_headroom_11": "NOT USED \u2014 closed, untouched"
+  },
+  "doctrine_blob_sha1": "caa2bcb5832fa5fe688763e97cdc1e6ff99317d4",
+  "doctrine_file": "skills/skill-authoring/SKILL.md",
+  "documents": {
+    "SLOT-TABLE.md": "0d70d8f108f5319c88d1ad9aea028b73f3cf53aef577ee7097a8d277ccb938fc",
+    "SMOKE-CHECKLIST.md": "63e49621310fdf94da72b1691c72e2f782cf734e8747dbd3f8fbb1d11eecde8e",
+    "T5P-PROBE-PREREG-v1.md": "b2692156334412b8072eb82248615d5b899d7ddbd14b31cbb90260b45c117591",
+    "make_manifest.py": "f2286ca683fa726cf15ee28571f3381e2e3e42d8d2e464f7df044e820d9b50bd",
+    "rubrics/OWNERSHIP-PREDICATE.md": "20dba7a644abee0d89a1921cb4d183a4eda59a857ddcbbf2287552712fecc00c",
+    "rubrics/R-P1.md": "d50ef0e9cf723c72e96feab56f6c000ebb18a6f48052e2c1a6cb081e546c71cc",
+    "rubrics/R-P2.md": "960d867f62daeb401de17ace0e4a654046137556d2591f03af5b0fe9339962b7",
+    "static_checks.py": "6c2f4bb95df0cfe2a216a998ca1641f441c6f495306c5f1243c04411bc4d8ea6",
+    "wrappers/WRAPPER.md": "1321414c06222b3d7ff1b69f4c379ede39fa8201d627c9f9074d0052ebdb6b28"
+  },
+  "fixtures": [
+    {
+      "addendum_file": "wrappers/clauses/OWNERSHIP-CRITERION-addendum.txt",
+      "addendum_sha256": "f484eae0abe5195e91a57113d3d14d929c39eaa11e4d9259cabaef57126b4a12",
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 1,
+      "clause_file": "wrappers/clauses/CURRENT-clause.txt",
+      "clause_sha256": "3bdeaec5543000b993dfe9ef925b844f37a1e2e961646e5a7c92e2fc1fd8cebc",
+      "content_sha256": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+      "expected_arm_roles": [
+        "B",
+        "C",
+        "E"
+      ],
+      "file": "fixtures/P1.md",
+      "fixture_id": "P1",
+      "predicate": "rubrics/OWNERSHIP-PREDICATE.md",
+      "predicate_sha256": "20dba7a644abee0d89a1921cb4d183a4eda59a857ddcbbf2287552712fecc00c",
+      "rendered_prompt_sha256": {
+        "B": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+        "C": "d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663",
+        "E": "9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396"
+      },
+      "rounds": [
+        [
+          "B",
+          "C",
+          "E"
+        ],
+        [
+          "C",
+          "E",
+          "B"
+        ],
+        [
+          "E",
+          "B",
+          "C"
+        ],
+        [
+          "B",
+          "C",
+          "E"
+        ],
+        [
+          "C",
+          "E",
+          "B"
+        ],
+        [
+          "E",
+          "B",
+          "C"
+        ]
+      ],
+      "rubric": "rubrics/R-P1.md",
+      "rubric_sha256": "d50ef0e9cf723c72e96feab56f6c000ebb18a6f48052e2c1a6cb081e546c71cc",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "1321414c06222b3d7ff1b69f4c379ede39fa8201d627c9f9074d0052ebdb6b28"
+    },
+    {
+      "addendum_file": "wrappers/clauses/OWNERSHIP-CRITERION-addendum.txt",
+      "addendum_sha256": "f484eae0abe5195e91a57113d3d14d929c39eaa11e4d9259cabaef57126b4a12",
+      "allowed_surfaces": [
+        "executor prompt (single-turn, 0 tools)"
+      ],
+      "campaign_position": 2,
+      "clause_file": "wrappers/clauses/CURRENT-clause.txt",
+      "clause_sha256": "3bdeaec5543000b993dfe9ef925b844f37a1e2e961646e5a7c92e2fc1fd8cebc",
+      "content_sha256": "60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db",
+      "expected_arm_roles": [
+        "B",
+        "C",
+        "E"
+      ],
+      "file": "fixtures/P2.md",
+      "fixture_id": "P2",
+      "predicate": "rubrics/OWNERSHIP-PREDICATE.md",
+      "predicate_sha256": "20dba7a644abee0d89a1921cb4d183a4eda59a857ddcbbf2287552712fecc00c",
+      "rendered_prompt_sha256": {
+        "B": "60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db",
+        "C": "036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0",
+        "E": "5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f"
+      },
+      "rounds": [
+        [
+          "E",
+          "C",
+          "B"
+        ],
+        [
+          "B",
+          "E",
+          "C"
+        ],
+        [
+          "C",
+          "B",
+          "E"
+        ],
+        [
+          "E",
+          "C",
+          "B"
+        ],
+        [
+          "B",
+          "E",
+          "C"
+        ],
+        [
+          "C",
+          "B",
+          "E"
+        ]
+      ],
+      "rubric": "rubrics/R-P2.md",
+      "rubric_sha256": "960d867f62daeb401de17ace0e4a654046137556d2591f03af5b0fe9339962b7",
+      "wrapper": "wrappers/WRAPPER.md",
+      "wrapper_sha256": "1321414c06222b3d7ff1b69f4c379ede39fa8201d627c9f9074d0052ebdb6b28"
+    }
+  ],
+  "package_id": "issue115-t5pprobe-v1",
+  "probed_clause_pin": {
+    "clause_sha256": "3bdeaec5543000b993dfe9ef925b844f37a1e2e961646e5a7c92e2fc1fd8cebc",
+    "note": "clause-level pin is load-bearing; the containing file blob changed between the sealed campaign and this baseline while the clause bytes did not (machine-checked by static_checks.py)"
+  },
+  "sealed_anchors": {
+    "R_T5S1_rubric_sha256": "79bdeb515ea4b769b0672304618c95cb8f81f7654cec3e9258c3e3f2607a41f1",
+    "T5S1_content_sha256": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+    "T5_placement_clause_sha256": "3bdeaec5543000b993dfe9ef925b844f37a1e2e961646e5a7c92e2fc1fd8cebc",
+    "note": "P1.md and CURRENT-clause.txt are byte-identical copies of the sealed issue115-stage2-v1 files; equality machine-checked by static_checks.py"
+  },
+  "sealed_campaign_doctrine_blob_sha1": "e49c7d9f782d628758db59d5207d9185884e46fa",
+  "status": "PROPOSAL \u2014 design gate only; no execution authorized"
+}

@@ -1,0 +1,43 @@
+# SLOT-TABLE — absolute 39-slot expansion (generated; frozen with the package)
+
+| slot | kind | fixture | arm | n | expected rendered-prompt sha256 |
+|---|---|---|---|---|---|
+| 0 | DRY-RUN | — | — | — | — (identity probe; no fixture prompt) |
+| S1 | SMOKE | P1 | fixture-only | — | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 1 | SCORED | P1 | B | 1 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 2 | SCORED | P1 | C | 1 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| 3 | SCORED | P1 | E | 1 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 4 | SCORED | P1 | C | 2 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| 5 | SCORED | P1 | E | 2 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 6 | SCORED | P1 | B | 2 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 7 | SCORED | P1 | E | 3 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 8 | SCORED | P1 | B | 3 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 9 | SCORED | P1 | C | 3 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| 10 | SCORED | P1 | B | 4 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 11 | SCORED | P1 | C | 4 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| 12 | SCORED | P1 | E | 4 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 13 | SCORED | P1 | C | 5 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| 14 | SCORED | P1 | E | 5 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 15 | SCORED | P1 | B | 5 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 16 | SCORED | P1 | E | 6 | 9109dcea2596e0cc81b5f0ee89cbaeddc7d6dc52d962ce68f172ca3f5d9f3396 |
+| 17 | SCORED | P1 | B | 6 | 9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b |
+| 18 | SCORED | P1 | C | 6 | d54597ec0b36f3e9d52d8564ee750ebc5507bd989f9f4b0e49ef48959de83663 |
+| S2 | SMOKE | P2 | fixture-only | — | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 19 | SCORED | P2 | E | 1 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
+| 20 | SCORED | P2 | C | 1 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 21 | SCORED | P2 | B | 1 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 22 | SCORED | P2 | B | 2 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 23 | SCORED | P2 | E | 2 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
+| 24 | SCORED | P2 | C | 2 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 25 | SCORED | P2 | C | 3 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 26 | SCORED | P2 | B | 3 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 27 | SCORED | P2 | E | 3 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
+| 28 | SCORED | P2 | E | 4 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
+| 29 | SCORED | P2 | C | 4 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 30 | SCORED | P2 | B | 4 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 31 | SCORED | P2 | B | 5 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 32 | SCORED | P2 | E | 5 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
+| 33 | SCORED | P2 | C | 5 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 34 | SCORED | P2 | C | 6 | 036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0 |
+| 35 | SCORED | P2 | B | 6 | 60259f5afa83b0f47af6d6976505698acc10dbdae0d8ec460370ab1923d514db |
+| 36 | SCORED | P2 | E | 6 | 5802b539d3998cdd99d7e6d94ac5c9e885bf3832d276565159b6ede778ec8e4f |
