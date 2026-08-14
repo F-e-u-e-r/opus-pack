@@ -318,6 +318,33 @@ treat every returned result as a claim until verified.
   it."
   ❌ "the wrapper call worked and the alias exists in the provider's
   list, so they're the same model."
+- **A repeatedly-called weak-model surface earns tool design, not just
+  a better prompt — expose the task, hide the mechanism, and make
+  failure states first-class returns** (`unprobed` — contributor
+  design as shape; see Provenance). Where the same weak-tier
+  subordinate calls the same underlying capability across many
+  invocations (a tool wrapping a multi-step browser flow, a scripted
+  API sequence), the leverage point shifts from the per-call prompt to
+  the tool surface itself: expose one high-level task tool per
+  outcome, not the individual mechanism steps, so a weak model composes
+  fewer decisions per call. A recurring precondition failure (an auth
+  wall, a stale session, a rate limit) that each mechanism silently
+  swallows on its own gets promoted to a distinct, named return value
+  every wrapping tool surfaces the same way — a weak model routes on an
+  explicit state far more reliably than it infers one from a generic
+  error or a downstream symptom. Where the precondition is cheap to
+  check and expensive to discover mid-task, add a dedicated
+  cheap-probe tool and instruct the FIRST step of any task tool to call
+  it — burning the full expensive path only to fail on a
+  precondition it could have checked in one cheap call is the
+  recurring waste this prevents.
+  ✅ "collapsed six mechanism-level tools most callers chained
+  identically into one task tool; a sweep for uncovered failure modes
+  found two mechanism tools not yet returning the shared auth-wall
+  state, fixed before the surface shipped."
+  ❌ a tool surface that lets a wrong-precondition call run to its full
+  multi-step cost before failing, on a state a one-call probe would
+  have caught first.
 
 ## 2. The dispatch packet
 
@@ -497,6 +524,25 @@ reviewers that they silently absorb as implementers.
   to break it" has higher recall and false alarms. Reproduce hunt-mode findings.
 - Give verifiers the spec and artifact, never the author's self-summary. All-clear
   verdicts name the point nearest failure or they are rubber stamps.
+- **A reviewer's verdict inherits the dispatch packet's own errors — a
+  wrong premise in the spec manufactures a finding that is correct
+  given the packet and false given the system** (`unprobed` — private
+  incidents as shape; see Provenance). Before crediting a CRITICAL or
+  must-fix, check the packet's own claim, not only the diff against it:
+  an overstated contract, a fabricated precondition, or a wrong
+  architectural premise produces a finding whose fix is correcting the
+  PACKET, not the code — and independent reviewers agreeing under the
+  same wrong premise is not corroboration, it is the same error
+  counted twice. The same channel opens for a subordinate-authored test
+  file the packet placed or scoped: a wrong directory or naming the
+  spec never specified can leave it outside the project's test-runner
+  include pattern, so a claimed new coverage gate needs ground-truth-
+  gates' "confirm a new test actually runs" check applied to where the
+  packet put it, not only to what it asserts.
+  ❌ two independently dispatched reviewers both flag the identical
+  CRITICAL, both correctly derived from a contract the dispatch packet
+  overstated — read as corroboration until the packet itself was
+  checked.
 - Critic verdicts carry evidence: REFUTED needs a counterexample; untested
   assumptions are listed. Verify critics too; stale or missing review is not approval.
 - **Batching verification checkpoints is a cost decision with a hard
@@ -1309,6 +1355,36 @@ landed at the destination instead of being replayed, so the ladder can
 never read as an at-least-once mutation license.
 Ships `unprobed` per the covenant; its probe joins the standing #115
 queue.
+The packet-error-propagates-to-verdict bullet (2026-08-12) comes from
+contributor incidents (contributor-reported, not linkable), two
+instances in one project: a dispatch packet overstated a contract, and
+two independently run reviewers each flagged the identical CRITICAL
+derived from that overstatement — read as corroboration until the
+packet's own claim was checked; separately, a packet's wrong premise
+about where state was held inflated a different reviewer's finding,
+and in the same project a subordinate placed a new test file in a
+directory the packet's own instruction had specified incorrectly,
+which the project's test runner's include pattern then silently
+excluded. Ships `unprobed` per the covenant; its probe — plant a
+dispatch packet with one incorrect premise, observe whether a ruled
+reviewer's adjudication checks the premise before crediting a finding
+derived from it, where a bare one credits it outright — joins the
+standing #115 queue.
+The weak-model-tool-surface bullet (2026-08-12) comes from a
+contributor's own design principle, applied and observed working
+(contributor-reported, not linkable): a tool surface built for a
+free-tier subordinate to drive a multi-step automated flow was
+explicitly redesigned around "expose high-level task tools, keep the
+mechanism hidden, and surface the recurring precondition as first-class
+state rather than letting each tool silently fail on it" — a sweep
+after the redesign caught two of the wrapped mechanism tools not yet
+returning the shared precondition state, and a dedicated cheap-probe
+step was added ahead of the expensive path for exactly this reason.
+Design guidance rather than an incident report; ships `unprobed` per
+the covenant, its probe — a weak-tier subordinate driving a
+mechanism-level tool surface with a swallowed precondition vs. one
+with the precondition promoted to a named return, comparing task
+completion — joins the standing #115 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
