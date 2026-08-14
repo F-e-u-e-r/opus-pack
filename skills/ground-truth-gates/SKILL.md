@@ -237,6 +237,29 @@ audit log), or the claim stays state-only, said so. No independent
 prescription available → the re-run is a consistency check, labelled so —
 never a proof.
 
+**When direct state readback is unreliable or unavailable, verify through
+a downstream observable that must move under a correct application and
+cannot move otherwise** (`unprobed` — contributor incident as shape; see
+Provenance). A control/treatment pair — run the system once without the
+change and once with it, over identical input, and assert the
+treatment's downstream signal differs from the control's in the
+direction the change predicts, written down BEFORE either run (P1 > P0,
+not merely P1 ≠ P0) — proves the application happened even where the
+state it touched cannot be read back directly (an opaque UI setting, a
+third-party system with no inspectable state). The same differential
+form pins protocol-level bugs: diff your own request byte-for-byte
+against the target system's own observed WORKING request for the same
+operation — a length or byte-offset difference the diff surfaces is
+often the entire defect.
+✅ "state readback was unavailable; ran the flow with the setting unset
+(P0) and set (P1) over identical inputs, asserted P1 > P0 before either
+run — passed, proving the setting reached the downstream calculation."
+✅ "diffed my request body against the app's own captured working
+request byte-for-byte; length differed by 5, decoding to exactly the
+two JSON quotes and `Bearer ` my construction had dropped."
+❌ a single successful run with no control, read as proof the change
+did anything — nothing rules out the same output with the change absent.
+
 **In parity work, the artifact settles disputes — reading it beats
 adjudicating between reviewers or picking the plausible option**
 (`unprobed` — contributor incident as shape; see Provenance). When the
@@ -372,7 +395,22 @@ A generic green test is not proof. A gate is real only if:
    the entire window). A **CI/automation config that has never executed** —
    count runs (the platform's runs API), not files; a config can be structurally
    undiscoverable (wrong directory in a monorepo) and inert forever while
-   reading as coverage. A **snapshot gate that silently re-freezes when its
+   reading as coverage. Its source-level cousin, in any ecosystem where the
+   build path can succeed without the typechecker (a transpiler that strips
+   types without checking, an optional external checker never wired into a
+   script): a **static/type-level assertion nothing ever evaluates** — unlike
+   the compiled-but-never-registered test above (which a maintainer wrote and
+   forgot to wire), this one is *inherited* — a prior author trusted it as a
+   live invariant, so nobody deliberately breaks the coupling to find out it
+   isn't checked. Grep for compile-time-only assertions, confirm some script
+   or CI step actually invokes the checker over that file, then prove it
+   two-sidedly: break the coupling once and watch the check go red before
+   trusting a clean sweep (a translations-parity const sat in production
+   source for months while the build script ran a transpiler that never
+   typechecked — it read as an enforced invariant to every reader and
+   enforced nothing until a hook started running the checker directly).
+   (`unprobed` — private incident as shape; see Provenance.) A **snapshot
+   gate that silently re-freezes when its
    baseline is missing** — deleting the baseline must be an error at gate time,
    never a vacuous green. A **scanner that matched zero inputs** — a gate whose
    file pattern silently expands empty (`**` degrading in an old shell dialect
@@ -596,6 +634,26 @@ A generic green test is not proof. A gate is real only if:
    still exported GROQ_API_KEYS (plural, the pool form), which the loader
    checks first; the fallback the test named never ran, green for as long
    as the test existed.
+13. **A success status is not identity — a lookup can return the WRONG
+   entity and still say it worked** (`unprobed` — contributor incident as
+   shape; see Provenance). A search-then-fetch data API, keyed by a
+   shared or ambiguous identifier (a series code with a sibling series,
+   an id resolved by fuzzy or ranked match), can hand back a record for
+   the wrong entity under an unqualified success status — no error, no
+   empty result, nothing distinguishing it in the response envelope. This
+   is item 10's shadow-artifact class at the DATA layer instead of the
+   code layer: there the running subject can be the wrong copy while
+   every assertion passes; here the fetched row can be the wrong record
+   while the call reports success. Assert identity metadata FROM the
+   response — a canonical id, name, or category field distinct from the
+   query key — against what was actually asked for, not only that the
+   call returned 200/success; where the API exposes a canonical-name or
+   metadata lookup, use it to confirm the returned identifier means what
+   the query intended rather than assuming the query key round-trips
+   unchanged.
+   ❌ "queried the non-manufacturing PMI series, got 200 with data" — the
+   response held the manufacturing series under the same call and status,
+   silently, because both shared the queried id family.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -787,10 +845,20 @@ enforces one at runtime — and has its own failure design:
   sub-check, and leave the full suite to the ship gate. It blocks with
   the failure reported, never a repair — which side of a coupling is
   right is judgment, and gate changes stay the orchestrator's call
-  (rule 4).
+  (rule 4). A narrow trigger watching a broad check can name the wrong
+  edit: the check catches drift the trigger did not cause, so its block
+  reason must carry the check's own output verbatim, not only a canned
+  "you changed X" diagnosis naming the trigger — the diagnosis is a hint
+  toward the likely edit, the tool output is the evidence, and only the
+  output can point past the trigger to an earlier, unwatched one
+  (`unprobed` — contributor rollout as shape; see Provenance).
   ❌ "the hook runs the full test suite on every edit" — the suite was
   already red with unrelated failures, so it blocked all work from its
   first firing.
+  ❌ "You changed translations.ts and tsc now fails" as the block's only
+  reason — the actual break was a fixture drifted by an earlier edit to
+  a file the hook never watches; recovery worked only because the raw
+  tsc output was embedded alongside the canned line.
 
 ## When NOT to build a gate
 
@@ -960,6 +1028,19 @@ ideas only, no text — same sourcing and acknowledgements as the two
 2026-07-31 PRs). Each was deferred at the original gate as recipe-level or
 needing generalized wording; the wording here is this pack's. All three ship
 `unprobed` per the covenant; their probes join the private round-5 queue.
+The downstream-observable-differential bullet (2026-08-12) comes from
+contributor incidents (contributor-reported, not linkable), two
+instances in one project: an application setting with no reliable
+direct readback was proven applied by a control/treatment run over a
+downstream calculation the setting must move; separately, an auth
+protocol bug was pinned by diffing an outgoing request byte-for-byte
+against the target application's own observed working request for the
+same operation, the byte-length delta decoding directly to the missing
+field. Ships `unprobed` per the covenant; its probe — a state change
+with no reliable readback, does a ruled reviewer demand a
+control/treatment differential before crediting "applied" where a
+bare one accepts a single successful-looking run — joins the standing
+#115 queue.
 The artifact-settles-disputes and derive-the-derivable-constant bullets
 (2026-08-04) come from one contributor session's parity-implementation
 work against a financial workbook: two independent reviewers flagged a
@@ -1016,6 +1097,18 @@ probe; shorter comparison prose). Ships `unprobed` per the covenant; its
 probe — seed a suite stripping one alias of a two-alias dependency,
 confirm a ruled reviewer catches the live second alias where a bare one
 does not — joins the standing #115 queue.
+Item 13's wrong-entity-under-success clause (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable): a query
+against a data provider's series-lookup API returned a sibling series
+under the queried id family with an unqualified success status — the
+call itself gave no signal the returned entity differed from the one
+requested; caught only by reading the returned record's own name field
+against the query intent, then confirmed by harvesting the provider's
+canonical id/name mapping directly. Ships `unprobed` per the covenant;
+its probe — an ambiguous-id lookup seeded to return a sibling entity,
+does a ruled reviewer check the response's own identity field before
+crediting the fetch where a bare one accepts any 200 — joins the
+standing #115 queue.
 The FP-noise numeric-contract clause (2026-08-07; maintainer fold
 2026-08-08) comes from a contributor incident (contributor-reported,
 not linkable): a golden projection snapshot frozen under one Node major
@@ -1045,6 +1138,35 @@ covenant; its probe — seed a two-file coupling with a red baseline
 sub-check, observe whether a ruled reviewer demands the baseline run
 before the check may block where a bare one wires it straight in —
 joins the standing #115 queue.
+The verbatim-output amendment to that bullet (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable) on the same
+deployed hook, first-hand: an edit to a translations file re-ran the
+coupled type check, which failed on a fixture in an unrelated,
+unwatched file drifted by an earlier edit in the same session — the
+hook's canned "you changed X" reason named the triggering edit, not
+the actual break, and recovery depended on the verbatim compiler
+output the block also carried. Ships `unprobed` per the covenant; its
+probe — armed with only the canned reason, does a bare model self-blame
+the trigger and stall, where a ruled one reads the attached raw output
+and finds the real site — joins the standing #115 queue.
+The dead-source-level-assertion fake-pass shape (2026-08-12) comes from
+the same contributor rollout as the coupled-edit bullet above
+(contributor-reported, not linkable): one repo's cross-language parity
+invariant was written as a type-level const in production source, and
+the repo's build script ran a transpiler that never invoked the
+typechecker — the const sat unenforced from the day it was written
+until an edit-time hook started running the checker directly, deriving
+the same file's coupling that motivated the coupled-edit bullet. It is
+adjacent to, not a restatement of, the existing compiled-but-never-
+registered-test shape earlier in this item: that one is a test a
+maintainer wrote and forgot to wire, discoverable by deliberately
+breaking the code; this one is an assertion a *later* reader inherits
+and trusts as live, so nobody thinks to break it. Ships `unprobed` per
+the covenant; its probe — seed a repo whose build path can succeed
+without the typechecker, plant an unenforced type-level assertion,
+observe whether a ruled reviewer demands proof the checker runs where
+a bare one takes the assertion's presence as enforcement — joins the
+standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
