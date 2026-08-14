@@ -232,6 +232,28 @@ axes, treat it as load-bearing — the pass fails closed.
   --help lists the flag now (existence), a dry-run invocation
   accepted it (function); corrected the playbook in place."
   ❌ "the playbook says there's no flag, so drive it through the UI."
+- **A recorded environment remedy is a hypothesis on reuse, not a fact —
+  verify it fired this time, and retract it in place when it doesn't**
+  (`unprobed` — private incident as shape; see Provenance). A fix for an
+  environment quirk (a process restart, a service bounce, a config
+  toggle) gets written to memory once it worked, then reused across
+  sessions on the strength of that one success — but the underlying
+  cause can be a different bug next time the same symptom appears, or
+  the environment can have moved out from under the remedy entirely.
+  Applying a recorded remedy without confirming the symptom actually
+  cleared repeats the capability-negative failure above in the opposite
+  direction: a false negative fails silent, a false remedy fails LOUD
+  the first time someone trusts it and it doesn't work — but only if
+  the session checks; skipped, it just re-applies the broken fix next
+  time too. Before writing "X fixes Y" into a durable file: confirm Y
+  actually cleared, not merely that X ran without erroring. Before
+  reapplying a recorded remedy: confirm it fixed THIS occurrence before
+  moving on, and when it doesn't, correct the rule in place (per the
+  correction discipline below) rather than leaving the disproven fix
+  for the next reader.
+  ❌ "restart the service — that's the documented fix" written once,
+  applied unverified in three later sessions, until a session that
+  checked found the symptom persisted and the note was stale.
 - Correct a stale rule in place — never append the correction below the old
   line. A zero-context reader obeys whichever sentence it reads first, not
   the latest one.
@@ -584,20 +606,53 @@ axes, treat it as load-bearing — the pass fails closed.
   Phrase triggers as observed states ("a test failed twice"), not topic
   labels ("debugging") — states fire; labels drift.
   A skill that never fires is dead weight; a skill that always fires is a tax.
+- **A description is a rule too — probe its ROUTING, never just its
+  prose** (`unprobed` — see Provenance). The description is the
+  layer loaded before the skill fires at all, and a rule §6's
+  behavioral probe never reaches: that probe hands a fresh reader the
+  file already loaded, which tests whether the loaded content is
+  usable, never whether the file would have loaded in the first
+  place (the frontmatter `name` also routes pre-load; probing the
+  description exercises both). Writing or editing a description: probe
+  the routing as a distinct step, not folded into §6's usability
+  probe — run at least 5 natural-language task prompts at the file's
+  target executor tier (§7), each phrased as an observed state that
+  should fire the skill, none naming the skill; grade only
+  did-it-invoke, and a close or surprising call re-runs before
+  deciding (§7's own convention). Done when every prompt fires the
+  skill — a partial pass is a fail requiring a rewrite, not a passing
+  grade with a caveat. This single-skill probe cannot by itself catch
+  the sibling-collision case — a description that only misfires once a
+  similarly-worded sibling is installed; run it together with the
+  catalog-collision bullet's defense (3) below.
 - Prefer few dense skills over many fragments. A 20-file library of
   near-duplicates dilutes triggers and splits facts across homes.
 - **Catalog size itself degrades triggering — measure collision, don't just
   avoid duplicates** (`unprobed` — see Provenance). Beyond the near-duplicate
   case above, a second failure appears at scale: with many skills installed,
   context pressure trims some from view, so the right one may not fire even with
-  a clean trigger. Two defenses — (1) make description collision a *measured*
+  a clean trigger. Three defenses — (1) make description collision a *measured*
   gate, not a manual eyeball: a deterministic pairwise-similarity check across
   every skill's trigger description, failing when pairwise similarity exceeds a
   ceiling, and only lowering that ceiling over time, never raising it to pass a
   regression; (2) when triggering degrades, walk a mitigation ladder — install
   only the groups the work needs, then invoke by explicit name, then prune the
-  unused — before blaming a single skill's wording. A multi-skill install like
-  this project's own is the setting this addresses.
+  unused — before blaming a single skill's wording; (3) text similarity is a
+  proxy, not the failure — pair it with the behavioral routing probe above,
+  adding at least one prompt per candidate pair that should fire the OTHER
+  skill in the pair (candidate pairs: every pair method (1) scores above half
+  its ceiling, plus every pair the author judges to share a task domain —
+  similarity flags wording overlap, judgment flags competition the wording
+  hides); the pair-prompt fails when the intended skill does not fire,
+  and an additional firing is a collision only when the fired skill's
+  own current description does not claim that prompt's state — a
+  documented companion firing (one description explicitly names the
+  other as a co-load) is expected behavior and may be asserted as an
+  explicit control case rather than graded as a collision. A
+  description that wins its own prompts by stealing a sibling's fails the
+  collision arm even at a clean pairwise-similarity score, since
+  differently-worded descriptions can still compete in practice. A multi-skill
+  install like this project's own is the setting this addresses.
 - Discover before writing: read the repo like an incoming engineer (history,
   reverted attempts, CI, docs), then ask the user only what the repo cannot
   tell you — a small, bounded list.
@@ -1428,3 +1483,36 @@ rule's incident paragraph drafted from a summary carried across
 sessions did not match the source transcript it claimed to describe.
 All contributor-reported, not linkable. Each clause ships `unprobed`
 per the covenant; both probes join the standing #115 queue.
+The recorded-environment-remedy bullet (2026-08-12) comes from a
+contributor incident (contributor-reported, not linkable): a service
+restart recorded in memory as "the fix" for an environment symptom
+after it cleared once was reused across several later sessions, then
+directly falsified — the same restart no longer cleared the symptom,
+and the durable note claiming it did was itself the thing that needed
+correcting. Ships `unprobed` per the covenant; its probe — reuse a
+recorded remedy for a symptom whose underlying cause has since
+changed, observe whether a ruled reviewer checks the symptom cleared
+before moving on where a bare one trusts the note — joins the standing
+#115 queue.
+The §5 description-routing-probe rule (2026-08-12) closes a gap noticed
+while auditing a private skill cache against this file's own §6 review
+lens: the behavioral usability probe there hands the reader a skill
+already loaded, so it never exercises whether the description would
+have fired the load. The existing catalog-collision bullet already
+catches the multi-skill case of this, but only via static
+pairwise-similarity text scoring — no *behavioral* check existed for
+either the single-skill fire-at-all case or a similarity-scored-clean
+pair that still competes in practice; the new bullet adds the former
+and folds the latter into the catalog-collision bullet as its method
+(3), cross-referenced rather than duplicated. No incident is cited;
+the gap is structural, reasoned from re-reading §5 and §6 side by
+side, not from an observed misfire. At the 2026-08-14 maintainer
+gate the collision grading was scoped: the contributed draft graded
+every co-fire as a collision, which false-fails a catalog whose
+descriptions deliberately co-route (this pack's own operational-rigor
+and delegation-and-review pairing); an additional firing now collides
+only where the fired skill's own description does not claim the
+prompt's state, and a documented companion firing is asserted as a
+control instead. Ships `unprobed` per the covenant; its probe (and
+the sibling-collision arm specifically) joins the standing #115
+queue.
