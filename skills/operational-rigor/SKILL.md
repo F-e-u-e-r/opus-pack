@@ -562,6 +562,23 @@ When rigor conflicts with finishing sooner, rigor wins.
 - Between failed fixes, return to a clean state; stacked half-fixes hide causes.
 - Reproduce reported bugs before fixing. Fix the observed failure, not the implied
   one. Refutation is valid: report confirmed non-bugs and ship nothing.
+- **Content moved over a lossy channel needs a hash gate, not a hope** (`unprobed`
+  — contributor incident as shape; see Provenance). A clipboard relay, a
+  remote-desktop paste, a GUI keystroke stream, an OCR/scrape read — any
+  side-channel that can silently drop, stale, or mangle bytes in transit —
+  turns "I sent X" into an unverified claim about what the far side actually
+  received: a paste can deliver yesterday's clipboard content, a keystroke
+  stream can drop a chunk mid-word, and neither errors. Compose the content
+  locally, encode it (base64 is enough to survive most lossy text paths),
+  transfer, then decode-and-verify a content hash before the far side acts on
+  it — treat a hash mismatch as a resend, never a partial-apply; for a
+  transfer split into chunks, key each chunk by index so a resend is
+  idempotent rather than compounding the corruption. State the verification
+  in the report ("MD5-verified byte-identical"), not just that the transfer
+  "completed."
+  ❌ "pasted the deploy command over RDP, it ran" — the clipboard delivered a
+  stale prior value; the command that ran was not the one composed, and nothing
+  in the transcript would have shown it without a hash check.
 - **A check's name is not its coverage** (`unprobed` — private incident as
   shape; see Provenance). A named gate earns evidentiary weight from what
   it asserts AND what it actually drives: one session cited a check whose
@@ -1280,6 +1297,22 @@ the underlying session is verifiable by the contributor, not linkable
 here. Ships `unprobed` per the covenant; its probe joins the standing
 #115 queue — a future campaign, not round-5, which was a completed,
 frozen ten-target slice this rule was not part of.
+
+The hash-gate-lossy-channel bullet (2026-08-12) comes from a contributor
+incident (contributor-reported, not linkable): driving a remote host
+over a remote-desktop session, a clipboard paste silently delivered a
+stale prior value instead of the composed command, and separately a
+typed keystroke stream dropped characters mid-word (a backup command
+mangled into a different, silently-run command immediately before an
+overwrite it was meant to protect against). The fix invented in-session
+— compose, hash, transfer, verify before use, index-keyed chunks for
+idempotent resend — is the shape shipped here, generalized past the
+remote-desktop specifics to any lossy side-channel (clipboard, GUI
+paste, OCR/scrape). Ships `unprobed` per the covenant; its probe —
+pipe a known payload through a simulated lossy channel that corrupts
+one byte, observe whether a ruled reviewer demands the hash check
+before trusting the transfer where a bare one accepts "it pasted" —
+joins the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
