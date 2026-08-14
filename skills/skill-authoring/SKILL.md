@@ -293,7 +293,18 @@ axes, treat it as load-bearing — the pass fails closed.
   <upstream> --base <branch> --state merged --json
   number,mergedAt` — the repo/base flags and the mergedAt field are
   load-bearing: an unflagged query can read the wrong fork or
-  default branch, and PR numbers do not order by merge time). Each list is enumerated
+  default branch, and PR numbers do not order by merge time). **A CLOSED PR is
+  not automatically a non-hit.** Some maintainers land contributions by
+  rebuilding them (no cherry-pick) into a consolidated branch grouped by
+  target file, merging that branch, then closing the original PRs with a
+  disposition comment — GitHub never marks the originals MERGED even though
+  their content is live on the anchor branch, and the OPEN/MERGED queries
+  above never surface them (observed: `F-e-u-e-r/opus-pack` PRs #173–181,
+  closed individually, landed via consolidated PRs #194–197). CLOSED ≠
+  rejected — read the disposition comment, or diff the PR's own changes
+  against the anchor branch, before excluding it as a non-hit; a closed PR
+  with no disposition comment and no matching content on the anchor branch is
+  the only shape that safely reads as declined. Each list is enumerated
   to EXHAUSTION — the tool's default page size (gh's is 30) silently
   truncates, and a date bound does not lift the cap: paginate until
   the last page is short, and record the total counted. "Touching" is
