@@ -1,0 +1,8 @@
+ADDITIONAL PLACEMENT CRITERION:
+When more than one existing bullet could plausibly host the new
+statement, identify the bullet whose own subject — the object,
+process, or property that bullet already governs — is the thing the
+new statement further constrains, and fold the statement into that
+bullet. Shared vocabulary is not ownership: a bullet that merely uses
+words the new statement also uses, without governing what the new
+statement constrains, is not the host.
