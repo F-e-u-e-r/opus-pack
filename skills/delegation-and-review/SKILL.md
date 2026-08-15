@@ -686,6 +686,48 @@ reviewers that they silently absorb as implementers.
   green both times the subordinate reported RED. The subordinate had
   disclosed the sandbox limitation honestly in its own report — the risk
   was a reader trusting the RED verdict without reading that far.)
+- **A worker-misconduct verdict — "it fabricated the file", "it wrote
+  outside its scope" — is manufactured as easily by the dispatch
+  plumbing as by the worker: verify where the harness actually pointed
+  the worker before crediting either** (`unprobed` — contributor
+  incident as shape; see Provenance). The reported-FAILURE rule above
+  covers a worker's own claim; this covers YOUR verdict about worker
+  behavior. A spawned tool can resolve its working directory from
+  something other than the real process cwd (an inherited environment
+  variable a directory-changing spawn never rewrote, a persisted
+  project root, a server it attached to), so a worker's writes land
+  where the tool was pointed, not where the dispatcher looked: an
+  expected file missing from the observed directory reads as
+  fabrication, and a file found elsewhere reads as a scope violation —
+  both verdicts correct against the observation and false against the
+  system. Before recording either: (1) treat the worker's own
+  self-reported location and file listing as EVIDENCE, not noise — a
+  worker that names a different directory than the one you dispatched
+  it to, or lists files you know live elsewhere, has already told you
+  the plumbing diverged; (2) prove where the tool actually points with
+  a single split probe — real cwd one place, the suspect channel
+  another, one write, observe which receives it; (3) only a worker
+  whose delivered working directory is verified correct can earn a
+  fabrication or scope verdict, and mtime forensics on a shared target
+  path cannot rehabilitate one after the fact — successive runs
+  overwrite the same misdirected path, so surviving timestamps show
+  the LAST writer, leaving earlier verdicts unprovable either way.
+  (Incident: a CLI resolved its working directory from the inherited
+  `$PWD` env var rather than the real cwd, which a Python
+  `subprocess(cwd=...)` changes without rewriting `$PWD`; one bench
+  session recorded a "fabricated file 3/3, with invented line number
+  and verification" verdict and a separate "wrote real code to the
+  wrong directory" verdict against two different models — both
+  retracted the same day when a deliberate real-vs-fake `$PWD` split
+  run proved the writes landed exactly where the tool was pointed. The
+  first worker's transcript had self-reported the wrong directory's
+  file listing all along.)
+  ✅ "the worker listed files from a directory I never gave it —
+  suspected the plumbing, ran the split probe, found the env-var
+  channel, retracted the scope-violation verdict."
+  ❌ "the file isn't in its directory and it claimed verification, so
+  it fabricated" — no probe of where the spawn actually pointed the
+  tool.
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
@@ -1385,6 +1427,24 @@ the covenant, its probe — a weak-tier subordinate driving a
 mechanism-level tool surface with a swallowed precondition vs. one
 with the precondition promoted to a named return, comparing task
 completion — joins the standing #115 queue.
+The §3 misconduct-verdict-plumbing rule (2026-08-15) comes from a
+contributor incident (contributor-reported, not linkable): during a
+model bench, a subordinate CLI resolved its working directory from the
+inherited `$PWD` env var instead of the real process cwd (which the
+harness's directory-changing spawn never rewrote), and one session
+recorded both a fabrication verdict and a scope-violation verdict
+against two different models — both retracted the same day after a
+deliberate real-cwd-vs-fake-`$PWD` split run isolated the channel. The
+first worker's transcript had self-reported the wrong directory's file
+listing from the start; the mtime-forensics limit was learned
+attempting (and failing) to rehabilitate the fabrication verdict after
+the fact. Kin to the reported-FAILURE rule (environment fabricating a
+RED) but placed separately because the object differs: that rule
+audits the worker's claim, this one audits the dispatcher's own
+verdict about the worker. Ships `unprobed` per the covenant; its
+probe — a spawn with mismatched real-cwd/`$PWD` and a grader that
+checks only the real cwd, does a ruled reviewer suspect the plumbing
+before the worker — joins the standing #115 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
