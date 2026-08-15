@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mXgVv47RWhS4Gqngs1",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Placement Decision\n\nI would add the new rule to **§2 (Flag lifecycle)** as a new bullet following the existing two bullets:\n\n## Edited region:\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n- **Flags are deleted at 100%, not merely marked done.** Once a rollout\n  has stood at 100% for a full release, the flag must be deleted from\n  the codebase — leaving it behind keeps both branches running. Record\n  the clearing release beside the figure in the flag sheet.\n```\n\n## Explanation\n\nThe new rule concerns the *end state* of flag lifecycle — specifically the concrete action of deletion and its timing. This is squarely within §2's scope (which covers the span from introduction to removal). It fits naturally as a third lifecycle principle after the steward's ownership obligation and the exposure-statement rule, not as a reporting concern (§3). A standalone bullet is appropriate here because no existing bullet owns the topic of *when and how to physically delete a flag* — the first bullet addresses purpose-driven removal conceptually, but not the operational details this rule specifies."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 586,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 337,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

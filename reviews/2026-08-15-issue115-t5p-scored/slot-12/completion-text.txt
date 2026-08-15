@@ -1,0 +1,25 @@
+# Placement Decision
+
+**Add to Section 2, Failure handling, as a new bullet after the existing two bullets:**
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+- **Wall-clock caps bound retry loops.** A retry wrapper must cap
+  total elapsed time, not only attempt count — a per-attempt timeout
+  with unbounded attempts still hangs the caller. Declare both the
+  attempt cap and the wall-clock cap at the call site.
+
+## 3. Recording outcomes
+```
+
+## Explanation
+
+The new rule governs a distinct failure-handling constraint (total elapsed time) that is not owned by the two existing bullets in Section 2. The first bullet owns *attempt count* bounds; the second owns *per-attempt timeout* declaration. Neither already constrains the *wall-clock cap* across the entire retry loop — that is new territory. A standalone bullet is appropriate because this constraint cannot be folded into either existing bullet without muddying their discrete subjects; it deserves its own clear statement as a third pillar of failure-handling discipline.

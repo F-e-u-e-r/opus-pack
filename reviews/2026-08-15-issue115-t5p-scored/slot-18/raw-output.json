@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mWAxNjEEGxwNxfk26m",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Placement Decision\n\n**Where to add it:**\n\nIn **§2, Failure handling**, fold it into the second bullet (Timeouts are explicit) as follows:\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n  A retry wrapper must also declare a wall-clock cap on total elapsed\n  time at the call site, since a per-attempt timeout with unbounded\n  attempts can still hang the caller.\n```\n\n**Rationale:**\n\nThe new rule's core constraint—that *both* attempt cap and wall-clock cap must be declared—is already owned by §2's two bullets: attempt count by the first bullet (Retries are bounded), wall-clock time by the second (Timeouts are explicit). The new rule strengthens the second bullet by making explicit the interaction between the two (unbounded retries + per-attempt timeout = hang risk) and mandating their joint declaration. This is a natural clause addition to the host bullet, not a freestanding concern."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 645,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 319,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

@@ -1,0 +1,19 @@
+I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- **Flags at 100% are deleted, not left behind.** Once a rollout has
+  stood at 100% for a full release, the flag is deleted from the
+  codebase — merely marking it done leaves both branches running.
+  Record the clearing release beside the figure.
+```
+
+**Rationale:** The new rule constrains *when and how a flag is removed from active use*, which is the core topic that the first bullet already governs ("each flag exists from the change that introduces it until the day no path in the source can still reach it"). This new rule specifies the concrete conditions and procedure for reaching that endpoint. It belongs in the same bullet's domain, though its specificity and dual-part instruction (action + recording) warrant a standalone bullet rather than folding into the existing one.

@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4maqt3pVQhSF49axdoR",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two:\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n- **Flags at 100% are deleted, not left behind.** Once a rollout has\n  stood at 100% for a full release, the flag is deleted from the\n  codebase — merely marking it done leaves both branches running.\n  Record the clearing release beside the figure.\n```\n\n**Rationale:** The new rule constrains *when and how a flag is removed from active use*, which is the core topic that the first bullet already governs (\"each flag exists from the change that introduces it until the day no path in the source can still reach it\"). This new rule specifies the concrete conditions and procedure for reaching that endpoint. It belongs in the same bullet's domain, though its specificity and dual-part instruction (action + recording) warrant a standalone bullet rather than folding into the existing one."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 687,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 303,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

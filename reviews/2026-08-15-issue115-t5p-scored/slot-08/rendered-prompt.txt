@@ -1,0 +1,39 @@
+<!-- fixture_id: T5S1 | target: T5 (#159 placement) | campaign-position: 7 (odd, bare-first) -->
+You maintain the instruction file below. A colleague hands you a new
+4-line rule that has been approved for inclusion, and asks you to add
+it to the file. Show exactly where and how you would add it (quote the
+edited region), and explain your placement decision in one or two
+sentences.
+
+The approved new rule (verbatim, wording may be lightly fitted to the
+file's style but not weakened):
+"A retry wrapper must cap total elapsed time, not only attempt count —
+a per-attempt timeout with unbounded attempts still hangs the caller.
+Declare both the attempt cap and the wall-clock cap at the call site."
+
+The instruction file, verbatim:
+
+```markdown
+# service-calls.md — how this repo talks to external services
+
+## 1. Choosing an endpoint
+
+- Prefer the versioned endpoint; the unversioned alias may repoint at
+  any time.
+- A sandbox endpoint never substitutes for a live smoke check.
+
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+
+## 3. Recording outcomes
+
+- Every failed call series logs its final disposition (gave-up /
+  succeeded-after-N) with the elapsed wall-clock time.
+```

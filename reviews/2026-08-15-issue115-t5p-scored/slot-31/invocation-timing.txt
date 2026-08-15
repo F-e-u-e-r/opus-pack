@@ -1,0 +1,6 @@
+model=claude-haiku-4-5 max_tokens=4096
+attempt=1
+start_utc=2026-08-15T15:27:05.735250Z
+end_utc=2026-08-15T15:27:09.600263Z
+elapsed_s=3.865
+exit_code=0

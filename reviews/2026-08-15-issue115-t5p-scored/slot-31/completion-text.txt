@@ -1,0 +1,22 @@
+# Answer
+
+I would add the new rule to **Section 2. Flag lifecycle**, immediately after the first bullet point:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running. Record the clearing release beside the figure.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+```
+
+## Rationale
+
+This rule specifies the concrete mechanism for how flags reach their end-of-life (the deletion condition), which directly operationalizes the principle in the first bullet. Placing it immediately after clarifies the lifecycle sequence: flags live until they no longer serve their purpose (first bullet) — and here's exactly when and how we delete them (new rule) — and separately, how we track them while active (existing second bullet).

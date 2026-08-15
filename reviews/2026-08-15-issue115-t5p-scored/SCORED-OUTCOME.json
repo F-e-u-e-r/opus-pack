@@ -1,0 +1,51 @@
+{
+ "clean": {
+  "P1": true,
+  "P2": true
+ },
+ "decision_step_fired": 3,
+ "grid": {
+  "P1/B": {
+   "band": "LOW",
+   "pass": 0,
+   "ungradable": 0
+  },
+  "P1/C": {
+   "band": "LOW",
+   "pass": 2,
+   "ungradable": 0
+  },
+  "P1/E": {
+   "band": "MID",
+   "pass": 4,
+   "ungradable": 0
+  },
+  "P2/B": {
+   "band": "LOW",
+   "pass": 0,
+   "ungradable": 0
+  },
+  "P2/C": {
+   "band": "MID",
+   "pass": 3,
+   "ungradable": 0
+  },
+  "P2/E": {
+   "band": "LOW",
+   "pass": 1,
+   "ungradable": 0
+  }
+ },
+ "hypothesis_disposition": "NONE \u2014 the preregistered mapping yields INCONCLUSIVE, which supports no hypothesis; H1/H2/H3 all undecided",
+ "outcome": "INCONCLUSIVE(MIXED-P1+MIXED-P2)",
+ "patterns": {
+  "P1": "MIXED",
+  "P2": "MIXED"
+ },
+ "tags": [
+  "MIXED-P1",
+  "MIXED-P2"
+ ],
+ "ungradable_total": 0,
+ "valid_scored_total": 36
+}

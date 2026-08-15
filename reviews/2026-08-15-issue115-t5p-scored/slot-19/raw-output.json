@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mWU5Gjr5Nb5w3opqkL",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two bullets:\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n- **A flag is deleted once the rollout has stood at 100% for a full\n  release, not merely marked done.** One left behind keeps both\n  branches running. Record the clearing release beside the figure.\n```\n\n**Placement rationale:** The new rule governs *when and how a flag exits the codebase* — the endpoint of the lifecycle that §2's opening bullet (\"No flag outlives its purpose\") already claims as its domain. Although §3 mentions release notes, it does not govern flag deletion itself; the new rule's core constraint is the lifecycle condition (100% for a full release), which is §2's subject matter. This belongs as a third lifecycle bullet, not in reporting."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 687,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 282,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

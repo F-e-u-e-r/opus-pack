@@ -1,0 +1,20 @@
+# Placement Decision
+
+I would add this rule to **§2, as a new bullet following the existing two bullets:**
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- **A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running.** Record the clearing release beside the figure.
+```
+
+**Rationale:** The new rule directly operationalizes "no flag outlives its purpose" by specifying the concrete deletion criterion and timing. It belongs in the lifecycle section because it defines a transition state (from active flag to deleted), and it pairs naturally with the rollout-figure rule above it (both concern the flag sheet's record-keeping). This is a host-bullet clarification, not a new topic requiring standalone status.

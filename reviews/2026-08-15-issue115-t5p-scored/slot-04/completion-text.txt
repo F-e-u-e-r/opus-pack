@@ -1,0 +1,23 @@
+# Placement Decision
+
+**Where to add it:**
+Fold it into the second bullet of §2 as a trailing sentence, immediately after "No call inherits a library default timeout silently; the call site states its per-attempt timeout."
+
+**Edited region (§2):**
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+  A retry wrapper must also cap total elapsed time, not only attempt
+  count — declare both the per-attempt and wall-clock caps at the
+  call site, since a per-attempt timeout with unbounded attempts still
+  hangs the caller.
+```
+
+**Rationale:** The new rule is a direct refinement of the timeout bullet's own scope (the requirement to state timeout bounds at the call site). It strengthens that bullet by clarifying that *two* bounds are required, not one, and explains the failure mode that makes wall-clock capping non-optional. It belongs as an elaboration on the existing timeout principle, not as a standalone bullet.
