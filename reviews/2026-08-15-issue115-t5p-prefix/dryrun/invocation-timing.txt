@@ -1,0 +1,6 @@
+argv (message payload elided): ['ant', 'messages', 'create', '--debug', '--model', 'claude-haiku-4-5', '--max-tokens', '64']
+model=claude-haiku-4-5 max_tokens=64
+start_utc=2026-08-15T08:16:39.659658Z
+end_utc=2026-08-15T08:16:41.637076Z
+elapsed_s=1.977
+exit_code=0

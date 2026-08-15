@@ -1,0 +1,45 @@
+{
+ "receipt_type": "run",
+ "run_id": "issue115-t5pprobe-v1/slot-0/attempt-1",
+ "state_transition": "prefix grant: unit-start gate ALL PASS -> dry-run in flight -> identity CONFIRMED",
+ "slot": 0,
+ "execution_kind": "DRY-RUN",
+ "retry_role": "original",
+ "validity": "N/A (DRY-RUN and SMOKE never receive a validity value; prereg \u00a79 three-axis rule)",
+ "target_fixture_arm_n": "none \u2014 slot 0 is the identity probe, no fixture prompt (frozen SLOT-TABLE row 0)",
+ "attempt_number": 1,
+ "retry_linkage": "none (no retry authorized under this grant)",
+ "timestamp_utc": "2026-08-15T08:16:39.659658Z to 2026-08-15T08:16:41.637076Z (exit 0)",
+ "elapsed_s": 1.977,
+ "prompt_sha256": "d8adb66f9915732364edb6bad6a36db633ed580ae32a4edfa75d17ae3c1801e2",
+ "prompt_note": "identity probe bytes byte-identical to the sealed campaign's and the T2 probe's dry-run prompt",
+ "executor_requested_model": "claude-haiku-4-5",
+ "executor_reported_model": "claude-haiku-4-5-20251001",
+ "identity_verdict": "CONFIRMED \u2014 reported exact id equals the prereg \u00a711 pin (claude-haiku-4-5-20251001), the same identity as the sealed issue115-stage2-v1 campaign; no fallback, no tier substitution",
+ "api_message_id": "msg_011Ce4CjrMz7qFhHCnXK8SYW",
+ "completion_status": "intact \u2014 completion delivered, stop_reason=end_turn, nonempty output",
+ "completion_text": "OK",
+ "usage": {
+  "input_tokens": 12,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "output_tokens": 4,
+  "service_tier": "standard",
+  "inference_geo": "not_available"
+ },
+ "resolved_request_parameters": {
+  "transport": "ant CLI 1.22.1 -> POST https://api.anthropic.com/v1/messages, user_oauth profile",
+  "model": "claude-haiku-4-5",
+  "max_tokens": 64,
+  "messages": "[{role: user, content: <rendered-prompt.txt bytes>}] \u2014 single-turn",
+  "tools": "not sent (0 tools)",
+  "system": "not sent",
+  "sampling": "no temperature/top_p/top_k sent \u2014 platform-default sampling",
+  "evidence_basis": "WIRE-LEVEL: --debug transcript captured the full HTTP request; DECODED body content byte-identical to rendered-prompt.txt; model/max_tokens/no-tools/no-system verified on the decoded wire object"
+ },
+ "decoded_wire_equals_prompt": true
+}

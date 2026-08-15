@@ -1,0 +1,56 @@
+{
+ "receipt_type": "run",
+ "run_id": "issue115-t5pprobe-v1/slot-S1/attempt-1",
+ "slot": "S1",
+ "execution_kind": "SMOKE",
+ "fixture": "P1",
+ "arm": "fixture-only (bare render)",
+ "retry_role": "original",
+ "validity": "N/A (SMOKE never receives a validity value)",
+ "attempt_number": 1,
+ "retry_linkage": "none (no retry authorized under this grant)",
+ "timestamp_utc": "2026-08-15T08:17:04.432215Z to 2026-08-15T08:17:07.722344Z (exit 0)",
+ "elapsed_s": 3.29,
+ "prompt_sha256": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+ "slot_table_expected_sha256": "9617591bc3fe0655ab9539d07212aed0b1e03de971009eed9769e343099fe13b",
+ "pre_send_gate": "EXACT MATCH \u2014 digest compared against the frozen SLOT-TABLE row BEFORE the request was issued",
+ "executor_requested_model": "claude-haiku-4-5",
+ "executor_reported_model": "claude-haiku-4-5-20251001",
+ "identity_verdict": "CONFIRMED \u2014 equals the prereg \u00a711 pin",
+ "api_message_id": "msg_011Ce4CmcNfgJttF3fBwDk2s",
+ "stop_reason": "end_turn",
+ "usage": {
+  "input_tokens": 411,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "output_tokens": 295,
+  "service_tier": "standard",
+  "inference_geo": "not_available"
+ },
+ "resolved_request_parameters": {
+  "transport": "ant CLI 1.22.1 -> POST https://api.anthropic.com/v1/messages, user_oauth profile",
+  "model": "claude-haiku-4-5",
+  "max_tokens": 4096,
+  "messages": "[{role: user, content: <rendered-prompt.txt bytes = fixture bytes>}] \u2014 single-turn",
+  "tools": "not sent (0 tools)",
+  "system": "not sent",
+  "sampling": "no temperature/top_p/top_k sent \u2014 platform-default sampling",
+  "evidence_basis": "WIRE-LEVEL: DECODE-then-compare on the --debug transcript"
+ },
+ "decoded_wire_equals_prompt": true,
+ "decoded_wire_bytes": 1580,
+ "prompt_bytes": 1580,
+ "smoke_checklist": {
+  "item1": "PASS",
+  "item2": "PASS",
+  "item3": "PASS",
+  "item4": "PASS",
+  "item5": "PASS"
+ },
+ "smoke_verdict": "PASS 5/5",
+ "substantive_content_note": "NOT evaluated and NOT characterised: the frozen checklist grades gradability and harness viability only; substantive performance never conditions fixture survival and is not permitted to update any hypothesis, rubric, mapping, or threshold. Raw output preserved verbatim in raw-output.json."
+}

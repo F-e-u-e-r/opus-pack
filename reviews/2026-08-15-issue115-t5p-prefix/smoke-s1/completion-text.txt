@@ -1,0 +1,22 @@
+# Placement Decision
+
+I would add the new rule as a second bullet point under **"Timeouts are explicit,"** immediately after the existing timeout rule. Here's the edited region:
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+- **Total elapsed time is capped independently.** A per-attempt timeout
+  with unbounded attempts can still hang the caller; declare both the
+  attempt cap and the wall-clock cap at the call site.
+
+## 3. Recording outcomes
+```
+
+**Rationale:** The new rule directly extends the "Timeouts are explicit" principle by addressing a critical gap—it prevents the false security of having per-attempt timeouts without a total elapsed-time bound. Placing it as a sibling bullet emphasizes that wall-clock capping is a separate, mandatory concern from per-attempt timeouts, not a detail subordinate to them.
