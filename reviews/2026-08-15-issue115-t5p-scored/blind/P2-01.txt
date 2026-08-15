@@ -1,0 +1,18 @@
+I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two bullets:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- **A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done.** One left behind keeps both
+  branches running. Record the clearing release beside the figure.
+```
+
+**Placement rationale:** The new rule governs *when and how a flag exits the codebase* — the endpoint of the lifecycle that §2's opening bullet ("No flag outlives its purpose") already claims as its domain. Although §3 mentions release notes, it does not govern flag deletion itself; the new rule's core constraint is the lifecycle condition (100% for a full release), which is §2's subject matter. This belongs as a third lifecycle bullet, not in reporting.

@@ -1,0 +1,398 @@
+[
+ {
+  "oid": "P1-01",
+  "fixture": "P1",
+  "chars": 1265,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-02",
+  "fixture": "P1",
+  "chars": 878,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-03",
+  "fixture": "P1",
+  "chars": 1324,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-04",
+  "fixture": "P1",
+  "chars": 1187,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-05",
+  "fixture": "P1",
+  "chars": 1290,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-06",
+  "fixture": "P1",
+  "chars": 1300,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-07",
+  "fixture": "P1",
+  "chars": 1220,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-08",
+  "fixture": "P1",
+  "chars": 1206,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-09",
+  "fixture": "P1",
+  "chars": 1158,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-10",
+  "fixture": "P1",
+  "chars": 1181,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-11",
+  "fixture": "P1",
+  "chars": 1439,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-12",
+  "fixture": "P1",
+  "chars": 1275,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-13",
+  "fixture": "P1",
+  "chars": 1219,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-14",
+  "fixture": "P1",
+  "chars": 1418,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-15",
+  "fixture": "P1",
+  "chars": 1327,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-16",
+  "fixture": "P1",
+  "chars": 1245,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-17",
+  "fixture": "P1",
+  "chars": 1276,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P1-18",
+  "fixture": "P1",
+  "chars": 1114,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-01",
+  "fixture": "P2",
+  "chars": 1167,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-02",
+  "fixture": "P2",
+  "chars": 1076,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-03",
+  "fixture": "P2",
+  "chars": 1050,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-04",
+  "fixture": "P2",
+  "chars": 1287,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-05",
+  "fixture": "P2",
+  "chars": 1164,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-06",
+  "fixture": "P2",
+  "chars": 1374,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-07",
+  "fixture": "P2",
+  "chars": 1154,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-08",
+  "fixture": "P2",
+  "chars": 1284,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-09",
+  "fixture": "P2",
+  "chars": 1181,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-10",
+  "fixture": "P2",
+  "chars": 1450,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-11",
+  "fixture": "P2",
+  "chars": 1016,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-12",
+  "fixture": "P2",
+  "chars": 1281,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-13",
+  "fixture": "P2",
+  "chars": 1273,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-14",
+  "fixture": "P2",
+  "chars": 1015,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-15",
+  "fixture": "P2",
+  "chars": 1061,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-16",
+  "fixture": "P2",
+  "chars": 1088,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-17",
+  "fixture": "P2",
+  "chars": 1058,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 2,
+  "fenced_blocks": 1
+ },
+ {
+  "oid": "P2-18",
+  "fixture": "P2",
+  "chars": 1150,
+  "bullets_present": [
+   "2.1",
+   "2.2"
+  ],
+  "new_bullet_markers": 3,
+  "fenced_blocks": 1
+ }
+]

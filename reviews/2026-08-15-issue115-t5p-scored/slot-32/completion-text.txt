@@ -1,0 +1,26 @@
+# Placement Decision
+
+**New content should be folded into § 2, second bullet, as a trailing sentence.**
+
+## Edited region:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to. A flag is deleted once the rollout has stood
+  at 100% for a full release, not merely marked done — one left
+  behind keeps both branches running; record the clearing release
+  beside the figure.
+
+## 3. Reporting
+```
+
+## Rationale
+
+The new rule governs **when and how flags are removed from active use**, which is the terminal phase of the lifecycle already owned by § 2's first bullet. The second bullet in § 2 constrains how rollout figures are recorded; the new statement further constrains those figures by specifying when deletion occurs and demanding a clearing-release record—a metadata obligation on the same figure. Folding into the second bullet (rather than creating a third) recognizes that both govern the flag sheet's data and its states; the new rule is a continuation of the rollout-figure rule's scope, not a sibling lifecycle stage.

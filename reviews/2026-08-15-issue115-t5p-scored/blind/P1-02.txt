@@ -1,0 +1,17 @@
+**Placement decision:** Fold into the second bullet of §2, as a trailing sentence. That bullet already governs retry wrapper declarations at the call site; the new rule adds a required second parameter (wall-clock cap) to those declarations.
+
+**Edited region:**
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file. The wrapper must also declare a total elapsed-time
+  cap, since a per-attempt timeout alone cannot prevent indefinite
+  caller hangs across multiple attempts.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+```

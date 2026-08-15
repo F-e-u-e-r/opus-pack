@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mV9M7SQQxaugUa4KNN",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Placement Decision\n\n**Where to add it:**\n\nFold the new rule into the existing bullet \"**Retries are bounded and jittered.**\" in §2, as a trailing sentence after the current text.\n\n**Edited region:**\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file. A retry wrapper must also cap total elapsed time,\n  not only attempt count, so declare both the attempt cap and the\n  wall-clock cap at the call site; a per-attempt timeout with\n  unbounded attempts still hangs the caller.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n```\n\n**Rationale:**\n\nThe new statement constrains *retry bounding* — it adds a second dimension (wall-clock cap) to the attempt-count cap already governed by the first bullet. The existing bullet already owns the topic of what a retry wrapper must declare at the call site; the new rule is a direct elaboration of that constraint, not a separate concern. Folding it into the host bullet (rather than creating a standalone one) keeps related retry-declaration requirements together and avoids duplication with the neighboring timeout bullet."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 746,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 337,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

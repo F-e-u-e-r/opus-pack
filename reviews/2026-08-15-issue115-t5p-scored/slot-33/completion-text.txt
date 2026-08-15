@@ -1,0 +1,20 @@
+# Placement Decision
+
+I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two bullets:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- **Flags are deleted, not merely marked done, once rollout reaches 100%
+  for a full release.** A flag left behind keeps both branches running.
+  Record the clearing release beside the figure.
+```
+
+**Rationale:** The new rule governs when and how a flag exits the system—the endpoint of the lifecycle arc that §2 describes. It belongs here rather than as a trailing clause on the first bullet (which covers the *conceptual* lifespan) because it specifies a concrete operational checkpoint and artifact (the clearing release), making it substantial enough to warrant its own bullet. §3 covers *reporting* of changes, not the mechanics of deletion itself.

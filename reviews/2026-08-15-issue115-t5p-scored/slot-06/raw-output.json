@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mTB4juUp8SYJvTvHaB",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I would add the new rule to section 2, immediately after the existing timeout bullet point:\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n- **Retry wrappers cap total elapsed time, not only attempt count.**\n  A per-attempt timeout with unbounded attempts still hangs the caller.\n  Declare both the attempt cap and the wall-clock cap at the call site.\n\n## 3. Recording outcomes\n```\n\n**Placement rationale:** The new rule directly extends the timeout principle already stated in the preceding bullet, clarifying that per-attempt timeouts alone are insufficient—a wall-clock cap is equally mandatory. This placement keeps related timeout/retry constraints together rather than scattering them across sections."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 411,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 260,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

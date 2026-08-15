@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mXTdWMEuRTmBZUHHs7",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "I would add the new rule to **§2, Flag lifecycle**, folding it into the first bullet as a trailing sentence:\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span. A flag is deleted once the rollout has stood at 100% for a\n  full release, not merely marked done — one left behind keeps both\n  branches running. Record the clearing release beside the figure.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n```\n\n**Rationale:** The new rule constrains *flag deletion and its mechanics* — the completion of the lifecycle described in the first bullet. It is not a new topic but a specification of how the span from introduction to removal concludes. The first bullet already governs the flag's entire lifespan; this rule details the terminal state and its recording, making it a natural continuation of that governing statement rather than a separate concern."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 687,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 265,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

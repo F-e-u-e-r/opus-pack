@@ -1,0 +1,50 @@
+2026/08/15 23:27:20 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: P2 --\u003e\nYou maintain the instruction file below. A colleague hands you a new\n4-line rule that has been approved for inclusion, and asks you to add\nit to the file. Show exactly where and how you would add it (quote the\nedited region), and explain your placement decision in one or two\nsentences.\n\nThe approved new rule (verbatim, wording may be lightly fitted to the\nfile's style but not weakened):\n\"A flag is deleted once the rollout has stood at 100% for a full\nrelease, not merely marked done — one left behind keeps both\nbranches running. Record the clearing release beside the figure.\"\n\nThe instruction file, verbatim:\n\n```markdown\n# feature-flags.md — how this repo runs feature flags\n\n## 1. Naming and registration\n\n- A flag's name states the behaviour it gates, not the ticket that\n  introduced it.\n- A flag added outside the flag sheet is treated as an incident.\n\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n\n## 3. Reporting\n\n- Every release note lists the flags whose exposure changed, with the\n  figure before and after.\n```\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/15 23:27:23 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-15T15:27:21Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-15T15:27:23Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-15T15:27:20Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-15T15:27:21Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2b93909aef12691-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Sat, 15 Aug 2026 15:27:23 GMT
+Request-Id: req_011Ce4mac4MKU4Xyg7Egs5Wr
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-3926c9f5822e0997b3fdb05ef5b8ec4f-539f823bc48960d4-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011Ce4maccLpWkh3vnzrhtDZ","type":"message","role":"assistant","content":[{"type":"text","text":"I would add the new rule to section 2, immediately after the existing second bullet point:\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n- **A flag is deleted once the rollout has stood at 100% for a full\n  release, not merely marked done** — one left behind keeps both\n  branches running. Record the clearing release beside the figure.\n```\n\nThis placement belongs in the lifecycle section because it specifies the concrete end-state condition and removal procedure for flags, which is a natural continuation of the \"no flag outlives its purpose\" principle already stated there, and it directly complements the rule about stated rollout figures by explaining what happens when a rollout reaches completion."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":352,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":240,"service_tier":"standard","inference_geo":"not_available"}}

@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4maNR4dxC1TSBTAvTzL",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "# Placement Decision\n\nI would add this rule to **§2, as a new bullet following the existing two bullets:**\n\n```markdown\n## 2. Flag lifecycle\n\n- **No flag outlives its purpose.** Each flag exists from the change\n  that introduces it until the day no path in the source can still\n  reach it; the steward listed with it carries it over that whole\n  span.\n- **Rollout figures are stated, never inherited.** No flag takes a\n  default exposure; the flag sheet states the percentage and the\n  cohort it applies to.\n- **A flag is deleted once the rollout has stood at 100% for a full\n  release, not merely marked done — one left behind keeps both\n  branches running.** Record the clearing release beside the figure.\n```\n\n**Rationale:** The new rule directly operationalizes \"no flag outlives its purpose\" by specifying the concrete deletion criterion and timing. It belongs in the lifecycle section because it defines a transition state (from active flag to deleted), and it pairs naturally with the rollout-figure rule above it (both concern the flag sheet's record-keeping). This is a host-bullet clarification, not a new topic requiring standalone status."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 586,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 270,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

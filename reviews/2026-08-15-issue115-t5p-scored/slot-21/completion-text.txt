@@ -1,0 +1,18 @@
+I would add the new rule to section 2, immediately after the first bullet point, as follows:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running. Record the clearing release beside the figure.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+```
+
+**Placement rationale:** This rule specifies the concrete mechanics of flag deletion, which is the endpoint promised by the first bullet ("until the day no path in the source can still reach it"). It belongs immediately after that principle to explain *how* deletion actually happens, before moving to the separate concern of rollout tracking in the third bullet.

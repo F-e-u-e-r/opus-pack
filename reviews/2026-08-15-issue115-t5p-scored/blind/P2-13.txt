@@ -1,0 +1,22 @@
+## Placement Decision
+
+**New content location:** End of §2, second bullet (the "Rollout figures" bullet), as a trailing sentence.
+
+**Edited region:**
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to. A flag is deleted once the rollout has stood
+  at 100% for a full release, not merely marked done — one left behind
+  keeps both branches running; record the clearing release beside the
+  figure.
+```
+
+**Rationale:** The new rule constrains *rollout figures and their lifecycle* — specifically, what happens when a rollout reaches 100% and how to record that event. The second bullet in §2 already governs the statement and recording of rollout exposure; deletion upon sustained 100% rollout is a direct continuation of how rollout figures are managed. The first bullet's scope (what a flag is and when it dies) is broader but does not own the specific mechanics of *recording* rollout state, which the new rule introduces.

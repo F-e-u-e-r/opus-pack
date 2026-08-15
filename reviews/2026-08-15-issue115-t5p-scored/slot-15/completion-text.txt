@@ -1,0 +1,23 @@
+# Placement Decision
+
+I would insert the new rule as a third bullet point within Section 2, immediately after the existing timeout rule:
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+- **Wall-clock caps prevent indefinite hangs.** A retry wrapper must
+  bound total elapsed time, not only attempt count — a per-attempt
+  timeout with unbounded attempts still hangs the caller. Declare both
+  the attempt cap and the wall-clock cap at the call site.
+
+## 3. Recording outcomes
+```
+
+**Rationale:** The new rule is a direct elaboration on the timeout principle established in the preceding bullet, warning against a specific failure mode (unbounded attempts despite per-attempt timeouts) and prescribing the dual-cap pattern. Placing it immediately after makes the logical dependency clear without disrupting the section's focus on timeout and retry discipline.

@@ -1,0 +1,19 @@
+## Placement Decision
+
+I would **fold the new rule into the second bullet of §2**, modifying it as follows:
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file. The wrapper must also declare a wall-clock timeout
+  cap alongside the attempt cap, since a per-attempt timeout alone
+  cannot prevent unbounded total elapsed time.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+```
+
+**Rationale:** The new statement constrains the *retry wrapper itself* — specifically, what it must declare and enforce — which is the subject already governed by the first bullet (which owns "retries are bounded"). The second bullet governs per-attempt timeout *values*, a narrower concern, and does not govern the relationship between attempt caps and wall-clock caps. The new rule is a strengthening constraint on the retry wrapper's completeness, not a separate concern.

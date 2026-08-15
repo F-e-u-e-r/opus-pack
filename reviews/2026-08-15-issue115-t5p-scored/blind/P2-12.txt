@@ -1,0 +1,18 @@
+I would add the new rule to **§2, Flag lifecycle**, as a new bullet following the existing two:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running. Record the clearing release beside the figure.
+```
+
+**Rationale:** The new rule governs *when and how flags end their lifecycle* — the boundary condition for "no path in the source can still reach it" stated in the first bullet. It belongs in §2 because it constrains the lifecycle process itself (when deletion happens, what artifact records it), not naming (§1) or release communication (§3). It is a new bullet rather than a fold because it introduces a specific procedural requirement (the "full release" durability rule and the recording obligation) that does not naturally extend either existing bullet without becoming unwieldy.

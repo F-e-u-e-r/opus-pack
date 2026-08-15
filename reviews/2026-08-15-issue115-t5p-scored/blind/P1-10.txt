@@ -1,0 +1,23 @@
+# Placement Decision
+
+**Where to add it:**
+Fold the new rule into the second bullet of §2 ("Retries are bounded and jittered"), expanding it to cover wall-clock caps alongside attempt caps.
+
+**Edited region:**
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file. The wrapper must also declare a wall-clock cap on
+  total elapsed time, since a per-attempt timeout with unbounded
+  attempts can still hang the caller.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+```
+
+**Rationale:**
+The new statement constrains *retry wrapper caps*—the subject already governed by the first bullet. The existing bullet owns attempt-count declaration; the new clause adds the wall-clock cap as a parallel constraint on the same wrapper declaration at the call site. This is a natural elaboration of what "bounded" means, not a separate concern.

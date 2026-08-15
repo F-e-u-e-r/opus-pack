@@ -1,0 +1,42 @@
+{
+ "clean": {
+  "P1": true,
+  "P2": true
+ },
+ "grid": {
+  "P1/B": {
+   "band": "LOW",
+   "pass": 0,
+   "ungradable": 0
+  },
+  "P1/C": {
+   "band": "LOW",
+   "pass": 2,
+   "ungradable": 0
+  },
+  "P1/E": {
+   "band": "MID",
+   "pass": 4,
+   "ungradable": 0
+  },
+  "P2/B": {
+   "band": "LOW",
+   "pass": 0,
+   "ungradable": 0
+  },
+  "P2/C": {
+   "band": "MID",
+   "pass": 3,
+   "ungradable": 0
+  },
+  "P2/E": {
+   "band": "LOW",
+   "pass": 1,
+   "ungradable": 0
+  }
+ },
+ "patterns": {
+  "P1": "MIXED",
+  "P2": "MIXED"
+ }
+}

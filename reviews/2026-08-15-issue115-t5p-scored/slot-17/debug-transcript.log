@@ -1,0 +1,50 @@
+2026/08/15 23:26:16 Request Content:
+POST /v1/messages HTTP/1.1
+Host: api.anthropic.com
+Accept: application/json
+Anthropic-Beta: oauth-2025-04-20
+Anthropic-Version: 2023-06-01
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Authorization: Bearer <REDACTED>
+Content-Type: application/json
+User-Agent: Anthropic/CLI 1.22.1
+X-Stainless-Arch: arm64
+X-Stainless-Cli-Command: ant messages create
+X-Stainless-Lang: cli
+X-Stainless-Os: MacOS
+X-Stainless-Package-Version: 1.22.1
+X-Stainless-Retry-Count: 0
+X-Stainless-Runtime: cli
+X-Stainless-Runtime-Version: go1.25.12
+X-Stainless-Timeout: 600
+
+{"max_tokens":4096,"messages":[{"content":"\u003c!-- fixture_id: T5S1 | target: T5 (#159 placement) | campaign-position: 7 (odd, bare-first) --\u003e\nYou maintain the instruction file below. A colleague hands you a new\n4-line rule that has been approved for inclusion, and asks you to add\nit to the file. Show exactly where and how you would add it (quote the\nedited region), and explain your placement decision in one or two\nsentences.\n\nThe approved new rule (verbatim, wording may be lightly fitted to the\nfile's style but not weakened):\n\"A retry wrapper must cap total elapsed time, not only attempt count —\na per-attempt timeout with unbounded attempts still hangs the caller.\nDeclare both the attempt cap and the wall-clock cap at the call site.\"\n\nThe instruction file, verbatim:\n\n```markdown\n# service-calls.md — how this repo talks to external services\n\n## 1. Choosing an endpoint\n\n- Prefer the versioned endpoint; the unversioned alias may repoint at\n  any time.\n- A sandbox endpoint never substitutes for a live smoke check.\n\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n\n## 3. Recording outcomes\n\n- Every failed call series logs its final disposition (gave-up /\n  succeeded-after-N) with the elapsed wall-clock time.\n```\n","role":"user"}],"model":"claude-haiku-4-5"}
+2026/08/15 23:26:20 Response Content:
+HTTP/2.0 200 OK
+Anthropic-Organization-Id: 8350a6ea-b777-40e6-b1f9-0ce0e6d50c5c
+Anthropic-Ratelimit-Input-Tokens-Limit: 2000000
+Anthropic-Ratelimit-Input-Tokens-Remaining: 2000000
+Anthropic-Ratelimit-Input-Tokens-Reset: 2026-08-15T15:26:17Z
+Anthropic-Ratelimit-Output-Tokens-Limit: 400000
+Anthropic-Ratelimit-Output-Tokens-Remaining: 400000
+Anthropic-Ratelimit-Output-Tokens-Reset: 2026-08-15T15:26:20Z
+Anthropic-Ratelimit-Requests-Limit: 1000
+Anthropic-Ratelimit-Requests-Remaining: 999
+Anthropic-Ratelimit-Requests-Reset: 2026-08-15T15:26:16Z
+Anthropic-Ratelimit-Tokens-Limit: 2400000
+Anthropic-Ratelimit-Tokens-Remaining: 2400000
+Anthropic-Ratelimit-Tokens-Reset: 2026-08-15T15:26:17Z
+Anthropic-Workspace-Id: wrkspc_01UnwWdUKszqVVyBhp2u92Be
+Cf-Cache-Status: DYNAMIC
+Cf-Ray: a2b9377a9f4fd75e-NRT
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'
+Content-Type: application/json
+Date: Sat, 15 Aug 2026 15:26:20 GMT
+Request-Id: req_011Ce4mVu1BaECV1WD5wHjqS
+Server: cloudflare
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+Traceresponse: 00-a1564f25c131948b0829c0c51b1b02a6-6a043e68742f6c03-01
+Vary: Accept-Encoding
+X-Robots-Tag: none
+
+{"model":"claude-haiku-4-5-20251001","id":"msg_011Ce4mVuaQuCLe4qSB5Lk9R","type":"message","role":"assistant","content":[{"type":"text","text":"# Placement Decision\n\nI would add the new rule as a third bullet point under **Section 2. Failure handling**, immediately after the existing timeout rule:\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n- **Timeout caps must be dual-layered.** A per-attempt timeout alone\n  cannot prevent caller hangs under unbounded retries; declare both\n  the maximum attempt count and a wall-clock elapsed-time cap at the\n  call site.\n\n## 3. Recording outcomes\n```\n\n**Explanation:** The new rule directly extends the timeout principle already stated in the second bullet—it explains a critical *failure* of per-attempt-only timeouts and prescribes the corrective structure. Placing it immediately after the existing timeout guidance keeps related timeout concerns adjacent and prevents readers from missing the interaction between retries and timeouts."}],"stop_reason":"end_turn","stop_sequence":null,"stop_details":null,"usage":{"input_tokens":411,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"cache_creation":{"ephemeral_5m_input_tokens":0,"ephemeral_1h_input_tokens":0},"output_tokens":288,"service_tier":"standard","inference_geo":"not_available"}}

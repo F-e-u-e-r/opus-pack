@@ -1,0 +1,26 @@
+# Placement Decision
+
+**Where to add it:**
+
+Fold the new rule into the existing bullet "**Retries are bounded and jittered.**" in §2, as a trailing sentence after the current text.
+
+**Edited region:**
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file. A retry wrapper must also cap total elapsed time,
+  not only attempt count, so declare both the attempt cap and the
+  wall-clock cap at the call site; a per-attempt timeout with
+  unbounded attempts still hangs the caller.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+```
+
+**Rationale:**
+
+The new statement constrains *retry bounding* — it adds a second dimension (wall-clock cap) to the attempt-count cap already governed by the first bullet. The existing bullet already owns the topic of what a retry wrapper must declare at the call site; the new rule is a direct elaboration of that constraint, not a separate concern. Folding it into the host bullet (rather than creating a standalone one) keeps related retry-declaration requirements together and avoids duplication with the neighboring timeout bullet.

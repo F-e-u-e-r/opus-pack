@@ -1,0 +1,510 @@
+{
+ "mismatches": [],
+ "three_way": {
+  "P1-01": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-02": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-03": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P1-04": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-05": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P1-06": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P1-07": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P1-08": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-09": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-10": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-11": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-12": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P1-13": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-14": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-15": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-16": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P1-17": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P1-18": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-01": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-02": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P2-03": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-04": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P2-05": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-06": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P2-07": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P2-08": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-09": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-10": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-11": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-12": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-13": {
+   "luna": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "operator": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ],
+   "sol": [
+    "FAIL-WRONG-OWNER",
+    "2.2"
+   ]
+  },
+  "P2-14": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-15": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-16": {
+   "luna": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "operator": [
+    "PASS-OWNER",
+    "2.1"
+   ],
+   "sol": [
+    "PASS-OWNER",
+    "2.1"
+   ]
+  },
+  "P2-17": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  },
+  "P2-18": {
+   "luna": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "operator": [
+    "FAIL-STANDALONE",
+    null
+   ],
+   "sol": [
+    "FAIL-STANDALONE",
+    null
+   ]
+  }
+ },
+ "unanimous": true
+}

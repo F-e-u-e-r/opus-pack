@@ -1,0 +1,17 @@
+I would add the new rule to **§2, Flag lifecycle**, folded into the first bullet as a trailing sentence:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span. A flag is deleted once the rollout has stood at 100% for a
+  full release, not merely marked done — one left behind keeps both
+  branches running. Record the clearing release beside the figure.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+```
+
+**Rationale:** The new rule specifies *when* and *how* flags are removed—the concrete end-state for "no flag outlives its purpose"—so it belongs in the lifecycle section as a clarification of the first bullet's scope. It's the operational detail that answers "what does deletion actually mean?" and "what do we record?" It fits naturally as an elaboration rather than standing alone.

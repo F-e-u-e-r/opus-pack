@@ -1,0 +1,27 @@
+{
+  "model": "claude-haiku-4-5-20251001",
+  "id": "msg_011Ce4mUt4bzUaeBrMRfUxGH",
+  "type": "message",
+  "role": "assistant",
+  "content": [
+    {
+      "type": "text",
+      "text": "**Placement decision:** Fold the new rule into the second bullet of §2 as a trailing sentence and new requirement, since it directly extends the existing \"Retries are bounded\" mandate by adding the wall-clock cap that pairs with attempt count.\n\n**Edited region:**\n\n```markdown\n## 2. Failure handling\n\n- **Retries are bounded and jittered.** Every retry wrapper declares\n  its maximum attempt count at the call site; backoff is exponential\n  with jitter, and a non-retriable error class aborts immediately —\n  enumerate those classes beside the wrapper, not in a distant\n  constants file. A retry wrapper must also cap total elapsed time,\n  not only attempt count; declare both the attempt cap and the\n  wall-clock cap at the call site, since a per-attempt timeout with\n  unbounded attempts will still hang the caller.\n- **Timeouts are explicit.** No call inherits a library default\n  timeout silently; the call site states its per-attempt timeout.\n```\n\n**Rationale:** The new rule is topically inseparable from the bounded-retries requirement — it specifies a complementary constraint (wall-clock vs. attempt count) on the same wrapper object. Keeping them together strengthens the coherence of the \"both dimensions must be bounded\" principle without creating a standalone bullet for a clause that belongs in the existing host."
+    }
+  ],
+  "stop_reason": "end_turn",
+  "stop_sequence": null,
+  "stop_details": null,
+  "usage": {
+    "input_tokens": 645,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "cache_creation": {
+      "ephemeral_5m_input_tokens": 0,
+      "ephemeral_1h_input_tokens": 0
+    },
+    "output_tokens": 310,
+    "service_tier": "standard",
+    "inference_geo": "not_available"
+  }
+}

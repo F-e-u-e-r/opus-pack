@@ -1,0 +1,24 @@
+# Placement Decision
+
+**Where to add it:**
+
+In **§2, Failure handling**, fold it into the second bullet (Timeouts are explicit) as follows:
+
+```markdown
+## 2. Failure handling
+
+- **Retries are bounded and jittered.** Every retry wrapper declares
+  its maximum attempt count at the call site; backoff is exponential
+  with jitter, and a non-retriable error class aborts immediately —
+  enumerate those classes beside the wrapper, not in a distant
+  constants file.
+- **Timeouts are explicit.** No call inherits a library default
+  timeout silently; the call site states its per-attempt timeout.
+  A retry wrapper must also declare a wall-clock cap on total elapsed
+  time at the call site, since a per-attempt timeout with unbounded
+  attempts can still hang the caller.
+```
+
+**Rationale:**
+
+The new rule's core constraint—that *both* attempt cap and wall-clock cap must be declared—is already owned by §2's two bullets: attempt count by the first bullet (Retries are bounded), wall-clock time by the second (Timeouts are explicit). The new rule strengthens the second bullet by making explicit the interaction between the two (unbounded retries + per-attempt timeout = hang risk) and mandating their joint declaration. This is a natural clause addition to the host bullet, not a freestanding concern.

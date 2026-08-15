@@ -1,0 +1,20 @@
+I would add the new rule to Section 2, immediately after the second bullet point, as follows:
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- **A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running.** Record the clearing release beside the figure.
+
+## 3. Reporting
+```
+
+**Placement rationale:** This rule describes a specific operational requirement within the flag lifecycle (when and how to remove flags), making Section 2 the natural home. It follows logically after the statement about a flag's lifespan, clarifying the concrete process for that end-of-life phase.

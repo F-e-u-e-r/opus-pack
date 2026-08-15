@@ -1,0 +1,20 @@
+# Placement Decision
+
+**Where to add it:** Into **§2, second bullet**, as a trailing sentence after "the steward listed with it carries it over that whole span."
+
+**Edited region:**
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span. A flag is deleted once the rollout has stood at 100% for a
+  full release, not merely marked done — one left behind keeps both
+  branches running; record the clearing release beside the figure.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+```
+
+**Rationale:** The new rule specifies *when* and *how* a flag reaches its lifecycle endpoint (the "day" referenced in the host bullet). It belongs in the section on flag lifecycle, and the first bullet already owns the topic of flag removal and stewardship across a flag's full span — this is a necessary detail about executing that responsibility, not a sibling concern. Folding it as a trailing clause avoids a proliferation of narrow standalone bullets and keeps the complete removal logic in one place.

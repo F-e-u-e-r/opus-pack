@@ -1,0 +1,27 @@
+{
+ "slot": 33,
+ "fixture": "P2",
+ "arm": "C",
+ "n": 5,
+ "expected_sha256": "036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0",
+ "rendered_sha256": "036501ddca6540c0906ac5790f3addabcf38ce024f9b2f5fa7d6f88009a4b4e0",
+ "pre_send_gate": "EXACT MATCH",
+ "attempts": 1,
+ "validity": "VALID-SCORED",
+ "elapsed_s": 3.44,
+ "api_message_id": "msg_011Ce4ma7img48HwtKGXgjfg",
+ "reported_model": "claude-haiku-4-5-20251001",
+ "stop_reason": "end_turn",
+ "usage": {
+  "input_tokens": 586,
+  "cache_creation_input_tokens": 0,
+  "cache_read_input_tokens": 0,
+  "cache_creation": {
+   "ephemeral_5m_input_tokens": 0,
+   "ephemeral_1h_input_tokens": 0
+  },
+  "output_tokens": 281,
+  "service_tier": "standard",
+  "inference_geo": "not_available"
+ }
+}
