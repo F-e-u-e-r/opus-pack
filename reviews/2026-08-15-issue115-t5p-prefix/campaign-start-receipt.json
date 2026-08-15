@@ -1,0 +1,43 @@
+{
+ "receipt_type": "campaign-start",
+ "package_id": "issue115-t5pprobe-v1",
+ "grant": "PREFIX ONLY \u2014 1 dry-run + P1 smoke + P2 smoke; all 36 scored slots LOCKED",
+ "unit_start_gate": {
+  "main_sha": "6fe6813bcc35edb86a8b92b4aaaa7f9ba3459ef7",
+  "main_is_merge_commit_of_pr199": true,
+  "working_tree": "clean at gate time; only this execution package added afterwards",
+  "package_bytes_match_merged_main": true,
+  "static_checks": "175/175 PASS",
+  "repo_checks": "all passed",
+  "anchors": "P1xC == sealed ruled hash; P1xB == sealed bare hash (recomputed)",
+  "budget_at_start": {
+   "planned": 39,
+   "hard_cap": 50,
+   "consumed": 0
+  },
+  "t2_headroom_11": "untouched",
+  "stage2_reserve_18": "untouched",
+  "issue_115": "OPEN",
+  "verifier_only_correction": "one \u2014 the operator's consumed==0 predicate matched SLOT-TABLE.md on a filename substring; corrected to 'untracked files in the package' and re-verified against the same evidence (git ls-files vs filesystem). No request had been issued; not a campaign exception."
+ },
+ "invocations": [
+  {
+   "slot": 0,
+   "kind": "DRY-RUN",
+   "api_message_id": "msg_011Ce4CjrMz7qFhHCnXK8SYW",
+   "reported_model": "claude-haiku-4-5-20251001"
+  },
+  {
+   "slot": "S1",
+   "kind": "SMOKE",
+   "api_message_id": "msg_011Ce4CmcNfgJttF3fBwDk2s",
+   "reported_model": "claude-haiku-4-5-20251001"
+  },
+  {
+   "slot": "S2",
+   "kind": "SMOKE",
+   "api_message_id": "msg_011Ce4CnBqZrPpvb5szbMYMo",
+   "reported_model": "claude-haiku-4-5-20251001"
+  }
+ ]
+}

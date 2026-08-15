@@ -1,0 +1,20 @@
+# Edited Region
+
+```markdown
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+- A flag is deleted once the rollout has stood at 100% for a full
+  release, not merely marked done — one left behind keeps both
+  branches running. Record the clearing release beside the figure.
+```
+
+## Placement Rationale
+
+This rule belongs in section 2 (Flag lifecycle) because it specifies the concrete conditions and mechanics for removing a flag, which directly follows the principle that "no flag outlives its purpose." It clarifies *how* that deletion happens and *when*, making it a natural continuation of the lifecycle definition rather than a reporting or naming concern.

@@ -1,0 +1,39 @@
+<!-- fixture_id: P2 -->
+You maintain the instruction file below. A colleague hands you a new
+4-line rule that has been approved for inclusion, and asks you to add
+it to the file. Show exactly where and how you would add it (quote the
+edited region), and explain your placement decision in one or two
+sentences.
+
+The approved new rule (verbatim, wording may be lightly fitted to the
+file's style but not weakened):
+"A flag is deleted once the rollout has stood at 100% for a full
+release, not merely marked done — one left behind keeps both
+branches running. Record the clearing release beside the figure."
+
+The instruction file, verbatim:
+
+```markdown
+# feature-flags.md — how this repo runs feature flags
+
+## 1. Naming and registration
+
+- A flag's name states the behaviour it gates, not the ticket that
+  introduced it.
+- A flag added outside the flag sheet is treated as an incident.
+
+## 2. Flag lifecycle
+
+- **No flag outlives its purpose.** Each flag exists from the change
+  that introduces it until the day no path in the source can still
+  reach it; the steward listed with it carries it over that whole
+  span.
+- **Rollout figures are stated, never inherited.** No flag takes a
+  default exposure; the flag sheet states the percentage and the
+  cohort it applies to.
+
+## 3. Reporting
+
+- Every release note lists the flags whose exposure changed, with the
+  figure before and after.
+```
