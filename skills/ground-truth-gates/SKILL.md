@@ -116,6 +116,27 @@ provider, tier, or configuration takes its own runs there — same-family
 or similar-name inference is not parity evidence. (`unprobed` — see
 Provenance.)
 
+**A population claim needs the population benched — a subset scored
+under one harness supports "N of the M tested", never "no member does
+X" or "every member does X"** (`unprobed` — contributor incident as
+shape; see Provenance). The trap is sharpest for a probe that
+SEPARATES subjects: any subset that happens to lack a separating
+member makes the property look universal, and the resulting "law"
+reads as MORE solid than a per-subject score precisely because it
+sounds structural rather than sampled. Before a claim names the
+population ("the pool", "every tier", "all of them"), check the
+denominator: either every current member ran under the same harness
+build, or the claim carries its subset explicitly ("3 of the 7").
+And the denominator decays independently of the scores — population
+membership churns, so a population claim expires with the roster,
+not just with serving drift.
+❌ "no member of the pool defends unstated degenerate inputs — the
+rule is now unconditional" — 3 of 7 members had been benched; a
+whole-pool run days later found one guarding that edge 2/2 on debut
+and another 1/2. The same author had already made and retracted a
+different universal-from-subset claim on the same probe weeks
+earlier — each subset lacking a separating member looked like a law.
+
 The same calibration discipline applies within one arm across time
 (`unprobed` — contributor incident as shape; see Provenance). A
 stochastic subject — a model, a scheduler, a network path, anything whose
@@ -127,7 +148,15 @@ replicated, carry its run count beside its score so a lone sweep cannot read
 as a measurement. Every claimed run needs a persisted row of its own: a run
 quoted from recall, or one whose output the next run overwrote, cannot be
 re-checked and is not a run — publishing four while one is on disk is how an
-unreplicated result becomes an unfalsifiable one.
+unreplicated result becomes an unfalsifiable one. And the overwrite is
+usually the harness's own design, not an accident: a results file at a
+fixed path makes every re-run destroy the baseline it will be compared
+against, so key result artifacts by run (date, tag, or run id) and treat
+an existing file at the output path as an error, never a target — a
+harness that can silently consume its own prior evidence is one careless
+re-run away from an uncheckable comparison (one harness's hardcoded
+results filename replaced the prior week's scorecard on re-run; those
+rows survived only because a separate log duplicated them).
 ❌ "30/30, no thinking step — make it the default." Replicated to N=4 the
 same candidate scored 30/30/20/29, failing twice by mechanisms the first run
 never produced.
@@ -1167,6 +1196,24 @@ without the typechecker, plant an unenforced type-level assertion,
 observe whether a ruled reviewer demands proof the checker runs where
 a bare one takes the assertion's presence as enforcement — joins the
 standing #115 queue.
+The population-claim rule and the run-keyed-artifacts amendment
+(2026-08-21) are mined from one contributor bench session
+(contributor-reported, not linkable): a 4-probe free-model bench whose
+edge probe separates models had twice yielded a universal claim from a
+subset — most recently "no model in the pool defends this edge" off 3
+of 7 members, undone days later when a whole-pool run under one
+harness build found one member guarding it 2/2 and another 1/2 — and
+the same session's harness, writing to a hardcoded results filename,
+silently replaced the prior week's scorecard on re-run, leaving those
+rows recoverable only from a duplicate log. The amendment extends this
+section's existing persisted-row clause (a run whose output the next
+run overwrote is not a run) from the epistemic consequence to the
+design prescription; it is adjacent to, not a restatement of, that
+clause. Both ship `unprobed` per the covenant; the population-claim
+probe — hand a reviewer a k-of-M bench table plus a "does anything in
+the pool do X?" question and observe whether a ruled reviewer bounds
+the answer to the tested subset where a bare one publishes the law —
+joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
