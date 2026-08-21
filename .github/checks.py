@@ -328,12 +328,12 @@ for rel in ("README.md", "README.zh-Hant.md"):
         ok(f"{rel} carries a backticked mention of all {len(skill_names)} skills")
 
 # 4. Hidden-directive sweep over ALL tracked files: zero-width, bidi
-#    controls, ALM, word-joiner, BOM, Unicode Tag Block. Every tracked path
-#    is OPENED first
+#    controls, ALM, word-joiner, BOM, soft hyphen, Unicode Tag Block.
+#    Every tracked path is OPENED first
 #    (a missing tracked file is a failure, whatever its extension); known
 #    TEXT extensions may not hide behind an embedded NUL; only unknown
 #    extensions may classify as binary via NUL.
-BAD = re.compile("[\\u200b-\\u200f\\u2060\\u061c\\ufeff\\u202a-\\u202e\\u2066-\\u2069\\U000e0000-\\U000e007f]")
+BAD = re.compile("[\\u200b-\\u200f\\u2060\\u061c\\ufeff\\u00ad\\u202a-\\u202e\\u2066-\\u2069\\U000e0000-\\U000e007f]")
 BINARY_EXTS = (".png", ".jpg", ".jpeg", ".gif", ".ico", ".pdf", ".zip",
                ".woff", ".woff2", ".ttf", ".eot", ".mp4", ".db")
 TEXT_EXTS = (".md", ".py", ".sh", ".mjs", ".js", ".yml", ".yaml", ".json",

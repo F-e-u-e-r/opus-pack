@@ -1,0 +1,32 @@
+== POST-PATCH (GREEN side), working tree vs base 6069aad4a408994076ccf96ce8ab79a1a4199369 ==
+PASS op-rigor prose |set|                                       EXPECT 146                          ACTUAL 146
+PASS skill-vetting prose |set|                                  EXPECT 146                          ACTUAL 146
+PASS checks.py executable |set|                                 EXPECT 146                          ACTUAL 146
+PASS op-rigor == skill-vetting                                  EXPECT True                         ACTUAL True
+PASS op-rigor == executable                                     EXPECT True                         ACTUAL True
+PASS U+00AD in executable set                                   EXPECT True                         ACTUAL True
+PASS U+00AD in op-rigor prose set                               EXPECT True                         ACTUAL True
+PASS U+00AD in skill-vetting prose set                          EXPECT True                         ACTUAL True
+PASS U+0085 excluded (all surfaces)                             EXPECT True                         ACTUAL True
+PASS U+180E excluded (all surfaces)                             EXPECT True                         ACTUAL True
+PASS known-bad U+200B caught by regex                           EXPECT True                         ACTUAL True
+PASS U+00AD caught by regex (live probe)                        EXPECT True                         ACTUAL True
+PASS plain ASCII not caught                                     EXPECT False                        ACTUAL False
+PASS legit TAB U+0009 not caught                                EXPECT False                        ACTUAL False
+PASS legit LF U+000A not caught                                 EXPECT False                        ACTUAL False
+PASS legit CR U+000D not caught                                 EXPECT False                        ACTUAL False
+PASS legit NBSP U+00A0 not caught                               EXPECT False                        ACTUAL False
+PASS legit e-acute U+00E9 not caught                            EXPECT False                        ACTUAL False
+PASS legit CJK zhong U+4E2D not caught                          EXPECT False                        ACTUAL False
+PASS legit en dash U+2013 not caught                            EXPECT False                        ACTUAL False
+PASS legit em dash U+2014 not caught                            EXPECT False                        ACTUAL False
+PASS legit middle dot U+00B7 not caught                         EXPECT False                        ACTUAL False
+PASS legit rightwards arrow U+2192 not caught                   EXPECT False                        ACTUAL False
+PASS legit check mark U+2713 not caught                         EXPECT False                        ACTUAL False
+executable set = U+00AD U+061C U+200B-U+200F U+202A-U+202E U+2060 U+2066-U+2069 U+FEFF U+E0000-U+E007F
+PASS baseline executable |set| (re-derived)                     EXPECT 145                          ACTUAL 145
+PASS after == before | {U+00AD}                                 EXPECT True                         ACTUAL True
+PASS exact set delta == [U+00AD]                                EXPECT ['U+00AD']                   ACTUAL ['U+00AD']
+PASS nothing removed from old set                               EXPECT True                         ACTUAL True
+PASS all old 145 still individually caught                      EXPECT True                         ACTUAL True
+RESULT: ALL EXPECTATIONS PASS
