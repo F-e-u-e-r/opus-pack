@@ -1,0 +1,276 @@
+{
+ "A_probed_in_part_loci": [
+  "skills/cross-model-review/SKILL.md:154",
+  "skills/delegation-and-review/references/recurring-sweep-ledgers.md:68",
+  "skills/operational-rigor/SKILL.md:703",
+  "skills/security-architect/SKILL.md:456",
+  "skills/skill-authoring/SKILL.md:720"
+ ],
+ "A_surface": {
+  "files": 12,
+  "in_body_markers": 129,
+  "issue_snapshot_at_097a253": {
+   "files": 11,
+   "occurrences": 161
+  },
+  "occurrences": 251
+ },
+ "B_split": {
+  "path1_probed_in_part": 3,
+  "path3_unprobed": 7
+ },
+ "B_targets": {
+  "round5.cross-model-review.convergence-corrective": {
+   "heading_line": 89,
+   "marker": "unprobed",
+   "path": "skills/cross-model-review/SKILL.md"
+  },
+  "round5.delegation.absence-is-not-resolution": {
+   "heading_line": 68,
+   "marker": "probed in part",
+   "path": "skills/delegation-and-review/references/recurring-sweep-ledgers.md"
+  },
+  "round5.delegation.costumed-as-completion": {
+   "heading_line": 349,
+   "marker": "unprobed",
+   "path": "skills/delegation-and-review/SKILL.md"
+  },
+  "round5.delegation.handoff-compression": {
+   "heading_line": 869,
+   "marker": "unprobed",
+   "path": "skills/delegation-and-review/SKILL.md"
+  },
+  "round5.operational-rigor.consumer-position-verification": {
+   "heading_line": 703,
+   "marker": "probed in part",
+   "path": "skills/operational-rigor/SKILL.md"
+  },
+  "round5.sec-arch.audience-check-on-disclosure": {
+   "heading_line": 173,
+   "marker": "unprobed",
+   "path": "skills/security-architect/SKILL.md"
+  },
+  "round5.sec-arch.policy-shaped-data-tier": {
+   "heading_line": 493,
+   "marker": "unprobed",
+   "path": "skills/security-architect/SKILL.md"
+  },
+  "round5.sec-arch.severity-confidence-split": {
+   "heading_line": 146,
+   "marker": "unprobed",
+   "path": "skills/security-architect/SKILL.md"
+  },
+  "round5.sec-arch.subprocess-env-minimization": {
+   "heading_line": 455,
+   "marker": "probed in part",
+   "path": "skills/security-architect/SKILL.md"
+  },
+  "round5.sec-arch.threat-model-system-scoping": {
+   "heading_line": 30,
+   "marker": "unprobed",
+   "path": "skills/security-architect/SKILL.md"
+  }
+ },
+ "C_items": {
+  "1": {
+   "anchor": "Sentinel-tag every synthetic fixture",
+   "path": "skills/ground-truth-gates/SKILL.md",
+   "present": true
+  },
+  "10": {
+   "anchor": "A consumer loop over paged or streamed work ends on the producer's",
+   "path": "skills/delegation-and-review/SKILL.md",
+   "present": true
+  },
+  "11": {
+   "anchor": "A self-benefit metric ships the tests that keep it honest",
+   "path": "skills/ground-truth-gates/SKILL.md",
+   "present": true
+  },
+  "2": {
+   "anchor": "A diagnostic that CROSSES a trust boundary",
+   "path": "skills/security-architect/SKILL.md",
+   "present": true
+  },
+  "3": {
+   "anchor": "A deliberate \"not now\" on measured work records the evidence",
+   "path": "skills/operational-rigor/SKILL.md",
+   "present": true
+  },
+  "4": {
+   "anchor": "Replay's inverse \u2014 verify-by-reconstruction",
+   "path": "skills/ground-truth-gates/SKILL.md",
+   "present": true
+  },
+  "5": {
+   "anchor": "a mutable precondition is re-validated immediately",
+   "path": "skills/operational-rigor/SKILL.md",
+   "present": true
+  },
+  "6": {
+   "anchor": "\"You created it\" is a provenance claim",
+   "path": "skills/operational-rigor/SKILL.md",
+   "present": true
+  },
+  "7": {
+   "anchor": "A one-directional flag is meaningful in only one direction",
+   "path": "skills/operational-rigor/references/external-systems.md",
+   "present": true
+  },
+  "8": {
+   "anchor": "Recipe for marker-framed packets",
+   "path": "skills/delegation-and-review/SKILL.md",
+   "present": true
+  },
+  "9": {
+   "anchor": "A side-effecting create whose outcome is unknown is never blindly",
+   "path": "skills/operational-rigor/references/external-systems.md",
+   "present": true
+  }
+ },
+ "C_lineage_files": [
+  "skills/delegation-and-review/SKILL.md",
+  "skills/ground-truth-gates/SKILL.md",
+  "skills/operational-rigor/SKILL.md",
+  "skills/operational-rigor/references/external-systems.md",
+  "skills/security-architect/SKILL.md"
+ ],
+ "E_local_untracked": {
+  "gitignored": true,
+  "postfix_result": "11/11 PASS exit 0",
+  "prefix_control_result": "10 FAIL / 1 PASS exit 1",
+  "run4_pre0a_bak_sha256": "ea9abd8c06f68cd12e0d4f5f7ec460974fb18f7a9d0788eb50c64caf49278612",
+  "run4_sh_sha256": "594a8b8c98a613fc3240925b4841637b520facffbc18087cbda6724c16e2482d",
+  "test_sandbox_root_sha256": "672a5ac15ebdbb740f992cd3de3afca2007facf270ed9a96d7925e21ce103e84"
+ },
+ "T2_amendment_present": true,
+ "blobs": {
+  "reviews/2026-08-04-round5-results/RESULT-SUMMARY.md": "c1f4c5fb2154a2e54eae64d351b3ee36d6c0e80d",
+  "reviews/2026-08-04-round5-targets.json": "66a8cd9b7264d2f76f10b6e25c89877a32d6d5c7",
+  "reviews/2026-08-13-issue115-campaign-synthesis/CLOSURE-ASSESSMENT.md": "b5a7d24908486f79c47dcf5f1c09c022b876bb27",
+  "reviews/2026-08-13-issue115-section-a-disposition/DISPOSITION-RECORD.md": "60f091de5596de0dfeb239e047f12e6849433613",
+  "reviews/2026-08-13-issue115-t2-semantic-determination/T2-SEMANTIC-DETERMINATION.md": "2bad0db547b63681dbf14a0a871c643ae7e9729e",
+  "reviews/2026-08-15-issue115-t5-placement-disposition/DISPOSITION.md": "8df9cf82e3b3e845f542ff4c7288feed4e137225",
+  "skills/operational-rigor/references/external-systems.md": "f2d43106e3176e2750e977d0c830136dc28629b8"
+ },
+ "issue115": {
+  "comments": 2,
+  "state": "open",
+  "state_reason": null
+ },
+ "main": "dd052c46b27bdebb8378aa21adeab4902bc54bd6",
+ "prs": {
+  "116": {
+   "merge_commit_sha": "158d15e399e2b2ab9ef2bb425d3f28b220fecbaf",
+   "merged": true,
+   "merged_at": "2026-08-01T11:52:54Z",
+   "state": "closed",
+   "title": "Ship the 11 deferred backlog candidates from #112 (#115 Phase 1)"
+  },
+  "140": {
+   "merge_commit_sha": "e6581e183272cf38f1f7ff55f4ef82e8c81b5adc",
+   "merged": true,
+   "merged_at": "2026-08-04T12:58:35Z",
+   "state": "closed",
+   "title": "Round-5 results-only evidence (durable): PREREG, ledger, 38 raw outputs, receipts"
+  },
+  "141": {
+   "merge_commit_sha": "d6d68c5fb67f2eb82cb4b27141988ea1df9d55cb",
+   "merged": true,
+   "merged_at": "2026-08-04T13:50:27Z",
+   "state": "closed",
+   "title": "Round-5 marker disposition: settle T4/T8/T10 to `probed in part`"
+  },
+  "185": {
+   "merge_commit_sha": "493d68dea53cc36c2b02d2524fbc4846b93a00fe",
+   "merged": true,
+   "merged_at": "2026-08-13T05:48:21Z",
+   "state": "closed",
+   "title": "issue-115 campaign synthesis: proposed 8-marker disposition matrix + closure assessment (dual gate PROCEED x2)"
+  },
+  "186": {
+   "merge_commit_sha": "444880da4dbdf3c94531d6507252c1ad3870e71c",
+   "merged": true,
+   "merged_at": "2026-08-13T06:16:07Z",
+   "state": "closed",
+   "title": "issue-115 Section-A disposition: T4 \u2192 probed in part (sole marker mutation) + 7 path-3 settlements (dual exact-diff gate PROCEED\u00d72)"
+  },
+  "187": {
+   "merge_commit_sha": "c1ab89de42f087dc78f510da5071571ee1f5b4dc",
+   "merged": true,
+   "merged_at": "2026-08-13T06:48:37Z",
+   "state": "closed",
+   "title": "issue-115 doctrine-concern adjudication: T2 = RETAIN-CONCERN-ONLY, T5-placement = NEEDS-NEW-PROBE (dual gate, round-2 PROCEED\u00d72)"
+  },
+  "188": {
+   "merge_commit_sha": "b68a4fb25b796a9bcf4be9eb7aa8d45de322cc19",
+   "merged": true,
+   "merged_at": "2026-08-13T07:08:10Z",
+   "state": "closed",
+   "title": "issue-115 T2 semantic determination: settle-destination-first = STRICTLY-ORDINAL; routing \u2192 NEEDS-NEW-PROBE (dual gate PROCEED\u00d72)"
+  },
+  "189": {
+   "merge_commit_sha": "da9fda4883ccdce358e1dc4643d372698f9f9973",
+   "merged": true,
+   "merged_at": "2026-08-13T08:32:06Z",
+   "state": "closed",
+   "title": "issue-115 T2 transmission-probe prereg PROPOSAL (issue115-t2probe-v1) \u2014 design gate, zero execution"
+  },
+  "190": {
+   "merge_commit_sha": "2d416ef51f5561759ad18d85a2226c421e56fcd2",
+   "merged": true,
+   "merged_at": "2026-08-13T09:14:27Z",
+   "state": "closed",
+   "title": "issue-115 t2probe prefix evidence \u2014 dry-run + 2 smokes durable landing (3/50; 36 scored LOCKED)"
+  },
+  "191": {
+   "merge_commit_sha": "327b26434222163541e38916655a1c7eded5444d",
+   "merged": true,
+   "merged_at": "2026-08-13T15:42:52Z",
+   "state": "closed",
+   "title": "issue-115 t2probe scored evidence \u2014 36/36 unit, O2 (guidance-transmission gap, DIRECTIONAL), dual recomputation PROCEED\u00d72"
+  },
+  "192": {
+   "merge_commit_sha": "332034b0ce5345003cb720c8f02db3871b59b77e",
+   "merged": true,
+   "merged_at": "2026-08-13T16:36:36Z",
+   "state": "closed",
+   "title": "issue-115 T2 amendment DESIGN \u2014 M1-r2 minimal ordinal wording (design only; no canonical mutation)"
+  },
+  "193": {
+   "merge_commit_sha": "d474b9923b21749f6db5a8c0e46526186805d31c",
+   "merged": true,
+   "merged_at": "2026-08-13T17:02:04Z",
+   "state": "closed",
+   "title": "issue-115 T2 doctrine MUTATION \u2014 sealed M1-r2 ordinal sentence (byte-exact per #192; PROCEED\u00d72)"
+  },
+  "199": {
+   "merge_commit_sha": "6fe6813bcc35edb86a8b92b4aaaa7f9ba3459ef7",
+   "merged": true,
+   "merged_at": "2026-08-14T16:07:04Z",
+   "state": "closed",
+   "title": "issue #115: T5-placement ownership probe \u2014 preregistration package (reviews-only, design gate)"
+  },
+  "202": {
+   "merge_commit_sha": "1578bdabc9f813f780e76f2f6664a4496d85001a",
+   "merged": true,
+   "merged_at": "2026-08-15T15:13:29Z",
+   "state": "closed",
+   "title": "issue #115 t5p prefix: dry-run + S1 + S2 execution evidence (3/50, 36 scored LOCKED)"
+  },
+  "203": {
+   "merge_commit_sha": "66d9144a7cb49714cb2132280161c16b47924d96",
+   "merged": true,
+   "merged_at": "2026-08-15T15:49:22Z",
+   "state": "closed",
+   "title": "issue #115 t5p scored: 36-observation unit + dual independent recomputation (39/50, INCONCLUSIVE)"
+  },
+  "204": {
+   "merge_commit_sha": "dd052c46b27bdebb8378aa21adeab4902bc54bd6",
+   "merged": true,
+   "merged_at": "2026-08-15T16:51:48Z",
+   "state": "closed",
+   "title": "issue #115: T5-placement concern disposition \u2014 RETAIN-CONCERN-ONLY (PROBE-INCONCLUSIVE)"
+  }
+ }
+}
