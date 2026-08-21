@@ -303,6 +303,33 @@ When rigor conflicts with finishing sooner, rigor wins.
     security-critical clause above (cross-family review + re-gate on
     update), not a lighter pass — that claim seeks standing triggers and
     authority over other components, the trojan's preferred shape.
+- **Activation-gated payload (dormant branch).** A harmful effect — or a
+  security-relevant effect outside the candidate's disclosed purpose — gated
+  behind an activation predicate is a trojan shape in its own right: the
+  default path a reviewer reads, or a fixture exercises, need not reach it.
+  The predicate may be a date/time, a trigger word or prompt substring, an
+  environment or context value, an execution count, or any dormant branch;
+  it may be indirect (a helper, an imported dependency, config-derived
+  state), and a gated branch may merely arm state whose harmful effect fires
+  later outside it. Enumerate the predicates guarding security-relevant
+  behavior and trace each — and any state it arms — to its source and
+  downstream effect, as far as materially affects the candidate's
+  security-relevant reachability or effect; read what the gated branch does.
+  A clean default-path read or fixture does not clear a branch it never
+  entered, and any predicate or armed effect whose resolution is opaque (an
+  unreadable imported dependency that materially bears on reach or effect)
+  fails closed — an ordinary platform conditional carries no such tracing
+  burden. A branch is cleared only when reading it shows the gated behavior
+  is not harmful and is either protective or a non-harmful operation within
+  the disclosed purpose; disclosure never clears a harmful effect (a payload
+  described as "telemetry" is still a payload), and a benign label never
+  clears a branch, since a hostile branch hides most easily under one. Here,
+  harmful means unauthorized, deceptive, or adverse to the user contrary to
+  the candidate's authorized, disclosed purpose; high-impact behavior is not
+  harmful merely because it is destructive or powerful when it is expressly
+  authorized and within that purpose. A documented conditional attack
+  technique in a security-testing playbook is data, not a live gate.
+  (`unprobed` — see Provenance.)
 - **An env var defined only in an interactive rc file is not loaded in a
   non-interactive shell** (`unprobed` — contributor incident as shape; see
   Provenance). `~/.bashrc`, `~/.zshrc`, and their equivalents load only for
@@ -1314,6 +1341,35 @@ pipe a known payload through a simulated lossy channel that corrupts
 one byte, observe whether a ruled reviewer demands the hash check
 before trusting the transfer where a bare one accepts "it pasted" —
 joins the standing #115 queue.
+
+The §2 activation-gated-payload rule (2026-08-21) names a dormant-branch /
+delayed-activation trojan shape the install-gate checklist did not carry:
+the exfiltration coverage in skill-vetting §2 is scoped to the default
+execution path, so a payload gated behind an activation predicate evaded
+it, and skill-vetting §3's fail-closed read blocks such a payload only if
+the reviewer notices the branch — which no rule directed them to enumerate.
+Distilled from an attested incident family of time/trigger-gated skill
+trojans (ClawHavoc / ATR-2026-00157, getHours()-style variants), cited as
+shape — not first-hand reproduced here (no such artifact was cloned or
+executed). Design gate: a three-round cross-family review (gpt-5.6-luna +
+gpt-5.6-sol, both at max effort, mutually blind). It did NOT reach a joint
+PROCEED — round 3 was luna PROCEED / sol FIX and the round cap was reached;
+sol's remaining factual corrections were accepted and folded (an inspectable
+ungated flip fixture, a non-exfiltration failing fixture, a wording recast
+from "permits" to "does not direct discovery"), while two substantive policy
+splits — how tightly to define "harmful", and whether the skill-vetting
+mirror should repeat the criterion — were adjudicated by the owner (harmful
+defined by authorization and adversity, not impact magnitude; the canonical
+rule lives here, with a bare-pointer mirror in skill-vetting §2 that owns no
+separate criterion copy or marker). This is reviewed security doctrine whose
+behavioral effectiveness has NOT been probed: no bare-vs-ruled behavioral
+probe was run (that would measure transmission/effectiveness, a separate
+question from whether the shape is real and the checklist lacked it), so the
+rule ships `unprobed` per the covenant; its probe joins the standing #115
+queue. The single marker lives here on the canonical rule; the skill-vetting
+mirror routes to it and carries no second marker or probe debt. Nine inert
+synthetic fixtures (placeholder hosts, never executed) and the full review
+trail are recorded in reviews/2026-08-21-issue2-activation-gated-payload/.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
