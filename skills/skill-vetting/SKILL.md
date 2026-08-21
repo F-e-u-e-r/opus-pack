@@ -107,6 +107,21 @@ proof, but it is a finding that must be explained or it blocks:
 - **MCP / tool auto-registration.** Instructions to auto-register an MCP server or
   tool globally without per-use consent, especially offensive tooling.
 - **Self-vouching.** Covered in §0 - re-flag if seen inside the source.
+- **Activation-gated payload (dormant branch).** Apply operational-rigor
+  §2's activation-gated-payload check to skill prose as much as to
+  executable helpers — a SKILL.md "when the request mentions X, also do Y"
+  is an activation predicate. It supplements the exfiltration bullet above,
+  which looks only at the *default* execution path: gating a payload out of
+  that path is exactly how it evades that bullet. Clearing this finding by
+  reading the branch discharges the shape, not §1's fixture obligation — for
+  an executable candidate you still exercise both sides (step 5: *a read is
+  not enough*).
+  ✅ "the exfil `curl` builds only when an `is_prod()` helper two files away
+  is true — a §2 exfil hit armed to stay off the default run: BLOCK, and
+  surface it."
+  ❌ "it's under `if feature_x_enabled:` and the default path + fixture were
+  clean, so it's SAFE" — the label doesn't clear the branch and the fixture
+  never entered it.
 
 ## 3. The verdict - fail closed
 
