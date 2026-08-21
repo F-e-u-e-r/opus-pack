@@ -1,0 +1,42 @@
+ok    skills/cross-model-review/SKILL.md frontmatter valid
+ok    skills/delegation-and-review/SKILL.md frontmatter valid
+ok    skills/domain-evidence-discipline/SKILL.md frontmatter valid
+ok    skills/ground-truth-gates/SKILL.md frontmatter valid
+ok    skills/operational-rigor/SKILL.md frontmatter valid
+ok    skills/personal-goal-planning/SKILL.md frontmatter valid
+ok    skills/product-roadmap/SKILL.md frontmatter valid
+ok    skills/security-architect/SKILL.md frontmatter valid
+ok    skills/skill-authoring/SKILL.md frontmatter valid
+ok    skills/skill-vetting/SKILL.md frontmatter valid
+ok    design-pack/skills/design-review-gate/SKILL.md frontmatter valid
+ok    design-pack/skills/motion-craft/SKILL.md frontmatter valid
+ok    design-pack/skills/ui-design-craft/SKILL.md frontmatter valid
+ok    version consistent across 6 sites (0.1.16)
+ok    design-pack/.claude-plugin/plugin.json is reachable from marketplace.json
+ok    README.md design-pack version callout matches 0.1.0
+ok    README.zh-Hant.md design-pack version callout matches 0.1.0
+ok    README.md carries a backticked mention of all 13 skills
+ok    README.zh-Hant.md carries a backticked mention of all 13 skills
+ok    no zero-width/bidi/joiner/BOM/tag chars in 1444 tracked text files (0 binaries skipped)
+ok    README.md inline relative markdown links resolve
+ok    README.zh-Hant.md inline relative markdown links resolve
+ok    LICENSE present (non-empty regular file)
+ok    THIRD-PARTY-NOTICES.md present (non-empty regular file)
+ok    hooks/gate-before-commit.sh + its test suite present
+ok    hooks/gate-credential-destruction.py + its test suite present
+ok    hooks/mutation_matrix.py + its test suite present
+ok    hooks/skill-vetting-advisory.py + its test suite present
+ok    hooks/skill_snapshot.py + its test suite present
+ok    hooks/verify-before-stop.py + its test suite present
+ok    plugin registers no hooks (standing invariant holds)
+ok    hooks/test-skill_snapshot.py has 100 tests, no shadowed duplicates
+ok    hooks/test-skill-vetting-advisory.py has 56 tests, no shadowed duplicates
+ok    mutation_matrix.py takes no env/config input, so the authoritative gate covers every measurement-changing option
+ok    tier canon (metadata/skill-tiers.json) integrity
+ok    extension dependency contract (metadata/plugin-dependencies.json)
+ok    derived skill inventory + marketplace-wide unique IDs
+ok    README tier/dependency projection parity (EN + zh-Hant)
+ok    normative references non-dangling (ARCHITECTURE.md §7 grammar)
+ok    routing-contract corpus completeness (ARCHITECTURE.md §6, structural only)
+
+all checks passed

@@ -294,8 +294,9 @@ When rigor conflicts with finishing sooner, rigor wins.
     live code, not prose.
   - Sweep for zero-width/bidi Unicode that can hide directives — one grep
     over U+200B–U+200F, U+202A–U+202E, U+2066–U+2069, the joiner/ALM/BOM
-    (U+2060, U+061C, U+FEFF), and the invisible Unicode Tag Block
-    U+E0000–U+E007F (ASCII-smuggling a zero-width-only sweep misses).
+    (U+2060, U+061C, U+FEFF), the soft hyphen (U+00AD), and the invisible
+    Unicode Tag Block U+E0000–U+E007F (ASCII-smuggling a zero-width-only
+    sweep misses).
   - Any read/write of CLAUDE.md, MEMORY.md, or agent config (`~/.claude`)
     is a red flag the install-gate safety sentence must address.
   - A component self-described as a security tool or gate earns the

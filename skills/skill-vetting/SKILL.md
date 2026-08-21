@@ -97,9 +97,9 @@ proof, but it is a finding that must be explained or it blocks:
   convention that executes) are live code, not prose - read them as code.
 - **Invisible-Unicode smuggling.** One grep over the hidden-directive ranges -
   U+200B-U+200F, U+202A-U+202E, U+2066-U+2069, the joiner/ALM/BOM (U+2060, U+061C,
-  U+FEFF), and the **Unicode Tag Block U+E0000-U+E007F** (the ASCII-smuggling range
-  a narrow zero-width sweep misses). This is operational-rigor §2's sweep; keep the
-  ranges in sync with it.
+  U+FEFF), the soft hyphen (U+00AD), and the **Unicode Tag Block U+E0000-U+E007F**
+  (the ASCII-smuggling range a narrow zero-width sweep misses). This is
+  operational-rigor §2's sweep; keep the ranges in sync with it.
 - **Exfiltration-shaped commands.** `curl`/`wget`/`nc` to a non-placeholder external
   host, or reads of `~/.ssh`, browser credential stores, `.env`, or keychains, in a
   default (non-example) execution path. Distinguish a documented attack technique in
