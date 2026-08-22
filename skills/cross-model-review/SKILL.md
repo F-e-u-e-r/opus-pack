@@ -72,6 +72,34 @@ Everything here is a rule about *how to choose*, never *what to choose*.
   session the pin still discovers clean → used silently. neg: "always use `<fixed slug>`"
   → a release later it errors or is a retired tier and the gate silently ran
   the cheap tier, or nothing.
+- **A different model family is not an independent lens if the CLI feeds it
+  your own doctrine by default** (`unprobed` — contributor incident as
+  shape; see Provenance). Several reviewer CLIs auto-load operator config on
+  every invocation — the author's own instruction/memory files (this pack's
+  CLAUDE.md/MEMORY.md, an equivalent AGENTS.md), installed skills, or local
+  permission settings — with no flag requested and no packet content
+  involved. The family-diversity check above is necessary but not
+  sufficient: it verifies the MODEL differs from the author's, not that the
+  TOOL'S runtime is clean of the author's own rules. A reviewer reading your
+  doctrine back to you can converge with the author on doctrine-shaped
+  defects for the wrong reason — agreement, not independent judgment — and
+  §3's cross-family corroboration-requires-independent-authorship clause
+  cannot catch this, since it is scoped to remedies, not to whether the
+  review itself was contaminated before a single finding was written. Before
+  trusting a reviewer as an independent lens, check whether its default
+  invocation ingests the author's own instruction files (a `--help`/docs
+  check, or an explicit inspection command where the tool offers one) and,
+  if so, invoke it under an isolated config root that strips the operator's
+  files while leaving the tool's own vendor-shipped defaults intact — an
+  isolated HOME/config directory carrying only the tool's own auth and
+  bundled defaults, not a bare/empty one (a genuinely bare environment can
+  hang on missing auth instead of degrading). Reviewing this pack's own
+  doctrine is the one case where ingestion is a feature, not contamination —
+  the reviewer arriving already primed on the rules under test is then the
+  point; isolate for everything else.
+  ❌ "grok reviewed the change and flagged nothing outside my own CLAUDE.md
+  conventions" — it had read that file by default; the pass measured
+  agreement with the author's own rules, not independent scrutiny.
 
 ## 2. The self-contained packet
 
@@ -329,6 +357,20 @@ and does not extend to a general runtime-difference taxonomy.
 Contributed via PR #151; wording narrowed at gate to bind to the
 affected environment(s) rather than a single machine. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue.
+The config-ingestion-defeats-independence bullet (2026-08-23) comes from a
+contributor incident (contributor-reported, not linkable): benchmarking a
+newly-added reviewer CLI surfaced that its default invocation ingested the
+operator's own CLAUDE.md, installed Claude skills, and local permission
+settings unprompted — a fact discoverable only via the tool's own inspection
+command, not documented behavior the operator would otherwise have known to
+check for. A second CLI in the same operator's toolchain was independently
+confirmed to auto-load its own equivalent instruction file (AGENTS.md) by
+the same mechanism, so the shape generalizes across at least two vendors
+rather than being one tool's quirk. Ships `unprobed` per the covenant; its
+probe — run the same packet through a reviewer once under its default
+config and once under an isolated one, and check whether findings converge
+specifically on doctrine-shaped issues in the first arm — joins the
+standing #115 queue.
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier
