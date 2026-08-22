@@ -277,7 +277,33 @@ When rigor conflicts with finishing sooner, rigor wins.
   simply have moved on — so it never justifies re-applying the branch), NOT
   a three-dot `...` diff, which
   measures from the merge-base and still shows the work as unlanded — and
-  never per-commit patch equivalence.
+  never per-commit patch equivalence. A non-empty two-dot diff can still
+  be READ: its deletion side is the stale-base tell — hunks that would
+  remove work shipped since the branch diverged mean merging the branch
+  is a regression, not that those removals were ever intended; run this
+  read before merging OR deleting any parallel branch that claims "the
+  same fix", since agreement in intent says nothing about safety at the
+  base level (`unprobed` — contributor incident as shape; see
+  Provenance).
+- **A pruned worktree does not make git fail — it makes git act on the
+  enclosing repo** (`unprobed` — contributor incident as shape; see
+  Provenance). Git resolves its repository by walking up from cwd, so
+  when a linked worktree is removed out from under a long-lived session
+  (merged and pruned by cleanup, its gitdir pointer gone) while the
+  directory path still resolves inside the main checkout's tree, every
+  subsequent git command silently rebinds to the main checkout — its
+  branch, its index, its uncommitted files, possibly another session's
+  work in progress. The staged-diff and outgoing-patch reads above audit
+  WHAT a commit or push carries; this failure changes WHERE they act,
+  through no action of yours. After any merge, prune, or cleanup event —
+  and before the first commit, push, or PR that follows one — re-verify
+  identity: `git rev-parse --show-toplevel` and `--abbrev-ref HEAD` must
+  still name the tree and branch you believe you are on.
+  ❌ a create-PR command issued from a session's own already-pruned
+  worktree directory would have committed a sibling session's
+  uncommitted files to the main checkout under this session's name; it
+  was caught only because repo identity was checked before the commit,
+  not after.
 - **Third-party executable content** (hooks, scripts, plugins) installs only
   after: provenance check (owner/age/fork metadata), full source read, one
   written sentence stating why it is inert or safe here, and a fixture test
@@ -1370,6 +1396,22 @@ queue. The single marker lives here on the canonical rule; the skill-vetting
 mirror routes to it and carries no second marker or probe debt. Nine inert
 synthetic fixtures (placeholder hosts, never executed) and the full review
 trail are recorded in reviews/2026-08-21-issue2-activation-gated-payload/.
+
+The pruned-worktree-identity bullet and the residue rule's
+deletion-side-read amendment (2026-08-20) come from one contributor
+session's teardown arc (contributor-reported, not linkable). The
+session's own linked worktree had been merged and pruned while it
+worked; the directory path still resolved inside the main checkout, so
+git commands fell through to the main repo — a create-PR command was
+about to commit a sibling session's uncommitted files under this
+session's name and was stopped by an identity check, not by any git
+error. In the same teardown, a parallel branch carrying the "same fix"
+as an already-landed change was diffed against the default branch
+before disposal: the diff's deletion side showed it would have removed
+109 lines of work shipped after the branch's base — a late merge would
+have been a silent regression despite the two branches agreeing in
+intent. Both ship `unprobed` per the covenant; their probes join the
+standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
