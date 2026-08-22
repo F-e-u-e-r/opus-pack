@@ -101,6 +101,32 @@ before publishing.
 ❌ "criteria: see `scratch/PREREG.md`" — reclaimed a session later, and
 the frozen criteria can no longer be distinguished from fitted ones.
 
+Pre-registration also has to survive the run tripping its own validity
+clause mid-flight — a run that goes dead-cell-heavy or otherwise breaches
+its pre-registered kill condition after some results are already visible.
+The failure mode here is not skipping the clause, it is **honoring it by
+patching the live run and continuing to count**: the harness gets a fix
+(a retry, a widened timeout, a corrected fixture) and the same in-flight
+run keeps going, so the corrected cells sit next to cells scored under
+the broken method and the two get treated as one comparable set. **Void
+and re-run from zero instead.** The sequence that keeps this honest: (1)
+void the run the instant its own clause fires, discard its scores as
+evidence for the verdict; (2) write the amendment down — what broke,
+what changed — in the same durable record as the pre-registration, not
+folded silently into the method section; (3) disclose that partial
+results were seen before the amendment, and give the one-line argument
+for why that visibility could not have manufactured the outcome (e.g.
+the voided run's direction favored the arm that did NOT end up winning,
+or the decision table is symmetric so a peek couldn't tilt it either
+way) — if that argument can't be made honestly, the amendment is
+contaminated and the fix needs a reviewer who never saw the voided
+scores; (4) re-run the full battery under the amended method, and the
+verdict cites only the re-run. (`unprobed` — see Provenance.)
+❌ "Run 1 lost 6 cells to a transport flake, added a retry, cells 7–36
+came back clean, calling it 30/30 net of the flake" — mixes pre- and
+post-amendment cells in one scored set with no disclosure they ran under
+different methods.
+
 Calibrate the difficulty of the SHARED
 case set before comparing — never each arm's separately, which destroys
 comparability: a comparison where every arm sits at the same ceiling (every
@@ -1167,6 +1193,27 @@ without the typechecker, plant an unenforced type-level assertion,
 observe whether a ruled reviewer demands proof the checker runs where
 a bare one takes the assertion's presence as enforcement — joins the
 standing #115 queue.
+The void-amend-disclose-rerun rule comes from a measured-harness export
+(2026-08-18, N=30 ledger items/arm over 6 real-repo review packets, agy
+gemini-3.7-flash-high vs gemini-3.6-flash-high): Run 1 tripped its own
+pre-registered validity clause (>4 dead cells voids the run) after
+losing 6/36 cells to empty returns, all six on the two largest prompt
+packets. Rather than patching the harness for empty-return retry and
+letting the same in-flight run continue, the run was voided outright;
+the amendment adding retry-on-empty was logged in the same durable
+record as the pre-registration, with an explicit disclosure that Run
+1's per-arm scores had already been seen before the amendment was
+written, plus the argument for why that could not have manufactured
+the eventual result — Run 1's direction favored the incumbent arm, and
+the pre-registered decision table treats both arms symmetrically, so a
+peek biased toward one arm cannot explain a verdict that didn't move
+in that arm's favor. Run 2 re-ran the full battery under the amended
+method and lost only 1/36 cells; the verdict cites Run 2 alone. Ships
+`unprobed` per the covenant; its probe — seed a run whose validity
+clause fires after partial results are visible, observe whether a
+ruled agent voids and re-runs versus patching the live run and
+netting the fixed cells against the broken ones — joins the standing
+#115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
