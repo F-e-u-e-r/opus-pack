@@ -439,7 +439,21 @@ A generic green test is not proof. A gate is real only if:
    incident as shape; see Provenance.) Worker-written guard scripts
    especially: item 2's known-broken run applies before trust, no exemption —
    whoever wrote a guard has never seen it fail. (`unprobed` — private
-   incident as shape; see Provenance.)
+   incident as shape; see Provenance.) A **gate runner whose own aggregation
+   arithmetic fails open**: a shell script that counts failures with
+   `return`/`exit` truncates the count mod 256, so exactly 256 failing files
+   or gates reads as success; a `printf | grep -q` check under `pipefail` can
+   SIGPIPE-fail the pipeline on large output, flipping the verdict
+   independent of the underlying result; a crashed test that dies before
+   printing its own failure marker leaves the marker-grep matching nothing,
+   so the runner reports a bare, diagnostic-free failure. None of these are
+   the code under test failing — the gate's own plumbing fails open or loses
+   information under conditions its author never exercised (an exact
+   multiple of 256, an oversized log, a crash before the first marker).
+   Reproduce the runner's failure mode itself before trusting its count:
+   feed it a synthetic 256th failure, an oversized output, a file that
+   throws before printing anything. (`unprobed` — contributor incident as
+   shape; see Provenance.)
 4. **Nobody weakens a gate to turn it green.** A worker satisfies the gate, never
    edits it — gate changes are the orchestrator's call. Three corollaries:
    - For an *immutable policy-checker* (not an ordinary test), run it from a
@@ -654,6 +668,40 @@ A generic green test is not proof. A gate is real only if:
    ❌ "queried the non-manufacturing PMI series, got 200 with data" — the
    response held the manufacturing series under the same call and status,
    silently, because both shared the queried id family.
+14. **An absence claim needs a positive-control probe, not just a clean
+   scan** (`unprobed` — contributor incident as shape; see Provenance).
+   "Zero matches" or "zero rows" can mean the thing you checked for
+   genuinely isn't there, or it can mean the query itself can't see it — a
+   timestamp comparison mixing epoch-millis against a `Timestamp` column
+   that silently coerces to always-false, a grep confined to a file set
+   that excludes where the pattern actually lives (an imported helper, a
+   re-exported symbol). Before trusting a zero-result scan, prove the probe
+   COULD have matched: run it against a case seeded to trigger a hit, or
+   temporarily reintroduce a known instance and confirm the scan finds it.
+   A scan that has never once returned non-zero is unproven, not clean —
+   this is item 3's zero-input-scanner shape applied to a claim about the
+   world instead of a claim about a file set.
+   ❌ "grep for the deprecated call across the target files found nothing —
+   safe to remove" — the call was one import away, inside a helper the grep
+   never traversed; the scan was reporting its own blind spot as an
+   all-clear.
+15. **A type-valid response is not a real value — a model can coerce
+   "nothing" into a value that clears every downstream truthy/shape check**
+   (`unprobed` — contributor incident as shape; see Provenance). Where a
+   schema or prompt contract requires a field to be present, a model
+   under-specified on what "absent" should look like can emit a sentinel
+   that satisfies the type (the literal string `"null"`, an empty-but-valid
+   object, a zero that reads as a real zero) — every guard checking
+   `if (value)` or validating shape sees a pass, and the absence is
+   laundered into a plausible-looking fact. Where the contract allows a
+   genuine absence, say so explicitly (an actual `null`/optional field, a
+   documented sentinel with its own check) rather than leaving the model to
+   invent one; and where a value is asserted present, check it against the
+   domain — does this look like a real record, not just the right type.
+   ❌ a person-lookup schema marking a field required non-null; the model,
+   finding no data, emitted the four-character string `"null"` — every
+   `if (result.field)` guard downstream read that as truthy and shipped it
+   as a real value.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -1167,6 +1215,28 @@ without the typechecker, plant an unenforced type-level assertion,
 observe whether a ruled reviewer demands proof the checker runs where
 a bare one takes the assertion's presence as enforcement — joins the
 standing #115 queue.
+The item-3 gate-runner-aggregation-fails-open shape and items 14–15
+(2026-08-20) come from a contributor's TG-bot-helper- unit-test/gate runner,
+`checks/run-all.sh` (contributor-reported, not linkable). The runner shape:
+one PR (#80) fixed a crashed test dying before printing its own `❌` marker,
+leaving the marker-grep matching nothing and the runner reporting a bare,
+diagnostic-free `FAIL <file>`; reviewing that fix, one subordinate model
+flagged — and the contributor independently reproduced 5/5 with an 820KB
+string — that the fix's own `printf | grep -q "❌"` could SIGPIPE-fail under
+`pipefail` on large output, contradicting pass/fail independent of the
+underlying test result; a second, pre-existing instance of the same SIGPIPE
+pattern was found in the runner's outer aggregate condition but deliberately
+left out of that PR (scope discipline, item 4) and chipped separately, where
+a different subordinate session went beyond the chip's spec and additionally
+found the runner's `return`/`exit` truncating its failure count mod 256 (PR
+#81) — an exact-256-failures input would have reported success. Item 14
+(absence positive-control) and item 15 (type-valid-sentinel-for-absence)
+generalize two further incidents mined from the same contributor's session
+history: a zero-row database query that silently always-false'd on an
+epoch-millis/`Timestamp` type mismatch, and a schema-required field where a
+model, finding no data, emitted the literal string `"null"` past every
+downstream truthy guard. All three ship `unprobed` per the covenant; their
+probes join the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
