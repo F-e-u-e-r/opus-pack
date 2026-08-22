@@ -100,10 +100,35 @@ proof, but it is a finding that must be explained or it blocks:
   U+FEFF), the soft hyphen (U+00AD), and the **Unicode Tag Block U+E0000-U+E007F**
   (the ASCII-smuggling range a narrow zero-width sweep misses). This is
   operational-rigor §2's sweep; keep the ranges in sync with it.
-- **Exfiltration-shaped commands.** `curl`/`wget`/`nc` to a non-placeholder external
-  host, or reads of `~/.ssh`, browser credential stores, `.env`, or keychains, in a
-  default (non-example) execution path. Distinguish a documented attack technique in
-  a security-testing playbook (data) from a command the skill itself runs (live).
+- **Exfiltration-shaped channels.** Judge the data flow and the disclosure, not the
+  transport name. Two layers. **(a) Legacy high-signal triggers**, each a §2 finding
+  that must be explained (a hit is not automatic proof — it blocks unless the disclosed
+  purpose explains it) and that need NOT first be shown to carry a secret: a transport
+  command (`curl`/`wget`/`nc`) to a non-placeholder external host — payload or not, a
+  bare beacon/callback still leaks presence — or a read of `~/.ssh`, browser credential
+  stores, `.env`, or keychains, in a default (non-example) execution path. **(b) The
+  generalized criterion** for every other channel: a hit is a private-data disclosure
+  the candidate's disclosed purpose does not need, over any outbound path (needed or
+  not) — a passively-fetched resource whose URL, path, query, or request metadata (a
+  header, a `Referer`) embeds it (a markdown image `![](…)`, an embedded `src`, a
+  preload/redirect the renderer/client loads with no explicit call — emitting content
+  that makes the renderer/client fetch IS the skill opening the channel, live); a
+  hostname/DNS label that carries it (exfil completes at name resolution — no HTTP body
+  or listed transport); or secret bits encoded in an otherwise-fixed request's presence,
+  count, or order. The tell is whether the private-data disclosure is one the purpose
+  doesn't need — NOT the transport, and NOT whether the recipient is ordinary: a secret
+  piggybacked onto a documented API call, a `Referer` leaking a private path, or a fixed
+  beacon whose presence encodes a secret is a hit even though the endpoint is
+  legitimate, and a disclosed purpose never launders an unnecessary private-data export.
+  Not a channel hit: a remote image, a library HTTP call, or a DNS lookup that carries
+  NO secret in its address, payload, metadata, or presence/count/order; a skill's own
+  credential sent to its own documented host for required authentication; a request
+  conditioned on a disclosed non-secret setting. A legacy (a) `curl`/`wget`/`nc` with no
+  secret in view stays a finding — explained by the disclosed purpose and cleared, not
+  silently ignored. Pure timing/cache side-channels are beyond a static read — flag what
+  the source shows, don't claim exhaustive covert-channel coverage. Distinguish a
+  documented attack technique in a security-testing playbook (data) from a channel the
+  skill itself opens (live).
 - **MCP / tool auto-registration.** Instructions to auto-register an MCP server or
   tool globally without per-use consent, especially offensive tooling.
 - **Self-vouching.** Covered in §0 - re-flag if seen inside the source.
@@ -327,6 +352,19 @@ file): does the ruled arm read the whole tree, reach BLOCK, and surface it, vers
 a bare arm that installs it? Those files are retained privately as the vetting
 skill's regression fixtures (they are not shipped in this tree); that probe joins
 the private round-5 queue.
+
+The §2 exfiltration bullet was reframed from *commands* to *channels* (2026-08-22,
+issue ①) — covering renderer/resource auto-fetch (secret in a passively-fetched
+URL/`Referer`), DNS-label exfil (secret in a hostname, carried by name resolution),
+and request-metadata / presence-count-order encodings, while keeping the legacy
+`curl`/`wget`/`nc` + credential-read triggers as findings-to-explain. It adds no
+separate probe marker: its behavioral transmission/effectiveness debt is the same
+skill-level covenant this skill already carries above, and a future issue-①-specific
+probe is a #115 routing decision, not a new inline marker. Design review was a
+three-round cross-family gate (gpt-5.6-luna + gpt-5.6-sol, max effort, mutually
+blind) that ended at the round cap with luna PROCEED / sol FIX; the final bounded
+precision fixes and the finding-to-explain layering (Option X) were owner-adjudicated,
+not a 2/2 consensus. Evidence: `reviews/2026-08-22-issue1-exfiltration-channel/`.
 
 The companion hook `hooks/skill-vetting-advisory.py` is a delta-detector, not a
 scanner: signature scanning was removed at the 2026-07-25 cross-family security
