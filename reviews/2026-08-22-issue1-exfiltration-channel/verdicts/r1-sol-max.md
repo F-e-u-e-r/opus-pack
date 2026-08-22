@@ -1,0 +1,17 @@
+1. **Yes—both are genuinely uncovered.** The sole current rule is explicitly “**Exfiltration-shaped commands**” and enumerates `curl`/`wget`/`nc` plus credential-store reads. Neither the passive Markdown fetch nor `socket.getaddrinfo()` in the two FAIL fixtures matches that command framing. Security-architect’s “path that sends data out” is an architectural design duty, not the vetting checklist.
+
+2. **Yes for the two illustrated shapes.** The proposed wording expressly covers secrets in resource URLs and DNS labels, while the benign fixtures’ fixed `api.example.com` and static CDN URL contain no secret and are expressly excluded. It therefore avoids a blanket image/DNS ban for those cases.
+
+3. **The amendment belongs in the single existing bullet, but it does not cleanly preserve that bullet.** The current text independently flags external `curl`/`wget`/`nc` commands “or reads of” sensitive stores. The rewrite instead opens with a “move of secret data” and concludes that the tell is “secret data leaving,” making a standalone `.env` or keychain read—and possibly a no-payload external command—no longer an unambiguous finding. That contradicts the claimed backward compatibility.
+
+4. **The examples are presented as illustrative, but the operative definition is still too narrow.** Requiring the “destination or payload” to carry the secret misses an observable request-pattern channel: fixed URL and fixed payload, with secret bits encoded through whether, when, how often, or in what order requests occur. Renderer-added metadata such as a sensitive `Referer` also is not clearly covered by “URL/path/query.”
+
+5. **The benign controls prevent only the simplest false positives.** Both controls avoid transmitting any secret, so they do not test a legitimate, purpose-required secret transfer—such as an API client sending its credential in an `Authorization` header or loading a private image through a signed URL. Conversely, “an ordinary API endpoint … is not a hit” could wrongly clear a malicious skill that appends private data to a genuinely needed weather/API request. The test should ask whether that particular data disclosure is needed, not merely whether the recipient or channel is needed.
+
+6. **Yes—the single bullet is the minimal surface.** Operational-rigor §2 contains no exfiltration rule, while security-architect covers system design rather than vetting untrusted instruction content. A new bullet or mirror would split one semantic finding unnecessarily.
+
+7. **No unnecessary runtime or tooling mechanism is proposed.** This is doctrine wording plus explicitly inert static fixtures; it introduces no detector, execution path, or behavioral probe.
+
+8. **Yes—the provenance is appropriately qualified.** It identifies ATR-2026-00261 as owner-attested, says it was “NOT first-hand reproduced,” labels the result `unprobed`, and limits the claim to static discriminating power.
+
+FIX 1. Preserve external-command and sensitive-store-read findings unambiguously; 2. Key the rule on unnecessary disclosure of private or sensitive data, not merely an unnecessary party/channel, and remove the categorical safe harbor for documented or ordinary endpoints; 3. Cover observable metadata and behavioral encodings such as headers, referrers, timing, presence, count, and order; 4. Add fixtures for read-only regression, exfil through a needed endpoint, and legitimate purpose-required secret transport.
