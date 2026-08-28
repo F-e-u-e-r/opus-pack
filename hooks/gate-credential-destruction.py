@@ -32,7 +32,8 @@ Behavior:
   command overrides that command only, mirroring shell env-assignment
   scoping — `CRED_GATE_APPROVED=1 rm .env; rm id_rsa` still blocks on the
   second command, and an override appearing after a destructive command
-  does not launder it. Overridden hits are logged. The model can
+  does not launder it. Overridden hits attempt an audit log entry
+  (best-effort — see _log). The model can
   technically self-serve this override; the gate's value is friction plus
   an audit trail, not tamper-proofing against the model itself.
 - Unparseable commands (unbalanced quotes): fall back to a raw-text scan;
@@ -67,7 +68,10 @@ an embedded directive or acting carelessly on a single line or `;`-separated
 commands — NOT an adversarial security boundary. Real protection is filesystem
 isolation / keeping credentials outside the tool's reach.
 
-Python 3.8+, stdlib only. Audit events append to ~/.claude/hooks/hooks.log.
+Python 3.8+, stdlib only. Audit events are appended to
+~/.claude/hooks/hooks.log on a best-effort basis: _log swallows every write
+error, so a failed or unwritable log is dropped silently and never blocks a
+call. Treat the log as friction and telemetry, not as a guaranteed audit trail.
 """
 
 import datetime
