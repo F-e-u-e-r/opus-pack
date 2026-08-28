@@ -686,6 +686,57 @@ reviewers that they silently absorb as implementers.
   green both times the subordinate reported RED. The subordinate had
   disclosed the sandbox limitation honestly in its own report — the risk
   was a reader trusting the RED verdict without reading that far.)
+- **A worker-misconduct verdict — "it fabricated the file", "it wrote
+  outside its scope" — is manufactured as easily by the dispatch
+  plumbing as by the worker: verify where the harness actually pointed
+  the worker before crediting either** (`unprobed` — contributor
+  incident as shape; see Provenance). The reported-FAILURE rule above
+  covers a worker's own claim; this covers YOUR verdict about worker
+  behavior. A spawned tool can resolve its working directory from
+  something other than the real process cwd (an inherited environment
+  variable a directory-changing spawn never rewrote, a persisted
+  project root, a server it attached to), so a worker's writes land
+  where the tool was pointed, not where the dispatcher looked: an
+  expected file missing from the observed directory reads as
+  fabrication, and a file found elsewhere reads as a scope violation —
+  both verdicts correct against the observation and false against the
+  system. Before recording either: (1) treat the worker's own
+  self-reported location and file listing as a diagnostic LEAD — it
+  stays a claim, never proof (the completion-claim rule above still
+  governs), but it is a statement against interest: a worker that names
+  a different directory than the one you dispatched it to, or lists
+  files you know live elsewhere, is grounds to suspect the plumbing
+  before suspecting the worker; (2) prove where the tool actually
+  points with a split probe — real cwd one place, the suspect channel
+  another, one write, observe which receives it — run OUT-OF-TREE
+  (a scratch directory, never the delivered tree, which stays
+  untouched per the completion-claim audit), and note it validates
+  only the probed channel: a tool writing via absolute paths or an
+  attached server needs its own check; (3) only a worker whose
+  delivered working directory is verified correct can earn a verdict
+  that depends on WHERE files landed — a missing-file fabrication
+  charge or an out-of-scope-location charge; content-level fraud
+  inside a file that IS present in the dispatched tree needs no
+  location probe. And mtime forensics on a shared target
+  path cannot rehabilitate one after the fact — successive runs
+  overwrite the same misdirected path, so surviving timestamps show
+  the LAST writer, leaving earlier verdicts unprovable either way.
+  (Incident: a CLI resolved its working directory from the inherited
+  `$PWD` env var rather than the real cwd, which a Python
+  `subprocess(cwd=...)` changes without rewriting `$PWD`; one bench
+  session recorded a "fabricated file 3/3, with invented line number
+  and verification" verdict and a separate "wrote real code to the
+  wrong directory" verdict against two different models — both
+  retracted the same day when a deliberate real-vs-fake `$PWD` split
+  run proved the writes landed exactly where the tool was pointed. The
+  first worker's transcript had self-reported the wrong directory's
+  file listing all along.)
+  ✅ "the worker listed files from a directory I never gave it —
+  suspected the plumbing, ran the split probe, found the env-var
+  channel, retracted the scope-violation verdict."
+  ❌ "the file isn't in its directory and it claimed verification, so
+  it fabricated" — no probe of where the spawn actually pointed the
+  tool.
 - **Unit-green is not integration.** A worker's component tests can all pass
   while the bridge that wires the component in hardcodes a value that bypasses
   the very behavior under test — a hollow integration. Verify by following ONE
@@ -776,6 +827,53 @@ reviewers that they silently absorb as implementers.
   produced nothing to relay: report the failure; do not fabricate a
   stand-in and pass it off as the delegate's work. (`unprobed` — see
   Provenance.)
+- **A silently-dead background delegate indicts your launch plumbing before it
+  indicts the delegate — two of your own surfaces fail in ways that read as the
+  worker's.** (a) *The stdin you handed it.* Do not assume launch-descriptor
+  state is constant across ostensibly identical background dispatches; when a
+  silent-death failure shape could be plumbing-induced, inspect or pin the
+  relevant descriptors as the dispatch contract permits, and read the
+  delegate's own process status before attributing the failure to the worker.
+  In the source incident the same command shape inherited `/dev/null` on one
+  launch and an open pipe on the next (WHY the wiring varied in that harness
+  remains unresolved — treat any candidate cause as unverified until probed
+  in that harness). A CLI that
+  documents "stdin piped → read as input" blocks on that pipe until your
+  timeout kills it — no output artifact, no diagnostics — and the discriminator
+  is not "is stdin a pipe" but whether the pipe's write end ever closes
+  (contributor-reported reproduction: a held-open pipe hangs the same
+  invocation to rc=124/no-output that an immediately-EOF pipe lets
+  succeed). Pin fd0 closed
+  (`</dev/null`) on every non-interactive dispatch whose contract does not
+  consume stdin — never on one fed data through stdin (`cmd - `, `git apply`,
+  a piped payload): a trailing `</dev/null` overrides the earlier pipe and
+  starves it. And never record the redirect as the retroactive diagnosis of a
+  specific past failure without a paired control: the one time that claim was
+  tested, both arms passed, refuting "the redirect is THE fix" while leaving
+  the mechanism it prevents fully real. This rung covers the launch-side
+  audit only — a first-invocation timeout still gets §1's cold-start warm
+  retry, and a quiet worker still gets §4's reconcile-before-discard read,
+  before any dead verdict. (b) *The exit status you read.* After
+  `delegate … | tail -N`, `$?` is tail's status, not the delegate's — a
+  timeout-killed delegate reads back as EXIT=0. Same family as
+  ground-truth-gates item 13 (a success status bound to the wrong entity), on
+  a different surface: the status is genuine but belongs to the wrong PROCESS.
+  Read the delegate's own array slot — and mind the off-by-one: zsh
+  `${pipestatus[1]}` (1-based) and bash `${PIPESTATUS[0]}` (0-based) both name
+  the FIRST process; bash `${PIPESTATUS[1]}` is tail's, the exact bug this
+  rung exists to prevent. `set -o pipefail` is only an aggregate failure
+  detector (`$?` = rightmost non-zero) — it cannot attribute a status to the
+  delegate, so it never substitutes for the array read. Do this before
+  recording any verdict — including the verdict that the plumbing in (a) was
+  clean. (`unprobed` — contributor incident, contributor-reported mechanism
+  reproduction; see Provenance.)
+  ✅ "background dispatch: `timeout 240 <cli> … </dev/null >log 2>&1;
+  echo rc=$?` — stdin pinned, full log kept (tail it for display only), and
+  with no pipe `$?` IS the delegate's; if you must pipe, read zsh
+  `${pipestatus[1]}` / bash `${PIPESTATUS[0]}`. (`timeout` is GNU coreutils —
+  absent on stock macOS; probe for it before trusting rc=124 readings.)"
+  ❌ "EXIT=0 printed after the tail, so the delegate ran clean" — the delegate
+  was killed at 240s; EXIT=0 was tail's.
 - **At the ceiling, the ladder inverts** (`unprobed` — adapted external
   design; see Provenance). The advice-mode rung above assumes a tier exists
   above the executor. When the ORCHESTRATOR is observably the ceiling
@@ -1385,6 +1483,38 @@ the covenant, its probe — a weak-tier subordinate driving a
 mechanism-level tool surface with a swallowed precondition vs. one
 with the precondition promoted to a named return, comparing task
 completion — joins the standing #115 queue.
+The §3 misconduct-verdict-plumbing rule (2026-08-15) comes from a
+contributor incident (contributor-reported, not linkable): during a
+model bench, a subordinate CLI resolved its working directory from the
+inherited `$PWD` env var instead of the real process cwd (which the
+harness's directory-changing spawn never rewrote), and one session
+recorded both a fabrication verdict and a scope-violation verdict
+against two different models — both retracted the same day after a
+deliberate real-cwd-vs-fake-`$PWD` split run isolated the channel. The
+first worker's transcript had self-reported the wrong directory's file
+listing from the start; the mtime-forensics limit was learned
+attempting (and failing) to rehabilitate the fabrication verdict after
+the fact. Kin to the reported-FAILURE rule (environment fabricating a
+RED) but placed separately because the object differs: that rule
+audits the worker's claim, this one audits the dispatcher's own
+verdict about the worker. Ships `unprobed` per the covenant; its
+probe — a spawn with mismatched real-cwd/`$PWD` and a grader that
+checks only the real cwd, does a ruled reviewer suspect the plumbing
+before the worker — joins the standing #115 queue.
+The §4 dead-delegate-launch-plumbing bullet (2026-08-28) comes from a
+contributor incident (contributor-reported, not linkable): two background
+CLI dispatches in one session died with no output file while
+identically-shaped controls succeeded; direct reproduction isolated
+open-pipe-on-fd0 (write end never closing) as the hang mechanism, a paired
+with/without-`</dev/null` control REFUTED the redirect as the diagnosis of
+the original failures, and the EXIT=0-was-tail's misread occurred live in
+the same investigation. Two independent cross-family lenses converged on
+launcher descriptor topology as the likely wiring variable, but WHY the
+wiring varied remains unresolved — the rule prescribes pinning and correct
+status reads, deliberately not a topology claim. Ships `unprobed` per the
+covenant; its probe — a weak-tier arm dispatching a background delegate
+through a pipeline, bare vs ruled, scored on whether it pins stdin and
+reads the delegate's own status — joins the standing #115 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
