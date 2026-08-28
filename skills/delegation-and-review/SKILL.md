@@ -543,6 +543,47 @@ reviewers that they silently absorb as implementers.
   CRITICAL, both correctly derived from a contract the dispatch packet
   overstated — read as corroboration until the packet itself was
   checked.
+- **A clean verdict is never evidence about material the reviewer did not
+  receive or otherwise verify — reconcile coverage before crediting a
+  clearance** (`unprobed` — see Provenance). The packet-errors rule above
+  checks the packet's CLAIMS before crediting a finding; this is its
+  all-clear counterpart: it checks the review's COVERAGE before crediting
+  a clearance. A bounded-scope review's PROCEED gets consumed as "the
+  requested scope is clean", but the verdict can bind only the scope the
+  reviewer actually covered — and an assembly gap (a truncated diff, a
+  pagination cap, a glob that missed a path) produces an honest PROCEED
+  that silently clears material nobody saw: no fraud exists anywhere, so
+  the completion-claim audit above never fires — the gap is a COVERAGE
+  defect in the dispatch, never the reviewer's failure. Before expanding
+  an all-clear to the full requested scope, reconcile three things: the
+  REQUIRED scope (what this clearance is about to be credited against),
+  the AVAILABLE material (what the reviewer could actually see — an
+  embedded diff, an independent copy, or trusted access to the frozen
+  tree all qualify; availability is not prompt-embedding), and the
+  COVERED scope (what the verdict's own evidence shows was examined).
+  The clearance binds the covered scope only — downward, never inflated
+  upward. Every gap between required and covered is EXPLAINED or it
+  stays open: a required path never made available and never examined is
+  UNREVIEWED, never clean — a reviewer's silence about it is not
+  clearance (it could not mention what it never saw), and the only way
+  to close it without re-review is the orchestrator's own independent
+  ground truth that the path is unchanged against the review baseline
+  (verified, not assumed — unchanged material legitimately produces no
+  diff to review); an extra path beyond the brief is an authorized
+  producer's output, or a discovered dependency to escalate and
+  re-scope, or it stays outside the clearance — never silently absorbed,
+  and never auto-filed as misconduct; a reviewer assigned a subset
+  judges that subset — its PROCEED never expands to paths it was never
+  given. No machine-readable path manifest is required — the
+  reconciliation is the orchestrator's read of what the brief asked
+  against what the packet carried and the verdict shows, at whatever
+  granularity the dispatch actually declared.
+  ❌ "the reviewer PROCEEDed and never mentioned B, so B is clean" — B's
+  diff was dropped by a pagination cap; the PROCEED covers what the
+  packet carried, and B was never in it.
+  ✅ "brief asked A+B; packet carried only A; before crediting A+B
+  clean, diffed B against the review baseline myself — unchanged, so
+  the A-clearance plus the verified-unchanged B closes the scope."
 - Critic verdicts carry evidence: REFUTED needs a counterexample; untested
   assumptions are listed. Verify critics too; stale or missing review is not approval.
 - **Batching verification checkpoints is a cost decision with a hard
@@ -1515,6 +1556,23 @@ status reads, deliberately not a topology claim. Ships `unprobed` per the
 covenant; its probe — a weak-tier arm dispatching a background delegate
 through a pipeline, bare vs ruled, scored on whether it pins stdin and
 reads the delegate's own status — joins the standing #115 queue.
+The coverage-before-clearance rule (2026-08-29) comes from a first-hand
+orientation over this file's own review-lane semantics, after an intake
+question asked whether brief-vs-diff reconciliation was already covered:
+the dispatch-side scope declaration (§2), the completion-claim audit
+(dishonesty-bound, bound to an execution deliverable, and claim-side),
+the packet-errors rule (finding-side), and the settled-tree protocol
+(motion-bound) each pass a constructed counterexample in which an honest
+reviewer PROCEEDs over a silently-truncated packet (a pagination cap
+dropping one requested file's diff) and the orchestrator reads the
+verdict as full-scope clean — a false clearance with zero rule
+violations. The rule closes the consumption-side gap; the locked
+invariant is credited-scope ⊆ actually-covered-scope,
+explanation-based, deliberately not path-set equality. Ships `unprobed`
+per the covenant; its probe — a bare vs ruled orchestrator handed a
+truncated packet's PROCEED and a broader requested scope, scored on
+whether the absent path gets credited clean — joins the standing #115
+queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
