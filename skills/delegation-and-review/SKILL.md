@@ -781,28 +781,41 @@ reviewers that they silently absorb as implementers.
   worker's.** (a) *The stdin you handed it.* Launch-descriptor state is not
   constant across ostensibly identical background dispatches: the same command
   shape can inherit `/dev/null` on one launch and an open pipe on the next
-  (session restarts and parallel-launch topology change the wiring). A CLI that
+  (WHY the wiring varies in a given harness is often unresolved — treat any
+  candidate cause as unverified until probed in that harness). A CLI that
   documents "stdin piped → read as input" blocks on that pipe until your
   timeout kills it — no output artifact, no diagnostics — and the discriminator
   is not "is stdin a pipe" but whether the pipe's write end ever closes
   (execution-verified: a held-open pipe hangs the same invocation to
   rc=124/no-output that an immediately-EOF pipe lets succeed). Pin fd0 closed
-  (`</dev/null`) on every non-interactive dispatch as hardening — and never
-  record the redirect as the retroactive diagnosis of a specific past failure
-  without a paired control: the one time that claim was tested, both arms
-  passed, refuting "the redirect is THE fix" while leaving the mechanism it
-  prevents fully real. (b) *The exit status you read.* After
+  (`</dev/null`) on every non-interactive dispatch whose contract does not
+  consume stdin — never on one fed data through stdin (`cmd - `, `git apply`,
+  a piped payload): a trailing `</dev/null` overrides the earlier pipe and
+  starves it. And never record the redirect as the retroactive diagnosis of a
+  specific past failure without a paired control: the one time that claim was
+  tested, both arms passed, refuting "the redirect is THE fix" while leaving
+  the mechanism it prevents fully real. This rung covers the launch-side
+  audit only — a first-invocation timeout still gets §1's cold-start warm
+  retry, and a quiet worker still gets §4's reconcile-before-discard read,
+  before any dead verdict. (b) *The exit status you read.* After
   `delegate … | tail -N`, `$?` is tail's status, not the delegate's — a
   timeout-killed delegate reads back as EXIT=0. Same family as
   ground-truth-gates item 13 (a success status bound to the wrong entity), on
   a different surface: the status is genuine but belongs to the wrong PROCESS.
-  Read the delegate's own status (`${pipestatus[1]}` zsh / `PIPESTATUS` bash /
-  `set -o pipefail`) before recording any verdict — including the verdict that
-  the plumbing in (a) was clean. (`unprobed` — contributor incident,
-  execution-verified mechanism; see Provenance.)
-  ✅ "background dispatch: `timeout 240 <cli> … </dev/null 2>&1 | tail -5;
-  echo rc=${pipestatus[1]}` — stdin pinned, delegate's own rc read through
-  the pipe."
+  Read the delegate's own array slot — and mind the off-by-one: zsh
+  `${pipestatus[1]}` (1-based) and bash `${PIPESTATUS[0]}` (0-based) both name
+  the FIRST process; bash `${PIPESTATUS[1]}` is tail's, the exact bug this
+  rung exists to prevent. `set -o pipefail` is only an aggregate failure
+  detector (`$?` = rightmost non-zero) — it cannot attribute a status to the
+  delegate, so it never substitutes for the array read. Do this before
+  recording any verdict — including the verdict that the plumbing in (a) was
+  clean. (`unprobed` — contributor incident, execution-verified mechanism;
+  see Provenance.)
+  ✅ "background dispatch: `timeout 240 <cli> … </dev/null >log 2>&1;
+  echo rc=$?` — stdin pinned, full log kept (tail it for display only), and
+  with no pipe `$?` IS the delegate's; if you must pipe, read zsh
+  `${pipestatus[1]}` / bash `${PIPESTATUS[0]}`. (`timeout` is GNU coreutils —
+  absent on stock macOS; probe for it before trusting rc=124 readings.)"
   ❌ "EXIT=0 printed after the tail, so the delegate ran clean" — the delegate
   was killed at 240s; EXIT=0 was tail's.
 - **At the ceiling, the ladder inverts** (`unprobed` — adapted external
