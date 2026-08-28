@@ -701,14 +701,23 @@ reviewers that they silently absorb as implementers.
   fabrication, and a file found elsewhere reads as a scope violation —
   both verdicts correct against the observation and false against the
   system. Before recording either: (1) treat the worker's own
-  self-reported location and file listing as EVIDENCE, not noise — a
-  worker that names a different directory than the one you dispatched
-  it to, or lists files you know live elsewhere, has already told you
-  the plumbing diverged; (2) prove where the tool actually points with
-  a single split probe — real cwd one place, the suspect channel
-  another, one write, observe which receives it; (3) only a worker
-  whose delivered working directory is verified correct can earn a
-  fabrication or scope verdict, and mtime forensics on a shared target
+  self-reported location and file listing as a diagnostic LEAD — it
+  stays a claim, never proof (the completion-claim rule above still
+  governs), but it is a statement against interest: a worker that names
+  a different directory than the one you dispatched it to, or lists
+  files you know live elsewhere, is grounds to suspect the plumbing
+  before suspecting the worker; (2) prove where the tool actually
+  points with a split probe — real cwd one place, the suspect channel
+  another, one write, observe which receives it — run OUT-OF-TREE
+  (a scratch directory, never the delivered tree, which stays
+  untouched per the completion-claim audit), and note it validates
+  only the probed channel: a tool writing via absolute paths or an
+  attached server needs its own check; (3) only a worker whose
+  delivered working directory is verified correct can earn a verdict
+  that depends on WHERE files landed — a missing-file fabrication
+  charge or an out-of-scope-location charge; content-level fraud
+  inside a file that IS present in the dispatched tree needs no
+  location probe. And mtime forensics on a shared target
   path cannot rehabilitate one after the fact — successive runs
   overwrite the same misdirected path, so surviving timestamps show
   the LAST writer, leaving earlier verdicts unprovable either way.
