@@ -306,9 +306,14 @@ When rigor conflicts with finishing sooner, rigor wins.
   longhand degrades: on unrelated histories `git merge-base` prints
   nothing, the substitution empties, and the command silently becomes a
   working-tree diff, which `<base>...<branch>` never does. What deleting
-  the branch would lose is its unlanded work — the two-dot ADDITION
-  side, or `git log <base>..<branch>` (the materialization set, the
-  merge-tree preview and the merge-base longhand were verified against
+  the branch would lose is its unlanded work — read that off
+  `git log <base>..<branch>` or the three-dot `git diff
+  <base>...<branch>`, NOT the two-dot ADDITION side: once the base has
+  moved on, that side also carries the branch's older copy of base-side
+  edits, which deleting the branch does not lose. The addition side is
+  inconclusive for the same reason the deletion side is (the
+  materialization set, the merge-tree preview, the addition-side read
+  and the merge-base longhand were verified against
   fixtures 2026-08-28; the squash and empty-two-dot claims above and the
   incident shape stay `unprobed` — contributor incident; see
   Provenance).
@@ -1502,7 +1507,12 @@ repository". (9) `format-patch --stdout ... | git am` is the runnable
 form; bare `format-patch` wrote `0001-*.patch` into cwd and bare
 `git am` read stdin. (10) `merge-tree --write-tree` on unrelated
 histories exited 128 ("refusing to merge unrelated histories"), outside
-its documented 0/1.
+its documented 0/1. (11) With the base moved on (a base-side edit the
+branch predates), the two-dot ADDITION side listed the branch's older
+copy of that file alongside its genuine new work, while
+`git log <base>..<branch>` and the three-dot diff listed only the new
+work — so the addition side over-reports what deleting the branch loses,
+by the same mechanism that makes the deletion side inconclusive.
 The incident SHAPE of both bullets remains contributor-reported
 and ships `unprobed`; those probes stay on the standing #115 queue.
 
