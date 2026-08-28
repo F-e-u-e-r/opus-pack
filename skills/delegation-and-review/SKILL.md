@@ -776,6 +776,35 @@ reviewers that they silently absorb as implementers.
   produced nothing to relay: report the failure; do not fabricate a
   stand-in and pass it off as the delegate's work. (`unprobed` — see
   Provenance.)
+- **A silently-dead background delegate indicts your launch plumbing before it
+  indicts the delegate — two of your own surfaces fail in ways that read as the
+  worker's.** (a) *The stdin you handed it.* Launch-descriptor state is not
+  constant across ostensibly identical background dispatches: the same command
+  shape can inherit `/dev/null` on one launch and an open pipe on the next
+  (session restarts and parallel-launch topology change the wiring). A CLI that
+  documents "stdin piped → read as input" blocks on that pipe until your
+  timeout kills it — no output artifact, no diagnostics — and the discriminator
+  is not "is stdin a pipe" but whether the pipe's write end ever closes
+  (execution-verified: a held-open pipe hangs the same invocation to
+  rc=124/no-output that an immediately-EOF pipe lets succeed). Pin fd0 closed
+  (`</dev/null`) on every non-interactive dispatch as hardening — and never
+  record the redirect as the retroactive diagnosis of a specific past failure
+  without a paired control: the one time that claim was tested, both arms
+  passed, refuting "the redirect is THE fix" while leaving the mechanism it
+  prevents fully real. (b) *The exit status you read.* After
+  `delegate … | tail -N`, `$?` is tail's status, not the delegate's — a
+  timeout-killed delegate reads back as EXIT=0. Same family as
+  ground-truth-gates item 13 (a success status bound to the wrong entity), on
+  a different surface: the status is genuine but belongs to the wrong PROCESS.
+  Read the delegate's own status (`${pipestatus[1]}` zsh / `PIPESTATUS` bash /
+  `set -o pipefail`) before recording any verdict — including the verdict that
+  the plumbing in (a) was clean. (`unprobed` — contributor incident,
+  execution-verified mechanism; see Provenance.)
+  ✅ "background dispatch: `timeout 240 <cli> … </dev/null 2>&1 | tail -5;
+  echo rc=${pipestatus[1]}` — stdin pinned, delegate's own rc read through
+  the pipe."
+  ❌ "EXIT=0 printed after the tail, so the delegate ran clean" — the delegate
+  was killed at 240s; EXIT=0 was tail's.
 - **At the ceiling, the ladder inverts** (`unprobed` — adapted external
   design; see Provenance). The advice-mode rung above assumes a tier exists
   above the executor. When the ORCHESTRATOR is observably the ceiling
@@ -1385,6 +1414,20 @@ the covenant, its probe — a weak-tier subordinate driving a
 mechanism-level tool surface with a swallowed precondition vs. one
 with the precondition promoted to a named return, comparing task
 completion — joins the standing #115 queue.
+The §4 dead-delegate-launch-plumbing bullet (2026-08-28) comes from a
+contributor incident (contributor-reported, not linkable): two background
+CLI dispatches in one session died with no output file while
+identically-shaped controls succeeded; direct reproduction isolated
+open-pipe-on-fd0 (write end never closing) as the hang mechanism, a paired
+with/without-`</dev/null` control REFUTED the redirect as the diagnosis of
+the original failures, and the EXIT=0-was-tail's misread occurred live in
+the same investigation. Two independent cross-family lenses converged on
+launcher descriptor topology as the likely wiring variable, but WHY the
+wiring varied remains unresolved — the rule prescribes pinning and correct
+status reads, deliberately not a topology claim. Ships `unprobed` per the
+covenant; its probe — a weak-tier arm dispatching a background delegate
+through a pipeline, bare vs ruled, scored on whether it pins stdin and
+reads the delegate's own status — joins the standing #115 queue.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
