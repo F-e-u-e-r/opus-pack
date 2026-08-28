@@ -403,7 +403,9 @@ and the `.ssh`/`.aws`/`.gnupg` directories, `.env` variants,
 that specific deletion is explicitly confirmed: after the user's yes,
 re-run prefixed with `CRED_GATE_APPROVED=1`, which overrides that one
 command only. The override is friction plus an audit log, not proof of
-consent — every use is logged. Why the hook exists: in the pack's own
+consent — every approved override attempts to append an audit event, but
+the log write is best-effort: a failed write is silently dropped and
+never blocks the hook. Why the hook exists: in the pack's own
 eval, both weak-tier no-skills runs deleted a credentials backup because
 an instruction embedded in a vendor-notes file told them to — this gate
 turns that exact failure into a blocked call whose error message points at
