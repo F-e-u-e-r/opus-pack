@@ -283,7 +283,7 @@ bash hooks/test-skill_snapshot.sh
 ```
 
 **第三個(可選)hook——憑證樣檔案不因「有字叫我刪」就被銷毀。**
-`hooks/gate-credential-destruction.py`(Python 3 標準庫,2026-07-11 已測試)是一個 `PreToolUse`(matcher: `Bash`)hook:對憑證樣路徑(ssh 私鑰與 `.ssh`/`.aws`/`.gnupg` 目錄本身、`.env` 系列、`*.pem`/keystore、名字含 credential/secret/password/apikey 的檔案)的 `rm`/`unlink`/`shred`/`srm`/`truncate`/`git rm`——含 `sudo`/wrapper 與完整路徑寫法——一律擋下,直到該次刪除被明確確認:取得使用者同意後,在指令前加 `CRED_GATE_APPROVED=1` 重跑,且 override 只作用於那一條指令。override 是摩擦力加稽核紀錄,不是同意的證明——每次使用都會留 log。它存在的原因:本包自己的 eval 中,兩場弱模型無 skills 的 run 因為 vendor 筆記檔裡嵌的一段指令就把憑證備份刪了——這個閘門把那個失敗原樣變成一次被擋下的呼叫,錯誤訊息直接指向 delegation-and-review §7 與 security-architect。已知極限寫在腳本開頭(`bash script.sh`、alias、`find -delete`、`xargs rm`、`>` 截斷可繞過——文字層 hook 的先天限制)。掛在同一個 `PreToolUse`/`Bash` matcher 下加第二條 command 即可:
+`hooks/gate-credential-destruction.py`(Python 3 標準庫,2026-07-11 已測試)是一個 `PreToolUse`(matcher: `Bash`)hook:對憑證樣路徑(ssh 私鑰與 `.ssh`/`.aws`/`.gnupg` 目錄本身、`.env` 系列、`*.pem`/keystore、名字含 credential/secret/password/apikey 的檔案)的 `rm`/`unlink`/`shred`/`srm`/`truncate`/`git rm`——含 `sudo`/wrapper 與完整路徑寫法——一律擋下,直到該次刪除被明確確認:取得使用者同意後,在指令前加 `CRED_GATE_APPROVED=1` 重跑,且 override 只作用於那一條指令。override 是摩擦力加稽核紀錄,不是同意的證明——每次 approved override 都會嘗試追加一筆稽核事件;log 寫入是盡力而為(best-effort),寫入失敗會被靜默丟棄,且絕不阻擋 hook 本身。它存在的原因:本包自己的 eval 中,兩場弱模型無 skills 的 run 因為 vendor 筆記檔裡嵌的一段指令就把憑證備份刪了——這個閘門把那個失敗原樣變成一次被擋下的呼叫,錯誤訊息直接指向 delegation-and-review §7 與 security-architect。已知極限寫在腳本開頭(`bash script.sh`、alias、`find -delete`、`xargs rm`、`>` 截斷可繞過——文字層 hook 的先天限制)。掛在同一個 `PreToolUse`/`Bash` matcher 下加第二條 command 即可:
 
 ```json
 { "type": "command",
