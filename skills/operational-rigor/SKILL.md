@@ -281,21 +281,35 @@ When rigor conflicts with finishing sooner, rigor wins.
   be READ — but never as a merge preview: a three-way merge applies the
   branch's changes from the MERGE-BASE, so base-side work the branch
   never touched survives the merge even though the two-dot shows it as
-  deletions (those deletions materialize only under `reset --hard`,
-  re-applying the branch as a patch, or otherwise overwriting the base
-  with the branch tip — which is why non-empty never justifies
-  re-applying). Match the read to the action: what a merge would
-  actually change is the branch's own delta from the merge-base
-  (`git diff $(git merge-base <base> <branch>) <branch>`); what
-  deleting the branch would lose is its unlanded work — the two-dot
-  ADDITION side, or `git log <base>..<branch>` (`unprobed` —
-  contributor incident as shape; see Provenance).
+  deletions. Survives is not untouched — a branch-side rename of an
+  enclosing directory still relocates such a file or conflicts on it.
+  Those deletions materialize when the base is OVERWRITTEN by the
+  branch tip (`reset --hard`, a force-push, a tip-over-base copy) —
+  which is why non-empty never justifies re-applying — but NOT under
+  `format-patch` + `am`, which replays the branch's own commits and
+  leaves base-only files in place. Match the read to the action: a real
+  merge preview is `git merge-tree --write-tree <base> <branch>`, which
+  reports the conflicts and the resulting tree; `git diff $(git
+  merge-base <base> <branch>) <branch>` is the branch's CONTRIBUTION,
+  not the merge result — note it is the very same computation as the
+  three-dot form rejected above, and on unrelated histories
+  `git merge-base` prints nothing, silently degrading the command to a
+  working-tree diff. What deleting the branch would lose is its
+  unlanded work — the two-dot ADDITION side, or
+  `git log <base>..<branch>` (git mechanics above verified against
+  fixtures 2026-08-28; the incident shape stays `unprobed` —
+  contributor incident; see Provenance).
 - **A torn-down worktree can make git act on the ENCLOSING repo instead
-  of failing** (`unprobed` — contributor incident as shape; see
-  Provenance). The usual teardown fails LOUDLY: a removed linked
+  of failing** (prune/repair/discovery mechanics verified against
+  fixtures 2026-08-28; the incident shape stays `unprobed` —
+  contributor incident; see Provenance). The usual teardown fails LOUDLY: a removed linked
   worktree is a dead cwd, sibling paths stop resolving, and commands
-  there die with "not a git repository" (`git worktree prune` itself
-  only drops admin entries whose directory is already missing). The
+  there die with "not a git repository". `git worktree prune` does not
+  create the silent case below, but it does CLOSE the exit from it: it
+  drops the admin entry whenever the worktree's `.git` pointer file is
+  missing — its directory still fully present or not ("gitdir file
+  points to non-existent location") — and `git worktree repair <path>`
+  can rewrite that pointer only until prune has run. The
   silent case is narrower and worse: the worktree's `.git` pointer file
   is gone while its directory path still resolves INSIDE the main
   checkout's tree — git resolves its repository by walking up from cwd,
@@ -308,9 +322,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   notice. So the trigger is positional, not observational: from any
   long-lived session working in a linked worktree that cleanup could
   have touched, before the first commit, push, or PR after a merge or
-  cleanup event, re-verify identity. `git rev-parse --show-toplevel` is
-  the decisive check — a rebound checkout can be sitting on the very
-  branch name you expect, so `--abbrev-ref HEAD` alone can false-pass.
+  cleanup event, re-verify identity. Decide it on `git rev-parse
+  --show-toplevel` COMPARED against the worktree path you expect: it
+  does not error in this failure, it succeeds and prints the enclosing
+  checkout, so reading it without comparing proves nothing. And a
+  rebound checkout can be sitting on the very branch name you expect,
+  so `--abbrev-ref HEAD` alone can false-pass.
   ❌ a create-PR command issued from a session's own already-torn-down
   worktree directory would have acted on the main checkout — wrong
   tree, wrong branch — under this session's name; the staged-diff read
@@ -1426,9 +1443,30 @@ late merge would have silently regressed them" — was REFUTED on
 base-side work the branch never touched; the two-dot deletion side
 materializes only under reset/re-apply/overwrite), which is why the
 amendment now reads the two-dot as a re-apply hazard and routes merge
-and delete decisions to the merge-base delta and the addition side
-respectively. Both bullets ship `unprobed` per the covenant; their
-probes join the standing #115 queue.
+and delete decisions away from it.
+
+Both bullets' GIT MECHANICS were probed on 2026-08-28 against throwaway
+fixtures (git 2.50.1), after a two-family prose review of the same text
+returned findings but ran nothing. Three claims failed and are corrected
+above. (1) `git worktree prune` does NOT only drop admin entries whose
+directory is already missing: with the directory fully populated and
+only the `.git` pointer file deleted, `git worktree prune -v` printed
+"Removing worktrees/<name>: gitdir file points to non-existent
+location" and removed the entry — so prune fires on precisely the silent
+state this bullet warns about, and it closes the `git worktree repair`
+recovery that works until it runs. (2) `git diff $(git merge-base <base>
+<branch>) <branch>` is not a merge preview: it is byte-identical to the
+three-dot form the same rule rejects, it collapses to a working-tree
+diff when the histories are unrelated (`git merge-base` exits 1 printing
+nothing), and on a branch that renamed an enclosing directory the merge
+CONFLICTED and relocated a base-only file — neither of which that diff
+shows. `git merge-tree --write-tree` predicted both. (3) `format-patch`
++ `am` does not materialize the two-dot deletions: replaying the
+branch's commits onto the base left the base-only file in place. Also
+tightened: `--show-toplevel` succeeds and prints the ENCLOSING checkout
+in this failure, so it is decisive only when COMPARED against the path
+expected. The incident SHAPE of both bullets remains contributor-reported
+and ships `unprobed`; those probes stay on the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
