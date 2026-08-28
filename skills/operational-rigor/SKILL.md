@@ -283,14 +283,17 @@ When rigor conflicts with finishing sooner, rigor wins.
   never touched survives the merge even though the two-dot shows it as
   deletions. Survives is not untouched — a branch-side rename of an
   enclosing directory still relocates such a file or conflicts on it.
-  Those deletions materialize when the base is OVERWRITTEN by the
-  branch tip (`reset --hard`, a force-push, a tip-over-base copy) —
-  which is why non-empty never justifies re-applying — but NOT under
+  Those deletions materialize when the base CHECKOUT is overwritten by
+  the branch tip (`reset --hard`, a tip-over-base copy) — which is why
+  non-empty never justifies re-applying — but NOT under
   `format-patch` + `am`, which replays the branch's own commits and
   leaves base-only files in place. Match the read to the action: a real
-  merge preview is `git merge-tree --write-tree <base> <branch>`, which
-  reports the conflicts and the resulting tree; `git diff $(git
-  merge-base <base> <branch>) <branch>` is the branch's CONTRIBUTION,
+  merge preview is `git merge-tree --write-tree <base> <branch>`: it
+  writes and prints the resulting tree either way, adding the conflicted
+  paths and a conflict message and exiting non-zero when the merge does
+  not apply cleanly — so read its output, not its status. `git diff
+  $(git merge-base <base> <branch>) <branch>` is the branch's
+  CONTRIBUTION,
   not the merge result — note it is the very same computation as the
   three-dot form rejected above, and on unrelated histories
   `git merge-base` prints nothing, silently degrading the command to a
@@ -306,10 +309,12 @@ When rigor conflicts with finishing sooner, rigor wins.
   worktree is a dead cwd, sibling paths stop resolving, and commands
   there die with "not a git repository". `git worktree prune` does not
   create the silent case below, but it does CLOSE the exit from it: it
-  drops the admin entry whenever the worktree's `.git` pointer file is
-  missing — its directory still fully present or not ("gitdir file
-  points to non-existent location") — and `git worktree repair <path>`
-  can rewrite that pointer only until prune has run. The
+  drops the admin entry of any UNLOCKED worktree whose `.git` pointer
+  file is missing — its directory still fully present or not ("gitdir
+  file points to non-existent location"); `git worktree lock` is what
+  holds an entry through a prune. `git worktree repair <path>` rewrites
+  the pointer from that admin entry, so it works only until prune
+  removes it. The
   silent case is narrower and worse: the worktree's `.git` pointer file
   is gone while its directory path still resolves INSIDE the main
   checkout's tree — git resolves its repository by walking up from cwd,
@@ -1447,25 +1452,23 @@ and delete decisions away from it.
 
 Both bullets' GIT MECHANICS were probed on 2026-08-28 against throwaway
 fixtures (git 2.50.1), after a two-family prose review of the same text
-returned findings but ran nothing. Three claims failed and are corrected
-above. (1) `git worktree prune` does NOT only drop admin entries whose
-directory is already missing: with the directory fully populated and
-only the `.git` pointer file deleted, `git worktree prune -v` printed
-"Removing worktrees/<name>: gitdir file points to non-existent
-location" and removed the entry — so prune fires on precisely the silent
-state this bullet warns about, and it closes the `git worktree repair`
-recovery that works until it runs. (2) `git diff $(git merge-base <base>
-<branch>) <branch>` is not a merge preview: it is byte-identical to the
-three-dot form the same rule rejects, it collapses to a working-tree
-diff when the histories are unrelated (`git merge-base` exits 1 printing
-nothing), and on a branch that renamed an enclosing directory the merge
-CONFLICTED and relocated a base-only file — neither of which that diff
-shows. `git merge-tree --write-tree` predicted both. (3) `format-patch`
-+ `am` does not materialize the two-dot deletions: replaying the
-branch's commits onto the base left the base-only file in place. Also
-tightened: `--show-toplevel` succeeds and prints the ENCLOSING checkout
-in this failure, so it is decisive only when COMPARED against the path
-expected. The incident SHAPE of both bullets remains contributor-reported
+returned findings but ran nothing. Results, each corrected above:
+(1) `git worktree prune -v` removed the admin entry of an UNLOCKED
+worktree whose directory was fully populated and whose `.git` pointer
+file alone was deleted ("gitdir file points to non-existent location");
+a locked worktree in the same state survived. The old text said prune
+only drops entries whose directory is already missing. (2) `git diff
+$(git merge-base A B) B` was byte-identical (`cmp`) to `git diff A...B`;
+on unrelated histories `git merge-base` exited 1 printing nothing; and on
+a branch that renamed an enclosing directory the merge conflicted and
+relocated a base-only file, which that diff did not show and
+`git merge-tree --write-tree` did (tree written and printed, conflicted
+path listed, exit 1). (3) `format-patch $(git merge-base A B)..B` + `am`
+onto the base left the base-only file in place. (4) A force-push updated
+the ref and left the pushing tree untouched, so it is not a materializing
+action. (5) `git rev-parse --show-toplevel` exited 0 printing the
+enclosing checkout in the rebind case.
+The incident SHAPE of both bullets remains contributor-reported
 and ships `unprobed`; those probes stay on the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
