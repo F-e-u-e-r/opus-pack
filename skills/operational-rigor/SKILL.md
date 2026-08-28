@@ -306,14 +306,21 @@ When rigor conflicts with finishing sooner, rigor wins.
   longhand degrades: on unrelated histories `git merge-base` prints
   nothing, the substitution empties, and the command silently becomes a
   working-tree diff, which `<base>...<branch>` never does. What deleting
-  the branch would lose is its unlanded work — read that off
-  `git log <base>..<branch>` or the three-dot `git diff
-  <base>...<branch>`, NOT the two-dot ADDITION side: once the base has
-  moved on, that side also carries the branch's older copy of base-side
-  edits, which deleting the branch does not lose. The addition side is
-  inconclusive for the same reason the deletion side is (the
-  materialization set, the merge-tree preview, the addition-side read
-  and the merge-base longhand were verified against
+  the branch would lose is its unlanded work, and the two-dot ADDITION
+  side does not measure it: once the base has moved on, that side also
+  carries the branch's older copy of base-side edits, which deleting the
+  branch does not lose — inconclusive for the same tip-to-tip reason as
+  the deletion side. Use two COMPLEMENTARY reads instead, never as
+  equivalents: `git log <base>..<branch>` enumerates the branch's unique
+  COMMITS, and `git diff <base>...<branch>` shows its net CONTENT since
+  the merge-base. They diverge — a commit plus its revert leaves the log
+  non-empty and the three-dot diff empty. Mind the dots on the log: the
+  two-dot `<base>..<branch>` (or `^<base> <branch>`) is the one you
+  want; `git log <base>...<branch>` is the SYMMETRIC difference and
+  lists base-side commits too, recreating the very over-report this
+  paragraph exists to stop (the materialization set, the merge-tree
+  preview, the addition-side over-report and the merge-base longhand
+  were verified against
   fixtures 2026-08-28; the squash and empty-two-dot claims above and the
   incident shape stay `unprobed` — contributor incident; see
   Provenance).
@@ -1470,8 +1477,10 @@ base-side work the branch never touched; the two-dot deletion side
 materializes when the base checkout is overwritten by the tip or the
 two-dot diff is itself applied, not under `format-patch` + `am`), which
 is why the amendment now reads the two-dot as a re-apply hazard, routes
-the merge preview to `git merge-tree --write-tree`, and still reads
-delete risk off the two-dot ADDITION side / `git log <base>..<branch>`.
+the merge preview to `git merge-tree --write-tree`, and reads delete
+risk off `git log <base>..<branch>` plus `git diff <base>...<branch>` —
+treating the two-dot ADDITION side as inconclusive for the same
+tip-to-tip reason as its deletion side (result 11).
 
 Both bullets' GIT MECHANICS were probed on 2026-08-28 against throwaway
 fixtures (git 2.50.1), after a two-family prose review of the same text
@@ -1507,12 +1516,16 @@ repository". (9) `format-patch --stdout ... | git am` is the runnable
 form; bare `format-patch` wrote `0001-*.patch` into cwd and bare
 `git am` read stdin. (10) `merge-tree --write-tree` on unrelated
 histories exited 128 ("refusing to merge unrelated histories"), outside
-its documented 0/1. (11) With the base moved on (a base-side edit the
-branch predates), the two-dot ADDITION side listed the branch's older
-copy of that file alongside its genuine new work, while
-`git log <base>..<branch>` and the three-dot diff listed only the new
-work — so the addition side over-reports what deleting the branch loses,
-by the same mechanism that makes the deletion side inconclusive.
+its documented 0/1. Probed 2026-08-29: (11) with the base moved on (a
+base-side edit the branch predates), the two-dot ADDITION side carried
+the branch's older copy of that file alongside its genuine new work,
+while `git log <base>..<branch>` contained only the branch's unique
+commit and `git diff <base>...<branch>` only its net new content — so
+the addition side over-reports what deleting the branch loses, by the
+same mechanism that makes the deletion side inconclusive. The two reads
+are not equivalent: a commit plus its revert left the log listing two
+commits and the three-dot diff empty. (12) `git log <base>...<branch>`
+(three dots) listed the BASE-side commit as well.
 The incident SHAPE of both bullets remains contributor-reported
 and ships `unprobed`; those probes stay on the standing #115 queue.
 
