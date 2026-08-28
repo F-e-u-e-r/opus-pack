@@ -101,6 +101,32 @@ before publishing.
 ❌ "criteria: see `scratch/PREREG.md`" — reclaimed a session later, and
 the frozen criteria can no longer be distinguished from fitted ones.
 
+Pre-registration also has to survive the run tripping its own validity
+clause mid-flight — a run that goes dead-cell-heavy or otherwise breaches
+its pre-registered kill condition after some results are already visible.
+The failure mode here is not skipping the clause, it is **honoring it by
+patching the live run and continuing to count**: the harness gets a fix
+(a retry, a widened timeout, a corrected fixture) and the same in-flight
+run keeps going, so the corrected cells sit next to cells scored under
+the broken method and the two get treated as one comparable set. **Void
+and re-run from zero instead.** The sequence that keeps this honest: (1)
+void the run the instant its own clause fires, discard its scores as
+evidence for the verdict; (2) write the amendment down — what broke,
+what changed — in the same durable record as the pre-registration, not
+folded silently into the method section; (3) disclose that partial
+results were seen before the amendment, and give the one-line argument
+for why that visibility could not have manufactured the outcome (e.g.
+the voided run's direction favored the arm that did NOT end up winning,
+or the decision table is symmetric so a peek couldn't tilt it either
+way) — if that argument can't be made honestly, the amendment is
+contaminated and the fix needs a reviewer who never saw the voided
+scores; (4) re-run the full battery under the amended method, and the
+verdict cites only the re-run. (`unprobed` — see Provenance.)
+❌ "Run 1 lost 6 cells to a transport flake, added a retry, cells 7–36
+came back clean, calling it 30/30 net of the flake" — mixes pre- and
+post-amendment cells in one scored set with no disclosure they ran under
+different methods.
+
 Calibrate the difficulty of the SHARED
 case set before comparing — never each arm's separately, which destroys
 comparability: a comparison where every arm sits at the same ceiling (every
@@ -116,6 +142,27 @@ provider, tier, or configuration takes its own runs there — same-family
 or similar-name inference is not parity evidence. (`unprobed` — see
 Provenance.)
 
+**A population claim needs the population benched — a subset scored
+under one harness supports "N of the M tested", never "no member does
+X" or "every member does X"** (`unprobed` — contributor incident as
+shape; see Provenance). The trap is sharpest for a probe that
+SEPARATES subjects: any subset that happens to lack a separating
+member makes the property look universal, and the resulting "law"
+reads as MORE solid than a per-subject score precisely because it
+sounds structural rather than sampled. Before a claim names the
+population ("the pool", "every tier", "all of them"), check the
+denominator: either every current member ran under the same harness
+build, or the claim carries its subset explicitly ("3 of the 7").
+And the denominator decays independently of the scores — population
+membership churns, so a population claim expires with the roster,
+not just with serving drift.
+❌ "no member of the pool defends unstated degenerate inputs — the
+rule is now unconditional" — 3 of 7 members had been benched; a
+whole-pool run days later found one guarding that edge 2/2 on debut
+and another 1/2. The same author had already made and retracted a
+different universal-from-subset claim on the same probe weeks
+earlier — each subset lacking a separating member looked like a law.
+
 The same calibration discipline applies within one arm across time
 (`unprobed` — contributor incident as shape; see Provenance). A
 stochastic subject — a model, a scheduler, a network path, anything whose
@@ -127,7 +174,18 @@ replicated, carry its run count beside its score so a lone sweep cannot read
 as a measurement. Every claimed run needs a persisted row of its own: a run
 quoted from recall, or one whose output the next run overwrote, cannot be
 re-checked and is not a run — publishing four while one is on disk is how an
-unreplicated result becomes an unfalsifiable one.
+unreplicated result becomes an unfalsifiable one. And the overwrite is
+usually the harness's own design, not an accident: a results file at a
+fixed path makes every re-run destroy the baseline it will be compared
+against, so key result artifacts by run (date, tag, or run id) and treat
+an existing file at a run's keyed output path as a collision error,
+never a target to overwrite. The ban is on silent replacement, not on a
+stable path — an append-only ledger whose rows carry their run keys
+satisfies it. A
+harness that can silently consume its own prior evidence is one careless
+re-run away from an uncheckable comparison (one harness's hardcoded
+results filename replaced the prior week's scorecard on re-run; those
+rows survived only because a separate log duplicated them).
 ❌ "30/30, no thinking step — make it the default." Replicated to N=4 the
 same candidate scored 30/30/20/29, failing twice by mechanisms the first run
 never produced.
@@ -439,7 +497,21 @@ A generic green test is not proof. A gate is real only if:
    incident as shape; see Provenance.) Worker-written guard scripts
    especially: item 2's known-broken run applies before trust, no exemption —
    whoever wrote a guard has never seen it fail. (`unprobed` — private
-   incident as shape; see Provenance.)
+   incident as shape; see Provenance.) A **gate runner whose own aggregation
+   arithmetic fails open**: a shell script that counts failures with
+   `return`/`exit` truncates the count mod 256, so exactly 256 failing files
+   or gates reads as success; a `printf | grep -q` check under `pipefail` can
+   SIGPIPE-fail the pipeline on large output, flipping the verdict
+   independent of the underlying result; a crashed test that dies before
+   printing its own failure marker leaves the marker-grep matching nothing,
+   so the runner reports a bare, diagnostic-free failure. None of these are
+   the code under test failing — the gate's own plumbing fails open or loses
+   information under conditions its author never exercised (an exact
+   multiple of 256, an oversized log, a crash before the first marker).
+   Reproduce the runner's failure mode itself before trusting its count:
+   feed it a synthetic 256th failure, an oversized output, a file that
+   throws before printing anything. (`unprobed` — contributor incident as
+   shape; see Provenance.)
 4. **Nobody weakens a gate to turn it green.** A worker satisfies the gate, never
    edits it — gate changes are the orchestrator's call. Three corollaries:
    - For an *immutable policy-checker* (not an ordinary test), run it from a
@@ -654,6 +726,42 @@ A generic green test is not proof. A gate is real only if:
    ❌ "queried the non-manufacturing PMI series, got 200 with data" — the
    response held the manufacturing series under the same call and status,
    silently, because both shared the queried id family.
+14. **An absence claim needs a positive-control probe, not just a clean
+   scan** (`unprobed` — contributor incident as shape; see Provenance).
+   "Zero matches" or "zero rows" can mean the thing you checked for
+   genuinely isn't there, or it can mean the query itself can't see it — a
+   timestamp comparison mixing epoch-millis against a `Timestamp` column
+   that silently coerces to always-false, a grep confined to a file set
+   that excludes where the pattern actually lives (an imported helper, a
+   re-exported symbol). Before trusting a zero-result scan, prove the probe
+   COULD have matched: run it against a case seeded to trigger a hit, or
+   temporarily reintroduce a known instance and confirm the scan finds it.
+   A scan that has never once returned non-zero is unproven, not clean —
+   this is item 2's known-bad-arm proof applied to a claim about the
+   world (the seeded case IS the known-bad arm: prove the probe can hit
+   before trusting that it didn't), the same discipline item 3's
+   zero-input-scanner shape enforces for a file set.
+   ❌ "grep for the deprecated call across the target files found nothing —
+   safe to remove" — the call was one import away, inside a helper the grep
+   never traversed; the scan was reporting its own blind spot as an
+   all-clear.
+15. **A type-valid response is not a real value — a model can coerce
+   "nothing" into a value that clears every downstream truthy/shape check**
+   (`unprobed` — contributor incident as shape; see Provenance). Where a
+   schema or prompt contract requires a field to be present, a model
+   under-specified on what "absent" should look like can emit a sentinel
+   that satisfies the type (the literal string `"null"`, an empty-but-valid
+   object, a zero that reads as a real zero) — every guard checking
+   `if (value)` or validating shape sees a pass, and the absence is
+   laundered into a plausible-looking fact. Where the contract allows a
+   genuine absence, say so explicitly (an actual `null`/optional field, a
+   documented sentinel with its own check) rather than leaving the model to
+   invent one; and where a value is asserted present, check it against the
+   domain — does this look like a real record, not just the right type.
+   ❌ a person-lookup schema marking a field required non-null; the model,
+   finding no data, emitted the four-character string `"null"` — every
+   `if (result.field)` guard downstream read that as truthy and shipped it
+   as a real value.
 
 **A red result is not automatically a real defect** — but ruling one
 "environmental" is a gate change, not the worker's call (rule 4): quarantine it
@@ -1167,6 +1275,69 @@ without the typechecker, plant an unenforced type-level assertion,
 observe whether a ruled reviewer demands proof the checker runs where
 a bare one takes the assertion's presence as enforcement — joins the
 standing #115 queue.
+The void-amend-disclose-rerun rule comes from a contributor's
+measured-harness export (2026-08-18, N=30 ledger items/arm over 6
+real-repo review packets, agy gemini-3.7-flash-high vs
+gemini-3.6-flash-high; contributor-reported, not linkable — the harness
+is not in this repo): Run 1 tripped its own
+pre-registered validity clause (>4 dead cells voids the run) after
+losing 6/36 cells to empty returns, all six on the two largest prompt
+packets. Rather than patching the harness for empty-return retry and
+letting the same in-flight run continue, the run was voided outright;
+the amendment adding retry-on-empty was logged in the same durable
+record as the pre-registration, with an explicit disclosure that Run
+1's per-arm scores had already been seen before the amendment was
+written, plus the argument for why that could not have manufactured
+the eventual result — Run 1's direction favored the incumbent arm, and
+the pre-registered decision table treats both arms symmetrically, so a
+peek biased toward one arm cannot explain a verdict that didn't move
+in that arm's favor. Run 2 re-ran the full battery under the amended
+method and lost only 1/36 cells; the verdict cites Run 2 alone. Ships
+`unprobed` per the covenant; its probe — seed a run whose validity
+clause fires after partial results are visible, observe whether a
+ruled agent voids and re-runs versus patching the live run and
+netting the fixed cells against the broken ones — joins the standing
+#115 queue.
+The item-3 gate-runner-aggregation-fails-open shape and items 14–15
+(2026-08-20) come from a contributor's TG-bot-helper- unit-test/gate runner,
+`checks/run-all.sh` (contributor-reported, not linkable). The runner shape:
+one PR (#80) fixed a crashed test dying before printing its own `❌` marker,
+leaving the marker-grep matching nothing and the runner reporting a bare,
+diagnostic-free `FAIL <file>`; reviewing that fix, one subordinate model
+flagged — and the contributor independently reproduced 5/5 with an 820KB
+string — that the fix's own `printf | grep -q "❌"` could SIGPIPE-fail under
+`pipefail` on large output, contradicting pass/fail independent of the
+underlying test result; a second, pre-existing instance of the same SIGPIPE
+pattern was found in the runner's outer aggregate condition but deliberately
+left out of that PR (scope discipline, item 4) and chipped separately, where
+a different subordinate session went beyond the chip's spec and additionally
+found the runner's `return`/`exit` truncating its failure count mod 256 (PR
+#81) — an exact-256-failures input would have reported success. Item 14
+(absence positive-control) and item 15 (type-valid-sentinel-for-absence)
+generalize two further incidents mined from the same contributor's session
+history: a zero-row database query that silently always-false'd on an
+epoch-millis/`Timestamp` type mismatch, and a schema-required field where a
+model, finding no data, emitted the literal string `"null"` past every
+downstream truthy guard. All three ship `unprobed` per the covenant; their
+probes join the standing #115 queue.
+The population-claim rule and the run-keyed-artifacts amendment
+(2026-08-21) are mined from one contributor bench session
+(contributor-reported, not linkable): a 4-probe free-model bench whose
+edge probe separates models had twice yielded a universal claim from a
+subset — most recently "no model in the pool defends this edge" off 3
+of 7 members, undone days later when a whole-pool run under one
+harness build found one member guarding it 2/2 and another 1/2 — and
+the same session's harness, writing to a hardcoded results filename,
+silently replaced the prior week's scorecard on re-run, leaving those
+rows recoverable only from a duplicate log. The amendment extends this
+section's existing persisted-row clause (a run whose output the next
+run overwrote is not a run) from the epistemic consequence to the
+design prescription; it is adjacent to, not a restatement of, that
+clause. Both ship `unprobed` per the covenant; the population-claim
+probe — hand a reviewer a k-of-M bench table plus a "does anything in
+the pool do X?" question and observe whether a ruled reviewer bounds
+the answer to the tested subset where a bare one publishes the law —
+joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
 sentinel starter ran green two-sided (PASS + `--demo-leak` FAIL) on
