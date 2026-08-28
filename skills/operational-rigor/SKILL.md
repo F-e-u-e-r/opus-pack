@@ -284,14 +284,16 @@ When rigor conflicts with finishing sooner, rigor wins.
   deletions. Survives is not untouched — a branch-side rename of an
   enclosing directory still relocates such a file or conflicts on it.
   Those deletions materialize when the base CHECKOUT is overwritten by
-  the branch tip (`reset --hard`, a tip-over-base copy) — which is why
-  non-empty never justifies re-applying — but NOT under
-  `format-patch` + `am`, which replays the branch's own commits and
+  the branch tip (`reset --hard`, a working-tree copy of the tip) —
+  which is why non-empty never justifies re-applying — but NOT under
+  `git format-patch $(git merge-base <base> <branch>)..<branch>` +
+  `git am` onto the base, which replays the branch's own commits and
   leaves base-only files in place. Match the read to the action: a real
-  merge preview is `git merge-tree --write-tree <base> <branch>`: it
-  writes and prints the resulting tree either way, adding the conflicted
-  paths and a conflict message and exiting non-zero when the merge does
-  not apply cleanly — so read its output, not its status. `git diff
+  merge preview is `git merge-tree --write-tree <base> <branch>`. Its
+  first stdout line is the OID of the merged tree, written either way;
+  exit 0 means clean and exit 1 means conflicted, with the conflicted
+  paths and a CONFLICT message following that OID on stdout. Diff that
+  OID against the base to read the merge's net change. `git diff
   $(git merge-base <base> <branch>) <branch>` is the branch's
   CONTRIBUTION,
   not the merge result — note it is the very same computation as the
@@ -299,9 +301,10 @@ When rigor conflicts with finishing sooner, rigor wins.
   `git merge-base` prints nothing, silently degrading the command to a
   working-tree diff. What deleting the branch would lose is its
   unlanded work — the two-dot ADDITION side, or
-  `git log <base>..<branch>` (git mechanics above verified against
-  fixtures 2026-08-28; the incident shape stays `unprobed` —
-  contributor incident; see Provenance).
+  `git log <base>..<branch>` (the materialization set, the merge-tree
+  preview and the merge-base longhand were verified against fixtures
+  2026-08-28; the squash and two-dot claims above and the incident
+  shape stay `unprobed` — contributor incident; see Provenance).
 - **A torn-down worktree can make git act on the ENCLOSING repo instead
   of failing** (prune/repair/discovery mechanics verified against
   fixtures 2026-08-28; the incident shape stays `unprobed` —
@@ -312,9 +315,11 @@ When rigor conflicts with finishing sooner, rigor wins.
   drops the admin entry of any UNLOCKED worktree whose `.git` pointer
   file is missing — its directory still fully present or not ("gitdir
   file points to non-existent location"); `git worktree lock` is what
-  holds an entry through a prune. `git worktree repair <path>` rewrites
-  the pointer from that admin entry, so it works only until prune
-  removes it. The
+  holds an entry through a prune. A bare `git worktree repair` run from
+  the main checkout rewrites the missing pointer from that admin entry,
+  so the exit works only until prune removes the entry; the
+  `repair <path>` form also restores it but exits 1 with an `error:`
+  line, so its status reads as a failure it is not. The
   silent case is narrower and worse: the worktree's `.git` pointer file
   is gone while its directory path still resolves INSIDE the main
   checkout's tree — git resolves its repository by walking up from cwd,
@@ -1446,7 +1451,8 @@ shipped after the branch's base. The incident's original reading — "a
 late merge would have silently regressed them" — was REFUTED on
 2026-08-28 pre-merge review by execution (a three-way merge preserves
 base-side work the branch never touched; the two-dot deletion side
-materializes only under reset/re-apply/overwrite), which is why the
+materializes only when the base checkout is overwritten by the tip, not
+under `format-patch` + `am`), which is why the
 amendment now reads the two-dot as a re-apply hazard and routes merge
 and delete decisions away from it.
 
@@ -1462,12 +1468,18 @@ $(git merge-base A B) B` was byte-identical (`cmp`) to `git diff A...B`;
 on unrelated histories `git merge-base` exited 1 printing nothing; and on
 a branch that renamed an enclosing directory the merge conflicted and
 relocated a base-only file, which that diff did not show and
-`git merge-tree --write-tree` did (tree written and printed, conflicted
-path listed, exit 1). (3) `format-patch $(git merge-base A B)..B` + `am`
+`git merge-tree --write-tree` did (merged-tree OID on the first stdout
+line, then the conflicted path and a CONFLICT message, exit 1; a clean
+pair printed the OID alone and exited 0). (3) `format-patch
+$(git merge-base A B)..B` + `am`
 onto the base left the base-only file in place. (4) A force-push updated
 the ref and left the pushing tree untouched, so it is not a materializing
 action. (5) `git rev-parse --show-toplevel` exited 0 printing the
-enclosing checkout in the rebind case.
+enclosing checkout in the rebind case. (6) With the pointer file deleted
+and the admin entry present, a bare `git worktree repair` from the main
+checkout restored the pointer and exited 0, and `repair <path>` restored
+it too but exited 1 with an `error:` line; after `prune` removed the
+entry, both failed and the pointer stayed gone.
 The incident SHAPE of both bullets remains contributor-reported
 and ships `unprobed`; those probes stay on the standing #115 queue.
 
