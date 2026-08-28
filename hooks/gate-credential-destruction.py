@@ -41,7 +41,8 @@ Behavior:
   same posture as gate-before-commit's "can't tell" exits.
 - Any other internal error runs that same degraded raw-scan over the decoded
   command (or, if the envelope was unparseable, the raw stdin): a clearly
-  destructive match blocks, anything else fails open with the traceback logged —
+  destructive match blocks, anything else fails open with a traceback audit
+  entry attempted on a best-effort basis (see _log) —
   so a bug in this hook cannot freeze every Bash call. An envelope larger than
   the 1 MiB cap is blocked unread (no override path — split the call).
 
@@ -69,9 +70,9 @@ commands — NOT an adversarial security boundary. Real protection is filesystem
 isolation / keeping credentials outside the tool's reach.
 
 Python 3.8+, stdlib only. Audit events are appended to
-~/.claude/hooks/hooks.log on a best-effort basis: _log swallows every write
-error, so a failed or unwritable log is dropped silently and never blocks a
-call. Treat the log as friction and telemetry, not as a guaranteed audit trail.
+~/.claude/hooks/hooks.log on a best-effort basis: _log swallows EVERY
+exception, the directory creation included, so an unwritable or failed log is
+dropped silently and never blocks a call. Treat the log as friction and telemetry, not as a guaranteed audit trail.
 """
 
 import datetime
