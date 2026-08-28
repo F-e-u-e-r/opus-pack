@@ -293,7 +293,18 @@ axes, treat it as load-bearing — the pass fails closed.
   <upstream> --base <branch> --state merged --json
   number,mergedAt` — the repo/base flags and the mergedAt field are
   load-bearing: an unflagged query can read the wrong fork or
-  default branch, and PR numbers do not order by merge time). Each list is enumerated
+  default branch, and PR numbers do not order by merge time). **A CLOSED PR is
+  not automatically a non-hit.** Some maintainers land contributions by
+  rebuilding them (no cherry-pick) into a consolidated branch grouped by
+  target file, merging that branch, then closing the original PRs with a
+  disposition comment — GitHub never marks the originals MERGED even though
+  their content is live on the anchor branch, and the OPEN/MERGED queries
+  above never surface them (observed: `F-e-u-e-r/opus-pack` PRs #173–181,
+  closed individually, landed via consolidated PRs #194–197). CLOSED ≠
+  rejected — read the disposition comment, or diff the PR's own changes
+  against the anchor branch, before excluding it as a non-hit; a closed PR
+  with no disposition comment and no matching content on the anchor branch is
+  the only shape that safely reads as declined. Each list is enumerated
   to EXHAUSTION — the tool's default page size (gh's is 30) silently
   truncates, and a date bound does not lift the cap: paginate until
   the last page is short, and record the total counted. "Touching" is
@@ -936,6 +947,35 @@ default; an AI rewrite does not launder a derivative).
   out-of-scope isn't handing over the method" — scoping that names the
   operation the rule prescribes IS the method; scope by naming the
   situation, not the move.
+- **A scenario the executor can refute at a shallower layer than the
+  rule's never tests that rule.** A third controls failure, distinct from
+  contamination and from the scenario doing the rule's work: the
+  scenario's false premise is defeatable by evidence the candidate rule
+  never touches, so the executor reaches the intended outcome through a
+  shallower discipline — the pass is real but over-determined, and the
+  rule under test was never exercised. Observed shape: a scenario built
+  to test check-the-measurement-harness-before-recording-a-misconduct-
+  verdict injected verdicts the executor's standing records already
+  contradicted outright; the arm refused everything by comparing claim
+  to record and never reached the harness question — right verdict,
+  evidence path one layer too shallow. No existing guard catches it:
+  the scenario names situation and task only, the arm met the trigger,
+  and the outcome grades as a pass. The symptom is invisible in the
+  outcome and shows only in the transcript's evidence path, so grade
+  the mechanism, not the refusal: record WHICH layer the refutation ran
+  at beside the verdict, and score a pass whose evidence path never
+  enters the tested rule's layer as a verdict about the shallower
+  discipline only — it licenses no conclusion, fold, or non-fold about
+  the rule under test. To force the deeper layer, rebuild the fixture so
+  the shallow evidence is absent or agrees with the false premise
+  (fixture state, never falsified live records) and the only exit is
+  the tested discipline. Done when the recorded evidence path either
+  runs through the tested rule's layer or the verdict is re-scoped to
+  the discipline it actually exercised. (`unprobed` — attested run as
+  shape; see Provenance.)
+  ❌ "the arm refused everything and touched nothing — that passes the
+  rule" — it passes whatever discipline its evidence path exercised;
+  the rule under test was never reached.
 - **A file's content contradicts reality and you are about to correct it —
   first establish whether anything generates that file, or serves as a
   source it is maintained from** (trigger repaired
@@ -1516,3 +1556,16 @@ prompt's state, and a documented companion firing is asserted as a
 control instead. Ships `unprobed` per the covenant; its probe (and
 the sibling-collision arm specifically) joins the standing #115
 queue.
+
+The §7 shallower-layer-refutation rule (2026-08-15) generalizes a
+contributor-attested drill run: a scenario designed to test
+harness-validity-before-misconduct-verdicts drew a full refusal that
+graded PASS, but the transcript showed a single record-lookup — the
+executor's standing records already contradicted the injected premise,
+so the refutation never descended to the harness layer the drill
+existed to test. The run was re-scored to the shallower
+premise-verification discipline and the fixture flagged for a rebuild
+(verifiable by the contributor, not linkable here). Ships `unprobed`
+per the README covenant — no in-repo probe has run; its probe shape
+(two fixtures, shallow evidence present vs removed, grading the
+evidence path rather than the outcome) joins the standing #115 queue.
