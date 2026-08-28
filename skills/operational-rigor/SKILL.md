@@ -277,7 +277,46 @@ When rigor conflicts with finishing sooner, rigor wins.
   simply have moved on — so it never justifies re-applying the branch), NOT
   a three-dot `...` diff, which
   measures from the merge-base and still shows the work as unlanded — and
-  never per-commit patch equivalence.
+  never per-commit patch equivalence. A non-empty two-dot diff can still
+  be READ — but never as a merge preview: a three-way merge applies the
+  branch's changes from the MERGE-BASE, so base-side work the branch
+  never touched survives the merge even though the two-dot shows it as
+  deletions (those deletions materialize only under `reset --hard`,
+  re-applying the branch as a patch, or otherwise overwriting the base
+  with the branch tip — which is why non-empty never justifies
+  re-applying). Match the read to the action: what a merge would
+  actually change is the branch's own delta from the merge-base
+  (`git diff $(git merge-base <base> <branch>) <branch>`); what
+  deleting the branch would lose is its unlanded work — the two-dot
+  ADDITION side, or `git log <base>..<branch>` (`unprobed` —
+  contributor incident as shape; see Provenance).
+- **A torn-down worktree can make git act on the ENCLOSING repo instead
+  of failing** (`unprobed` — contributor incident as shape; see
+  Provenance). The usual teardown fails LOUDLY: a removed linked
+  worktree is a dead cwd, sibling paths stop resolving, and commands
+  there die with "not a git repository" (`git worktree prune` itself
+  only drops admin entries whose directory is already missing). The
+  silent case is narrower and worse: the worktree's `.git` pointer file
+  is gone while its directory path still resolves INSIDE the main
+  checkout's tree — git resolves its repository by walking up from cwd,
+  so the walk-up lands on the main checkout and every subsequent git
+  command silently rebinds to it: its branch, its index, its
+  uncommitted files, possibly another session's work in progress. The
+  staged-diff and outgoing-patch reads above audit WHAT a commit or
+  push carries; this failure changes WHERE they act, through no action
+  of yours — and the dangerous case is precisely the one you did not
+  notice. So the trigger is positional, not observational: from any
+  long-lived session working in a linked worktree that cleanup could
+  have touched, before the first commit, push, or PR after a merge or
+  cleanup event, re-verify identity. `git rev-parse --show-toplevel` is
+  the decisive check — a rebound checkout can be sitting on the very
+  branch name you expect, so `--abbrev-ref HEAD` alone can false-pass.
+  ❌ a create-PR command issued from a session's own already-torn-down
+  worktree directory would have acted on the main checkout — wrong
+  tree, wrong branch — under this session's name; the staged-diff read
+  above would have flagged the sibling session's dirty files, but only
+  the identity check caught the wrong DESTINATION, before the commit
+  rather than after.
 - **Third-party executable content** (hooks, scripts, plugins) installs only
   after: provenance check (owner/age/fork metadata), full source read, one
   written sentence stating why it is inert or safe here, and a fixture test
@@ -1370,6 +1409,26 @@ queue. The single marker lives here on the canonical rule; the skill-vetting
 mirror routes to it and carries no second marker or probe debt. Nine inert
 synthetic fixtures (placeholder hosts, never executed) and the full review
 trail are recorded in reviews/2026-08-21-issue2-activation-gated-payload/.
+
+The worktree-identity bullet and the residue rule's two-dot-reading
+amendment (2026-08-20) come from one contributor session's teardown arc
+(contributor-reported, not linkable). The session's own linked worktree
+had been torn down while it worked; the directory path still resolved
+inside the main checkout, so git commands fell through to the main repo
+— a create-PR command was about to act on the main checkout under this
+session's name and was stopped by an identity check, not by any git
+error. In the same teardown, a parallel branch carrying the "same fix"
+as an already-landed change was diffed against the default branch
+before disposal: the two-dot deletion side showed 109 lines of work
+shipped after the branch's base. The incident's original reading — "a
+late merge would have silently regressed them" — was REFUTED on
+2026-08-28 pre-merge review by execution (a three-way merge preserves
+base-side work the branch never touched; the two-dot deletion side
+materializes only under reset/re-apply/overwrite), which is why the
+amendment now reads the two-dot as a re-apply hazard and routes merge
+and delete decisions to the merge-base delta and the addition side
+respectively. Both bullets ship `unprobed` per the covenant; their
+probes join the standing #115 queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
