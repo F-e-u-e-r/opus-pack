@@ -17,7 +17,7 @@ sha256 `66bff37d083a0f70a042f1f690a8ebc848e9f8ad231133ca51c90847c6cafa1b`:
 
 ## R3-reviewed → landed (word-level; every hunk accounted)
 
-- **Option X — explicit layering** (owner: "把語義分層寫清楚"; keep `curl/wget/nc` +
+- **Option X — explicit layering** (owner-adjudicated; keep `curl/wget/nc` +
   credential reads as findings-to-explain):
   - added the framing sentence "Judge the data flow and the disclosure, not the
     transport name";
