@@ -784,6 +784,43 @@ without that the item stays BLOCKED, not Pass.
 Preserve evidence: the command run, the log, the artifact, or the CI URL —
 so the next session can re-check the claim instead of trusting it.
 
+Re-running a recipe creates NEW evidence; it does not verify the prior
+evidence record being audited (`unprobed` — see Provenance). The
+preservation sentence above is the producer side; this is the consumer
+side: when a claim cites an earlier run, log, artifact, or verdict,
+inspect that cited evidence IDENTITY first — its durable form (the
+artifact, run id, CI URL, or commit), its recorded inputs/config, what
+it actually contains, and whether the claim is faithful to it. The
+identity is the evidence, not the pathname: a verified
+content-identical archival copy (an exact blob/hash-matched or
+run-id-matched relocation) IS the cited record — reading it is reading
+the original. A fresh execution of the same recipe answers a different
+question — what happens NOW, under this invocation's model, config,
+and environment — and gets its own persisted row (the
+every-claimed-run rule above), never the old row's seat: a fresh PASS
+cannot show that the original ledger was complete, that the original
+run finished, that its config matched, or that the report transcribed
+it correctly. If the cited record cannot be recovered in ANY
+content-verified form, the historical claim stays UNVERIFIED — a fresh
+reproduction may establish current behavior, or corroborate a record
+that was actually inspected (report both identities: "the record says
+X; a fresh run now says Y" — agreement is corroboration, divergence a
+new finding), but it cannot recreate the missing history. None of this
+touches the rules that legitimately RUN things: a current-state health
+check, a reproducibility claim, a regenerate-and-diff gate on a
+generated artifact, and verify-by-reconstruction of a delivered state
+all get fresh runs — their claims are about NOW or about STATE, and
+the reconstruction rule above already says state-proofs are not
+history-proofs. What none of them may do is silently substitute the
+rerun for the evidence identity under audit.
+❌ "the report says Run R was 36/36 and cites a ledger; I re-ran the
+recipe, got 36/36, so the report is verified" — the ledger was never
+opened: a 35-row ledger, a crashed original run, a different config,
+or a mistranscribed result all survive that fresh PASS.
+✅ "the cited ledger path is gone, but the archive carries a
+hash-identical copy — read it: 36 rows, claim faithful; a fresh run
+today also passes — corroborated, two evidence rows."
+
 If a judgment step's outputs are compared across time, **version it** — a
 threshold or rule change is a version bump, not an edit (it changes the meaning
 of every prior comparison); keep a pinned canonical scorer separate from a
@@ -1337,6 +1374,20 @@ clause. Both ship `unprobed` per the covenant; the population-claim
 probe — hand a reviewer a k-of-M bench table plus a "does anything in
 the pool do X?" question and observe whether a ruled reviewer bounds
 the answer to the tested subset where a bare one publishes the law —
+joins the standing #115 queue.
+The rerun-is-new-evidence rule (2026-08-29) comes from a first-hand
+orientation over this file's own evidence semantics: nine adjacent
+passages (preservation, persisted rows, regenerate-and-diff,
+verify-by-reconstruction's state-not-history clause, and the
+delegation/operational-rigor neighbors) each individually pass a
+constructed counterexample in which an auditor never opens a cited
+36/36 ledger, re-runs the recipe, gets a fresh 36/36, and declares the
+historical report verified — a substitution every current rule
+permits. The rule adds the consumption-side dual of the preservation
+sentence above; evidence identity is content-verified, never
+pathname-bound. Ships `unprobed` per the covenant; its probe — a bare
+vs ruled auditor handed a cited-ledger claim and a runnable recipe,
+scored on whether the ledger is opened before the claim is credited —
 joins the standing #115 queue.
 `template/` scripts are self-contained (Node + bash, zero deps); the
 golden/replay starters ran green on 2026-07-06 with Node v23, and the
