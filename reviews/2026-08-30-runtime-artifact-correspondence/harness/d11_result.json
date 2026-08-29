@@ -1,0 +1,28 @@
+{
+  "py": "3.9.6",
+  "unchecked_mismatch_default": {
+    "marker": "PAYLOAD",
+    "payload_ran": true,
+    "rc": 0,
+    "stderr_tail": ""
+  },
+  "unchecked_mismatch_always": {
+    "marker": "DECOY",
+    "payload_ran": false,
+    "rc": 0,
+    "stderr_tail": ""
+  },
+  "checked_mismatch_default": {
+    "marker": "DECOY",
+    "payload_ran": false,
+    "rc": 0,
+    "stderr_tail": ""
+  },
+  "checked_mismatch_never": {
+    "marker": "PAYLOAD",
+    "payload_ran": true,
+    "rc": 0,
+    "stderr_tail": ""
+  },
+  "ALL_MATCH_PREDICTION": true
+}
