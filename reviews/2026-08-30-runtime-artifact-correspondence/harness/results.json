@@ -1,0 +1,177 @@
+{
+  "D1": {
+    "expect": "HIT (unchecked)",
+    "pass": true,
+    "obs": {
+      "case": "D1",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'DECOY'",
+      "executed_marker": "PAYLOAD",
+      "payload_ran": true,
+      "pyc_flavor": "hash/unchecked",
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D1/d1mod.cpython-39.pyc"
+    }
+  },
+  "D2": {
+    "expect": "HIT + freshness PASS",
+    "pass": true,
+    "obs": {
+      "case": "D2",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'DECOY'",
+      "executed_marker": "PAYLOAD",
+      "payload_ran": true,
+      "pyc_flavor": "hash/checked",
+      "header_source_hash": "98802ca450d88dcb",
+      "recomputed_source_hash": "98802ca450d88dcb",
+      "checked_hash_freshness_passes": true,
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D2/d2mod.cpython-39.pyc"
+    }
+  },
+  "D3": {
+    "expect": "RECOMPILE -> DECOY",
+    "pass": true,
+    "obs": {
+      "case": "D3",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'DECOY'",
+      "executed_marker": "DECOY",
+      "payload_ran": false,
+      "pyc_flavor": "hash/checked-mismatch",
+      "header_source_hash": "883598be13d64318",
+      "recomputed_source_hash": "98802ca450d88dcb",
+      "header_matches_source": false,
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D3/d3mod.cpython-39.pyc"
+    }
+  },
+  "D4": {
+    "expect": "HIT (ts collision)",
+    "pass": true,
+    "obs": {
+      "case": "D4",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'DECOY'",
+      "executed_marker": "PAYLOAD",
+      "payload_ran": true,
+      "pyc_flavor": "timestamp",
+      "forged_mtime": 1788027163,
+      "forged_size": 17,
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D4/d4mod.cpython-39.pyc",
+      "caveat": "mtime integer-second granularity is FS/ENV-sensitive; forged deterministically here"
+    }
+  },
+  "D5": {
+    "expect": "HIT (sourceless)",
+    "pass": true,
+    "obs": {
+      "case": "D5",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "(no .py present \u2014 bare d5mod.pyc)",
+      "executed_marker": "PAYLOAD",
+      "payload_ran": true,
+      "pyc_flavor": "sourceless",
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D5/d5mod.pyc"
+    }
+  },
+  "D6": {
+    "expect": "CLEAR (source-only)",
+    "pass": true,
+    "obs": {
+      "case": "D6",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'CLEAN'",
+      "executed_marker": "CLEAN",
+      "payload_ran": false,
+      "pyc_flavor": "none (compiled from source)"
+    }
+  },
+  "D7": {
+    "expect": "CLEAR (rebuild)",
+    "pass": true,
+    "obs": {
+      "case": "D7",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "source_reviewer_sees": "MARKER = 'DECOY'",
+      "executed_marker": "DECOY",
+      "payload_ran": false,
+      "pyc_flavor": "hash/checked (regenerated)",
+      "forged_digest": "0b9d8c4d56f1f6a230fda65f242a687ce4d031ccdd114642f4689719932dd415",
+      "regen_digest": "f550f4e509b3bdafcefe2526569dea12a286806ddae93fb8e3eb1ab5e7a185e9",
+      "honest_digest": "f550f4e509b3bdafcefe2526569dea12a286806ddae93fb8e3eb1ab5e7a185e9",
+      "regen_corresponds_to_source": true,
+      "cache": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/work/D7/d7mod.cpython-39.pyc"
+    }
+  },
+  "D8": {
+    "expect": "CLEAR/finding split",
+    "pass": true,
+    "obs": {
+      "case": "D8",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "pyc_flavor": "provenance-by-reproduction",
+      "honest_digest": "6b44befb8c6c127d56fbea73908bcdbecc24e4824579130acb82644a73efc061",
+      "good_digest": "6b44befb8c6c127d56fbea73908bcdbecc24e4824579130acb82644a73efc061",
+      "forge_digest": "ca2f3169546419bc102d82fdbc86d5f317a40d6bcced424cfa3b55c76698109b",
+      "good_matches_reproduction": true,
+      "forge_matches_reproduction": false,
+      "note": "a \"generated\" metadata claim alone cannot separate good from forge; only the reproduction digest does"
+    }
+  },
+  "D9": {
+    "expect": "CONTROL (identity)",
+    "pass": true,
+    "obs": {
+      "case": "D9",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "pyc_flavor": "divergent tree (clean source + payload pyc in __pycache__)",
+      "digest_stable": true,
+      "digest_changes_on_byteflip": true,
+      "divergence_present": true,
+      "anomalies": [],
+      "note": "stable, non-anomalous whole-tree digest over a source/pyc-divergent tree: identity, not correspondence"
+    }
+  },
+  "D10": {
+    "expect": "ORTHOGONAL 5 _|_ 2",
+    "pass": true,
+    "obs": {
+      "case": "D10",
+      "py": "3.9.6",
+      "cache_tag": "cpython-39",
+      "pycache_prefix": "/private/tmp/claude-501/-Users-ccso-Developer-fable/993293ba-9196-4afc-8e63-136322ca93ef/scratchpad/c5-design/pyc",
+      "pyc_flavor": "orthogonality fixtures",
+      "a_pure5": {
+        "executed_diverges_from_source": true,
+        "source_contains_gate": false
+      },
+      "b_pure2": {
+        "executed_diverges_from_source": false,
+        "source_contains_gate": true,
+        "gate_dormant_ran": false
+      },
+      "c_cofire": {
+        "executed_diverges_from_source": true,
+        "executed_contains_gate": true,
+        "source_contains_gate": false
+      }
+    }
+  }
+}

@@ -377,6 +377,38 @@ When rigor conflicts with finishing sooner, rigor wins.
   source (cross-model-review, including its §6 fallback), and re-gate on
   any upstream update — a passed gate certifies the version read, not the
   file path.
+- **A source review clears executable *behavior* only when the
+  runtime-selected bytes are bound to what was reviewed** (`unprobed` —
+  see Provenance). The full-source read above clears source *text*; a
+  runtime can load a compiled, bundled, generated, or cached artifact that
+  it selects in preference to — or in the absence of — that source,
+  whether that artifact is shipped in the candidate tree, installed
+  elsewhere, or resolved from an external/central cache or load path (a
+  `.pyc`, a minified bundle, a checked-in `dist/`, a build cache). Such an
+  artifact's executable contents are cleared only when the
+  runtime-selected bytes are themselves reviewed, or an independent path
+  establishes those *exact* bytes were produced from the reviewed source
+  under a named build/compile recipe. Legitimate clearance: (a) remove any
+  competing shipped or cached artifact, regenerate from the exact reviewed
+  source under a named toolchain/recipe, and confirm the bytes the runtime
+  then selects match the regenerated artifact by digest; (b) bind the
+  exact artifact bytes by digest to the reviewed source + recipe via
+  reproducible/attested build evidence; or (c) review the runtime-selected
+  artifact itself, when it is reviewable as source-equivalent, as the
+  executable truth. A stable tree digest proves identity, not
+  correspondence. Cache-validity metadata is at most a freshness *signal*,
+  never evidence of correspondence: a timestamp is forgeable; a hash-based
+  `.pyc`'s stored source-hash is, under the default policy, either not
+  compared to the source (an `UNCHECKED_HASH` header) or, when compared
+  and matching (`CHECKED_HASH`), binds only that header to the current
+  source, never the bytecode body to it — and whether that comparison runs
+  at all is a runtime policy, not a guarantee. A filename or "generated"
+  claim proves nothing. An artifact the runtime may select whose
+  correspondence you cannot establish is a finding — fail closed (the
+  opaque-dependency default); a source-only candidate with no such
+  artifact is not a finding on this ground. This operationalizes
+  security-architect's "what executes must be verifiably bound to what was
+  reviewed" at per-candidate install/vetting time.
 - **Instruction files are executable content.** A third-party skill or
   instruction file gets the third-party install gate above (provenance,
   full source read, written safety sentence). On top of that:
@@ -1612,6 +1644,59 @@ The single marker lives here on the canonical rule; the skill-vetting
 §2 mirror routes to it and carries no second marker or probe debt. The
 full review trail is recorded in
 reviews/2026-08-30-trust-grant-breadth/.
+
+The §2 runtime-selected-artifact correspondence limb and its
+skill-vetting §1 step-4 pointer (2026-08-30) close a PARTIAL-GAP: the
+binding principle already lived in security-architect ("what executes
+must be verifiably bound to what was reviewed" — a provenance chain from
+reviewed source + build recipe to the running artifact, framed there as
+an ingestion-pipeline rule), and this section's install gate plus
+skill-vetting §1 already required a full source read and failed closed
+on opaque dependencies; what was missing was the per-candidate
+recognition trigger at the reviewer's own working point — find the
+artifact the runtime will actually select and establish its
+correspondence to the reviewed source. The abstraction is locked at L2
+(reviewed-source ↔ runtime-selected executable-artifact correspondence):
+broader than a `.pyc`-specific L1 that same-shape bypasses (`.pyo`,
+other cache tags, a shipped `.so`, a source-less bundle, a compiled
+hook) defeat at once, and narrower than an
+all-runtime-reachable-artifact / all-supply-chain L3, which was
+discovered as a broader generalization and deliberately NOT activated.
+Mechanism first-hand verified on CPython 3.9.6 (macOS 26.5.2 arm64,
+Apple system Python, whose baked pycache-prefix routes a sourced
+import's pyc to a central cache outside the candidate tree): a P1–P8
+orientation and a D1–D11 design battery. D2 shipped a forged
+`CHECKED_HASH` pyc whose header source-hash matched a clean decoy while
+its body was an unrelated payload — the runtime's own freshness check
+passed while it executed bytes never produced from the reviewed source
+(a checked hash binds header↔current-source, never bytecode↔source). D11
+confirmed the `--check-hash-based-pycs` default/always/never policy
+controls whether the source-hash is compared at all (an `UNCHECKED_HASH`
+header is not compared under the default policy; a `CHECKED_HASH`
+comparison can be disabled), so cache metadata is at most a freshness
+signal; a stable tree digest proves identity, not correspondence; and a
+reviewed-source↔runtime-artifact divergence is an actually-executable
+failure shape. The P4 timestamp-collision result carries a
+filesystem-granularity caveat (mtime integer-second resolution is
+FS/ENV-sensitive), and the out-of-tree central-cache observation is
+environment-specific supporting evidence, not a universal premise. The
+wording was settled by a dual-blind two-variant review — two variants of
+one model family, both outside the author family, NOT a cross-family
+gate (the family-diversity caveat is retained): round 1 both reviewers
+FIX (out-of-tree/central-cache discovery scope, and a freshness
+overclaim), round 2 one PROCEED / one FIX (a CPython hash-policy
+precision point, fixed with the D11 probe), round 3 PROCEED × 2 with all
+ten review axes passing, including the L2/L3 boundary and the
+canonical/mirror separation. Mechanism is first-hand verified; only the
+rule's behavioral transmission/effectiveness — whether handing it to a
+real reviewer surfaces a same-shape candidate more reliably than bare
+doctrine — is unprobed, so the rule ships `unprobed` per the covenant on
+that axis alone; its probe joins the standing #115 queue. The single
+marker lives here on the canonical §2 rule; the skill-vetting §1 pointer
+routes to it and carries no second marker or probe debt. The full review
+trail — orientation, P1–P8, the D1–D11 mechanism harness and results,
+the three review packets and six verdicts, and the landing manifest — is
+recorded in reviews/2026-08-30-runtime-artifact-correspondence/.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
