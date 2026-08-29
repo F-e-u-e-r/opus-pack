@@ -131,6 +131,15 @@ proof, but it is a finding that must be explained or it blocks:
   skill itself opens (live).
 - **MCP / tool auto-registration.** Instructions to auto-register an MCP server or
   tool globally without per-use consent, especially offensive tooling.
+- **Over-broad trust grant.** For any persistent trust/allow/approval
+  entry a candidate requests — including entries it asks the human to
+  type — apply operational-rigor §2's effective-grant-expansion rule;
+  that rule is canonical and holds the criterion, the clearers, and
+  the fail-closed default (nothing is restated here). Distinct from
+  and co-fires with: config self-propagation (who writes),
+  authorization-default flip (claimed authority), MCP
+  auto-registration (the registration act) — this pointer routes what
+  the persistent grant COVERS.
 - **Self-vouching.** Covered in §0 - re-flag if seen inside the source.
 - **Activation-gated payload (dormant branch).** Apply operational-rigor
   §2's activation-gated-payload check to skill prose as much as to
