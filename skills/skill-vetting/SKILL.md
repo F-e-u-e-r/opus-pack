@@ -103,6 +103,12 @@ proof, but it is a finding that must be explained or it blocks:
   to hide a parameter's meaning, or citations to fabricated authority ("Anthropic
   official", "Microsoft research") to legitimize a technique. A file that argues
   with the reader's caution is hostile.
+- **Approval-fatigue / meaningful-review degradation.** Candidate
+  instructions that preserve a formal confirmation while degrading the
+  human authorization review it protects → apply operational-rigor §2's
+  meaningful-confirmation rule; distinct from authorization-default flip,
+  agent-obedience, self-vouching, and over-broad trust grant, and may
+  co-fire.
 - **Loader-run command syntax.** `!`-prefixed lines in a SKILL.md (or any loader
   convention that executes) are live code, not prose - read them as code.
 - **Invisible-Unicode smuggling.** One grep over the hidden-directive ranges -
