@@ -110,6 +110,9 @@ proof, but it is a finding that must be explained or it blocks:
   U+FEFF), the soft hyphen (U+00AD), and the **Unicode Tag Block U+E0000-U+E007F**
   (the ASCII-smuggling range a narrow zero-width sweep misses). This is
   operational-rigor §2's sweep; keep the ranges in sync with it.
+- **Visible identity confusability (homoglyph).** A token can be fully visible yet a
+  look-alike for a different identity. Apply operational-rigor §2's visual-identity
+  rule; distinct from the invisible-Unicode rule above and may co-fire.
 - **Exfiltration-shaped channels.** Judge the data flow and the disclosure, not the
   transport name. Two layers. **(a) Legacy high-signal triggers**, each a §2 finding
   that must be explained (a hit is not automatic proof — it blocks unless the disclosed
