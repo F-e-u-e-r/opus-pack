@@ -1,0 +1,759 @@
+{
+ "rows": {
+  "H1": [
+   {
+    "tag": "ascii",
+    "text": "paypal",
+    "codepoints": [
+     "U+0070",
+     "U+0061",
+     "U+0079",
+     "U+0070",
+     "U+0061",
+     "U+006C"
+    ],
+    "names": [
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER Y",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER L"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": true,
+    "skeleton": "paypal",
+    "confusable_with_target": false,
+    "target": "paypal",
+    "note": ""
+   },
+   {
+    "tag": "homoglyph",
+    "text": "p\u0430ypal",
+    "codepoints": [
+     "U+0070",
+     "U+0430",
+     "U+0079",
+     "U+0070",
+     "U+0061",
+     "U+006C"
+    ],
+    "names": [
+     "LATIN SMALL LETTER P",
+     "CYRILLIC SMALL LETTER A",
+     "LATIN SMALL LETTER Y",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER L"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "paypal",
+    "confusable_with_target": true,
+    "target": "paypal",
+    "note": "one Cyrillic a U+0430"
+   }
+  ],
+  "H2": [
+   {
+    "tag": "ascii_tool",
+    "text": "scope",
+    "codepoints": [
+     "U+0073",
+     "U+0063",
+     "U+006F",
+     "U+0070",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER C",
+     "LATIN SMALL LETTER O",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": true,
+    "skeleton": "scope",
+    "confusable_with_target": false,
+    "target": "scope",
+    "note": ""
+   },
+   {
+    "tag": "confusable_sibling",
+    "text": "sc\u043epe",
+    "codepoints": [
+     "U+0073",
+     "U+0063",
+     "U+043E",
+     "U+0070",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER C",
+     "CYRILLIC SMALL LETTER O",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "scope",
+    "confusable_with_target": true,
+    "target": "scope",
+    "note": "Cyrillic o U+043E"
+   }
+  ],
+  "H3": [
+   {
+    "tag": "ascii_host",
+    "text": "trusted.example",
+    "codepoints": [
+     "U+0074",
+     "U+0072",
+     "U+0075",
+     "U+0073",
+     "U+0074",
+     "U+0065",
+     "U+0064",
+     "U+002E",
+     "U+0065",
+     "U+0078",
+     "U+0061",
+     "U+006D",
+     "U+0070",
+     "U+006C",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER R",
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER D",
+     "FULL STOP",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER X",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER M",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER L",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": true,
+    "skeleton": "trusted.example",
+    "confusable_with_target": false,
+    "target": "trusted.example",
+    "note": ""
+   },
+   {
+    "tag": "confusable_host",
+    "text": "trust\u0435d.example",
+    "codepoints": [
+     "U+0074",
+     "U+0072",
+     "U+0075",
+     "U+0073",
+     "U+0074",
+     "U+0435",
+     "U+0064",
+     "U+002E",
+     "U+0065",
+     "U+0078",
+     "U+0061",
+     "U+006D",
+     "U+0070",
+     "U+006C",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER R",
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER T",
+     "CYRILLIC SMALL LETTER IE",
+     "LATIN SMALL LETTER D",
+     "FULL STOP",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER X",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER M",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER L",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "trusted.example",
+    "confusable_with_target": true,
+    "target": "trusted.example",
+    "note": "Cyrillic e U+0435"
+   }
+  ],
+  "H4": [
+   {
+    "tag": "ascii_key",
+    "text": "authToken",
+    "codepoints": [
+     "U+0061",
+     "U+0075",
+     "U+0074",
+     "U+0068",
+     "U+0054",
+     "U+006F",
+     "U+006B",
+     "U+0065",
+     "U+006E"
+    ],
+    "names": [
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER H",
+     "LATIN CAPITAL LETTER T",
+     "LATIN SMALL LETTER O",
+     "LATIN SMALL LETTER K",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER N"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": true,
+    "skeleton": "authToken",
+    "confusable_with_target": false,
+    "target": "authToken",
+    "note": ""
+   },
+   {
+    "tag": "confusable_key",
+    "text": "\u0430uthToken",
+    "codepoints": [
+     "U+0430",
+     "U+0075",
+     "U+0074",
+     "U+0068",
+     "U+0054",
+     "U+006F",
+     "U+006B",
+     "U+0065",
+     "U+006E"
+    ],
+    "names": [
+     "CYRILLIC SMALL LETTER A",
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER H",
+     "LATIN CAPITAL LETTER T",
+     "LATIN SMALL LETTER O",
+     "LATIN SMALL LETTER K",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER N"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "authToken",
+    "confusable_with_target": true,
+    "target": "authToken",
+    "note": "leading Cyrillic a"
+   }
+  ],
+  "H5": [
+   {
+    "tag": "pure_cyrillic",
+    "text": "\u043f\u0440\u0438\u0432\u0435\u0442",
+    "codepoints": [
+     "U+043F",
+     "U+0440",
+     "U+0438",
+     "U+0432",
+     "U+0435",
+     "U+0442"
+    ],
+    "names": [
+     "CYRILLIC SMALL LETTER PE",
+     "CYRILLIC SMALL LETTER ER",
+     "CYRILLIC SMALL LETTER I",
+     "CYRILLIC SMALL LETTER VE",
+     "CYRILLIC SMALL LETTER IE",
+     "CYRILLIC SMALL LETTER TE"
+    ],
+    "scripts": [
+     "CYRILLIC"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "\u043fp\u0438\u0432e\u0442",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "Russian hello; single script, impersonates no ASCII token"
+   }
+  ],
+  "H6": [
+   {
+    "tag": "cafe",
+    "text": "caf\u00e9",
+    "codepoints": [
+     "U+0063",
+     "U+0061",
+     "U+0066",
+     "U+00E9"
+    ],
+    "names": [
+     "LATIN SMALL LETTER C",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER F",
+     "LATIN SMALL LETTER E WITH ACUTE"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "caf\u00e9",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "accented Latin"
+   },
+   {
+    "tag": "strasse",
+    "text": "Stra\u00dfe",
+    "codepoints": [
+     "U+0053",
+     "U+0074",
+     "U+0072",
+     "U+0061",
+     "U+00DF",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN CAPITAL LETTER S",
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER R",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER SHARP S",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "Stra\u00dfe",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "eszett, Latin script"
+   }
+  ],
+  "H7": [
+   {
+    "tag": "user_name_jp",
+    "text": "user\u540d\u524d",
+    "codepoints": [
+     "U+0075",
+     "U+0073",
+     "U+0065",
+     "U+0072",
+     "U+540D",
+     "U+524D"
+    ],
+    "names": [
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER R",
+     "CJK UNIFIED IDEOGRAPH-540D",
+     "CJK UNIFIED IDEOGRAPH-524D"
+    ],
+    "scripts": [
+     "CJK",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "user\u540d\u524d",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "Latin+CJK legit mixed content, impersonates no trusted token"
+   }
+  ],
+  "H8": [
+   {
+    "tag": "zero_width",
+    "text": "ad\u200bmin",
+    "codepoints": [
+     "U+0061",
+     "U+0064",
+     "U+200B",
+     "U+006D",
+     "U+0069",
+     "U+006E"
+    ],
+    "names": [
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER D",
+     "ZERO WIDTH SPACE",
+     "LATIN SMALL LETTER M",
+     "LATIN SMALL LETTER I",
+     "LATIN SMALL LETTER N"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": true,
+    "nfkc_folds_to_target": false,
+    "skeleton": "ad\u200bmin",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "ZWSP -> existing sweep owns it"
+   },
+   {
+    "tag": "bidi_override",
+    "text": "user\u202enimda",
+    "codepoints": [
+     "U+0075",
+     "U+0073",
+     "U+0065",
+     "U+0072",
+     "U+202E",
+     "U+006E",
+     "U+0069",
+     "U+006D",
+     "U+0064",
+     "U+0061"
+    ],
+    "names": [
+     "LATIN SMALL LETTER U",
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER R",
+     "RIGHT-TO-LEFT OVERRIDE",
+     "LATIN SMALL LETTER N",
+     "LATIN SMALL LETTER I",
+     "LATIN SMALL LETTER M",
+     "LATIN SMALL LETTER D",
+     "LATIN SMALL LETTER A"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": true,
+    "nfkc_folds_to_target": false,
+    "skeleton": "user\u202enimda",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "RLO -> existing sweep owns it"
+   }
+  ],
+  "H9": [
+   {
+    "tag": "ligature_fi",
+    "text": "\ufb01le",
+    "codepoints": [
+     "U+FB01",
+     "U+006C",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LIGATURE FI",
+     "LATIN SMALL LETTER L",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": true,
+    "skeleton": "\ufb01le",
+    "confusable_with_target": false,
+    "target": "file",
+    "note": "fi ligature -> NFKC folds to file"
+   },
+   {
+    "tag": "cyrillic_a",
+    "text": "\u0430",
+    "codepoints": [
+     "U+0430"
+    ],
+    "names": [
+     "CYRILLIC SMALL LETTER A"
+    ],
+    "scripts": [
+     "CYRILLIC"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "a",
+    "confusable_with_target": true,
+    "target": "a",
+    "note": "Cyrillic a: NFC/NFKC do NOT fold to Latin a"
+   }
+  ],
+  "H10": [
+   {
+    "tag": "prose_decorative",
+    "text": "\u0430pp",
+    "codepoints": [
+     "U+0430",
+     "U+0070",
+     "U+0070"
+    ],
+    "names": [
+     "CYRILLIC SMALL LETTER A",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER P"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "app",
+    "confusable_with_target": true,
+    "target": "app",
+    "note": "confusable token in decorative prose - low security relevance"
+   },
+   {
+    "tag": "grant_token",
+    "text": "sc\u043epe",
+    "codepoints": [
+     "U+0073",
+     "U+0063",
+     "U+043E",
+     "U+0070",
+     "U+0065"
+    ],
+    "names": [
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER C",
+     "CYRILLIC SMALL LETTER O",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER E"
+    ],
+    "scripts": [
+     "CYRILLIC",
+     "LATIN"
+    ],
+    "pure_ascii": false,
+    "mixes_scripts": true,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "scope",
+    "confusable_with_target": true,
+    "target": "scope",
+    "note": "same confusable mechanism in a trustedCommands grant entry - high security relevance"
+   }
+  ],
+  "H11": [
+   {
+    "tag": "ascii_collision_ref",
+    "text": "rnicrosoft",
+    "codepoints": [
+     "U+0072",
+     "U+006E",
+     "U+0069",
+     "U+0063",
+     "U+0072",
+     "U+006F",
+     "U+0073",
+     "U+006F",
+     "U+0066",
+     "U+0074"
+    ],
+    "names": [
+     "LATIN SMALL LETTER R",
+     "LATIN SMALL LETTER N",
+     "LATIN SMALL LETTER I",
+     "LATIN SMALL LETTER C",
+     "LATIN SMALL LETTER R",
+     "LATIN SMALL LETTER O",
+     "LATIN SMALL LETTER S",
+     "LATIN SMALL LETTER O",
+     "LATIN SMALL LETTER F",
+     "LATIN SMALL LETTER T"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "rnicrosoft",
+    "confusable_with_target": false,
+    "target": "microsoft",
+    "note": "rn->m, single-script Latin/ASCII, impersonates trusted brand"
+   },
+   {
+    "tag": "digit_collision_ref",
+    "text": "paypa1",
+    "codepoints": [
+     "U+0070",
+     "U+0061",
+     "U+0079",
+     "U+0070",
+     "U+0061",
+     "U+0031"
+    ],
+    "names": [
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER A",
+     "LATIN SMALL LETTER Y",
+     "LATIN SMALL LETTER P",
+     "LATIN SMALL LETTER A",
+     "DIGIT ONE"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "paypa1",
+    "confusable_with_target": false,
+    "target": "paypal",
+    "note": "digit 1 for l, pure ASCII, impersonates trusted brand"
+   },
+   {
+    "tag": "no_reference_typo",
+    "text": "teh",
+    "codepoints": [
+     "U+0074",
+     "U+0065",
+     "U+0068"
+    ],
+    "names": [
+     "LATIN SMALL LETTER T",
+     "LATIN SMALL LETTER E",
+     "LATIN SMALL LETTER H"
+    ],
+    "scripts": [
+     "LATIN"
+    ],
+    "pure_ascii": true,
+    "mixes_scripts": false,
+    "invisible_sweep_hit": false,
+    "nfkc_folds_to_target": false,
+    "skeleton": "teh",
+    "confusable_with_target": false,
+    "target": null,
+    "note": "same-script typo with NO trusted reference identity"
+   }
+  ]
+ },
+ "summary": {
+  "runtime_unicode": "13.0.0",
+  "H1-H4 any homoglyph caught by invisible sweep (EXPECT [])": [],
+  "H1-H4 all homoglyphs confusable_with_target (EXPECT True)": true,
+  "H1-H4 all homoglyphs mix scripts within token (EXPECT True)": true,
+  "H5 pure-cyrillic mixes_scripts (EXPECT False)": false,
+  "H5 confusable_with_target (EXPECT False)": false,
+  "H6 accented-latin mixes_scripts (EXPECT [False,False])": [
+   false,
+   false
+  ],
+  "H6 accented-latin invisible_hit (EXPECT [False,False])": [
+   false,
+   false
+  ],
+  "H7 mixes_scripts True but confusable_with_target False": [
+   true,
+   false
+  ],
+  "H8 invisible_sweep_hit (EXPECT [True,True] = existing rule owns)": [
+   true,
+   true
+  ],
+  "H9 ligature folds under NFKC (EXPECT True)": true,
+  "H9 cyrillic-a folds under NFKC (EXPECT False)": false,
+  "H10 same skeleton both, security-relevance differs (codepoints identical class)": {
+   "prose_cps": [
+    "U+0430",
+    "U+0070",
+    "U+0070"
+   ],
+   "grant_cps": [
+    "U+0073",
+    "U+0063",
+    "U+043E",
+    "U+0070",
+    "U+0065"
+   ],
+   "both_confusable": [
+    true,
+    true
+   ]
+  },
+  "H11a rnicrosoft impersonates microsoft (EXPECT True)": true,
+  "H11a mixes_scripts (EXPECT False = NOT cross-script)": false,
+  "H11a cross-script skeleton alone MISSES it (confusable_with_target EXPECT False)": false,
+  "H11b paypa1 impersonates paypal (EXPECT True)": true,
+  "H11c teh has NO reference identity -> CLEAR (impersonates None EXPECT False)": false
+ }
+}

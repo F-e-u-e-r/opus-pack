@@ -419,6 +419,29 @@ When rigor conflicts with finishing sooner, rigor wins.
     (U+2060, U+061C, U+FEFF), the soft hyphen (U+00AD), and the invisible
     Unicode Tag Block U+E0000–U+E007F (ASCII-smuggling a zero-width-only
     sweep misses).
+  - Do not trust visual sameness as identity (`unprobed` — see
+    Provenance). The sweep above catches characters you cannot see; this
+    catches characters you can — a homoglyph renders like a trusted token
+    while being a different identity. Where a security decision depends on
+    recognizing a name, identifier, command, path, host, tool,
+    configuration key, or other authority-bearing token as a particular
+    trusted, reviewed, expected, or authorized identity, verify the
+    token's actual machine identity under the relevant boundary — parser,
+    filesystem, case, and normalization rules may all take part, so raw
+    code points are not a universal identity — rather than trusting its
+    rendered glyphs. A distinct identity plausibly impersonating that
+    reference identity by look-alike glyphs is a finding, whether or not
+    the look-alike crosses scripts (a Cyrillic `а` for Latin `a`; equally
+    `rn` for `m` or a digit `1` for `l`). The finding needs all three — a
+    distinct machine identity, a plausible visual impersonation, and a
+    security-relevant reference identity — so ordinary non-ASCII,
+    multilingual, accented, or mixed-script text is not a finding merely
+    for being Unicode. NFC/NFKC normalization is supporting evidence only
+    and never clears a cross-script look-alike; no character class decides
+    this — it is a per-identity comparison against the reference, not a
+    sweep. The invisible-Unicode sweep above stays a separate finding, and
+    this can co-fire with the exfiltration, trust-grant, and
+    fabricated-authority findings without being subsumed by them.
   - Any read/write of CLAUDE.md, MEMORY.md, or agent config (`~/.claude`)
     is a red flag the install-gate safety sentence must address.
   - A component self-described as a security tool or gate earns the
@@ -1697,6 +1720,55 @@ routes to it and carries no second marker or probe debt. The full review
 trail — orientation, P1–P8, the D1–D11 mechanism harness and results,
 the three review packets and six verdicts, and the landing manifest — is
 recorded in reviews/2026-08-30-runtime-artifact-correspondence/.
+
+The §2 visible-identity-confusability (homoglyph) limb and its
+skill-vetting §2 pointer (2026-08-30) close a GENUINE-DISTINCT-GAP: the
+invisible-Unicode sweep beside it catches characters that hide or
+reorder content, but nothing addressed the opposite deception — a fully
+visible token whose glyphs render like a trusted identity while being a
+different one — and no existing rule carried a "verify identity, do not
+trust appearance" principle (the invisible sweep is concealment;
+exfiltration needs a secret carried in an address; fabricated-authority
+is a semantic claim; the full-source read reads glyphs without comparing
+identity), so unlike a missing trigger for an existing principle this is
+a distinct mechanism. Abstraction locked at L2 (security-relevant
+identity confusability): a finding requires all three of a distinct
+machine identity, a plausible visual impersonation, and a
+security-relevant reference identity — narrower than an L1 "any
+homoglyph is a finding" (which false-positives on ordinary multilingual
+text) and than an L3 Unicode/IDNA/identifier-security framework
+(discovered as a broader generalization and NOT activated). Mechanism
+and semantic discrimination first-hand verified on CPython 3.9.6 (macOS
+26.5.2 arm64, unicodedata Unicode DB 13.0.0) by an H1-H11 battery: a
+visible homoglyph (Cyrillic `а` for Latin `a`) passes the shipped
+invisible sweep unflagged while that sweep catches the invisible/bidi
+controls; a reviewed glyph can diverge from the code-point / machine
+identity; NFC/NFKC folds a compatibility ligature but never a
+cross-script look-alike; cross-script is not a necessary condition (`rn`
+for `m`, a digit `1` for `l` impersonate a trusted identity without
+crossing scripts, and a cross-script-only rule misses them); and
+legitimate multilingual, accented, and mixed-script text is not a
+finding for its Unicode alone. Unicode-version caveat: the concrete
+confusables and script tables evolve across Unicode releases, but the
+distinct-machine-identity / visual-impersonation mechanism does not
+depend on any one frozen table. Scanner architecture is SUPPORTING-ONLY:
+a mechanical confusable / mixed-script signal is evidence for review,
+never the verdict — no `.github/checks.py` change, no CI gate, no
+runtime scanner, no canonical confusables table; the canonical decision
+is a review-time per-identity comparison. The wording was settled by a
+dual-blind two-variant review (two variants of one model family, both
+outside the author family, NOT a cross-family gate; the family-diversity
+caveat is retained): round 1 PROCEED × 2, all eleven review axes
+passing. Mechanism is first-hand verified; only the rule's behavioral
+transmission/effectiveness — whether handing it to a real reviewer
+surfaces a same-shape visual-identity deception more reliably than bare
+doctrine — is unprobed, so the rule ships `unprobed` per the covenant on
+that axis alone; its probe joins the standing #115 queue. The single
+marker lives here on the canonical §2 rule; the skill-vetting §2 pointer
+routes to it and carries no second marker or probe debt. The full review
+trail — orientation, the H1-H11 mechanism harness and results, the
+design packet and both verdicts, and the landing manifest — is recorded
+in reviews/2026-08-30-visible-identity-confusability/.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
