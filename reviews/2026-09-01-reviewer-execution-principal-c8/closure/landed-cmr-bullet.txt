@@ -1,0 +1,13 @@
+- **Packet-only is a mode, not a property of every reviewer harness.** This
+  section's semantics — the reviewer sees only what you inline, plus the
+  packet-minimization and no-secret-egress duties above — describe a
+  packet-only reviewer; those content duties govern ALL model-bound
+  content in every mode (in a live run, file, tool, and command results
+  streamed to the reviewer included) — transport is never a
+  live-capability trigger, and live mode never waives the duty. A harness that actually lets the reviewer act —
+  read files, run commands or tools, or reach the network through its own
+  actions (beyond the model-serving transport that carries every external
+  review, packet-only included) — is running a live execution principal:
+  delegation-and-review §3's reviewer-principal confinement applies, and
+  that run is never described with packet-only assumptions ("cannot see
+  your repo", packet-bounded egress).

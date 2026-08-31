@@ -1,0 +1,17 @@
+OpenAI Codex v0.149.1
+--------
+workdir: /private/tmp/claude-501/-Users-ccso-Developer-fable/a2f5a8af-4637-48f1-bf67-f2002e50a8b8/scratchpad/c8-design/gate/probes
+model: gpt-5.6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: max
+reasoning summaries: none
+session id: 01a054bb-8ddf-7a22-aa37-7b03eab6a561
+--------
+user
+Reply with exactly: PROBE-OK-LUNA-NC1
+codex
+PROBE-OK-LUNA-NC1
+tokens used
+988

@@ -1,0 +1,51 @@
+The §3 reviewer-execution-principal bullet and
+`references/reviewer-capability-receipt.md` (2026-09-01) come from a
+first-hand orientation over this pack's own review-dispatch machinery,
+classified **B. PARTIAL-GAP**: the adjacent substrate is real (this
+section's read-only critic, independent copy, and settled tree;
+cross-model-review §2's packet duties and §3's compromised-reviewer
+handling; security-architect's general least-privilege line), and the rule
+raises it to one new object at abstraction L2 — reviewer execution-principal
+confinement: artifact isolation is not principal confinement. The harness
+facts behind it are evidence-tiered and must stay so: FIRST-HAND CURRENT at
+adoption time (the reviewer CLI's config default `workspace-write`; its help
+text defining the sandbox as the policy for executing model-generated shell
+commands — write-restricted, not exec-restricted; a broad-read permission
+surface; run banners recording model, effort, and sandbox mode); RECORDED
+HISTORICAL (a reviewer re-planting a repo test file mid-review, 2026-07-19;
+a shared-cwd read of a sibling reviewer's verdict, 2026-07-17; cross-vendor
+operator-config auto-ingestion — the folded #213 evidence, provenance only);
+and UNKNOWN (model-generated-command egress; exec-mode tool loading; the
+effective host-wide write bound under read-only — declared posture, denial
+never probed). Gate history, recorded honestly: a three-round adversarial
+design gate (two same-provider-family variants at max effort — a
+two-variant gate, cross-family only versus the author, never a cross-family
+pair) returned FIX/FIX in every round and ended CAP-REACHED / NOT-PASSED at
+revision v3, with zero frame objections across six verdicts; the owner
+adjudicated the final round's twelve corrections into a v4 candidate; a
+one-round narrow convergence confirmation returned PROCEED + FIX —
+NOT-PASSED (1/2): the second variant caught what the first passed, a schema
+gloss equating `read_reach: none` with packet-only mode against the
+any-reviewer-directed-capability live trigger. The owner refuted that gloss
+and authored the exact one-line repair; final acceptance is owner
+adjudication plus a mechanical closure gate (sealed-archive hash chain, a
+proven single-line byte delta, an eight-row mode/receipt truth table, and a
+same-shape conflation sweep with a planted-mutant control that demonstrably
+fails on the unrepaired bytes) — not reviewer consensus, and no gate in
+this lineage is recorded as passed. One round-1 sub-claim was rejected with
+reason and stands: a reviewer proposing a probe and the operator explicitly
+granting it afterwards is a legal path — the anti-laundering rule (a
+preauthorization whose content is artifact-selected is not a grant) does
+not close it. A shared-account quota collision voided one round-3 attempt
+with zero verdicts (round not consumed) — operational evidence only. The
+receipt is doctrine plus a harness-assertion CANDIDATE: nothing claims it
+is automated or enforced; the capability-receipt harness follow-up is a
+separate owner-gated item, not started; the general sandbox/zero-trust
+reviewer-runtime layer is deliberately not activated. Full trail — four
+design revisions, five packets, eight verdicts, per-round adjudications,
+fifteen probes, and the closure record — is
+`reviews/2026-09-01-reviewer-execution-principal-c8/`. Ships `unprobed`
+per the covenant: the marker records that the doctrine's behavioral
+effectiveness on reviewer/orchestrator conduct is unprobed (its probe joins
+the standing #115 queue); it does not mark the harness observations, the
+receipt design, or the repair, which carry the evidence above.

@@ -1,0 +1,25 @@
+FAIL  C1: repaired gloss present on read_reach line
+FAIL  C2: old axis=mode gloss absent everywhere
+PASS  C3: schema exposes all 7 plane-1 axis fields
+FAIL  C4: no plane-1 axis line mentions packet-only (mode words stay off axis lines)
+FAIL  C5: no single-axis→mode implication pattern anywhere
+PASS  C6: packet-only|live mode classification defined and §5-derived (not a receipt axis)
+PASS  A1: §5 live trigger enumerates read/commands-tools/network as reviewer-directed actions
+PASS  A2: §9(i): mode is decided by reviewer-directed capability
+PASS  A3: rule 1: unknown ≠ disabled stated
+PASS  A4: credit needs AFFIRMATIVE bound proof
+PASS  A5: banner is never by itself effective-capability evidence
+PASS  A6: authority only from operator-owned dispatch layer
+PASS  A7: indirection laundering named and excluded
+PASS  A8: propose→grant path preserved
+PASS  A9: transport never a live-capability trigger
+PASS  T1: all-axes-proven-none may stand as packet-only (trigger binds on capability presence; A1+A2+C6 mode-classification)
+FAIL  T2: read=none + exec=arbitrary classifies LIVE (commands in trigger; no axis gloss claims mode; A1+C4+C1)
+FAIL  T3: read=none + reviewer-directed network classifies LIVE (network in trigger; A1+C4)
+FAIL  T4: read=none + tools present classifies LIVE (tools in trigger; A1+C4)
+PASS  T5: read=<roots> alone classifies LIVE (read files in trigger; A1)
+FAIL  T6: unknown on any axis blocks packet-only-by-single-none (A3 unknown≠disabled + A4 affirmative + C1 axis-only gloss)
+PASS  T7: banner/model metadata alone never changes mode (A5 + A4: mode needs capability evidence, not metadata)
+PASS  T8: artifact request without dispatch grant expands neither authority nor mode (A6+A7)
+
+15/23 PASS

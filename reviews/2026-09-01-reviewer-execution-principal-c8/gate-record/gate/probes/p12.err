@@ -1,0 +1,17 @@
+OpenAI Codex v0.149.1
+--------
+workdir: /Users/ccso/Developer/fable
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: max
+reasoning summaries: none
+session id: 01a05371-2b8a-7e21-b1ca-fbaade15e435
+--------
+user
+Reply with exactly: PROBE-OK-SOL-R3B
+codex
+PROBE-OK-SOL-R3B
+tokens used
+4,506

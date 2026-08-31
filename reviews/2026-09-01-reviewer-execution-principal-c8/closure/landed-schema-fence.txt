@@ -1,0 +1,13 @@
+# plane 1 — EFFECTIVE CAPABILITY (evidence: what the reviewer could reach)
+read_reach:             none | <roots/breadth> | unknown   # none = no repository/host read reach (this axis only — mode is decided by §5's reviewer-directed-capability trigger, never by one field)
+write_reach:            none-anywhere | paths:<list> | workspace | broad | unknown
+exec_reach:             none | scoped:<bound> | arbitrary | unknown   # arbitrary = shell OR direct process spawn
+net_reach:              none | scoped:<endpoints> | reviewer-directed | unknown   # reviewer-directed = unscoped; model-serving transport excluded (rule 3)
+tool_reach:             none | <connector + operations/resources> | unknown-scope | unknown
+unrelated_secret_reach: excluded | present | unknown
+task_credential_reach:  none | <effective operations/resources; material: opaque|reviewer-readable|unknown> | unknown   # non-secret description of what injected task credentials can actually do, and whether their bytes are reviewer-readable
+
+# plane 2 — AUTHORIZED ENVELOPE (normative: what the operator granted; closed-world)
+reads: none | <scope> · probes: none | <named tests> · writes: none | <disposable locations>
+network: none | <declared scope> · tools: none | <connector + operations + resources>
+task_credentials: none | <declared + scoped>

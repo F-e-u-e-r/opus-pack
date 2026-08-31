@@ -1,0 +1,7 @@
+The §2 packet-only-is-a-mode pointer (2026-09-01) is the scope half of the
+reviewer-execution-principal rule: the canonical rule, receipt semantics,
+marker, and full gate history live in delegation-and-review §3, its
+`references/reviewer-capability-receipt.md`, and
+`reviews/2026-09-01-reviewer-execution-principal-c8/`. This pointer only
+classifies packet-only vs live runs and defers — it owns no criterion, no
+schema, and no marker.
