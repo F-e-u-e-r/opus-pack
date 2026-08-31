@@ -1,0 +1,6 @@
+interpreter : /Library/Developer/CommandLineTools/usr/bin/python3 3.9.6
+pycache_prefix: '<HOME>/Library/Caches/com.apple.python'
+source on disk : NEW_AND_A_DIFFERENT_LENGTH
+in-tree .pyc   : 0
+executed       : OLD
+VERDICT: REPRODUCED (stale bytes ran from an out-of-tree cache)
