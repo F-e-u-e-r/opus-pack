@@ -1,6 +1,9 @@
-interpreter : /Library/Developer/CommandLineTools/usr/bin/python3 3.9.6
-pycache_prefix: '<HOME>/Library/Caches/com.apple.python'
-source on disk : NEW_AND_A_DIFFERENT_LENGTH
-in-tree .pyc   : 0
-executed       : OLD
-VERDICT: REPRODUCED (stale bytes ran from an out-of-tree cache)
+interpreter   : /Library/Developer/CommandLineTools/usr/bin/python3 3.9.6
+child prefix  : <HOME>/Library/Caches/com.apple.python
+compiled to   : outside the tree
+source on disk: NEW_AND_A_DIFFERENT_LENGTH
+in-tree .pyc  : 0
+survived clean: True
+executed      : OLD
+runtime chose : <HOME>/Library/Caches/com.apple.python/private<TMPDIR>/pycprobe-XXXX
+VERDICT: REPRODUCED (the out-of-tree artifact survived the in-tree removal, the runtime selected it, and its stale bytes ran)
