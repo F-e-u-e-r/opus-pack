@@ -1,0 +1,11 @@
+--- v4-from-archive.md	2026-09-01 02:14:03
++++ DESIGN-v4-owner-repair.md	2026-09-01 02:14:03
+@@ -227,7 +227,7 @@
+ 
+ ```
+ # plane 1 — EFFECTIVE CAPABILITY (evidence: what the reviewer could reach)
+-read_reach:             none | <roots/breadth> | unknown   # none = packet-only: no repository/host read reach
++read_reach:             none | <roots/breadth> | unknown   # none = no repository/host read reach (this axis only — mode is decided by §5's reviewer-directed-capability trigger, never by one field)
+ write_reach:            none-anywhere | paths:<list> | workspace | broad | unknown
+ exec_reach:             none | scoped:<bound> | arbitrary | unknown   # arbitrary = shell OR direct process spawn
+ net_reach:              none | scoped:<endpoints> | reviewer-directed | unknown   # reviewer-directed = unscoped; model-serving transport excluded (rule 3)

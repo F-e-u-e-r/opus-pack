@@ -1,0 +1,24 @@
+PASS R1: packaged v4 == frozen 07f53b8c…
+PASS R2: MOD-AXIS-MODE unique target in packaged v4
+PASS R3: re-derived repair == frozen 788f80c7… == packaged repair file
+PASS R4: D&R contains the generated bullet verbatim
+PASS R5: CMR contains the generated pointer verbatim (zero adaptations)
+PASS R6: generated D&R bullet == raw §4 extraction + exactly A1 (no second substantive correction)
+PASS R7: generated CMR pointer == raw §5 extraction exactly
+PASS R8: reference schema fence == design fence + exactly A2
+PASS R9: reference rules 1–5 == design §6 rules verbatim
+PASS R10: exactly one marker added, in the D&R bullet; none in CMR pointer or reference
+PASS P1: authority-provenance pin: operator-owned dispatch layer (D&R bullet)
+PASS P2: propose→grant preserved (D&R bullet)
+PASS P3: artifact-mention neither necessary nor sufficient (D&R bullet)
+PASS P4: unknown ≠ disabled (bullet + reference)
+PASS P5: MOD-AXIS-MODE gloss present in reference (this-axis-only)
+PASS P6: indirection-laundering exclusion present (reference Named probes)
+PASS P7: transport never a live-capability trigger (CMR pointer)
+PASS P8: two-plane separation landed (fence headers)
+PASS P9: credential material exposure representable (reference)
+PASS P10: plane-2 closed-world (reference rules)
+PASS P11: mode derived, never single-field alias (reference Mode section)
+PASS P12: no runtime-enforcement claim (reference intro)
+
+22/22 PASS

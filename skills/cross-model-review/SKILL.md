@@ -83,6 +83,19 @@ explicit rubric, and a required structured verdict (last line `PROCEED` or
 - **Nothing secret leaves your machine.** The packet goes to a third-party
   model: no tokens, keys, `.env`, PII, or private customer data; minimize, and
   honor repo/org policy on sending code out.
+- **Packet-only is a mode, not a property of every reviewer harness.** This
+  section's semantics — the reviewer sees only what you inline, plus the
+  packet-minimization and no-secret-egress duties above — describe a
+  packet-only reviewer; those content duties govern ALL model-bound
+  content in every mode (in a live run, file, tool, and command results
+  streamed to the reviewer included) — transport is never a
+  live-capability trigger, and live mode never waives the duty. A harness that actually lets the reviewer act —
+  read files, run commands or tools, or reach the network through its own
+  actions (beyond the model-serving transport that carries every external
+  review, packet-only included) — is running a live execution principal:
+  delegation-and-review §3's reviewer-principal confinement applies, and
+  that run is never described with packet-only assumptions ("cannot see
+  your repo", packet-bounded egress).
 - neg: a packet that says "review the repo" and assumes the reviewer sees your
   working tree — it reviews nothing, or hallucinates.
 
@@ -329,6 +342,14 @@ and does not extend to a general runtime-difference taxonomy.
 Contributed via PR #151; wording narrowed at gate to bind to the
 affected environment(s) rather than a single machine. Ships `unprobed`
 per the covenant; its probe joins the standing #115 queue.
+The §2 packet-only-is-a-mode pointer (2026-09-01) is the scope half of the
+reviewer-execution-principal rule: the canonical rule, receipt semantics,
+marker, and full gate history live in delegation-and-review §3, its
+`references/reviewer-capability-receipt.md`, and
+`reviews/2026-09-01-reviewer-execution-principal-c8/`. This pointer only
+classifies packet-only vs live runs and defers — it owns no criterion, no
+schema, and no marker.
+
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier

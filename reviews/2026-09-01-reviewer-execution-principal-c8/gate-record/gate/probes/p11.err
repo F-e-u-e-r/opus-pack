@@ -1,0 +1,17 @@
+OpenAI Codex v0.149.1
+--------
+workdir: /Users/ccso/Developer/fable
+model: gpt-5.6-luna
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: max
+reasoning summaries: none
+session id: 01a05371-2a1a-7c92-9f0d-cd483ad0757b
+--------
+user
+Reply with exactly: PROBE-OK-LUNA-R3B
+codex
+PROBE-OK-LUNA-R3B
+tokens used
+1,924

@@ -1,0 +1,17 @@
+OpenAI Codex v0.149.1
+--------
+workdir: /private/tmp/claude-501/-Users-ccso-Developer-fable/a2f5a8af-4637-48f1-bf67-f2002e50a8b8/scratchpad/c8-design/gate/probes
+model: gpt-5.6-sol
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: max
+reasoning summaries: none
+session id: 01a05312-06d6-7b42-8936-73b6ba661b09
+--------
+user
+Reply with exactly: PROBE-OK-SOL-R3
+codex
+PROBE-OK-SOL-R3
+tokens used
+4,592
