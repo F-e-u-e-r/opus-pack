@@ -415,9 +415,19 @@ When rigor conflicts with finishing sooner, rigor wins.
   runtime-selected bytes are themselves reviewed, or an independent path
   establishes those *exact* bytes were produced from the reviewed source
   under a named build/compile recipe. Legitimate clearance: (a) remove any
-  competing shipped or cached artifact, regenerate from the exact reviewed
-  source under a named toolchain/recipe, and confirm the bytes the runtime
-  then selects match the regenerated artifact by digest; (b) bind the
+  competing shipped or cached artifact — LOCATE it rather than assume its
+  conventional in-tree path, because a runtime may use an out-of-tree
+  cache (path-mirrored, or under a per-user cache root), and deleting the
+  in-tree one then leaves that artifact sitting behind a visibly clean
+  tree — where it also remains runtime-ELIGIBLE, its stale bytes execute;
+  out-of-tree placement alone is not enough, since an artifact validated
+  against the current source is rejected once that source changes —
+  regenerate from the exact reviewed source under a named
+  toolchain/recipe, and confirm the bytes the runtime then selects match
+  the regenerated artifact by digest; that confirmation detects a
+  REMAINING mismatch, it does not prove the removal worked, so run it
+  against the bytes the runtime actually selects, never against the
+  tree's appearance; (b) bind the
   exact artifact bytes by digest to the reviewed source + recipe via
   reproducible/attested build evidence; or (c) review the runtime-selected
   artifact itself, when it is reviewable as source-equivalent, as the

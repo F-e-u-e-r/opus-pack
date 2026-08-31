@@ -1,0 +1,24 @@
+# Environment probes backing the trail's claims about the prefix.
+# Captured 2026-08-31T10:45Z on the same interpreter as the run above.
+
+$ command -v python3
+/usr/bin/python3
+
+$ python3 -c 'import sys; print(sys.executable)'
+/Library/Developer/CommandLineTools/usr/bin/python3
+
+$ python3 -c 'import sys; print(repr(sys.pycache_prefix))'
+'<HOME>/Library/Caches/com.apple.python'
+
+$ python3 -S -c ... (site disabled)
+'<HOME>/Library/Caches/com.apple.python'
+
+$ python3 -E -S -c ... (environment ignored)
+None
+
+$ PYTHON* variables visible to the child
+{}
+
+$ full env diff, normal child vs -E child
+keys only in normal child: []
+keys with differing values: []
