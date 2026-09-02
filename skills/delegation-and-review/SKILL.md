@@ -496,6 +496,39 @@ Every packet names:
   still wait on the readiness gates. A long analysis producing nothing is a known
   stall mode, but "edit first, read the real interface later" is the opposite
   failure (operational-rigor: reading precedes writing).
+- **Re-delegation** — task authority does not imply delegation authority
+  (`unprobed` — see Provenance).
+  A worker may delegate judgment to another principal only when its packet
+  or a governing operator policy explicitly grants re-delegation; with no
+  such grant, spawning another judgment principal is out of contract —
+  report the need instead. A granted child dispatch stays inside the
+  parent's own delegable scope, authority envelope, and applicable
+  fan-out/cost budget: a worker cannot grant authority it does not hold,
+  and its own dispatch text is never a new operator authority — the chain
+  is operator/dispatcher → the parent's re-delegation grant → a child
+  dispatch inside that grant (delegation-and-review §3's
+  execution-principal bullet governs what an operator-owned layer is; this
+  bullet adds no second definition). The return report accounts on two
+  tiers. Compact — EVERY spawned judgment principal, whether or not its
+  judgment ultimately contributes to the returned report: its existence
+  and the budget-relevant facts the governing limit needs (launching
+  critics and then not relying on them never zeroes this account). Rich —
+  every sub-principal whose judgment materially contributed: its
+  identity/model family, the delegated task, which findings/conclusions
+  it contributed, and — where relevant — which verification actions it
+  performed; a sub-principal's judgment is never presented as the
+  parent's own independent judgment. Deterministic helpers and ordinary tool execution
+  (a parser, grep, a compiler, a test runner, a mechanical transformation)
+  are not delegation merely because another process performs the work. For
+  authorization the boundary is PROSPECTIVE: whether the invocation
+  delegates independent model/agent judgment — asking another model or
+  agent to review, decide, assess, or form a conclusion is judgment
+  delegation at the moment of invocation, whatever the depth and whatever
+  the binary; a purely mechanical transformation delegates none. Whether
+  that judgment ultimately contributes to the parent's report is a
+  separate, RETROSPECTIVE question governing only provenance, lens, and
+  family accounting — discarding or ignoring the result never
+  retroactively makes an unauthorized judgment delegation permissible.
 
 If any field cannot be filled, the task is not ready. Before non-trivial
 implementation, have fresh context review the packet; models volunteer risks as
@@ -725,6 +758,33 @@ reviewers that they silently absorb as implementers.
   Immaterial discrepancies go in the findings, never into the verdict.
   The delivered tree stays untouched — no edits, no new files; findings
   go in the reply, not the tree.
+- **`[verified: ran/read]` is first-person, and a delegation tree is
+  accounted, not just disclosed** — a report's `[verified: ran <cmd>]` /
+  `[verified: read <file:line>]` asserts first-hand action by the
+  REPORTING principal itself; work a sub-principal performed is recorded
+  as delegated evidence — "<child identity> ran/read X and reported Y" —
+  never as the parent's first-hand verification. Disclosure does not
+  upgrade the evidence: a subordinate's report stays a claim, a critical
+  RED still gets the dispatcher's own reproduction, and a disclosed child
+  run never becomes the orchestrator's first-hand evidence (the
+  completion-claim audit and reported-failure rules above govern
+  unchanged). Accounting: any judgment principal created beneath a
+  delegated task consumes the same applicable fan-out / reviewer-count /
+  cost budget as if the dispatcher had launched it directly, unless the
+  governing packet explicitly establishes a separate nested budget;
+  deterministic tools and subprocesses are never principals, and a
+  principal whose judgment did not materially contribute to the
+  conclusion (a search-only helper) counts on the budget axis but is not
+  a contributing lens (§2's compact account is how every such principal
+  reaches the dispatcher's arithmetic). When a CONTRIBUTING sub-principal surfaces
+  undisclosed, the consequence is affected-scope-first, never blanket:
+  identify the findings/claims its contribution could have influenced;
+  treat those contributions as unverifiable; strike every independence /
+  family-diversity / count / first-hand claim that depended on the
+  undisclosed structure's absence; recompute the gate from the surviving
+  disclosed lenses — a gate the recomputation no longer satisfies is
+  incomplete (a missing lens, cross-model-review §3/§5 machinery), and
+  the parent's unaffected findings remain ordinary claims to reproduce.
 - **"That failure is pre-existing" is a checkable attribution claim, not a
   free pass** (`unprobed` — private incident as shape; see Provenance).
   Blame-shifting a self-caused regression onto prior state belongs in the
@@ -1688,3 +1748,35 @@ receipt design, or the repair, which carry the evidence above.
 Stable behavioral rules; re-check
 worktree/agent mechanics and any recorded hosted-endpoint behavioral
 claims against the current environment.
+
+The §2 re-delegation bullet, §3 first-person/accounting bullet, and
+cross-model-review §1's transitive family clause (2026-09-02) land the ⑫
+recursive-delegation design: orientation verdict B (PARTIAL-GAP) at
+abstraction L2 (delegated-authority / contribution-provenance propagation)
+over the existing substrate (this skill's bounded fan-out, claims-audit,
+and settled-tree machinery; cross-model-review's contributing
+author-family precedent; §3's execution-principal envelope), closing four
+missing semantics: re-delegation grant, subset propagation,
+contribution/first-hand provenance, and nested budget/family accounting.
+First-hand evidence: an inert two-level nested-spawn probe succeeded in
+the dispatching harness (the mechanical fact the rule governs), and an
+orphan-principal lifecycle window was DISCOVERED and expressly NOT
+ACTIVATED into doctrine. No runtime/tooling change is required; there is
+deliberately NO hard max-depth rule — judgment contribution, not process
+depth, is the criterion; deterministic helpers are never judgment
+principals; an operator-approved multi-agent tree remains legitimate.
+Design trail (honest): round 1 dual-blind (two same-provider variants at
+max effort — NOT cross-family) split 1/2 — one PROCEED, one FIX with two
+findings the owner validated first-hand: F1, the retrospective
+contribution criterion incorrectly used at the prospective authorization
+boundary; F2, budget-consuming non-contributing judgment principals
+lacked a compact reporting channel. The owner authorized exactly two
+semantic corrections (prospective invocation-based authorization;
+two-tier compact/rich accounting) plus pinning control cases; round 2 on
+the frozen v2 design returned PROCEED from both reviewers, whose
+nearest-failure sections independently converged on the same control-case
+reading (budget-axis-only vs authorization) and both judged it sound —
+wording frozen as reviewed, zero polish. Behavioral effectiveness of the
+shipped wording is unprobed (the single in-body marker in §2); its probe
+joins the standing #115 queue. Evidence package:
+reviews/2026-09-02-recursive-delegation-c12/.
