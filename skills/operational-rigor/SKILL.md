@@ -870,6 +870,44 @@ When rigor conflicts with finishing sooner, rigor wins.
   ❌ "read it — it's a regex pre-filter, but the name says integration,
   so the integration is covered" — a trace read and then overridden by
   the name.
+- **A probe's verdict line is established by observations sufficient
+  for it, never by proxies merely consistent with it** (`unprobed` — see
+  Provenance). The check's-name bullet above asks whether a cited
+  check's assertions cover a property; this asks whether the
+  observations behind a printed line establish what the line names, or
+  only proxies for it. A harness that prints "X ran from Y" must have
+  observed X, located Y, and established the relation between them;
+  deriving that line from cheaper facts that merely agree with it (the
+  old output appeared; the expected in-tree artifact is gone) can print
+  the line while the relation it names never held — and a broken search
+  and an empty location look the same from a proxy. Three obligations:
+  (1) every entity and relation the verdict line asserts is backed by an
+  observation sufficient for it (a path the runtime reported, a digest
+  compared, a return code checked, the two resolved to one file); an
+  unbacked term is measured or the line is weakened to what was
+  observed;
+  (2) a fixture that forces one of the mechanism's conditions (a
+  validation mode, a pre-seeded state) establishes the claim only under
+  that condition — name every forced condition material to the
+  mechanism in the verdict line and in any claim the probe is cited to
+  support — unnamed, the claim is read as asserting that the remaining
+  conditions alone suffice;
+  (3) an asserted diagnostic result with no reproducible invocation or
+  procedure and its captured observation, tied to the artifact and
+  environment the claim is about, is a claim, not evidence — a reviewer
+  marks it unconfirmed. Done when every term in
+  the verdict line has its sufficient observation, every material
+  forced condition is named in the line and in any claim the probe is
+  cited to support, and every asserted diagnostic result has its
+  invocation or procedure and its observation captured.
+  ✅ "the probe records the path the compiler returned, asserts that
+  file survived the clean, reads the imported module's own cache
+  attribute back, and prints REPRODUCED only when the two resolve to
+  the same file, naming the forced validation mode in the line."
+  ❌ "old output printed and the in-tree cache directory is empty →
+  'ran from an out-of-tree cache'" — the artifact was never located, the
+  relation never established, and the forced validation mode was absent
+  from the line.
 - **An error is signal only against a comparable known-invalid control —
   identical in kind means no signal** (`unprobed` — private incident as
   shape; see Provenance). Before reading an API/CLI error as evidence
@@ -1870,6 +1908,21 @@ probe debt. The full review trail — orientation, the A1-A14 controls,
 the current-rule semantic map, the three review packets and six
 verdicts, the MOD-CONSISTENCY manifest, and the ATR provenance note — is
 recorded in reviews/2026-08-30-meaningful-approval-review/.
+
+The §4 sufficient-observation rule (2026-09-02) is the harness half
+of PR #233's second review round: the first revision of the probe in
+reviews/2026-08-31-out-of-tree-cache-removal/ printed "ran from an
+out-of-tree cache" while measuring only that the old output appeared
+and no in-tree artifact remained; the reviewer (a second variant of
+the same family as round 1, not a cross-family gate) marked the
+location inferred, marked the fixture's forced validation mode an
+unreported co-cause, and marked the trail's asserted environment
+results as lacking checked-in evidence. The probe was rewritten to
+capture the compiled artifact's path and the imported module's own
+cache attribute, and the environment probes were captured. This
+rule's own review trail is reviews/2026-09-02-narrowing-is-not-repair/.
+Ships `unprobed` per the covenant; its probe joins the standing #115
+queue.
 
 Stable behavioral rules; the environment-specific facts to re-verify now travel
 with the rules that cite them — the external-systems set in
