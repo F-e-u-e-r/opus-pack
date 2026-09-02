@@ -1,0 +1,117 @@
+diff --git a/skills/cross-model-review/SKILL.md b/skills/cross-model-review/SKILL.md
+index a5dbd68..ac18996 100644
+--- a/skills/cross-model-review/SKILL.md
++++ b/skills/cross-model-review/SKILL.md
+@@ -205,6 +205,28 @@ this pack's own review (PR #30 round 1): a valid must-fix whose proposed
+ rewrite reintroduced the very defect the rule under review existed to prevent,
+ and would have paraphrased a clause another file owns (skill-authoring §3).
+ 
++**A scope qualifier repairs an over-claim only when the counterexamples
++fall outside it** (`unprobed` — see Provenance). When a reproduced
++finding says a claim is wider than its evidence, two repairs exist:
++measure — run the probe that would establish the wider claim and let
++its result set the wording — or retract the wording to exactly what was
++measured. Prepending a qualifier ("for this failure mode", "in this
++case") is a retraction only if every counterexample the finding cites
++now falls outside the qualified boundary; check that explicitly before
++recording `fixed`. A qualifier that still contains them changed the
++sentence and repaired nothing, and the ledger now marks closed a
++finding that is open. Done when each over-claim finding's disposition
++names which repair was applied — for a qualifier, the counterexamples
++it excludes.
++neg: a reviewer shows "the digest confirmation is what exposes a failed
++removal" over-claims; the author prepends "for this failure mode" and
++records `fixed`. The next round names a leftover that regeneration
++overwrites, and one byte-identical to the regenerated artifact — both
++inside that failure mode, both leaving the digest matching while the
++removal failed. Seen in this pack's own review (PR #233 rounds 1→2):
++the repair that held was the retraction — the confirmation detects a
++remaining mismatch and does not prove the removal worked.
++
+ **Two remedies for one defect are a free cross-check** (`unprobed` — see
+ Provenance). When a fix you are holding is overtaken by someone else's
+ landed fix for the same finding — a maintainer's gate commit, a parallel
+@@ -350,6 +372,18 @@ marker, and full gate history live in delegation-and-review §3, its
+ classifies packet-only vs live runs and defers — it owns no criterion, no
+ schema, and no marker.
+ 
++The §3 scope-qualifier rule (2026-09-02) comes from PR #233's own two
++rounds: round 1's High (a confirmation step sold as what exposes a
++failed removal) was recorded `fixed` by a scope qualifier, and round 2
++— a second variant of the same family, not a cross-family gate — showed
++the qualifier still contained two counterexamples; the repair that held
++was retraction to the measured claim. Trail:
++reviews/2026-08-31-out-of-tree-cache-removal/; this rule's own review
++trail is reviews/2026-09-02-narrowing-is-not-repair/. A
++contributor-reported doctrine drill (not linkable) showed the same
++shape earlier; recorded as shape only, not as evidence. Ships
++`unprobed` per the covenant; its probe joins the standing #115 queue.
++
+ Re-verify
+ line: model families, CLI availability, "flagship" identity, and effort tiers
+ are volatile — re-discover at session time; never trust a model name or tier
+diff --git a/skills/operational-rigor/SKILL.md b/skills/operational-rigor/SKILL.md
+index 80caa96..1385823 100644
+--- a/skills/operational-rigor/SKILL.md
++++ b/skills/operational-rigor/SKILL.md
+@@ -870,6 +870,38 @@ When rigor conflicts with finishing sooner, rigor wins.
+   ❌ "read it — it's a regex pre-filter, but the name says integration,
+   so the integration is covered" — a trace read and then overridden by
+   the name.
++- **A probe's verdict line is computed from the observation it names,
++  never from proxies consistent with it** (`unprobed` — see Provenance).
++  The check's-name bullet above traces a CITED check to its oracle; this
++  is one level deeper — the oracle's own printed line. A harness that
++  prints "X ran from Y" must have located Y and tied X to it; deriving
++  that line from two cheaper facts that merely agree with it (the old
++  output appeared; the expected in-tree artifact is gone) is an
++  inference, and an inference prints the right answer for the wrong
++  reason — including when the fixture's own search is broken, since a
++  search that finds nothing and a location that has nothing look the
++  same. Two obligations: (1) before trusting a verdict line, read the
++  code that emits it and confirm every noun in the line corresponds to
++  a measured value (a path the runtime reported, a digest compared, a
++  return code checked); a noun that is not measured is measured or the
++  line is weakened to what was; (2) a fixture that forces one of the
++  mechanism's conditions (a validation mode, a pre-seeded state) makes
++  the claim true only inside the fixture — name every forced condition
++  in the verdict line and in any rule text the probe supports, or the
++  rule asserts the other condition alone. And the trail carrying the
++  verdict is evidence only for what it captured: an asserted diagnostic
++  result with no command-and-output pair checked in is a claim a
++  reviewer must mark unconfirmed — capture each asserted probe's
++  invocation and output at the revision the claim is about. Done when
++  every noun in the verdict line and every forced condition is backed
++  by a captured measurement.
++  ✅ "the probe records the path the compiler returned, asserts that
++  file survived the clean, reads the imported module's own cache
++  attribute back, and prints REPRODUCED — with the forced validation
++  mode named — only when the two resolve to the same file."
++  ❌ "old output printed and the in-tree cache directory is empty →
++  'stale bytes ran from the out-of-tree cache'" — the artifact was never
++  located, and the fixture's forced validation mode was not in the line.
+ - **An error is signal only against a comparable known-invalid control —
+   identical in kind means no signal** (`unprobed` — private incident as
+   shape; see Provenance). Before reading an API/CLI error as evidence
+@@ -1871,6 +1903,21 @@ the current-rule semantic map, the three review packets and six
+ verdicts, the MOD-CONSISTENCY manifest, and the ATR provenance note — is
+ recorded in reviews/2026-08-30-meaningful-approval-review/.
+ 
++The §4 verdict-from-observation rule (2026-09-02) is the harness half
++of PR #233's second review round: the probe checked into
++reviews/2026-08-31-out-of-tree-cache-removal/ printed "stale bytes ran
++from an out-of-tree cache" while measuring only that the old output
++appeared and no in-tree artifact remained; the reviewer (a second
++variant of the same family as round 1, not a cross-family gate) marked
++the location inferred, marked the fixture's forced validation mode an
++unreported co-cause, and marked the trail's asserted environment
++results unconfirmed because no captured output backed them. The probe
++was rewritten to capture the compiled artifact's path and the imported
++module's own cache attribute, and the environment probes were captured.
++This rule's own review trail is
++reviews/2026-09-02-narrowing-is-not-repair/. Ships `unprobed` per the
++covenant; its probe joins the standing #115 queue.
++
+ Stable behavioral rules; the environment-specific facts to re-verify now travel
+ with the rules that cite them — the external-systems set in
+ `references/external-systems.md`, plus §2's mount-check commands

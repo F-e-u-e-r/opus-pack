@@ -205,6 +205,26 @@ this pack's own review (PR #30 round 1): a valid must-fix whose proposed
 rewrite reintroduced the very defect the rule under review existed to prevent,
 and would have paraphrased a clause another file owns (skill-authoring §3).
 
+**A scope qualifier repairs an over-claim only when the qualified claim
+is no wider than what the evidence establishes** (`unprobed` — see Provenance). When
+a reproduced finding says a claim is wider than its evidence, the
+repairs are: substantiate the wider claim — by a probe where the claim
+is empirical — or retract the wording to what the evidence establishes (the
+measurement, where the claim is empirical). Prepending a qualifier ("for this failure mode", "in this case") is a retraction
+only if the qualified claim is itself no wider than that evidence AND
+every reproduced counterexample the finding cites falls outside the
+qualified boundary; check both explicitly before recording `fixed`. A qualifier
+that fails either test has changed the sentence without closing the
+finding. Done when each over-claim finding recorded `fixed` names which
+repair was applied — for a qualifier, the evidence it is bounded by and
+the counterexamples it excludes; a deferral takes the disposition the
+paragraph above permits.
+neg: a reviewer shows "the digest confirmation is what makes an
+incomplete removal detectable" over-claims; the author prepends "for
+this failure mode" and records `fixed` — and the next round names two
+leftovers inside that failure mode that keep the digest matching while
+the removal failed (this pack's PR #233, rounds 1→2).
+
 **Two remedies for one defect are a free cross-check** (`unprobed` — see
 Provenance). When a fix you are holding is overtaken by someone else's
 landed fix for the same finding — a maintainer's gate commit, a parallel
@@ -349,6 +369,20 @@ marker, and full gate history live in delegation-and-review §3, its
 `reviews/2026-09-01-reviewer-execution-principal-c8/`. This pointer only
 classifies packet-only vs live runs and defers — it owns no criterion, no
 schema, and no marker.
+
+The §3 scope-qualifier rule (2026-09-02) comes from PR #233's own two
+rounds: round 1's High (a confirmation step sold as what makes an
+incomplete removal detectable) was recorded `fixed` by a scope
+qualifier, and round 2 — a second variant of the same family, not a
+cross-family gate — showed the qualifier still contained two
+counterexamples (a leftover that regeneration overwrites; one
+byte-identical to the regenerated artifact); the repair recorded in
+round 2 was a retraction — the text now claims only that the
+confirmation detects a remaining mismatch and does not prove the
+removal worked. Trail:
+reviews/2026-08-31-out-of-tree-cache-removal/; this rule's own review
+trail is reviews/2026-09-02-narrowing-is-not-repair/. Ships `unprobed`
+per the covenant; its probe joins the standing #115 queue.
 
 Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
