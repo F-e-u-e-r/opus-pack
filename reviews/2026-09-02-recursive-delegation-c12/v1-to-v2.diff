@@ -1,0 +1,69 @@
+1c1
+< # ⑫ design v1 — delegated-authority / contribution-provenance propagation (L2)
+---
+> # ⑫ design v2 — delegated-authority / contribution-provenance propagation (L2)
+3a4,10
+> v1→v2 (owner-authorized narrow R2): EXACTLY two semantic corrections from the
+> round-1 dual-blind gate — F1 (authorization boundary made PROSPECTIVE,
+> invocation-time; contribution stays retrospective accounting-only) and F2
+> (two-tier accounting: compact budget account for ALL judgment principals,
+> rich disclosure for contributors only) — plus control cases D17–D19 pinning
+> them. Everything else is byte-preserved (see the per-hunk diff annotation in
+> the review packet).
+30a38,41
+>   Round 1 ran 1/2 (luna PROCEED / sol FIX×2, both findings owner-validated);
+>   this v2 is the owner-authorized narrow R2 carrying exactly those two
+>   corrections, gated by one narrow dual-blind confirmation round — 2/2
+>   PROCEED → design passed; any FIX → stop, no v3.
+43a55,61
+> - **Timing separation (v2, F1):** AUTHORIZATION is prospective — judged at
+>   the moment of invocation by whether independent judgment is being
+>   delegated; CONTRIBUTION is retrospective — judged afterward by what the
+>   principal's judgment actually influenced, governing provenance/lens/
+>   family accounting only. The two never substitute: a discarded result
+>   cannot retroactively clear an unauthorized delegation, and an authorized
+>   delegation still owes its retrospective accounting.
+66,71c84,93
+< >   bullet adds no second definition). The return report discloses every
+< >   sub-principal whose judgment materially contributed: its identity/model
+< >   family, the delegated task, which findings/conclusions it contributed,
+< >   and — where relevant — which verification actions it performed; a
+< >   sub-principal's judgment is never presented as the parent's own
+< >   independent judgment. Deterministic helpers and ordinary tool execution
+---
+> >   bullet adds no second definition). The return report accounts on two
+> >   tiers. Compact — EVERY spawned judgment principal, whether or not its
+> >   judgment ultimately contributes to the returned report: its existence
+> >   and the budget-relevant facts the governing limit needs (launching
+> >   critics and then not relying on them never zeroes this account). Rich —
+> >   every sub-principal whose judgment materially contributed: its
+> >   identity/model family, the delegated task, which findings/conclusions
+> >   it contributed, and — where relevant — which verification actions it
+> >   performed; a sub-principal's judgment is never presented as the
+> >   parent's own independent judgment. Deterministic helpers and ordinary tool execution
+73,77c95,104
+< >   are not delegation merely because another process performs the work: the
+< >   boundary is whether independent model/agent judgment materially
+< >   contributed to the conclusion — process depth is not the criterion, on
+< >   either side (asking another model CLI to transform mechanically is not
+< >   delegation; asking it to review or decide is, whatever the depth).
+---
+> >   are not delegation merely because another process performs the work. For
+> >   authorization the boundary is PROSPECTIVE: whether the invocation
+> >   delegates independent model/agent judgment — asking another model or
+> >   agent to review, decide, assess, or form a conclusion is judgment
+> >   delegation at the moment of invocation, whatever the depth and whatever
+> >   the binary; a purely mechanical transformation delegates none. Whether
+> >   that judgment ultimately contributes to the parent's report is a
+> >   separate, RETROSPECTIVE question governing only provenance, lens, and
+> >   family accounting — discarding or ignoring the result never
+> >   retroactively makes an unauthorized judgment delegation permissible.
+101c128,129
+< >   a contributing lens. When a CONTRIBUTING sub-principal surfaces
+---
+> >   a contributing lens (§2's compact account is how every such principal
+> >   reaches the dispatcher's arithmetic). When a CONTRIBUTING sub-principal surfaces
+158a187,189
+> | D17 | no grant; worker asks another model to review; result then discarded | HIT | §2 prospective boundary (discard never retroactively clears) |
+> | D18 | grant + budget=2; worker spawns 3 judgment critics, relies on 1 | HIT (budget=3, over limit); rich disclosure owed for the 1 contributor only | §2 compact tier + §3 budget axis |
+> | D19 | worker calls 10 deterministic mechanical helpers | CLEAR | §2 carve-out (no judgment delegated; never a judgment-principal count) |

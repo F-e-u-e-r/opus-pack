@@ -44,7 +44,16 @@ Everything here is a rule about *how to choose*, never *what to choose*.
   (usually this session's own model; work drafted by a subagent or another
   CLI carries that model's family too, and work you materially edited carries
   BOTH — count every contributing family as an author-family and require a
-  reviewer outside all of them). 3+ providers → pick a diverse pair (or N);
+  reviewer outside all of them). Family accounting is transitive across
+  delegation depth on the reviewer side too: every model family that
+  materially contributed JUDGMENT to a reviewer's verdict counts as a
+  contributing reviewer family for the independence/diversity computation —
+  a lens that quietly consulted another family's judgment is a mixed-family
+  lens, and a pair sharing a contributing family this way is not a
+  cross-family pair (deterministic helpers contribute no family; conduct
+  and accounting rules for the delegation itself are delegation-and-review
+  §2/§3's — this clause owns only the family propagation). 3+ providers →
+  pick a diverse pair (or N);
   refuse a same-family pair. Cannot assemble ≥2 families → §6 fallback.
 - **Offer a choice on an axis only when discovery yields >1 working option**
   (never pose a one-answer question), applied uniformly: *flagship* — skip if
@@ -354,3 +363,11 @@ Re-verify
 line: model families, CLI availability, "flagship" identity, and effort tiers
 are volatile — re-discover at session time; never trust a model name or tier
 recalled from here.
+
+The §1 transitive reviewer-family sentence (2026-09-02) is the
+reviewer-side mirror of the author-family clause, landed from the ⑫
+recursive-delegation design (verdict B, abstraction L2): it owns ONLY the
+family propagation — re-delegation conduct, the two-tier accounting, the
+disclosure framework, and the single canonical marker live in
+delegation-and-review §2/§3, which stays the sole authority; evidence:
+reviews/2026-09-02-recursive-delegation-c12/.
