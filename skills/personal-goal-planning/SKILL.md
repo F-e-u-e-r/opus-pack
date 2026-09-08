@@ -65,8 +65,4 @@ beats one that only works in a perfect one.
 
 ## Provenance
 
-Adapted 2026-07 from a five-step goal-coaching protocol by @pro_ai.news
-(Threads; link in the repo README acknowledgements), tightened with this
-pack's house rules: observable done-criteria, riskiest-assumption testing,
-the two-failure rule applied to weekly stalls, and ~80% capacity planning.
-Stable method; nothing environment-specific to re-verify.
+Detailed historical review, probe, and amendment records for this skill are retained in `references/provenance.md`.
