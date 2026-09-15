@@ -18,6 +18,9 @@ import re
 import subprocess
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import derived_checks as _dc
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REAL_ROOT = os.path.realpath(ROOT)
 failures = []
@@ -140,6 +143,8 @@ for _rel_root, name in skill_names:
         fail(f"{rel}: frontmatter needs exactly one non-empty name: equal to the directory (got {names})")
     elif len(descs) != 1 or len(descs[0]) < 20:
         fail(f"{rel}: frontmatter needs exactly one single-line description: substantial enough to be a trigger")
+    elif _dc.description_over_cap(descs[0]):
+        fail(f"{rel}: frontmatter description exceeds the {_dc.DESCRIPTION_MAX_CHARS}-char Agent Skills cap ({len(descs[0])} chars)")
     else:
         ok(f"{rel} frontmatter valid")
 
@@ -485,8 +490,6 @@ if os.path.isfile(_matrix):
 # fixture trees (test-derived-checks.py); here each runs against the real ROOT.
 # A 'report:' line from the reference gate is a cross-plugin advisory, not a
 # failure - it prints as a note and never sets the exit code.
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import derived_checks as _dc  # noqa: E402
 for _label, _fn in [
     ("tier canon (metadata/skill-tiers.json) integrity", _dc.check_tier_canon),
     ("extension dependency contract (metadata/plugin-dependencies.json)",

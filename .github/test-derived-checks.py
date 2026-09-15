@@ -645,5 +645,19 @@ class RoutingCorpus(Base):
         self.assertTrue(self._fail(root, "schema_version"))
 
 
+class DescriptionCap(unittest.TestCase):
+    """Two-sided proof for the Agent Skills description-length ceiling enforced
+    by checks.py's frontmatter sweep. Boundary: 1024 chars passes, 1025 fails."""
+
+    def test_at_cap_passes(self):
+        self.assertFalse(d.description_over_cap("x" * d.DESCRIPTION_MAX_CHARS))
+
+    def test_one_over_cap_fails(self):
+        self.assertTrue(d.description_over_cap("x" * (d.DESCRIPTION_MAX_CHARS + 1)))
+
+    def test_cap_is_1024(self):
+        self.assertEqual(d.DESCRIPTION_MAX_CHARS, 1024)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=1)
