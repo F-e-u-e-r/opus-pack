@@ -787,10 +787,18 @@ so the next session can re-check the claim instead of trusting it.
 Re-running a recipe creates NEW evidence; it does not verify the prior
 evidence record being audited (`unprobed` — see Provenance). The
 preservation sentence above is the producer side; this is the consumer
-side: when a claim cites an earlier run, log, artifact, or verdict,
-inspect that cited evidence IDENTITY first — its durable form (the
+side: when a claim cites an earlier run, log, artifact, or verdict — or
+when the evidence you expected to read looks truncated, unreadable,
+incomplete, or unexpectedly missing — inspect or recover that evidence
+IDENTITY first, before re-running its producer — its durable form (the
 artifact, run id, CI URL, or commit), its recorded inputs/config, what
-it actually contains, and whether the claim is faithful to it. The
+it actually contains, and whether the claim is faithful to it. If
+re-running its producer could mutate, rotate, replace, or otherwise
+obscure that state, preserve it first — a producer that overwrites or
+rotates its own output can destroy a truncated or failing original
+before it is read; an already-immutable or content-addressed original
+needs nothing added, and genuinely missing evidence is recorded as
+missing, not preserved. The
 identity is the evidence, not the pathname: a verified
 content-identical archival copy (an exact blob/hash-matched or
 run-id-matched relocation) IS the cited record — reading it is reading
@@ -820,6 +828,13 @@ or a mistranscribed result all survive that fresh PASS.
 ✅ "the cited ledger path is gone, but the archive carries a
 hash-identical copy — read it: 36 rows, claim faithful; a fresh run
 today also passes — corroborated, two evidence rows."
+❌ "the receipt looked truncated, so I re-ran the suite for a clean
+one" — the producer rotated the old receipt away, so the fresh PASS is
+now the only record and the truncated run's failing state is gone.
+✅ read or recover the existing receipt first; since the rerun would
+rotate it, preserve its state, then rerun only if still needed and
+record that as NEW evidence — the original incomplete/failing state
+stays distinguishable."
 
 If a judgment step's outputs are compared across time, **version it** — a
 threshold or rule change is a version bump, not an edit (it changes the meaning
