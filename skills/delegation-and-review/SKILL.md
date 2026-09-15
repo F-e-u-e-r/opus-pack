@@ -611,6 +611,34 @@ reviewers that they silently absorb as implementers.
   dispatch's own control text.
   ❌ "the reviewer ran on a frozen copy, so credentials and network were
   isolated" — artifact isolation credited as principal confinement.
+- **Input isolation — a fresh CONTEXT, not merely a fresh process**
+  (`unprobed` — see Provenance). Read-only (above) isolates the critic from
+  MUTATING the artifact and the execution-principal rule isolates its
+  AUTHORITY; the third surface is the critic's own INPUT. A critic spawned
+  from the author's environment can silently inherit persistent
+  instructions, memory, prior findings, or other ambient context it was
+  never intentionally given — then "independently" agrees with a conclusion
+  that inherited context already carried. Fresh-context means input
+  provenance is controlled: supply the review packet and any canonical
+  repo/task constraints the review must apply INTENTIONALLY, and exclude —
+  or explicitly declare — other persistent state (author-specific memory,
+  prior-review notes, silently-loaded context). The bar is NOT that an
+  instruction came from a file: a repo/task constraint the reviewer is meant
+  to apply is legitimate input, deliberately supplied. What is barred is
+  UNDECLARED inheritance — ambient state the spawn pulled in that nobody
+  chose as review input. Lanes claimed as independent must not differ
+  through hidden inherited context: give equivalent lanes an intentionally
+  equivalent input posture, and record any deliberate difference rather than
+  calling them equivalent. Where a harness silently carries such ambient
+  state into the spawn, exclude it there — the mechanism is harness-specific,
+  the rule is not.
+  ✅ give the critic the packet and the canonical constraints it must apply,
+  with undeclared persistent memory/context excluded; two lanes fed
+  different context on purpose are recorded as such, not called equivalent
+  independent reviewers.
+  ❌ spawn an "independent" critic from the author's environment; it silently
+  loads prior conclusions or persistent memory and agrees with them — a
+  fresh process wearing fresh-context clothes.
 - Dispatcher and critics write expected results before actuals (operational-rigor
   §4). Prefer lens diversity over redundant same-lens votes.
 - Pick framing deliberately: "verify this contract" is precise/low-noise; "try
