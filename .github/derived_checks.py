@@ -25,6 +25,18 @@ VALID_DEP_CLASSES = ("standalone", "requires", "recommended_with")
 DEP_CLASS_PROSE = {"recommended_with": "recommended-with", "requires": "requires",
                    "standalone": "standalone"}
 
+# Agent Skills frontmatter contract: a skill `description` is capped at 1024
+# characters (platform.claude.com Agent Skills docs). checks.py's frontmatter
+# sweep enforces this ceiling; the >= 20 floor there stays a house-style
+# trigger tripwire. Kept here as a pure predicate so it carries a two-sided
+# proof in test-derived-checks.py.
+DESCRIPTION_MAX_CHARS = 1024
+
+
+def description_over_cap(desc):
+    """True if a skill frontmatter description exceeds the Agent Skills cap."""
+    return len(desc) > DESCRIPTION_MAX_CHARS
+
 
 def _schema_ok(obj):
     """True iff obj['schema_version'] is a REAL integer equal to the supported
