@@ -214,6 +214,12 @@ this pack's own review (PR #30 round 1): a valid must-fix whose proposed
 rewrite reintroduced the very defect the rule under review existed to prevent,
 and would have paraphrased a clause another file owns (skill-authoring §3).
 
+**Narrowing is not repair by itself** (`unprobed` — see Provenance). A
+scope qualifier can close an over-claim only when the revised claim is
+supported by the evidence and every reproduced counterexample cited by
+the finding falls outside that revised scope; otherwise keep the finding
+open.
+
 **Two remedies for one defect are a free cross-check** (`unprobed` — see
 Provenance). When a fix you are holding is overtaken by someone else's
 landed fix for the same finding — a maintainer's gate commit, a parallel
