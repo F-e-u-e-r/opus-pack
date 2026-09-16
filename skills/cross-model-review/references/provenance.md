@@ -89,3 +89,18 @@ family propagation — re-delegation conduct, the two-tier accounting, the
 disclosure framework, and the single canonical marker live in
 delegation-and-review §2/§3, which stays the sole authority; evidence:
 reviews/2026-09-02-recursive-delegation-c12/.
+
+The §3 narrowing-is-not-repair clause (2026-09-16) is the condensed
+owner-adopted residual from contributor PR #235 (firaen22), which
+distilled it from PR #233's own review rounds: a scope qualifier was
+recorded `fixed` in round 1, and round 2 showed two reproduced
+counterexamples still inside the qualified boundary. Only the narrow
+invariant landed — a qualifier closes an over-claim finding only when the
+revised claim is supported by the evidence AND the finding's reproduced
+counterexamples fall outside the revised scope; the contributor's longer
+treatment, and its companion operational-rigor §4 "sufficient-observation"
+proposal, were owner-rejected as duplicating existing fix-disposition
+(this §3) and check-name-not-coverage (operational-rigor §4) doctrine. The
+full contributor derivation trail (packets, verdicts, three review rounds)
+stays in PR #235 and is not recopied here; underlying reproduced episode:
+PR #233. Ships `unprobed` per the covenant.
