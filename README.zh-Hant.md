@@ -43,7 +43,7 @@ opus-pack 在場時解析得到;見 [`design-pack`](#design-pack設計-skill))�
 - [最高槓桿的十條原則](#萃取時保留的核心原則最高槓桿的十條)
 - [刻意捨棄的部分(與為什麼)](#刻意捨棄的部分與為什麼)
 - [Skill 會自動呼叫 agent 嗎?](#skill-會自動呼叫-agent-嗎) · [強制層:hooks](#強制層hooks-設定方法)
-- [Evals:測試這個 pack 本身](#evals測試這個-pack-本身) · [本包如何退化](#本包最可能的退化方式與內建對策)
+- [Evals:測試這個 pack 本身](#evals測試這個-pack-本身) · [評測結果](#評測結果) · [本包如何退化](#本包最可能的退化方式與內建對策)
 - [維護者筆記](#維護者筆記) · [Provenance 與致謝](#provenance-與致謝) · [授權](#授權)
 
 ## 安裝
@@ -340,6 +340,24 @@ slot 後判為 NOT-DISCRIMINATED、或不可計分。請把它讀成
 就明確標記 `unprobed`。公約的量具是私有套件的接班輪——自 fable-method
 已公開的 eval 計畫改作其 trap 機制、重新實作成全新私有 fixtures——與套件
 其餘部分一樣由擁有者執行、不公開。
+
+## 評測結果
+
+我們用受控的 routing 與行為 probe 來評測 Opus Pack,而不是只靠軼事式的例子。
+
+目前結果顯示:**skill 可用性與 routing 品質,並不等於 skill 的自主 activation**。
+
+* **明示 routing 明顯強於一般 activation。** 在 canonical routing 評測中,本包正確處理了大多數預期的 routing 判斷;但一般行為 run 幾乎不會自動叫用可用的 skill。
+* **通用的 activation 提示並不足夠。** 兩次 Activation Bridge 實驗只讓可觀測的 skill 叫用略為增加,大多數合格任務仍沒有自主的 skill activation。
+* **失效是 surface 特定的,不是全 pack 的。** Localization 實驗發現:有些 task surface 能穩定 route,另一些則漏掉、選到鄰近的 skill、或根本沒 activate。
+* **任務用詞能因果地影響 routing。** 對較弱的 `ground-truth-gates` surface,加入明示的 trust / verification 框架後,正確 routing 從 **0/6 提升到 4/6**(小型受控實驗);其中一個 surface 從 **0/3 變 3/3**。
+* **改 skill description 無法重現該效果。** 一個對照實驗維持自然任務用詞不變,只窄幅擴充 `ground-truth-gates` 的 description。目標 surface 的正確 routing 仍維持 **0/6 → 0/6**,而既有的強 surface 得以保留。因此該候選 description **未出貨**。
+
+這些實驗是方向性的,且目前每個條件的樣本數很小(small n),所以我們把它們當作工程決策的證據,而非母體層級的效能估計。
+
+目前的工作結論是:主要的剩餘挑戰在於 **activation 與 task-surface 的辨識**,而不是需要大規模改寫 skill description。除非有受控實驗支持,production 的 skill 內容維持不變。
+
+本輪的 per-surface 計數、實驗 identity 與 owner 裁定:[reviews/2026-09-18-activation-eval-reconciliation.md](reviews/2026-09-18-activation-eval-reconciliation.md)。
 
 ## 本包最可能的退化方式(與內建對策)
 

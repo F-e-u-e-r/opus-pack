@@ -45,7 +45,7 @@ opus-pack simply resolve when opus-pack is present; see
 - [The ten highest-leverage principles](#the-ten-highest-leverage-principles-kept)
 - [Deliberately dropped (and why)](#deliberately-dropped-and-why)
 - [Do skills auto-call agents?](#do-skills-auto-call-agents) · [Enforcement: hooks](#enforcement-setting-up-hooks)
-- [Evals: testing the pack itself](#evals-testing-the-pack-itself) · [How this pack degrades](#how-this-pack-degrades-and-the-built-in-countermeasure)
+- [Evals: testing the pack itself](#evals-testing-the-pack-itself) · [Evaluation results](#evaluation-results) · [How this pack degrades](#how-this-pack-degrades-and-the-built-in-countermeasure)
 - [Maintainer notes](#maintainer-notes) · [Provenance & acknowledgements](#provenance-and-acknowledgements) · [License](#license)
 
 ## Install
@@ -528,6 +528,24 @@ trap that would have failed without it, or it ships explicitly labeled
 round — trap mechanisms adapted from fable-method's published eval
 program, re-implemented as fresh private fixtures — owner-run and
 unpublished like the rest of the suite.
+
+## Evaluation results
+
+We evaluate Opus Pack with controlled routing and behavioral probes rather than relying only on anecdotal examples.
+
+Current results suggest that **skill availability and routing quality are not the same thing as autonomous skill activation**.
+
+* **Explicit routing is substantially stronger than ordinary activation.** In the canonical routing evaluation, the pack correctly handled most expected routing decisions, while ordinary behavioral runs rarely invoked an available skill automatically.
+* **Generic activation prompts were not enough.** Two Activation Bridge experiments increased observable skill invocation only modestly, leaving most eligible tasks without an autonomous skill activation.
+* **The failure is surface-specific, not pack-wide.** Localization experiments found some task surfaces route reliably while others miss, select neighboring skills, or remain unactivated.
+* **Task wording can causally affect routing.** For weak `ground-truth-gates` surfaces, adding explicit trust / verification framing increased correct routing from **0/6 to 4/6** in a small controlled experiment; one surface moved from **0/3 to 3/3**.
+* **Changing the skill description did not reproduce that effect.** A reciprocal experiment kept the natural task wording fixed and narrowly expanded the `ground-truth-gates` description. Correct routing on the target surfaces remained **0/6 → 0/6**, while existing strong surfaces were retained. The candidate description was therefore **not shipped**.
+
+These experiments are directional and currently use small per-condition samples, so we treat them as evidence for engineering decisions rather than population-level performance estimates.
+
+The current working conclusion is that the main remaining challenge is **activation and task-surface discrimination**, not a broad need to rewrite skill descriptions. Production skill content remains unchanged unless a controlled experiment supports the change.
+
+Per-surface counts, experiment identities, and owner adjudications for this round: [reviews/2026-09-18-activation-eval-reconciliation.md](reviews/2026-09-18-activation-eval-reconciliation.md).
 
 ## How this pack degrades (and the built-in countermeasure)
 
