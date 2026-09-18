@@ -37,6 +37,14 @@ opus-pack 在場時解析得到;見 [`design-pack`](#design-pack設計-skill))�
 > 用它自己的教條[檢驗自己](#evals測試這個-pack-本身)——包含一個誠實的 null result。
 > 歡迎用具體失敗案例開 issue 或 PR。
 
+**一覽**
+
+|  |  |
+|---|---|
+| **10** 個紀律 skill | **3** 個設計 skill |
+| **4** 個選配 hook | **2** 個可各自安裝的 plugin |
+| **狀態** 早期 alpha | **證據** 受控評測,含 null result |
+
 ## 目錄
 
 - [安裝](#安裝) · [`opus-pack`:紀律 skill](#opus-pack紀律-skill) · [`design-pack`:設計 skill](#design-pack設計-skill)
@@ -81,16 +89,16 @@ mkdir -p ~/.claude/skills && cp -R design-pack/skills/* ~/.claude/skills/
 
 | Skill | 涵蓋 | 主要來源 |
 |---|---|---|
-| `operational-rigor` | 任務契約、行動閘門、範圍控制、以執行驗證、對抗式自我審查、誠實完工 | operational-rigor 來源草稿(主幹)+ 兩個公開 repo 的 false-stops / investigate-before-fix / slop 清單——詳見致謝 |
-| `delegation-and-review` | 何時委派、dispatch packet、雙評審審查、失敗與升級階梯、長任務交接、何時問使用者、injection 防護 | 制度設計來源 brief + fable-agent-orchestration + agent-standard-oss §8–10 |
-| `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 ground-truth harness 筆記(主幹)+ task-relative-test-gate |
-| `skill-authoring` | 弱模型可執行的規則格式、ground-truth-only、provenance 與衰變、記憶架構(compile-don't-retrieve)、採用前審查 | tomicz skill-library brief(MIT)+ agent-standard-oss §1–2、§11 |
-| `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、不可信投稿的安全接收、agent 工具權限、洩漏事件處理 | 使用者提供的 security 參考稿 + OWASP/RFC 常識,經查證與補強 |
-| `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | 使用者提供的 roadmap 參考稿,砍儀式、補判斷 |
-| `personal-goal-planning` | 教練式五步驟:最少提問建檔、三層目標(2–4週/2–3月/6–12月)單一主線、可執行任務與可觀察完成標準、務實週節奏、含卡關規則的每週檢討 | @pro_ai.news 目標教練 protocol(Threads)+ 本包 house rules |
-| `domain-evidence-discipline` | 非程式交付物的證據紀律(行銷/研究/資料/營運):各領域的最低證據集、權威順序、「以觀察驗證」的定義、給審查者獵捕的 fraud table;red-line 專業判斷一律拒絕並轉介合格人類 | Sahir619/fable-method 的 domain-adapter schema(MIT、只採意念)濃縮為單一 pattern skill;實例為本包自行壓縮 |
-| `skill-vetting` | 在第三方 skill / plugin / hook / 指令檔執行前先掃 trojan:把 operational-rigor §2 的 install gate 變成可執行流程,附 trojan-shape checklist 與 fail-closed 判決(乾淨掃描絕不等於「safe」);另附一個 opt-in 的 advisory session-start 絆線(`hooks/skill-vetting-advisory.py`) | operational-rigor §2(canonical)+ 2026-07 的 12-source 社群 security-skill 稽查、以及 2026-07-24 starred-repo 挖礦掃描抓到的第 4 個活躍 trojan——見致謝 |
-| `cross-model-review` | load-bearing merge 前找**不同模型家族**做對抗審查:session 時偵測審查者(不寫死陣容)、自足 packet、findings 視為主張、有界的審查-修正迴圈(每位審查者都給出確認過的 verdict——各自為 PROCEED,或其每個剩餘 FIX 項皆為記錄在案且有正當理由的 gap,才 merge;timeout/空回應不算 verdict)、exit code≠通過。只放 doctrine——具體 CLI 不進 pack | 由 owner 私有 cross-model-review CLI 筆記提升;doctrine 一般化,機器 recipe 保留在個人端 |
+| `operational-rigor` | 任務契約、行動閘門、範圍控制、以執行驗證、對抗式自我審查、誠實完工 | 來源草稿主幹 + 兩個公開 repo |
+| `delegation-and-review` | 何時委派、dispatch packet、雙評審審查、失敗與升級階梯、長任務交接、何時問使用者、injection 防護 | 制度設計 brief + fable-agent-orchestration + agent-standard-oss |
+| `ground-truth-gates` | golden / replay / project 三閘門與 task-relative 測試紀律;含可直接執行的 `template/` | 私下分享的 harness 筆記 + task-relative-test-gate |
+| `skill-authoring` | 弱模型可執行的規則格式、ground-truth-only、provenance 與衰變、記憶架構(compile-don't-retrieve)、採用前審查 | tomicz skill-library brief + agent-standard-oss |
+| `security-architect` | 非資安專家用的實用安全審查:auth/JWT、各平台 secret 存放、MITM/TLS、web/backend/DB rules、不可信投稿的安全接收、agent 工具權限、洩漏事件處理 | owner 參考稿 + OWASP/RFC |
+| `product-roadmap` | Product owner 視角:證據先於意見、最險假設優先、Now/Next/Later/Not-now、milestone、鄰近 repo 挖掘、任務三分(agent/人/待資訊) | owner 參考稿 |
+| `personal-goal-planning` | 教練式五步驟:最少提問建檔、三層目標(2–4週/2–3月/6–12月)單一主線、可執行任務與可觀察完成標準、務實週節奏、含卡關規則的每週檢討 | @pro_ai.news 目標教練 protocol + house rules |
+| `domain-evidence-discipline` | 非程式交付物的證據紀律(行銷/研究/資料/營運):各領域的最低證據集、權威順序、「以觀察驗證」的定義、給審查者獵捕的 fraud table;red-line 專業判斷一律拒絕並轉介合格人類 | fable-method schema + 自有實例 |
+| `skill-vetting` | 在第三方 skill / plugin / hook / 指令檔執行前先掃 trojan:把 operational-rigor §2 的 install gate 變成可執行流程,附 trojan-shape checklist 與 fail-closed 判決(乾淨掃描絕不等於「safe」);另附一個 opt-in 的 advisory session-start 絆線(`hooks/skill-vetting-advisory.py`) | operational-rigor §2 + 社群安全稽查 |
+| `cross-model-review` | load-bearing merge 前找**不同模型家族**做對抗審查:session 時偵測審查者(不寫死陣容)、自足 packet、findings 視為主張、有界的審查-修正迴圈(每位審查者都給出確認過的 verdict——各自為 PROCEED,或其每個剩餘 FIX 項皆為記錄在案且有正當理由的 gap,才 merge;timeout/空回應不算 verdict)、exit code≠通過。只放 doctrine——具體 CLI 不進 pack | owner 私有 CLI 筆記(只放 doctrine) |
 
 `ground-truth-gates/template/` 已實跑驗證(Node v23,2026-07-06):
 無 snapshot 時正確 FAIL、凍結後全綠、改變 transform 行為時精準列出漂移的紀錄並 exit 1。
@@ -106,9 +114,9 @@ opus-pack 的 cross-reference 在 opus-pack 未安裝時退化為純脈絡。與
 
 | Skill | 涵蓋 | 主要來源 |
 |---|---|---|
-| `ui-design-craft` | 表面分類(marketing vs app UI)、附特徵的 AI-tell 禁令語料(hex/字體/版面/標籤)、版面預算(hero/nav/段落節奏)、accent 與對比紀律、五狀態覆蓋、改版保存規則、機械式 pre-flight 閘門 | Leonxlnx/taste-skill + referodesign/refero_skill(皆 MIT;策展式吸收,非整批進口);open-design(意念 + 一處具名 Apache-2.0 改作——五狀態表);純意念:gstack、creative-tim |
-| `motion-craft` | 依表面分類的時長預算、easing 方向規則、彈簧/手勢物理(投影、rubber-band、速度交接)、編排與 stagger 上限、效能陷阱、reduced-motion 底線、研究誤引修正、分級 pre-ship 閘門 | Emil Kowalski skills + LottieFiles motion-design-skill + refero_skill(皆 MIT);誤引修正改作自 open-design 的一級文獻查核(具名 Apache-2.0 改作——notice 見 THIRD-PARTY-NOTICES) |
-| `design-review-gate` | 先量測後判斷(瀏覽器普查 snippets)、有序審查 pass、規則錨定的 findings 與有界修復迴圈,以及 design-contract 規則:權威分類、觀察性 token 驗證、drift 方向、反模仿 | Emil Kowalski 的審查姿態(MIT)+ gstack/agentation/archify 意念;contract 段為本包自行綜合,經雙模型諮詢定形 |
+| `ui-design-craft` | 表面分類(marketing vs app UI)、附特徵的 AI-tell 禁令語料(hex/字體/版面/標籤)、版面預算(hero/nav/段落節奏)、accent 與對比紀律、五狀態覆蓋、改版保存規則、機械式 pre-flight 閘門 | taste-skill + refero_skill + open-design + 純意念來源 |
+| `motion-craft` | 依表面分類的時長預算、easing 方向規則、彈簧/手勢物理(投影、rubber-band、速度交接)、編排與 stagger 上限、效能陷阱、reduced-motion 底線、研究誤引修正、分級 pre-ship 閘門 | Emil Kowalski + LottieFiles + refero_skill + open-design |
+| `design-review-gate` | 先量測後判斷(瀏覽器普查 snippets)、有序審查 pass、規則錨定的 findings 與有界修復迴圈,以及 design-contract 規則:權威分類、觀察性 token 驗證、drift 方向、反模仿 | Emil Kowalski 姿態 + 自行綜合 + 純意念來源 |
 
 誠實備註:
 
@@ -183,6 +191,9 @@ window + 相容涵蓋,且須完成而非僅宣告)只在該 skill 所屬 source 
 
 ## 刻意捨棄的部分(與為什麼)
 
+<details>
+<summary><strong>展開七項捨棄與理由</strong></summary>
+
 這是你要我做的判斷,明確記下來:
 
 1. **來源 brief 的 11 檔制度包與四階段閉環**——那是為「一次性 Fable session」設計的流程,不是 Opus 的日常裝備。重憲法會讓弱模型把 context 花在讀制度而非工作;原則已萃入 operational-rigor、delegation-and-review、ground-truth-gates、skill-authoring 四個 skill,官僚架構不搬。
@@ -192,6 +203,8 @@ window + 相容涵蓋,且須完成而非僅宣告)只在該 skill 所屬 source 
 5. **USER_DECISION_CARD 完整表格**——壓縮成四要素(問題+脈絡、選項+代價、建議、不回覆時的安全預設)。要弱模型填八欄表格,得到的是填表不是判斷。
 6. **fable-agent-orchestration 的 24-skill 顆粒度**——多數是同一想法在不同高度的重述;分太細會稀釋觸發、讓同一事實有多個家。合併為 2 個 skill。
 7. **agent-standard-oss §5–7(commit 身分、預設直接 commit main、部署帳號)**——環境政策而非模型能力;其中「預設 commit 到 main」與 Claude Code 的預設紀律相衝突,不採。§4 SessionStart hook 屬 harness 設定,留給你自行決定。
+
+</details>
 
 ## Skill 會自動呼叫 agent 嗎?
 
@@ -347,6 +360,13 @@ slot 後判為 NOT-DISCRIMINATED、或不可計分。請把它讀成
 
 目前結果顯示:**skill 可用性與 routing 品質,並不等於 skill 的自主 activation**。
 
+| 發現 | 結果 |
+|---|---|
+| 自主 activation | 弱 |
+| 明示 routing | 整體強,但因 surface 而異 |
+| 任務側 T2 介入 | `0/6 → 4/6` |
+| description 側 T2 介入 | `0/6 → 0/6` |
+
 * **明示 routing 明顯強於一般 activation。** 在 canonical routing 評測中,本包正確處理了大多數預期的 routing 判斷;但一般行為 run 幾乎不會自動叫用可用的 skill。
 * **通用的 activation 提示並不足夠。** 兩次 Activation Bridge 實驗只讓可觀測的 skill 叫用略為增加,大多數合格任務仍沒有自主的 skill activation。
 * **失效是 surface 特定的,不是全 pack 的。** Localization 實驗發現:有些 task surface 能穩定 route,另一些則漏掉、選到鄰近的 skill、或根本沒 activate。
@@ -392,6 +412,9 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
 
 ## Provenance 與致謝
 
+<details>
+<summary><strong>展開所有來源與致謝</strong></summary>
+
 本包萃取並改作了以下來源的想法:
 
 - **gyozalab** — Threads 貼文;「Fable 5 一次性窗口 → 耐久制度」的核心框架,是本包的起點:
@@ -432,6 +455,8 @@ hooks(不得有 `hooks/hooks.json`、`plugin.json` 不得有 hooks 欄位)——
   - [`Nutlope/hallmark`](https://github.com/Nutlope/hallmark)(MIT)— 其 URL-fetch checklist 揭出 `security-architect` SSRF 條款要補的 metadata endpoint。這四個來源的設計面意念落在 design-pack。
 
 所有被採用的來源皆已通讀檢查;未執行任何內嵌指令,2026-07 稽查判為惡意的來源亦未被採用任何內容。萃取只採意念。每個連結都附作者+平台,連結失效後 attribution 仍可考。
+
+</details>
 
 ## 授權
 
