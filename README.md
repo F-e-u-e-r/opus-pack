@@ -39,6 +39,14 @@ opus-pack simply resolve when opus-pack is present; see
 > and the pack is [measured against its own doctrine](#evals-testing-the-pack-itself)
 > — honest null result included. Issues and PRs with concrete failure cases are welcome.
 
+**At a glance**
+
+|  |  |
+|---|---|
+| **10** discipline skills | **3** design skills |
+| **4** optional hooks | **2** independently installable plugins |
+| **Status** early alpha | **Evidence** controlled evaluations, null results included |
+
 ## Contents
 
 - [Install](#install) · [`opus-pack`: the discipline skills](#opus-pack-the-discipline-skills) · [`design-pack`: the design skills](#design-pack-the-design-skills)
@@ -88,16 +96,16 @@ occupies context until triggered.
 
 | Skill | Covers | Main source |
 |---|---|---|
-| `operational-rigor` | Task contract, action gating, scope containment, verify-by-execution, adversarial self-review, honest completion | operational-rigor source draft (backbone) + false-stops / investigate-before-fix / slop list from the two public repos — see Acknowledgements |
-| `delegation-and-review` | When to delegate, dispatch packets, two-critic review, failure/escalation ladder, long-task handoff, when to ask the user, injection defense | institution-design source briefs + fable-agent-orchestration + agent-standard-oss §8–10 |
-| `ground-truth-gates` | golden / replay / project gates and task-relative test discipline; ships a runnable `template/` | a privately shared ground-truth harness note (backbone) + task-relative-test-gate |
-| `skill-authoring` | Executable-rule format for weaker models, ground-truth-only, provenance and decay, memory architecture (compile-don't-retrieve), review before adopting | the tomicz skill-library brief (MIT) + agent-standard-oss §1–2, §11 |
-| `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, secure ingestion of untrusted contributions, agent tool permissions, leak incident response | user-supplied security reference draft + OWASP/RFC common knowledge, verified and extended |
-| `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | user-supplied roadmap reference draft — ceremony cut, judgment added |
-| `personal-goal-planning` | Coach-style five steps: minimal intake, tiered goals (2–4w / 2–3m / 6–12m) with one mainline, executable tasks with observable done-criteria, realistic weekly rhythm, weekly review with a stuck rule | @pro_ai.news goal-coaching protocol (Threads) + this pack's house rules |
-| `domain-evidence-discipline` | Evidence discipline for non-code deliverables (marketing / research / data / ops): per-domain minimum evidence set, authority order, what verification-by-observation means, and the fraud table a reviewer hunts; red-line professional judgment refused and routed to a qualified human | Sahir619/fable-method's domain-adapter schema (MIT, ideas only) condensed into one pattern skill; the worked instances are this pack's own compressions |
-| `skill-vetting` | Vet a third-party skill / plugin / hook / instruction file for trojan patterns before it runs: turns operational-rigor §2's install gate into a runnable procedure, with a trojan-shape checklist and a fail-closed verdict (a clean scan is never "safe"); ships an opt-in advisory session-start tripwire (`hooks/skill-vetting-advisory.py`) | operational-rigor §2 (canonical) + the 2026-07 twelve-source community-security-skill audit and a 2026-07-24 starred-repo mining pass that caught a 4th live trojan — see Acknowledgements |
-| `cross-model-review` | Adversarial review from a *different model family* before a load-bearing merge: session-time reviewer discovery (no hard-coded lineup), self-contained packet, findings-are-claims, bounded review-and-fix loop (merge only when every reviewer returned a confirmed verdict — each one PROCEED, or a FIX whose every remaining item is a recorded, justified gap; a timeout/empty body is not a verdict), exit-code≠pass. Doctrine only — concrete CLIs stay out of the pack | promoted from the owner's private cross-model-review CLI notes; doctrine generalized, machine recipes kept personal |
+| `operational-rigor` | Task contract, action gating, scope containment, verify-by-execution, adversarial self-review, honest completion | source-draft backbone + two public repos |
+| `delegation-and-review` | When to delegate, dispatch packets, two-critic review, failure/escalation ladder, long-task handoff, when to ask the user, injection defense | institution-design briefs + fable-agent-orchestration + agent-standard-oss |
+| `ground-truth-gates` | golden / replay / project gates and task-relative test discipline; ships a runnable `template/` | privately shared harness note + task-relative-test-gate |
+| `skill-authoring` | Executable-rule format for weaker models, ground-truth-only, provenance and decay, memory architecture (compile-don't-retrieve), review before adopting | tomicz skill-library brief + agent-standard-oss |
+| `security-architect` | Practical security for a non-expert owner: auth/JWT, per-platform secret storage, MITM/TLS, web/backend/DB rules, secure ingestion of untrusted contributions, agent tool permissions, leak incident response | owner reference draft + OWASP/RFC |
+| `product-roadmap` | Product-owner lens: evidence before opinion, riskiest assumption first, Now/Next/Later/Not-now, milestones, adjacent-repo mining, three-way task split (agent/human/needs-info) | owner reference draft |
+| `personal-goal-planning` | Coach-style five steps: minimal intake, tiered goals (2–4w / 2–3m / 6–12m) with one mainline, executable tasks with observable done-criteria, realistic weekly rhythm, weekly review with a stuck rule | @pro_ai.news goal-coaching protocol + house rules |
+| `domain-evidence-discipline` | Evidence discipline for non-code deliverables (marketing / research / data / ops): per-domain minimum evidence set, authority order, what verification-by-observation means, and the fraud table a reviewer hunts; red-line professional judgment refused and routed to a qualified human | fable-method schema + own worked instances |
+| `skill-vetting` | Vet a third-party skill / plugin / hook / instruction file for trojan patterns before it runs: turns operational-rigor §2's install gate into a runnable procedure, with a trojan-shape checklist and a fail-closed verdict (a clean scan is never "safe"); ships an opt-in advisory session-start tripwire (`hooks/skill-vetting-advisory.py`) | operational-rigor §2 + community-security audit |
+| `cross-model-review` | Adversarial review from a *different model family* before a load-bearing merge: session-time reviewer discovery (no hard-coded lineup), self-contained packet, findings-are-claims, bounded review-and-fix loop (merge only when every reviewer returned a confirmed verdict — each one PROCEED, or a FIX whose every remaining item is a recorded, justified gap; a timeout/empty body is not a verdict), exit-code≠pass. Doctrine only — concrete CLIs stay out of the pack | owner's private CLI notes (doctrine only) |
 
 `ground-truth-gates/template/` was verified by execution (Node v23, 2026-07-06):
 correctly FAILs without a snapshot, goes all-green after freezing, and lists
@@ -116,9 +124,9 @@ alongside, but they don't require it.
 
 | Skill | Covers | Main sources |
 |---|---|---|
-| `ui-design-craft` | Surface classification (marketing vs app UI), the AI-tell ban corpus with signatures (hexes, fonts, layouts, labels), layout budgets (hero/nav/section rhythm), accent and contrast discipline, five-state coverage, restyle preservation rules, a mechanical pre-flight gate | Leonxlnx/taste-skill + referodesign/refero_skill (both MIT; curated, not imported wholesale); open-design (ideas + one attributed Apache-2.0 adaptation - the five-state table); ideas only: gstack, creative-tim |
-| `motion-craft` | Duration budgets by surface, easing direction rules, spring/gesture physics (projection, rubber-band, velocity handoff), choreography and stagger caps, performance traps, the reduced-motion floor, misquoted-research corrections, a severity-tiered pre-ship gate | Emil Kowalski's skills + LottieFiles motion-design-skill + refero_skill (all MIT); misquote corrections adapted from open-design's primary-source review (an attributed Apache-2.0 adaptation - notice in THIRD-PARTY-NOTICES) |
-| `design-review-gate` | Measurement before judgment (browser census snippets), ordered review passes, rule-anchored findings with a bounded fix loop, and the design-contract rules: authority classes, verify-observational-tokens, drift direction, anti-impersonation | Emil Kowalski's review posture (MIT) + gstack/agentation/archify ideas; the contract section is this pack's own synthesis, shaped by a dual-model consultation |
+| `ui-design-craft` | Surface classification (marketing vs app UI), the AI-tell ban corpus with signatures (hexes, fonts, layouts, labels), layout budgets (hero/nav/section rhythm), accent and contrast discipline, five-state coverage, restyle preservation rules, a mechanical pre-flight gate | taste-skill + refero_skill + open-design + ideas-only refs |
+| `motion-craft` | Duration budgets by surface, easing direction rules, spring/gesture physics (projection, rubber-band, velocity handoff), choreography and stagger caps, performance traps, the reduced-motion floor, misquoted-research corrections, a severity-tiered pre-ship gate | Emil Kowalski + LottieFiles + refero_skill + open-design |
+| `design-review-gate` | Measurement before judgment (browser census snippets), ordered review passes, rule-anchored findings with a bounded fix loop, and the design-contract rules: authority classes, verify-observational-tokens, drift direction, anti-impersonation | Emil Kowalski posture + own synthesis + ideas-only refs |
 
 Notes that keep this honest:
 
@@ -219,6 +227,9 @@ it — opus-pack's in the Evals section below, design-pack's in its own section.
 
 ## Deliberately dropped (and why)
 
+<details>
+<summary><strong>Show the seven dropped items and the reasoning</strong></summary>
+
 The judgment you asked for, recorded explicitly:
 
 1. **The source briefs' 11-file institution pack and four-phase closed loop** — designed
@@ -257,6 +268,8 @@ The judgment you asked for, recorded explicitly:
    accounts)** — environment policy, not model capability; "commit straight
    to main by default" conflicts with Claude Code's default discipline. Not
    adopted. §4's SessionStart hook is harness config, left to your judgment.
+
+</details>
 
 ## Do skills auto-call agents?
 
@@ -535,6 +548,13 @@ We evaluate Opus Pack with controlled routing and behavioral probes rather than 
 
 Current results suggest that **skill availability and routing quality are not the same thing as autonomous skill activation**.
 
+| Finding | Result |
+|---|---|
+| Autonomous activation | weak |
+| Explicit routing | strong overall, surface-specific |
+| Task-side T2 intervention | `0/6 → 4/6` |
+| Description-side T2 intervention | `0/6 → 0/6` |
+
 * **Explicit routing is substantially stronger than ordinary activation.** In the canonical routing evaluation, the pack correctly handled most expected routing decisions, while ordinary behavioral runs rarely invoked an available skill automatically.
 * **Generic activation prompts were not enough.** Two Activation Bridge experiments increased observable skill invocation only modestly, leaving most eligible tasks without an autonomous skill activation.
 * **The failure is surface-specific, not pack-wide.** Localization experiments found some task surfaces route reliably while others miss, select neighboring skills, or remain unactivated.
@@ -587,6 +607,9 @@ either README → mirror the change in the other language.
   declared assumption.
 
 ## Provenance and acknowledgements
+
+<details>
+<summary><strong>Show all sources and acknowledgements</strong></summary>
 
 This pack distills and adapts ideas from:
 
@@ -832,6 +855,8 @@ All adopted sources were read and checked; no embedded instructions were
 executed, and nothing was taken from the sources the 2026-07 audit judged
 malicious. Extraction took ideas only. Author + platform accompany every
 link so the attribution survives link rot.
+
+</details>
 
 ## License
 
